@@ -1,4 +1,4 @@
-import { NotoSerif_400Regular, useFonts } from "@expo-google-fonts/noto-serif";
+import { NotoSerif_400Regular, NotoSerif_700Bold, useFonts } from "@expo-google-fonts/noto-serif";
 import * as SplashScreen from "expo-splash-screen";
 import { Stack } from "expo-router";
 import { useEffect } from "react";
@@ -9,6 +9,7 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
     const [loaded, error] = useFonts({
         NotoSerif_400Regular,
+        NotoSerif_700Bold,
     });
 
     useEffect(() => {
@@ -23,8 +24,8 @@ export default function RootLayout() {
 
     return (
         <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="signup" />
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="+not-found" />
         </Stack>
     );
