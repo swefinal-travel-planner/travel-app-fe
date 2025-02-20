@@ -1,22 +1,10 @@
-import { Text, View, StyleSheet } from "react-native";
+import { Text, View } from "react-native";
+import styles from "../styles";
 
 export default function Tools() {
     return (
-        <View style={styles.container}>
-            <Text style={styles.text}>Tools screen</Text>
+        <View style={styles.mainContainer}>
+            <Text style={styles.mainText}>Tools screen</Text>
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "#FFFFFF",
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    text: {
-        color: "#563D30",
-        fontFamily: "NotoSerif_400Regular",
-    },
-});
