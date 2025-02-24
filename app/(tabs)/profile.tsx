@@ -1,15 +1,15 @@
 import React, { useState } from "react";
-import { View, Text, Avatar, Button, Card, Colors, Modal } from "react-native-ui-lib";
-import { TouchableOpacity, ScrollView } from "react-native";
+import { View, Text, Avatar, Button, Card, Colors, Modal, TextField } from "react-native-ui-lib";
+import { TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
 import { GestureHandlerRootView, PanGestureHandler, State } from "react-native-gesture-handler";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, withTiming } from "react-native-reanimated";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Easing } from "react-native-reanimated";
 
 
 const ProfileScreen = () => {
     const [modalVisible, setModalVisible] = useState(false);
-    const translateY = useSharedValue(0); // Khởi tạo giá trị animation
+    const translateY = useSharedValue(0); // Khởi tạo giá trị animation\
+    const [name, setName] = useState("채수빈")
 
     const openModal = () => {
         setModalVisible(true);
@@ -48,7 +48,7 @@ const ProfileScreen = () => {
                     <View style={{ borderWidth: 5, borderColor: "green", borderRadius: 100, padding: 3 }}>
                         <Avatar size={120} source={require("@/assets/images/alligator.jpg")} />
                     </View>
-                    <Text text50 marginT-10>채수빈</Text>
+                    <Text text50 marginT-10>{name}</Text>
                 </View>
 
                 {/* Friendlist */}
@@ -123,30 +123,52 @@ const ProfileScreen = () => {
 
             {/* Popup modal */}
             <Modal visible={modalVisible} animationType="slide" transparent>
-                <PanGestureHandler onGestureEvent={onGestureEvent} onHandlerStateChange={onHandlerStateChange}>
-                    <Animated.View
-                        style={[
-                            {
-                                height: "95%",
-                                backgroundColor: Colors.white,
-                                padding: 20,
-                                borderTopLeftRadius: 20,
-                                borderTopRightRadius: 20,
-                                marginTop: "auto",
-                            },
-                            animatedStyle, // Áp dụng animation
-                        ]}
-                    >
-                        {/* Drag Indicator */}
-                        <View center marginB-10>
-                            <View style={{ width: 40, height: 5, backgroundColor: Colors.grey50, borderRadius: 10, marginBottom: 10 }} />
-                        </View>
-                        <Text text50>Drag down to close</Text>
-                        <Button label="Close" marginT-20 onPress={closeModal} />
-                    </Animated.View>
-                </PanGestureHandler>
-            </Modal>
+                <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+                    <PanGestureHandler onGestureEvent={onGestureEvent} onHandlerStateChange={onHandlerStateChange}>
+                        <Animated.View
+                            style={[
+                                {
+                                    height: "95%",
+                                    backgroundColor: Colors.white,
+                                    padding: 20,
+                                    borderTopLeftRadius: 20,
+                                    borderTopRightRadius: 20,
+                                    marginTop: "auto",
+                                    justifyContent: "space-between"
+                                },
+                                animatedStyle, // Áp dụng animation
+                            ]}
+                        >
+                            {/* Drag Indicator */}
+                            <View centerH marginB-10>
+                                <View style={{ width: 40, height: 5, backgroundColor: Colors.grey50, borderRadius: 10, marginBottom: 10 }} />
+                            </View>
 
+                            {/* Edit name form */}
+                            <View flex-1 centerV>
+                                <Text text30 style={{ fontWeight: "bold" }} center>Edit your name</Text>
+                                <TextField
+                                    placeholder="Enter your name"
+                                    marginV-20
+                                    padding-5
+                                    autoFocus
+                                    containerStyle={{ borderWidth: 2, borderRadius: 10, height: 50, justifyContent: "center" }}
+                                    value={name}
+                                    onChangeText={setName}
+                                />
+                            </View>
+
+                            {/* Save button */}
+                            <Button
+                                label="Save"
+                                disabled={!name.trim()}
+                                backgroundColor={name.trim() ? Colors.green5 : Colors.grey50}
+                                marginT-20
+                                onPress={closeModal} />
+                        </Animated.View>
+                    </PanGestureHandler>
+                </KeyboardAvoidingView>
+            </Modal>
         </GestureHandlerRootView>
     );
 };
