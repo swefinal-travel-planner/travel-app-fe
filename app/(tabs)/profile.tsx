@@ -45,6 +45,8 @@ const ProfileScreen = () => {
             {
                 options: ["Take Photo", "Choose from Library", "Cancel"],
                 cancelButtonIndex: 2,
+                title: "Change your profile picture",
+                message: "Your profile picture is visible to all your friends",
             },
             (buttonIndex) => {
                 if (buttonIndex === 0) {
@@ -90,9 +92,9 @@ const ProfileScreen = () => {
         <GestureHandlerRootView style={{ flex: 1, backgroundColor: Colors.grey80, paddingTop: 30 }}>
             <ScrollView contentContainerStyle={{ padding: 20 }}>
                 <View center>
-                    <View style={{ borderWidth: 5, borderColor: "green", borderRadius: 100, padding: 3 }}>
+                    <TouchableOpacity onPress={() => openActionSheet()} style={{ borderWidth: 5, borderColor: "green", borderRadius: 100, padding: 3 }}>
                         <Avatar size={120} source={require("@/assets/images/alligator.jpg")} />
-                    </View>
+                    </TouchableOpacity>
                     <Text text50 marginT-10>{name}</Text>
                 </View>
 
