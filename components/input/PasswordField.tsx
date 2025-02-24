@@ -5,32 +5,32 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import styles from "./styles";
 import PressableOpacity from "../PressableOpacity";
 
-interface PasswordInputProps {
+interface PasswordFieldProps {
     placeholder: string;
     label?: string;
     leftIcon?: string;
     error?: string;
     required?: boolean;
+    onChange?: (text: string) => void;
 }
 
-const PasswordInput: React.FC<PasswordInputProps> = ({
+const PasswordField: React.FC<PasswordFieldProps> = ({
     placeholder,
     label,
     leftIcon,
     error,
     required,
+    onChange,
 }) => {
-    const [text, onChangeText] = useState("");
     const [isVisible, setIsVisible] = useState(false);
 
     return (
         <View style={styles.wrapper}>
-            {leftIcon && <Ionicons name={leftIcon as any} style={styles.icon} size={24} />}
+            {leftIcon && <Ionicons name={leftIcon as any} style={styles.leftIcon} size={24} />}
             <TextInput
                 style={styles.input}
                 placeholder={placeholder ? placeholder : ""}
                 placeholderTextColor="#3F6453"
-                onChangeText={onChangeText}
                 underlineColorAndroid="transparent"
                 textContentType="password"
                 secureTextEntry={!isVisible}
@@ -39,7 +39,7 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
             <PressableOpacity onPress={() => setIsVisible(!isVisible)}>
                 <Ionicons
                     name={isVisible ? "eye-off-outline" : "eye-outline"}
-                    style={styles.icon}
+                    style={styles.rightIcon}
                     size={24}
                 />
             </PressableOpacity>
@@ -47,4 +47,4 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
     );
 };
 
-export default PasswordInput;
+export default PasswordField;

@@ -2,6 +2,7 @@ import { NotoSerif_400Regular, NotoSerif_700Bold, useFonts } from "@expo-google-
 import * as SplashScreen from "expo-splash-screen";
 import { Stack } from "expo-router";
 import { useEffect } from "react";
+import { View } from "react-native";
 
 // prevent the splash screen from hiding before the font finishes loading
 SplashScreen.preventAutoHideAsync();
@@ -23,10 +24,11 @@ export default function RootLayout() {
     }
 
     return (
-        <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="signup" />
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="+not-found" />
-        </Stack>
+        <View style={{ flex: 1 }}>
+            <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="+not-found" />
+            </Stack>
+        </View>
     );
 }

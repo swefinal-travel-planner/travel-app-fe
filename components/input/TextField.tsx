@@ -4,7 +4,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 
 import styles from "./styles";
 
-interface TextInputProps {
+interface TextFieldProps {
     placeholder: string;
     label?: string;
     rightIcon?: string;
@@ -12,10 +12,11 @@ interface TextInputProps {
     error?: string;
     required?: boolean;
     type?: string;
+    onChange?: (text: string) => void;
 }
 
-// custom text input component
-const CTextInput: React.FC<TextInputProps> = ({
+// custom text field component
+const TextField: React.FC<TextFieldProps> = ({
     placeholder,
     label,
     rightIcon,
@@ -23,23 +24,25 @@ const CTextInput: React.FC<TextInputProps> = ({
     error,
     required,
     type,
+    onChange,
 }) => {
-    const [text, onChangeText] = useState("");
-
     return (
         <View style={styles.wrapper}>
-            {leftIcon && <Ionicons name={leftIcon as any} style={styles.icon} size={24} />}
+            {leftIcon && <Ionicons name={leftIcon as any} style={styles.leftIcon} size={24} />}
             <TextInput
+                numberOfLines={1}
                 style={styles.input}
                 placeholder={placeholder ? placeholder : ""}
                 placeholderTextColor="#3F6453"
-                onChangeText={onChangeText}
+                onChangeText={(value) => {
+                    if (onChange) onChange(value);
+                }}
                 underlineColorAndroid="transparent"
                 autoComplete={type ? (type as any) : "none"}
             />
-            {rightIcon && <Ionicons name={rightIcon as any} style={styles.icon} size={24} />}
+            {rightIcon && <Ionicons name={rightIcon as any} style={styles.rightIcon} size={24} />}
         </View>
     );
 };
 
-export default CTextInput;
+export default TextField;
