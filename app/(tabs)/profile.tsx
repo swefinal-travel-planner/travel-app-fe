@@ -1,15 +1,60 @@
 import React, { useState } from "react";
 import { View, Text, Avatar, Button, Card, Colors, Modal, TextField } from "react-native-ui-lib";
-import { TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
+import { TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, ActionSheetIOS } from "react-native";
 import { GestureHandlerRootView, PanGestureHandler, State } from "react-native-gesture-handler";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, withTiming } from "react-native-reanimated";
 import Ionicons from "@expo/vector-icons/Ionicons";
-
+import * as ImagePicker from "expo-image-picker";
 
 const ProfileScreen = () => {
     const [modalVisible, setModalVisible] = useState(false);
-    const translateY = useSharedValue(0); // Khởi tạo giá trị animation\
+    const translateY = useSharedValue(0); // Khởi tạo giá trị animation
     const [name, setName] = useState("채수빈")
+
+    const [profilePic, setProfilePic] = useState(require("@/assets/images/alligator.jpg"));
+
+    const pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [1, 1],
+            quality: 1,
+        });
+
+        if (!result.canceled) {
+            setProfilePic({ uri: result.assets[0].uri });
+        }
+    };
+
+    // Mở camera
+    const takePhoto = async () => {
+        let result = await ImagePicker.launchCameraAsync({
+            allowsEditing: true,
+            aspect: [1, 1],
+            quality: 1,
+        });
+
+        if (!result.canceled) {
+            setProfilePic({ uri: result.assets[0].uri });
+        }
+    };
+
+    // Hiển thị Action Sheet trên iOS
+    const openActionSheet = () => {
+        ActionSheetIOS.showActionSheetWithOptions(
+            {
+                options: ["Take Photo", "Choose from Library", "Cancel"],
+                cancelButtonIndex: 2,
+            },
+            (buttonIndex) => {
+                if (buttonIndex === 0) {
+                    takePhoto(); // Chụp ảnh
+                } else if (buttonIndex === 1) {
+                    pickImage(); // Chọn ảnh từ thư viện
+                }
+            }
+        );
+    };
 
     const openModal = () => {
         setModalVisible(true);
@@ -82,7 +127,7 @@ const ProfileScreen = () => {
                         { title: "Edit phone number", icon: "call-outline" },
                         { title: "Edit email", icon: "mail-outline" },
                     ].map((item, index) => (
-                        <TouchableOpacity key={index} onPress={() => openModal()}>
+                        <TouchableOpacity key={index} onPress={item.title.includes('picture') ? () => openActionSheet() : () => openModal()}>
                             <View row spread paddingV-10>
                                 <View row center gap-10>
                                     <View bg-black br100 width={36} height={36} center>
