@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, Avatar, Button, Card, Colors, Modal, TextField } from "react-native-ui-lib";
+import { View, Text, Avatar, Button, Card, Colors, Modal, TextField, NumberInput } from "react-native-ui-lib";
 import { TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, ActionSheetIOS } from "react-native";
 import { GestureHandlerRootView, PanGestureHandler, State } from "react-native-gesture-handler";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, withTiming } from "react-native-reanimated";
@@ -15,6 +15,20 @@ const ProfileScreen = () => {
     const [phone, setPhone] = useState("4060001290");
     const [selectedInfo, setSelectedInfo] = useState("Edit name");
     const [profilePic, setProfilePic] = useState(require("@/assets/images/alligator.jpg"));
+    const [tempName, setTempName] = useState(name);
+    const [tempEmail, setTempEmail] = useState(email);
+    const [tempPhone, setTempPhone] = useState(phone);
+    const [errors, setErrors] = useState({
+        name: "",
+        email: "",
+        phone: "",
+    });
+
+    const handleChangePhone = (text) => {
+        const numericValue = text.replace(/[^0-9]/g, ""); // Loại bỏ ký tự không phải số
+        setPhone(numericValue);
+
+    };
 
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -61,8 +75,32 @@ const ProfileScreen = () => {
         );
     };
 
-    const openModal = (selectedInfo) => {
-        setSelectedInfo(selectedInfo);
+    const validateInputs = () => {
+        let newErrors = {
+            name: "",
+            email: "",
+            phone: "",
+        };
+        if (!tempName.trim()) newErrors.name = "Name cannot be empty";
+        if (!/^[0-9]{1,10}$/.test(tempPhone)) newErrors.phone = "Phone must be up to 10 digits";
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(tempEmail)) newErrors.email = "Invalid email format";
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handleSave = () => {
+        if (validateInputs()) {
+            setName(tempName);
+            setEmail(tempEmail);
+            setPhone(tempPhone);
+            closeModal();
+        }
+    };
+
+    const openModal = (field) => {
+        setSelectedInfo(field);
+        field.includes("name") ? setTempName(name) : field.includes("phone") ? setTempPhone(phone) : setTempEmail(email);
+        setErrors({});
         setModalVisible(true);
         translateY.value = withTiming(0, { duration: 200 }); // Hiển thị modal từ dưới lên
     };
@@ -91,54 +129,6 @@ const ProfileScreen = () => {
     const animatedStyle = useAnimatedStyle(() => ({
         transform: [{ translateY: translateY.value }],
     }));
-
-    const renderInputField = () => {
-        let placeholder = "";
-        let title = "";
-        let keyboardType = "default";
-
-        if (selectedInfo.includes("name")) {
-            placeholder = "Enter your name";
-            title = "Edit your name";
-        } else if (selectedInfo.includes("phone")) {
-            placeholder = "Enter your phone number";
-            title = "Edit your phone number";
-            keyboardType = "numeric";
-        } else if (selectedInfo.includes("email")) {
-            placeholder = "Enter your email";
-            title = "Edit your email";
-            keyboardType = "email-address";
-        }
-
-        return (
-            < View flex-1 centerV>
-                <Text text30 style={{ fontWeight: "bold" }} center>{title}</Text>
-                <TextField
-                    placeholder={placeholder}
-                    keyboardType={keyboardType}
-                    value={selectedInfo === "Edit name" ? name : selectedInfo === "Edit phone number" ? phone : email}
-                    onChange={(text) => {
-                        if (selectedInfo === "Edit phone number") {
-                            setPhone(text.replace(/[^0-9]/g, ""));
-                        } else if (selectedInfo === "Edit name") {
-                            setName(text);
-                        } else {
-                            setEmail(text);
-                        }
-                    }}
-                    marginV-20
-                    padding-5
-                    autoFocus
-                    containerStyle={{
-                        borderWidth: 2,
-                        borderRadius: 10,
-                        height: 50,
-                        justifyContent: "center",
-                    }}
-                />
-            </View>
-        );
-    };
 
     return (
         <>
@@ -182,7 +172,7 @@ const ProfileScreen = () => {
                             { title: "Edit phone number", icon: "call-outline" },
                             { title: "Edit email", icon: "mail-outline" },
                         ].map((item, index) => (
-                            <TouchableOpacity key={index} onPress={item.title === "Edit profile picture" ? () => openActionSheet() : () => openModal(item.title)}>
+                            <TouchableOpacity key={index} onPress={item.title.includes("picture") ? openActionSheet : () => openModal(item.title)}>
                                 <View row spread paddingV-10>
                                     <View row center gap-10>
                                         <View bg-black br100 width={36} height={36} center>
@@ -223,7 +213,7 @@ const ProfileScreen = () => {
 
                 {/* Popup modal */}
                 <Modal visible={modalVisible} animationType="slide" transparent>
-                    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+                    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
                         <PanGestureHandler onGestureEvent={onGestureEvent} onHandlerStateChange={onHandlerStateChange}>
                             <Animated.View
                                 style={[
@@ -244,15 +234,50 @@ const ProfileScreen = () => {
                                     <View style={{ width: 40, height: 5, backgroundColor: Colors.grey50, borderRadius: 10, marginBottom: 10 }} />
                                 </View>
 
-                                {renderInputField()}
-
+                                <View flex-1 centerV>
+                                    <Text text30 style={{ fontWeight: "bold" }} center>{selectedInfo.includes("name") ? "Edit your name" : selectedInfo.includes("phone") ? "Edit your phone number" : "Edit your email"}</Text>
+                                    {selectedInfo === "Edit name" ? (
+                                        <TextField
+                                            placeholder="Enter your name"
+                                            marginV-20
+                                            padding-5
+                                            autoFocus
+                                            containerStyle={{ borderWidth: 2, borderRadius: 10, height: 50, justifyContent: "center" }}
+                                            value={tempName}
+                                            onChangeText={setTempName}
+                                            errors={errors.name}
+                                        />
+                                    ) : selectedInfo === "Edit phone number" ? (
+                                        <TextField
+                                            placeholder="Enter your phone number"
+                                            keyboardType="numeric"
+                                            marginV-20
+                                            padding-5
+                                            autoFocus
+                                            containerStyle={{ borderWidth: 2, borderRadius: 10, height: 50, justifyContent: "center" }}
+                                            value={tempPhone}
+                                            onChangeText={setTempPhone}
+                                            error={errors.phone}
+                                        />
+                                    ) : (
+                                        <TextField
+                                            placeholder="Enter your email"
+                                            marginV-20
+                                            padding-5
+                                            autoFocus
+                                            containerStyle={{ borderWidth: 2, borderRadius: 10, height: 50, justifyContent: "center" }}
+                                            value={tempEmail}
+                                            onChangeText={setTempEmail}
+                                            errors={errors.email}
+                                        />
+                                    )}
+                                </View>
                                 {/* Save button */}
                                 <Button
                                     label="Save"
-                                    disabled={!name.trim()}
-                                    backgroundColor={name.trim() ? Colors.green5 : Colors.grey50}
+                                    backgroundColor={Colors.green5}
                                     marginT-20
-                                    onPress={closeModal} />
+                                    onPress={handleSave} />
                             </Animated.View>
                         </PanGestureHandler>
                     </KeyboardAvoidingView>
