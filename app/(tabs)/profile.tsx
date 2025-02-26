@@ -18,17 +18,7 @@ const ProfileScreen = () => {
     const [tempName, setTempName] = useState(name);
     const [tempEmail, setTempEmail] = useState(email);
     const [tempPhone, setTempPhone] = useState(phone);
-    const [errors, setErrors] = useState({
-        name: "",
-        email: "",
-        phone: "",
-    });
-
-    const handleChangePhone = (text) => {
-        const numericValue = text.replace(/[^0-9]/g, ""); // Loại bỏ ký tự không phải số
-        setPhone(numericValue);
-
-    };
+    const [errors, setErrors] = useState("");
 
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -75,32 +65,32 @@ const ProfileScreen = () => {
         );
     };
 
-    const validateInputs = () => {
-        let newErrors = {
-            name: "",
-            email: "",
-            phone: "",
-        };
-        if (!tempName.trim()) newErrors.name = "Name cannot be empty";
-        if (!/^[0-9]{1,10}$/.test(tempPhone)) newErrors.phone = "Phone must be up to 10 digits";
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(tempEmail)) newErrors.email = "Invalid email format";
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
+    const validateInputs = (field, value) => {
+        let error = "";
+        if (field === "name" && !value.trim()) {
+            error = "Name cannot be empty";
+        } else if (field === "phone" && !/^[0-9]{10}$/.test(value)) {
+            error = "Phone must be 10 digits";
+        } else if (field === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+            error = "Invalid email format";
+        }
+        setErrors(error);
     };
 
+    const isValid = !errors; // button disabled control
+
     const handleSave = () => {
-        if (validateInputs()) {
-            setName(tempName);
-            setEmail(tempEmail);
-            setPhone(tempPhone);
-            closeModal();
-        }
+        setName(tempName);
+        setEmail(tempEmail);
+        setPhone(tempPhone);
+        setErrors("");
+        closeModal();
     };
 
     const openModal = (field) => {
         setSelectedInfo(field);
         field.includes("name") ? setTempName(name) : field.includes("phone") ? setTempPhone(phone) : setTempEmail(email);
-        setErrors({});
+        setErrors("");
         setModalVisible(true);
         translateY.value = withTiming(0, { duration: 200 }); // Hiển thị modal từ dưới lên
     };
@@ -244,8 +234,7 @@ const ProfileScreen = () => {
                                             autoFocus
                                             containerStyle={{ borderWidth: 2, borderRadius: 10, height: 50, justifyContent: "center" }}
                                             value={tempName}
-                                            onChangeText={setTempName}
-                                            errors={errors.name}
+                                            onChangeText={(text) => { setTempName(text); validateInputs("name", text) }}
                                         />
                                     ) : selectedInfo === "Edit phone number" ? (
                                         <TextField
@@ -256,8 +245,7 @@ const ProfileScreen = () => {
                                             autoFocus
                                             containerStyle={{ borderWidth: 2, borderRadius: 10, height: 50, justifyContent: "center" }}
                                             value={tempPhone}
-                                            onChangeText={setTempPhone}
-                                            error={errors.phone}
+                                            onChangeText={(text) => { setTempPhone(text); validateInputs("phone", text) }}
                                         />
                                     ) : (
                                         <TextField
@@ -267,8 +255,7 @@ const ProfileScreen = () => {
                                             autoFocus
                                             containerStyle={{ borderWidth: 2, borderRadius: 10, height: 50, justifyContent: "center" }}
                                             value={tempEmail}
-                                            onChangeText={setTempEmail}
-                                            errors={errors.email}
+                                            onChangeText={(text) => { setTempEmail(text); validateInputs("email", text) }}
                                         />
                                     )}
                                 </View>
@@ -277,6 +264,7 @@ const ProfileScreen = () => {
                                     label="Save"
                                     backgroundColor={Colors.green5}
                                     marginT-20
+                                    disabled={!isValid}
                                     onPress={handleSave} />
                             </Animated.View>
                         </PanGestureHandler>
