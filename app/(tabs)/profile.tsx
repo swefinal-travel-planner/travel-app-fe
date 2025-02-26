@@ -67,11 +67,11 @@ const ProfileScreen = () => {
 
     const validateInputs = (field, value) => {
         let error = "";
-        if (field === "name" && !value.trim()) {
+        if (field.includes("name") && !value.trim()) {
             error = "Name cannot be empty";
-        } else if (field === "phone" && !/^[0-9]{10}$/.test(value)) {
+        } else if (field.includes("phone") && !/^[0-9]{10}$/.test(value)) {
             error = "Phone must be 10 digits";
-        } else if (field === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+        } else if (field.includes("email") && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
             error = "Invalid email format";
         }
         setErrors(error);
@@ -226,38 +226,17 @@ const ProfileScreen = () => {
 
                                 <View flex-1 centerV>
                                     <Text text30 style={{ fontWeight: "bold" }} center>{selectedInfo.includes("name") ? "Edit your name" : selectedInfo.includes("phone") ? "Edit your phone number" : "Edit your email"}</Text>
-                                    {selectedInfo === "Edit name" ? (
-                                        <TextField
-                                            placeholder="Enter your name"
-                                            marginV-20
-                                            padding-5
-                                            autoFocus
-                                            containerStyle={{ borderWidth: 2, borderRadius: 10, height: 50, justifyContent: "center" }}
-                                            value={tempName}
-                                            onChangeText={(text) => { setTempName(text); validateInputs("name", text) }}
-                                        />
-                                    ) : selectedInfo === "Edit phone number" ? (
-                                        <TextField
-                                            placeholder="Enter your phone number"
-                                            keyboardType="numeric"
-                                            marginV-20
-                                            padding-5
-                                            autoFocus
-                                            containerStyle={{ borderWidth: 2, borderRadius: 10, height: 50, justifyContent: "center" }}
-                                            value={tempPhone}
-                                            onChangeText={(text) => { setTempPhone(text); validateInputs("phone", text) }}
-                                        />
-                                    ) : (
-                                        <TextField
-                                            placeholder="Enter your email"
-                                            marginV-20
-                                            padding-5
-                                            autoFocus
-                                            containerStyle={{ borderWidth: 2, borderRadius: 10, height: 50, justifyContent: "center" }}
-                                            value={tempEmail}
-                                            onChangeText={(text) => { setTempEmail(text); validateInputs("email", text) }}
-                                        />
-                                    )}
+                                    <TextField
+                                        marginV-20
+                                        padding-5
+                                        autoFocus
+                                        keyboardType={selectedInfo === "Edit phone number" ? "number-pad" : "default"}
+                                        containerStyle={{ borderWidth: 2, borderRadius: 10, height: 50, justifyContent: "center" }}
+                                        placeholder={selectedInfo === "Edit name" ? "Enter your name" : selectedInfo === "Edit phone number" ? "Enter your phone number" : "Enter your email"}
+                                        value={selectedInfo === "Edit name" ? tempName : selectedInfo === "Edit phone number" ? tempPhone : tempEmail}
+                                        onChangeText={(text) => { selectedInfo === "Edit name" ? setTempName(text) : selectedInfo === "Edit phone number" ? setTempPhone(text) : setTempEmail(text); validateInputs(selectedInfo, text) }}
+                                    />
+                                    <Text text65 red30>{errors}</Text>
                                 </View>
                                 {/* Save button */}
                                 <Button
