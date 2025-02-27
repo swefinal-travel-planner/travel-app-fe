@@ -7,15 +7,22 @@ import { StatusBar } from "expo-status-bar";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import * as ImagePicker from "expo-image-picker";
 import EditProfileModal from "@/components/EditProfileModal";
+import FriendListModal from "@/components/FriendListModal";
 
 const ProfileScreen = () => {
     const [modalVisible, setModalVisible] = useState(false);
+    const [friendListModalVisible, setFriendListModalVisible] = useState(false);
     const translateY = useSharedValue(0); // Khởi tạo giá trị animation
     const [name, setName] = useState("채수빈")
     const [email, setEmail] = useState("csb@gmail.com");
     const [phone, setPhone] = useState("4060001290");
     const [selectedField, setSelectedField] = useState("Edit name");
     const [profilePic, setProfilePic] = useState(require("@/assets/images/alligator.jpg"));
+    const [friendList, setFriendList] = useState([
+        { id: 1, name: "John Doe", avatar: require("@/assets/images/capy.jpg") },
+        { id: 2, name: "Jane Smith", avatar: require("@/assets/images/corgi.jpg") },
+        { id: 3, name: "Alice Johnson", avatar: require("@/assets/images/pig.jpg") },
+    ]);
 
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -78,6 +85,16 @@ const ProfileScreen = () => {
         setTimeout(() => setModalVisible(false), 100);
     };
 
+    const openFriendListModal = () => {
+        setFriendListModalVisible(true);
+        translateY.value = withTiming(0, { duration: 200 });
+    };
+
+    const closeFriendListModal = () => {
+        translateY.value = withTiming(800, { duration: 100 });
+        setTimeout(() => setFriendListModalVisible(false), 100);
+    };
+
     return (
         <>
             <GestureHandlerRootView style={{ flex: 1, backgroundColor: Colors.grey80, paddingTop: 30 }}>
@@ -97,7 +114,7 @@ const ProfileScreen = () => {
                         <Text>Friend</Text>
                     </View>
                     <Card marginB-25 padding-15 borderRadius={10} style={{ backgroundColor: Colors.white }}>
-                        <TouchableOpacity>
+                        <TouchableOpacity onPress={openFriendListModal}>
                             <View row spread paddingV-10 centerV>
                                 <View row center gap-10>
                                     <View bg-black br100 width={36} height={36} center>
@@ -170,6 +187,9 @@ const ProfileScreen = () => {
                     onSave={handleSave}
                     closeModal={closeModal}
                 />
+
+                {/* Friend list modal */}
+                <FriendListModal translateY={translateY} visible={friendListModalVisible} closeModal={closeFriendListModal} friendList={friendList} />
             </GestureHandlerRootView >
             <StatusBar style="dark" />
         </>
