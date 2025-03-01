@@ -4,46 +4,48 @@ import { Text, StyleSheet } from "react-native";
 import PressableOpacity from "./PressableOpacity";
 
 interface ChipProps {
-    value: string;
+  value: string;
 }
 
 const Chip: React.FC<ChipProps> = ({ value }) => {
-    const [selected, setSelected] = useState(false);
+  const [selected, setSelected] = useState(false);
 
-    return (
-        <PressableOpacity
-            style={[styles.wrapper, selected ? styles.selectedBg : styles.baseBg]}
-            onPress={() => setSelected(!selected)}
-        >
-            <Text style={[styles.value, selected ? styles.selectedText : styles.baseText]}>
-                {value}
-            </Text>
-        </PressableOpacity>
-    );
+  return (
+    <PressableOpacity
+      style={[styles.wrapper, selected ? styles.selectedBg : styles.baseBg]}
+      onPress={() => setSelected(!selected)}
+    >
+      <Text
+        style={[styles.value, selected ? styles.selectedText : styles.baseText]}
+      >
+        {value}
+      </Text>
+    </PressableOpacity>
+  );
 };
 
 export default Chip;
 
 const styles = StyleSheet.create({
-    wrapper: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
-        borderRadius: 100,
-        paddingHorizontal: 16,
-        paddingVertical: 8,
-        margin: 4,
-    },
-    baseBg: {
-        backgroundColor: "#EEF8EF",
-        borderWidth: 1,
-        borderColor: "#3F6453",
-    },
-    selectedBg: { backgroundColor: "#3F6453" },
-    value: {
-        fontSize: 16,
-        fontFamily: "NotoSerif_400Regular",
-    },
-    baseText: { color: "#3F6453" },
-    selectedText: { color: "#FFFFFF" },
+  wrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 100,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    margin: 4,
+  },
+  baseBg: {
+    backgroundColor: "#EEF8EF",
+    borderWidth: 1,
+    borderColor: "#3F6453",
+  },
+  selectedBg: { backgroundColor: "#3F6453" },
+  value: {
+    fontSize: 16,
+    fontFamily: "NotoSerif_400Regular",
+  },
+  baseText: { color: "#3F6453" },
+  selectedText: { color: "#FFFFFF" },
 });
