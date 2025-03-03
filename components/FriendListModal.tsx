@@ -1,5 +1,5 @@
-import React from "react";
-import { View, Text, Colors, Modal, Card, Avatar, Button } from "react-native-ui-lib";
+import React, { useEffect, useState } from "react";
+import { View, Text, Colors, Modal, Card, Avatar, Button, TextField } from "react-native-ui-lib";
 import { KeyboardAvoidingView, Platform, TouchableOpacity } from "react-native";
 import { PanGestureHandler, ScrollView, State } from "react-native-gesture-handler";
 import Animated, { withSpring, useAnimatedStyle } from "react-native-reanimated";
@@ -7,6 +7,13 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 
 
 const FriendListModal = ({ translateY, visible, closeModal, friendList }) => {
+
+    const [isSearching, setIsSearching] = useState(false);
+
+    useEffect(() => {
+        setIsSearching(false);
+    }, [visible])
+
 
     const onGestureEvent = (event) => {
         translateY.value = event.nativeEvent.translationY;
@@ -27,6 +34,17 @@ const FriendListModal = ({ translateY, visible, closeModal, friendList }) => {
         transform: [{ translateY: translateY.value }],
     }));
 
+    // Animation mở rộng input khi search
+    const inputAnimatedStyle = useAnimatedStyle(() => ({
+        width: withSpring(isSearching ? 280 : 0, { damping: 15, stiffness: 120 }),
+        opacity: withSpring(isSearching ? 1 : 0),
+    }));
+
+    // Animation mở rộng label khi đóng search
+    const labelAnimatedStyle = useAnimatedStyle(() => ({
+        width: withSpring(isSearching ? 280 : 370, { damping: 15, stiffness: 120 }),
+        opacity: withSpring(isSearching ? 0 : 1),
+    }))
 
     return (
         <Modal visible={visible} animationType="slide" transparent>
@@ -47,21 +65,54 @@ const FriendListModal = ({ translateY, visible, closeModal, friendList }) => {
                         <View centerH marginV-10>
                             <View style={{ width: 40, height: 5, backgroundColor: Colors.grey50, borderRadius: 10, marginBottom: 10 }} />
                         </View>
-                        <TouchableOpacity
-                            style={{
-                                flexDirection: "row",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                alignSelf: "center",
-                                borderRadius: 20,
-                                padding: 15,
-                                width: "90%",
-                                backgroundColor: "#f0f0f0",
-                            }}
-                        >
-                            <Ionicons name="search" size={25} />
-                            <Text text60 marginL-10>Add a new friend</Text>
-                        </TouchableOpacity>
+                        {!isSearching ? (
+                            <Animated.View
+                                style={[{
+                                    alignSelf: "flex-start",
+                                    borderRadius: 20,
+                                    padding: 15,
+                                    width: "90%",
+                                    marginLeft: 20,
+                                    backgroundColor: "#f0f0f0",
+                                },
+                                    labelAnimatedStyle
+                                ]}
+                            >
+                                <TouchableOpacity onPress={() => setIsSearching(true)}>
+                                    <View row centerH>
+                                        <Ionicons name="search" size={25} />
+                                        <Text text60 marginL-10>Add a new friend</Text>
+                                    </View>
+                                </TouchableOpacity>
+                            </Animated.View>
+                        ) : (
+                            <View row centerV spread paddingH-20>
+                                <Animated.View
+                                    style={[
+                                        { flexDirection: "row", alignItems: "center", backgroundColor: "#f0f0f0", padding: 15, borderRadius: 60 },
+                                        inputAnimatedStyle
+                                    ]}>
+                                    <Ionicons name="search" size={25} color="black" />
+                                    <TextField
+                                        autoFocus
+                                        padding-5
+                                        marginH-5
+                                        marginR-10
+                                        keyboardType="default"
+                                        placeholder="Search or Add a new friend"
+                                    />
+                                </Animated.View>
+
+                                <Button
+                                    label="Cancel"
+                                    backgroundColor={Colors.white}
+                                    color="black"
+                                    labelStyle={{ fontWeight: "bold" }}
+                                    br50
+                                    onPress={() => setIsSearching(false)}
+                                />
+                            </View>
+                        )}
 
                         <ScrollView style={{ padding: 20 }}>
                             <View row centerV gap-5 marginT-20 marginB-10>
@@ -115,7 +166,7 @@ const FriendListModal = ({ translateY, visible, closeModal, friendList }) => {
                     </Animated.View>
                 </PanGestureHandler>
             </KeyboardAvoidingView>
-        </Modal>
+        </Modal >
     )
 }
 export default FriendListModal
