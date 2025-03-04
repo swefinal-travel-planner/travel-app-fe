@@ -10,189 +10,264 @@ import EditProfileModal from "@/components/EditProfileModal";
 import FriendListModal from "@/components/FriendListModal";
 
 const ProfileScreen = () => {
-    const [modalVisible, setModalVisible] = useState(false);
-    const [friendListModalVisible, setFriendListModalVisible] = useState(false);
-    const translateY = useSharedValue(0); // Khởi tạo giá trị animation
-    const [name, setName] = useState("채수빈")
-    const [email, setEmail] = useState("csb@gmail.com");
-    const [phone, setPhone] = useState("4060001290");
-    const [selectedField, setSelectedField] = useState("Edit name");
-    const [profilePic, setProfilePic] = useState(require("@/assets/images/alligator.jpg"));
-    const [friendList, setFriendList] = useState([
-        { id: 1, name: "John Doe", avatar: require("@/assets/images/capy.jpg") },
-        { id: 2, name: "Jane Smith", avatar: require("@/assets/images/corgi.jpg") },
-        { id: 3, name: "Alice Johnson", avatar: require("@/assets/images/pig.jpg") },
-    ]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [friendListModalVisible, setFriendListModalVisible] = useState(false);
+  const translateY = useSharedValue(0); // Khởi tạo giá trị animation
+  const [name, setName] = useState("채수빈");
+  const [email, setEmail] = useState("csb@gmail.com");
+  const [phone, setPhone] = useState("4060001290");
+  const [selectedField, setSelectedField] = useState("Edit name");
+  const [profilePic, setProfilePic] = useState(
+    require("@/assets/images/alligator.jpg"),
+  );
+  const [friendList, setFriendList] = useState([
+    { id: 1, name: "John Doe", avatar: require("@/assets/images/capy.jpg") },
+    { id: 2, name: "Jane Smith", avatar: require("@/assets/images/corgi.jpg") },
+    {
+      id: 3,
+      name: "Alice Johnson",
+      avatar: require("@/assets/images/pig.jpg"),
+    },
+    { id: 4, name: "John Doe", avatar: require("@/assets/images/capy.jpg") },
+    { id: 5, name: "Jane Smith", avatar: require("@/assets/images/corgi.jpg") },
+    {
+      id: 6,
+      name: "Alice Johnson",
+      avatar: require("@/assets/images/pig.jpg"),
+    },
+  ]);
 
-    const pickImage = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsEditing: true,
-            aspect: [1, 1],
-            quality: 1,
-        });
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
 
-        if (!result.canceled) {
-            setProfilePic({ uri: result.assets[0].uri });
+    if (!result.canceled) {
+      setProfilePic({ uri: result.assets[0].uri });
+    }
+  };
+
+  // Mở camera
+  const takePhoto = async () => {
+    let result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setProfilePic({ uri: result.assets[0].uri });
+    }
+  };
+
+  // Hiển thị Action Sheet trên iOS
+  const openActionSheet = () => {
+    ActionSheetIOS.showActionSheetWithOptions(
+      {
+        options: ["Take Photo", "Choose from Library", "Cancel"],
+        cancelButtonIndex: 2,
+        title: "Change your profile picture",
+        message: "Your profile picture is visible to all your friends",
+      },
+      (buttonIndex) => {
+        if (buttonIndex === 0) {
+          takePhoto(); // Chụp ảnh
+        } else if (buttonIndex === 1) {
+          pickImage(); // Chọn ảnh từ thư viện
         }
-    };
-
-    // Mở camera
-    const takePhoto = async () => {
-        let result = await ImagePicker.launchCameraAsync({
-            allowsEditing: true,
-            aspect: [1, 1],
-            quality: 1,
-        });
-
-        if (!result.canceled) {
-            setProfilePic({ uri: result.assets[0].uri });
-        }
-    };
-
-    // Hiển thị Action Sheet trên iOS
-    const openActionSheet = () => {
-        ActionSheetIOS.showActionSheetWithOptions(
-            {
-                options: ["Take Photo", "Choose from Library", "Cancel"],
-                cancelButtonIndex: 2,
-                title: "Change your profile picture",
-                message: "Your profile picture is visible to all your friends",
-            },
-            (buttonIndex) => {
-                if (buttonIndex === 0) {
-                    takePhoto(); // Chụp ảnh
-                } else if (buttonIndex === 1) {
-                    pickImage(); // Chọn ảnh từ thư viện
-                }
-            }
-        );
-    };
-
-    const handleSave = (value, field) => {
-        field.includes("name") ? setName(value) : field.includes("phone") ? setPhone(value) : setEmail(value);
-        closeModal();
-    };
-
-    const openModal = (field) => {
-        setSelectedField(field);
-        setModalVisible(true);
-        translateY.value = withTiming(0, { duration: 200 }); // Hiển thị modal từ dưới lên
-    };
-
-    const closeModal = () => {
-        translateY.value = withTiming(800, { duration: 100 }); // Kéo xuống để ẩn modal
-        setTimeout(() => setModalVisible(false), 100);
-    };
-
-    const openFriendListModal = () => {
-        setFriendListModalVisible(true);
-        translateY.value = withTiming(0, { duration: 200 });
-    };
-
-    const closeFriendListModal = () => {
-        translateY.value = withTiming(800, { duration: 100 });
-        setTimeout(() => setFriendListModalVisible(false), 100);
-    };
-
-    return (
-        <>
-            <GestureHandlerRootView style={{ flex: 1, backgroundColor: Colors.grey80, paddingTop: 30 }}>
-                <ScrollView contentContainerStyle={{ padding: 20 }}>
-
-                    {/* Avatar and name */}
-                    <View center>
-                        <TouchableOpacity onPress={() => openActionSheet()} style={{ borderWidth: 5, borderColor: "green", borderRadius: 100, padding: 3 }}>
-                            <Avatar size={120} source={profilePic} />
-                        </TouchableOpacity>
-                        <Text text50 marginT-10>{name}</Text>
-                    </View>
-
-                    {/* Friendlist */}
-                    <View row centerV gap-5 marginB-10>
-                        <Ionicons name="person-add" size={20} color="black" />
-                        <Text>Friend</Text>
-                    </View>
-                    <Card marginB-25 padding-15 borderRadius={10} style={{ backgroundColor: Colors.white }}>
-                        <TouchableOpacity onPress={openFriendListModal}>
-                            <View row spread paddingV-10 centerV>
-                                <View row center gap-10>
-                                    <View bg-black br100 width={36} height={36} center>
-                                        <Ionicons name="people" size={20} color="white" />
-                                    </View>
-                                    <Text>5 Friends</Text>
-                                </View>
-                                <Ionicons name="chevron-forward-outline" size={20} color="black" />
-                            </View>
-                        </TouchableOpacity>
-                    </Card>
-
-                    {/* Personal Information */}
-                    <View row centerV gap-5 marginB-10>
-                        <Ionicons name="settings" size={25} color="black" />
-                        <Text text70>General</Text>
-                    </View>
-                    <Card padding-15 marginB-25 borderRadius={10} style={{ backgroundColor: Colors.white }}>
-                        {[
-                            { title: "Edit profile picture", icon: "camera-outline" },
-                            { title: "Edit name", icon: "pencil" },
-                            { title: "Edit phone number", icon: "call-outline" },
-                            { title: "Edit email", icon: "mail-outline" },
-                        ].map((item, index) => (
-                            <TouchableOpacity key={index} onPress={item.title.includes("picture") ? openActionSheet : () => openModal(item.title)}>
-                                <View row spread paddingV-10>
-                                    <View row center gap-10>
-                                        <View bg-black br100 width={36} height={36} center>
-                                            <Ionicons name={item.icon} size={25} color="white" />
-                                        </View>
-                                        <Text>{item.title}</Text>
-                                    </View>
-                                    <Ionicons name="chevron-forward-outline" size={20} color="black" />
-                                </View>
-                            </TouchableOpacity>
-                        ))}
-                    </Card>
-
-                    {/* Danger Zone */}
-                    <View row centerV marginB-10 gap-5>
-                        <Ionicons name="alert-circle-outline" size={25} color="red" />
-                        <Text text70 color={Colors.red30}>Danger Zone</Text>
-                    </View>
-                    <Card padding-15 marginB-25 borderRadius={10} style={{ backgroundColor: Colors.white }}>
-                        {[
-                            { title: "Delete account", icon: "trash-outline" },
-                            { title: "Log out", icon: "log-out-outline" },
-                        ].map((item, index) => (
-                            <TouchableOpacity key={index} onPress={() => alert(item.title)}>
-                                <View row spread paddingV-10>
-                                    <View row center gap-10>
-                                        <View bg-black br100 width={36} height={36} center>
-                                            <Ionicons name={item.icon} size={20} color="white" />
-                                        </View>
-                                        <Text>{item.title}</Text>
-                                    </View>
-                                    <Ionicons name="chevron-forward-outline" size={20} color="black" />
-                                </View>
-                            </TouchableOpacity>
-                        ))}
-                    </Card>
-                </ScrollView>
-
-                {/* Popup modal */}
-                <EditProfileModal
-                    translateY={translateY}
-                    value={selectedField === "Edit name" ? name : selectedField === "Edit phone number" ? phone : email}
-                    visible={modalVisible}
-                    field={selectedField}
-                    onSave={handleSave}
-                    closeModal={closeModal}
-                />
-
-                {/* Friend list modal */}
-                <FriendListModal translateY={translateY} visible={friendListModalVisible} closeModal={closeFriendListModal} friendList={friendList} />
-            </GestureHandlerRootView >
-            <StatusBar style="dark" />
-        </>
+      },
     );
+  };
+
+  const handleSave = (value, field) => {
+    field.includes("name")
+      ? setName(value)
+      : field.includes("phone")
+        ? setPhone(value)
+        : setEmail(value);
+    closeModal();
+  };
+
+  const openModal = (field) => {
+    setSelectedField(field);
+    setModalVisible(true);
+    translateY.value = withTiming(0, { duration: 200 }); // Hiển thị modal từ dưới lên
+  };
+
+  const closeModal = () => {
+    translateY.value = withTiming(800, { duration: 100 }); // Kéo xuống để ẩn modal
+    setTimeout(() => setModalVisible(false), 100);
+  };
+
+  const openFriendListModal = () => {
+    setFriendListModalVisible(true);
+    translateY.value = withTiming(0, { duration: 200 });
+  };
+
+  const closeFriendListModal = () => {
+    translateY.value = withTiming(800, { duration: 100 });
+    setTimeout(() => setFriendListModalVisible(false), 100);
+  };
+
+  return (
+    <>
+      <GestureHandlerRootView
+        style={{ flex: 1, backgroundColor: Colors.grey80, paddingTop: 30 }}
+      >
+        <ScrollView contentContainerStyle={{ padding: 20 }}>
+          {/* Avatar and name */}
+          <View center>
+            <TouchableOpacity
+              onPress={() => openActionSheet()}
+              style={{
+                borderWidth: 5,
+                borderColor: "green",
+                borderRadius: 100,
+                padding: 3,
+              }}
+            >
+              <Avatar size={120} source={profilePic} />
+            </TouchableOpacity>
+            <Text text50 marginT-10>
+              {name}
+            </Text>
+          </View>
+
+          {/* Friendlist */}
+          <View row centerV gap-5 marginB-10>
+            <Ionicons name="person-add" size={20} color="black" />
+            <Text>Friend</Text>
+          </View>
+          <Card
+            marginB-25
+            padding-15
+            borderRadius={10}
+            style={{ backgroundColor: Colors.white }}
+          >
+            <TouchableOpacity onPress={openFriendListModal}>
+              <View row spread paddingV-10 centerV>
+                <View row center gap-10>
+                  <View bg-black br100 width={36} height={36} center>
+                    <Ionicons name="people" size={20} color="white" />
+                  </View>
+                  <Text>{friendList.length} Friends</Text>
+                </View>
+                <Ionicons
+                  name="chevron-forward-outline"
+                  size={20}
+                  color="black"
+                />
+              </View>
+            </TouchableOpacity>
+          </Card>
+
+          {/* Personal Information */}
+          <View row centerV gap-5 marginB-10>
+            <Ionicons name="settings" size={25} color="black" />
+            <Text text70>General</Text>
+          </View>
+          <Card
+            padding-15
+            marginB-25
+            borderRadius={10}
+            style={{ backgroundColor: Colors.white }}
+          >
+            {[
+              { title: "Edit profile picture", icon: "camera-outline" },
+              { title: "Edit name", icon: "pencil" },
+              { title: "Edit phone number", icon: "call-outline" },
+              { title: "Edit email", icon: "mail-outline" },
+            ].map((item, index) => (
+              <TouchableOpacity
+                key={index}
+                onPress={
+                  item.title.includes("picture")
+                    ? openActionSheet
+                    : () => openModal(item.title)
+                }
+              >
+                <View row spread paddingV-10>
+                  <View row center gap-10>
+                    <View bg-black br100 width={36} height={36} center>
+                      <Ionicons name={item.icon} size={25} color="white" />
+                    </View>
+                    <Text>{item.title}</Text>
+                  </View>
+                  <Ionicons
+                    name="chevron-forward-outline"
+                    size={20}
+                    color="black"
+                  />
+                </View>
+              </TouchableOpacity>
+            ))}
+          </Card>
+
+          {/* Danger Zone */}
+          <View row centerV marginB-10 gap-5>
+            <Ionicons name="alert-circle-outline" size={25} color="red" />
+            <Text text70 color={Colors.red30}>
+              Danger Zone
+            </Text>
+          </View>
+          <Card
+            padding-15
+            marginB-25
+            borderRadius={10}
+            style={{ backgroundColor: Colors.white }}
+          >
+            {[
+              { title: "Delete account", icon: "trash-outline" },
+              { title: "Log out", icon: "log-out-outline" },
+            ].map((item, index) => (
+              <TouchableOpacity key={index} onPress={() => alert(item.title)}>
+                <View row spread paddingV-10>
+                  <View row center gap-10>
+                    <View bg-black br100 width={36} height={36} center>
+                      <Ionicons name={item.icon} size={20} color="white" />
+                    </View>
+                    <Text>{item.title}</Text>
+                  </View>
+                  <Ionicons
+                    name="chevron-forward-outline"
+                    size={20}
+                    color="black"
+                  />
+                </View>
+              </TouchableOpacity>
+            ))}
+          </Card>
+        </ScrollView>
+
+        {/* Popup modal */}
+        <EditProfileModal
+          translateY={translateY}
+          value={
+            selectedField === "Edit name"
+              ? name
+              : selectedField === "Edit phone number"
+                ? phone
+                : email
+          }
+          visible={modalVisible}
+          field={selectedField}
+          onSave={handleSave}
+          closeModal={closeModal}
+        />
+
+        {/* Friend list modal */}
+        <FriendListModal
+          translateY={translateY}
+          visible={friendListModalVisible}
+          closeModal={closeFriendListModal}
+          friendList={friendList}
+        />
+      </GestureHandlerRootView>
+      <StatusBar style="dark" />
+    </>
+  );
 };
 export default ProfileScreen;
