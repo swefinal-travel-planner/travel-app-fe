@@ -21,11 +21,33 @@ import Animated, {
   useSharedValue,
 } from "react-native-reanimated";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { Share } from "react-native";
 
 const FriendListModal = ({ translateY, visible, closeModal, friendList }) => {
   const [isSearching, setIsSearching] = useState(false);
   const [visibleFriends, setVisibleFriends] = useState(3);
   const animatedHeight = useSharedValue(225);
+
+  const shareText = async () => {
+    try {
+      const message = "Test sharing invitation from Trip 🚀";
+      const url = "https://example.com";
+
+      const shareOptions = Platform.select({
+        ios: {
+          message: `${message} ${url}`, // iOS cần gộp message + URL
+        },
+        android: {
+          message,
+          url, // Android hỗ trợ tách riêng
+        },
+      });
+
+      await Share.share(shareOptions);
+    } catch (error) {
+      console.log("Error sharing:", error);
+    }
+  };
 
   useEffect(() => {
     setIsSearching(false);
@@ -236,19 +258,21 @@ const FriendListModal = ({ translateY, visible, closeModal, friendList }) => {
                   { name: "LinkedIn", icon: "logo-linkedin" },
                   { name: "Tiktok", icon: "logo-tiktok" },
                 ].map((app, index) => (
-                  <View key={index} row spread paddingV-10 centerV>
-                    <View row center gap-10>
-                      <View bg-black br100 width={50} height={50} center>
-                        <Ionicons name={app.icon} size={30} color="white" />
+                  <TouchableOpacity key={index} onPress={shareText}>
+                    <View row spread paddingV-10>
+                      <View row center gap-10>
+                        <View bg-black br100 width={50} height={50} center>
+                          <Ionicons name={app.icon} size={30} color="white" />
+                        </View>
+                        <Text>{app.name}</Text>
                       </View>
-                      <Text text60>{app.name}</Text>
+                      <Ionicons
+                        name="chevron-forward-outline"
+                        size={20}
+                        color="black"
+                      />
                     </View>
-                    <Ionicons
-                      name="chevron-forward-outline"
-                      size={25}
-                      color="black"
-                    />
-                  </View>
+                  </TouchableOpacity>
                 ))}
               </Card>
             </ScrollView>
