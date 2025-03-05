@@ -253,13 +253,14 @@ const FriendListModal = ({ translateY, visible, closeModal, friendList }) => {
                 style={{ backgroundColor: Colors.white }}
               >
                 {[
-                  { name: "Facebook", icon: "logo-facebook" },
-                  { name: "Instagram", icon: "logo-instagram" },
-                  { name: "LinkedIn", icon: "logo-linkedin" },
-                  { name: "Tiktok", icon: "logo-tiktok" },
+                  { name: "Share your request link", icon: "link" },
+                  // { name: "Facebook", icon: "logo-facebook" },
+                  // { name: "Instagram", icon: "logo-instagram" },
+                  // { name: "LinkedIn", icon: "logo-linkedin" },
+                  // { name: "Tiktok", icon: "logo-tiktok" },
                 ].map((app, index) => (
                   <TouchableOpacity key={index} onPress={shareText}>
-                    <View row spread paddingV-10>
+                    <View row spread centerV paddingV-10>
                       <View row center gap-10>
                         <View bg-black br100 width={50} height={50} center>
                           <Ionicons name={app.icon} size={30} color="white" />
