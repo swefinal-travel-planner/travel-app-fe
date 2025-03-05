@@ -264,6 +264,7 @@ const ProfileScreen = () => {
           visible={friendListModalVisible}
           closeModal={closeFriendListModal}
           friendList={friendList}
+          onUpdateFriendList={setFriendList}
         />
       </GestureHandlerRootView>
       <StatusBar style="dark" />

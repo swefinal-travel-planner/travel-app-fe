@@ -23,10 +23,19 @@ import Animated, {
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Share } from "react-native";
 
-const FriendListModal = ({ translateY, visible, closeModal, friendList }) => {
+const FriendListModal = ({
+  translateY,
+  visible,
+  closeModal,
+  friendList,
+  onUpdateFriendList,
+}) => {
   const [isSearching, setIsSearching] = useState(false);
   const [visibleFriends, setVisibleFriends] = useState(3);
   const animatedHeight = useSharedValue(225);
+  const [selectedFriend, setSelectedFriend] = useState(null);
+  const [deleteConfirmVisible, setDeleteConfirmVisible] = useState(false);
+  const [filteredFriendlist, setFilteredFriendlist] = useState(friendList);
 
   const shareText = async () => {
     try {
@@ -42,7 +51,6 @@ const FriendListModal = ({ translateY, visible, closeModal, friendList }) => {
           url, // Android hỗ trợ tách riêng
         },
       });
-
       await Share.share(shareOptions);
     } catch (error) {
       console.log("Error sharing:", error);
@@ -51,18 +59,47 @@ const FriendListModal = ({ translateY, visible, closeModal, friendList }) => {
 
   useEffect(() => {
     setIsSearching(false);
-    setVisibleFriends(3);
+    setVisibleFriends(friendList.length > 3 ? 3 : friendList.length);
   }, [visible]);
 
   useEffect(() => {
     animatedHeight.value = withSpring(
-      visibleFriends === 3 ? 225 : friendList.length * 75,
+      visibleFriends === 3
+        ? 225
+        : filteredFriendlist.length === 0
+          ? 75
+          : filteredFriendlist.length * 75,
       {
         damping: 100,
         stiffness: 120,
       },
     );
   }, [visibleFriends]);
+
+  const confirmDeleteFriend = (friend) => {
+    setSelectedFriend(friend);
+    setDeleteConfirmVisible(true);
+  };
+
+  const handleDeleteFriend = () => {
+    if (selectedFriend) {
+      const updatedList = friendList.filter(
+        (friend) => friend.id !== selectedFriend.id,
+      );
+
+      // Cập nhật danh sách bạn bè trong state hoặc từ props
+      setFilteredFriendlist(updatedList);
+      onUpdateFriendList(updatedList);
+
+      // Kiểm tra nếu visibleFriends đang hiển thị toàn bộ danh sách hoặc bị giảm xuống dưới 3
+      const newVisibleFriends = Math.min(visibleFriends, updatedList.length);
+      setVisibleFriends(newVisibleFriends);
+
+      // Reset các state cần thiết
+      setDeleteConfirmVisible(false);
+      setSelectedFriend(null);
+    }
+  };
 
   const onGestureEvent = (event) => {
     translateY.value = event.nativeEvent.translationY;
@@ -206,40 +243,60 @@ const FriendListModal = ({ translateY, visible, closeModal, friendList }) => {
                 <Animated.View
                   style={[{ overflow: "hidden" }, animatedFriendListStyle]}
                 >
-                  {friendList.slice(0, visibleFriends).map((friend, id) => (
-                    <View key={id} row spread paddingV-10 centerV>
-                      <View row center gap-10>
-                        <View
-                          style={{
-                            borderWidth: 3,
-                            borderColor: "green",
-                            borderRadius: 100,
-                            padding: 3,
-                          }}
-                        >
-                          <Avatar size={40} source={friend.avatar} />
-                        </View>
-                        <Text text60>{friend.name}</Text>
-                      </View>
-                      <Ionicons name="close-outline" size={25} color="black" />
+                  {filteredFriendlist.length === 0 ? (
+                    <View center style={{ height: "100%" }}>
+                      <Text text70>
+                        Share your request link to add new friend
+                      </Text>
                     </View>
-                  ))}
+                  ) : (
+                    filteredFriendlist
+                      .slice(0, visibleFriends)
+                      .map((friend, id) => (
+                        <View key={id} row spread paddingV-10 centerV>
+                          <View row center gap-10>
+                            <View
+                              style={{
+                                borderWidth: 3,
+                                borderColor: "green",
+                                borderRadius: 100,
+                                padding: 3,
+                              }}
+                            >
+                              <Avatar size={40} source={friend.avatar} />
+                            </View>
+                            <Text text60>{friend.name}</Text>
+                          </View>
+                          <TouchableOpacity
+                            onPress={() => confirmDeleteFriend(friend)}
+                          >
+                            <Ionicons
+                              name="close-outline"
+                              size={25}
+                              color="black"
+                            />
+                          </TouchableOpacity>
+                        </View>
+                      ))
+                  )}
                 </Animated.View>
-                <Button
-                  label={visibleFriends === 3 ? "Show more" : "Show less"}
-                  marginT-10
-                  backgroundColor={
-                    friendList.length < 4 ? Colors.grey5 : Colors.green5
-                  }
-                  labelStyle={{ fontWeight: "bold" }}
-                  style={{ width: "auto", alignSelf: "center" }}
-                  disabled={friendList.length < 4}
-                  onPress={() =>
-                    setVisibleFriends(
-                      visibleFriends === 3 ? friendList.length : 3,
-                    )
-                  }
-                />
+                {filteredFriendlist.length > 3 && (
+                  <Button
+                    label={visibleFriends === 3 ? "Show more" : "Show less"}
+                    marginT-10
+                    backgroundColor={
+                      friendList.length < 4 ? Colors.grey5 : Colors.green5
+                    }
+                    labelStyle={{ fontWeight: "bold" }}
+                    style={{ width: "auto", alignSelf: "center" }}
+                    disabled={friendList.length < 4}
+                    onPress={() =>
+                      setVisibleFriends(
+                        visibleFriends === 3 ? friendList.length : 3,
+                      )
+                    }
+                  />
+                )}
               </Card>
 
               <View row centerV gap-5 marginT-20 marginB-10>
@@ -280,6 +337,36 @@ const FriendListModal = ({ translateY, visible, closeModal, friendList }) => {
           </Animated.View>
         </PanGestureHandler>
       </KeyboardAvoidingView>
+
+      <Modal visible={deleteConfirmVisible} transparent animationType="fade">
+        <View flex center style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
+          <Card
+            padding-20
+            width={300}
+            center
+            style={{ backgroundColor: "white", borderRadius: 10 }}
+          >
+            <Text text60>Remove Friend</Text>
+            <Text marginV-10>
+              Are you sure you want to remove{" "}
+              <Text style={{ fontWeight: "bold" }}>{selectedFriend?.name}</Text>{" "}
+              from your friends list?
+            </Text>
+
+            <View row spread gap-4>
+              <Button
+                label="Delete"
+                backgroundColor="red"
+                onPress={handleDeleteFriend}
+              />
+              <Button
+                label="Cancel"
+                onPress={() => setDeleteConfirmVisible(false)}
+              />
+            </View>
+          </Card>
+        </View>
+      </Modal>
     </Modal>
   );
 };
