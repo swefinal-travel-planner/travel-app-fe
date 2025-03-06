@@ -9,6 +9,7 @@ import styles from "../styles";
 
 export default function SignUpOtp() {
   const [resendDisabled, setResendDisabled] = useState(true);
+  const [isFilled, setIsFilled] = useState(false);
   const [countdown, setCountdown] = useState(60);
 
   const router = useRouter();
@@ -17,12 +18,15 @@ export default function SignUpOtp() {
     router.replace("/signup/allergies");
   };
 
+  const onOtpChanged = (otp: string) => {
+    setIsFilled(otp.length === 6);
+  };
+
   useEffect(() => {
     const interval = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
           clearInterval(interval);
-          setCountdown(60);
           setResendDisabled(false);
           return 0;
         }
@@ -30,7 +34,10 @@ export default function SignUpOtp() {
       });
     }, 1000);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      setCountdown(60);
+    };
   }, [resendDisabled]);
 
   return (
@@ -42,21 +49,23 @@ export default function SignUpOtp() {
           inbox.
         </Text>
 
-        <OtpField />
+        <OtpField onChanged={onOtpChanged} />
 
         <Pressable
           title="Verify"
-          variant="primary"
+          variant={isFilled ? "primary" : "disabled"}
+          disabled={!isFilled}
           onPress={handlePress}
           style={{ marginTop: 36 }}
         />
+
         <Pressable
           title={
             resendDisabled
               ? `Send another code in ${countdown} seconds`
               : "Send another code"
           }
-          variant={resendDisabled ? "disabled" : "secondary"}
+          variant={resendDisabled ? "otpDisabled" : "secondary"}
           disabled={resendDisabled}
           onPress={() => setResendDisabled(true)}
         />

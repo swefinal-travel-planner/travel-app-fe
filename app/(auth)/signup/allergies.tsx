@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Text,
   View,
@@ -27,12 +27,26 @@ const data = [
 
 export default function SignUpAllergies() {
   const [query, setQuery] = useState<string>("");
+  const [selected, setSelected] = useState<string[]>([]);
+  const [hasSelectedItem, setHasSelectedItem] = useState<boolean>(false);
 
   const router = useRouter();
 
   const handlePress = () => {
     router.replace("/(tabs)");
   };
+
+  const handleSelect = (value: string) => {
+    setSelected([...selected, value]);
+  };
+
+  const handleDeselect = (value: string) => {
+    setSelected(selected.filter((item) => item !== value));
+  };
+
+  useEffect(() => {
+    setHasSelectedItem(selected.length > 0);
+  }, [selected]);
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -56,19 +70,26 @@ export default function SignUpAllergies() {
         >
           {data
             .filter((item) =>
-              item.value.toLowerCase().includes(query.toLowerCase())
+              item.value.toLowerCase().includes(query.toLowerCase()),
             )
             .map((item) => (
-              <Chip key={item.id} value={item.value} />
+              <Chip
+                key={item.id}
+                value={item.value}
+                onSelect={handleSelect}
+                onDeselect={handleDeselect}
+              />
             ))}
         </View>
 
         <Pressable
           title="Save"
           onPress={handlePress}
-          variant="primary"
+          variant={hasSelectedItem ? "primary" : "disabled"}
+          disabled={!hasSelectedItem}
           style={{ marginTop: 36 }}
         />
+
         <Pressable
           onPress={handlePress}
           title="Skip for now"

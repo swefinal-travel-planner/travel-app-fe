@@ -20,6 +20,7 @@ const OtpField: React.FC<OtpFieldProps> = ({ onChanged, onFilled }) => {
       type="numeric"
       secureTextEntry={false}
       onFilled={onFilled}
+      onTextChange={onChanged}
       theme={{
         pinCodeContainerStyle: styles.pinCodeContainer,
         pinCodeTextStyle: styles.pinCodeText,
