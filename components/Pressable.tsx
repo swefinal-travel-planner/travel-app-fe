@@ -3,20 +3,18 @@ import { Text, StyleSheet } from "react-native";
 
 import PressableOpacity from "./PressableOpacity";
 
-interface ButtonProps {
+interface PressableProps {
   title: string;
-  backgroundColor?: string;
-  color?: string;
+  variant?: "primary" | "secondary" | "disabled";
   onPress?: () => void;
   disabled?: boolean;
-  style?: any;
+  style?: object;
 }
 
 // custom button component
-const CButton: React.FC<ButtonProps> = ({
+const Pressable: React.FC<PressableProps> = ({
   title,
-  color,
-  backgroundColor,
+  variant,
   onPress,
   disabled,
   style,
@@ -25,18 +23,16 @@ const CButton: React.FC<ButtonProps> = ({
     <PressableOpacity
       onPress={onPress}
       disabled={disabled}
-      style={[
-        styles.wrapper,
-        { backgroundColor: backgroundColor ?? "#A8A8A8" },
-        style,
-      ]}
+      style={[styles.wrapper, styles[`${variant || "primary"}Bg`], style]}
     >
-      <Text style={[styles.title, { color: color ?? "#FFFFFF" }]}>{title}</Text>
+      <Text style={[styles.title, styles[`${variant || "primary"}Title`]]}>
+        {title}
+      </Text>
     </PressableOpacity>
   );
 };
 
-export default CButton;
+export default Pressable;
 
 const styles = StyleSheet.create({
   wrapper: {
@@ -47,8 +43,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 16,
   },
+  primaryBg: {
+    backgroundColor: "#3F6453",
+  },
+  secondaryBg: {},
+  disabledBg: {},
   title: {
-    fontSize: 12,
+    fontSize: 14,
     fontFamily: "NotoSerif_700Bold",
+  },
+  primaryTitle: {
+    color: "#FFFFFF",
+  },
+  secondaryTitle: {
+    color: "#3F6453",
+  },
+  disabledTitle: {
+    color: "#4B4B4B",
   },
 });
