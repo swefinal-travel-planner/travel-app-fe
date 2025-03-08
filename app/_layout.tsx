@@ -6,6 +6,8 @@ import {
 import * as SplashScreen from "expo-splash-screen";
 import { Stack } from "expo-router";
 import { useEffect } from "react";
+import { View } from "react-native";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
 
 // prevent the splash screen from hiding before the font finishes loading
 SplashScreen.preventAutoHideAsync();
@@ -19,6 +21,11 @@ export default function RootLayout() {
   useEffect(() => {
     if (loaded || error) {
       SplashScreen.hideAsync();
+      GoogleSignin.configure({
+        webClientId:
+          "490333496504-qe9p6s4an7ub4ros021q2p6kda9hakhm.apps.googleusercontent.com", // client ID of type WEB for your server. Required to get the `idToken` on the user object, and for offline access.
+        scopes: ["https://www.googleapis.com/auth/drive.readonly"], // what API you want to access on behalf of the user, default is email and profile
+      });
     }
   }, [loaded, error]);
 
@@ -27,10 +34,11 @@ export default function RootLayout() {
   }
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="signup" />
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen name="+not-found" />
-    </Stack>
+    <View style={{ flex: 1 }}>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="+not-found" />
+      </Stack>
+    </View>
   );
 }

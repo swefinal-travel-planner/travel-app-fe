@@ -54,4 +54,9 @@ export default StyleSheet.create({
     width: 40,
     height: 40,
   },
+  error: {
+    color: "#A82A00",
+    fontSize: 12,
+    fontFamily: "NotoSerif_400Regular",
+  },
 });

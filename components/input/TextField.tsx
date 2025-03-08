@@ -12,7 +12,9 @@ interface TextFieldProps {
   error?: string;
   required?: boolean;
   type?: string;
+  value?: string;
   onChange?: (text: string) => void;
+  onBlur?: () => void;
 }
 
 // custom text field component
@@ -25,6 +27,8 @@ const TextField: React.FC<TextFieldProps> = ({
   required,
   type,
   onChange,
+  onBlur,
+  value,
 }) => {
   return (
     <View style={styles.wrapper}>
@@ -38,6 +42,9 @@ const TextField: React.FC<TextFieldProps> = ({
         placeholderTextColor="#3F6453"
         onChangeText={(value) => {
           if (onChange) onChange(value);
+        }}
+        onBlur={() => {
+          if (onBlur) onBlur();
         }}
         underlineColorAndroid="transparent"
         autoComplete={type ? (type as any) : "none"}

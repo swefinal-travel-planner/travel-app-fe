@@ -11,7 +11,9 @@ interface PasswordFieldProps {
   leftIcon?: string;
   error?: string;
   required?: boolean;
+  value?: string;
   onChange?: (text: string) => void;
+  onBlur?: () => void;
 }
 
 const PasswordField: React.FC<PasswordFieldProps> = ({
@@ -21,6 +23,8 @@ const PasswordField: React.FC<PasswordFieldProps> = ({
   error,
   required,
   onChange,
+  value,
+  onBlur,
 }) => {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -35,6 +39,12 @@ const PasswordField: React.FC<PasswordFieldProps> = ({
         placeholderTextColor="#3F6453"
         underlineColorAndroid="transparent"
         textContentType="password"
+        onChangeText={(value) => {
+          if (onChange) onChange(value);
+        }}
+        onBlur={() => {
+          if (onBlur) onBlur();
+        }}
         secureTextEntry={!isVisible}
       />
 

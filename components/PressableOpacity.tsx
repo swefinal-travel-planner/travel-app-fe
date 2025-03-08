@@ -4,9 +4,14 @@ import { Pressable, Animated } from "react-native";
 interface PressableOpacityProps {
   children: React.ReactNode;
   [key: string]: any;
+  onPress?: () => void;
 }
 
-const PressableOpacity = ({ children, ...props }: PressableOpacityProps) => {
+const PressableOpacity = ({
+  children,
+  onPress,
+  ...props
+}: PressableOpacityProps) => {
   const animated = useRef(new Animated.Value(1)).current;
 
   const fadeIn = () => {
@@ -25,7 +30,12 @@ const PressableOpacity = ({ children, ...props }: PressableOpacityProps) => {
   };
 
   return (
-    <Pressable onPressIn={fadeIn} onPressOut={fadeOut} {...props}>
+    <Pressable
+      onPressIn={fadeIn}
+      onPressOut={fadeOut}
+      onPress={onPress}
+      {...props}
+    >
       <Animated.View style={{ opacity: animated }}>{children}</Animated.View>
     </Pressable>
   );
