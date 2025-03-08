@@ -56,7 +56,7 @@ export default function SignUpAllergies() {
         >
           {data
             .filter((item) =>
-              item.value.toLowerCase().includes(query.toLowerCase())
+              item.value.toLowerCase().includes(query.toLowerCase()),
             )
             .map((item) => (
               <Chip key={item.id} value={item.value} />
