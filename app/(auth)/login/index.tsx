@@ -10,17 +10,27 @@ import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import { GoogleAuthProvider } from "firebase/auth";
+// @ts-ignore
+import { signInWithRedirect } from "firebase/auth";
+import { auth } from "@/firebaseConfig";
+import type { UserCredential } from "firebase/auth";
+import type { FirebaseError } from "firebase/app";
+
 import TextField from "@/components/input/TextField";
 import PasswordField from "@/components/input/PasswordField";
 import Pressable from "@/components/Pressable";
+import PressableOpacity from "@/components/PressableOpacity";
 
 import styles from "../styles";
-import PressableOpacity from "@/components/PressableOpacity";
 
 interface LoginFormData {
   email: string;
   password: string;
 }
+
+interface GoogleSignInResult extends UserCredential {}
+interface GoogleSignInError extends FirebaseError {}
 
 // form validation schema
 const schema = z.object({
@@ -45,6 +55,30 @@ export default function Login() {
   });
 
   const errorMessage = errors.email?.message || errors.password?.message;
+
+  // auth provider
+  const googleProvider = new GoogleAuthProvider();
+
+  const handleGoogleLogin = async () => {
+    signInWithRedirect(auth, googleProvider)
+      .then((result: GoogleSignInResult) => {
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        // const token = credential ? credential.accessToken : undefined;
+
+        const user = result.user;
+        // const userInfo = getAdditionalUserInfo(result);
+
+        console.log(user);
+      })
+      .catch((error: GoogleSignInError) => {
+        const errorCode: string = error.code;
+        const errorMessage: string = error.message;
+
+        console.log(errorCode, errorMessage);
+        // const email = error.customData.email;
+        // const credential = GoogleAuthProvider.credentialFromError(error);
+      });
+  };
 
   const onSubmit = (data: LoginFormData): void => {
     router.replace("/(tabs)");
@@ -116,7 +150,7 @@ export default function Login() {
             />
           </PressableOpacity>
 
-          <PressableOpacity>
+          <PressableOpacity onPress={handleGoogleLogin}>
             <Image
               source={require("@/assets/images/google.png")}
               style={styles.socialIcon}
