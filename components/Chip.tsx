@@ -5,15 +5,22 @@ import PressableOpacity from "./PressableOpacity";
 
 interface ChipProps {
   value: string;
+  onSelect?: (value: string) => void;
+  onDeselect?: (value: string) => void;
 }
 
-const Chip: React.FC<ChipProps> = ({ value }) => {
+const Chip: React.FC<ChipProps> = ({ value, onSelect, onDeselect }) => {
   const [selected, setSelected] = useState(false);
 
   return (
     <PressableOpacity
       style={[styles.wrapper, selected ? styles.selectedBg : styles.baseBg]}
-      onPress={() => setSelected(!selected)}
+      onPress={() => {
+        const newSelected = !selected;
+        setSelected(newSelected);
+        if (newSelected && onSelect) onSelect(value);
+        if (!newSelected && onDeselect) onDeselect(value);
+      }}
     >
       <Text
         style={[styles.value, selected ? styles.selectedText : styles.baseText]}

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "490333496504",
+    "project_id": "travel-app-229d7",
+    "storage_bucket": "travel-app-229d7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:490333496504:android:750a94e2b76ad5fc9f004d",
+        "android_client_info": {
+          "package_name": "com.qhuongng.travelapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "490333496504-3ostjp4c4t1dhs10gmg4fqknidv8jebi.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.qhuongng.travelapp",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "490333496504-qe9p6s4an7ub4ros021q2p6kda9hakhm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA7HF24O7vs9OcXssK91Iysdg3jacwmF9o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "490333496504-qe9p6s4an7ub4ros021q2p6kda9hakhm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
