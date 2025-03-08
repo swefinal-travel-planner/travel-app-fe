@@ -10,12 +10,12 @@ import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { GoogleAuthProvider } from "firebase/auth";
-// @ts-ignore
-import { signInWithRedirect } from "firebase/auth";
-import { auth } from "@/firebaseConfig";
-import type { UserCredential } from "firebase/auth";
-import type { FirebaseError } from "firebase/app";
+import {
+  GoogleSignin,
+  isErrorWithCode,
+  isSuccessResponse,
+  statusCodes,
+} from "@react-native-google-signin/google-signin";
 
 import TextField from "@/components/input/TextField";
 import PasswordField from "@/components/input/PasswordField";
@@ -28,9 +28,6 @@ interface LoginFormData {
   email: string;
   password: string;
 }
-
-interface GoogleSignInResult extends UserCredential {}
-interface GoogleSignInError extends FirebaseError {}
 
 // form validation schema
 const schema = z.object({
@@ -56,28 +53,32 @@ export default function Login() {
 
   const errorMessage = errors.email?.message || errors.password?.message;
 
-  // auth provider
-  const googleProvider = new GoogleAuthProvider();
-
   const handleGoogleLogin = async () => {
-    signInWithRedirect(auth, googleProvider)
-      .then((result: GoogleSignInResult) => {
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        // const token = credential ? credential.accessToken : undefined;
-
-        const user = result.user;
-        // const userInfo = getAdditionalUserInfo(result);
-
-        console.log(user);
-      })
-      .catch((error: GoogleSignInError) => {
-        const errorCode: string = error.code;
-        const errorMessage: string = error.message;
-
-        console.log(errorCode, errorMessage);
-        // const email = error.customData.email;
-        // const credential = GoogleAuthProvider.credentialFromError(error);
-      });
+    try {
+      await GoogleSignin.hasPlayServices();
+      const response = await GoogleSignin.signIn();
+      if (isSuccessResponse(response)) {
+        console.log(response.data);
+        router.replace("/(tabs)");
+      } else {
+        console.log("Google sign-in cancelled");
+      }
+    } catch (error) {
+      if (isErrorWithCode(error)) {
+        switch (error.code) {
+          case statusCodes.IN_PROGRESS:
+            // operation (eg. sign in) already in progress
+            break;
+          case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
+            // Android only, play services not available or outdated
+            break;
+          default:
+          // some other error happened
+        }
+      } else {
+        // an error that's not related to google sign in occurred
+      }
+    }
   };
 
   const onSubmit = (data: LoginFormData): void => {
@@ -143,13 +144,6 @@ export default function Login() {
         </Text>
 
         <View style={styles.socials}>
-          <PressableOpacity>
-            <Image
-              source={require("@/assets/images/facebook.png")}
-              style={styles.socialIcon}
-            />
-          </PressableOpacity>
-
           <PressableOpacity onPress={handleGoogleLogin}>
             <Image
               source={require("@/assets/images/google.png")}

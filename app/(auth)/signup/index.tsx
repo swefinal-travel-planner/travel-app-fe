@@ -10,6 +10,13 @@ import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import {
+  GoogleSignin,
+  isErrorWithCode,
+  isSuccessResponse,
+  statusCodes,
+} from "@react-native-google-signin/google-signin";
+
 import TextField from "@/components/input/TextField";
 import PasswordField from "@/components/input/PasswordField";
 import Pressable from "@/components/Pressable";
@@ -59,6 +66,34 @@ export default function SignUp() {
     errors.email?.message ||
     errors.password?.message ||
     errors.repPassword?.message;
+
+  const handleGoogleLogin = async () => {
+    try {
+      await GoogleSignin.hasPlayServices();
+      const response = await GoogleSignin.signIn();
+      if (isSuccessResponse(response)) {
+        console.log(response.data);
+        router.replace("/(tabs)");
+      } else {
+        console.log("Google sign-in cancelled");
+      }
+    } catch (error) {
+      if (isErrorWithCode(error)) {
+        switch (error.code) {
+          case statusCodes.IN_PROGRESS:
+            // operation (eg. sign in) already in progress
+            break;
+          case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
+            // Android only, play services not available or outdated
+            break;
+          default:
+          // some other error happened
+        }
+      } else {
+        // an error that's not related to google sign in occurred
+      }
+    }
+  };
 
   const onSubmit = (data: SignupFormData): void => {
     router.push("/signup/otp");
@@ -142,14 +177,9 @@ export default function SignUp() {
         <Text style={[styles.text, { alignSelf: "center", marginBottom: 8 }]}>
           or continue with
         </Text>
+
         <View style={styles.socials}>
-          <PressableOpacity>
-            <Image
-              source={require("@/assets/images/facebook.png")}
-              style={styles.socialIcon}
-            />
-          </PressableOpacity>
-          <PressableOpacity>
+          <PressableOpacity onPress={handleGoogleLogin}>
             <Image
               source={require("@/assets/images/google.png")}
               style={styles.socialIcon}
