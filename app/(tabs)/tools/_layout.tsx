@@ -1,56 +1,63 @@
-import { Stack, useRouter, usePathname } from "expo-router";
-import { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { Stack, usePathname, useRouter } from "expo-router";
+import { useEffect } from "react";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 
 export default function ToolLayout() {
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
-    router.replace("/(tabs)/tools/exchange");
+    router.replace("/(tabs)/tools/currency-converter");
   }, []);
 
   return (
     <View style={{ flex: 1 }}>
-      {/* Custom Top Tabs */}
+      {/* Tools Top Tabs with Icons Only */}
       <View style={styles.tabContainer}>
         <TabButton
-          title="Weather"
+          icon="cloud"
           active={pathname.includes("weather")}
           onPress={() => router.push("/(tabs)/tools/weather")}
         />
         <TabButton
-          title="Exchange"
-          active={pathname.includes("exchange")}
-          onPress={() => router.push("/(tabs)/tools/exchange")}
+          icon="cash"
+          active={pathname.includes("currency-converter")}
+          onPress={() => router.push("/(tabs)/tools/currency-converter")}
         />
         <TabButton
-          title="Translate"
+          icon="language"
           active={pathname.includes("translate")}
           onPress={() => router.push("/(tabs)/tools/translate")}
         />
       </View>
+
+      {/* Nested Stack Navigator */}
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="weather" />
-        <Stack.Screen name="exchange" />
+        <Stack.Screen name="currency-converter" />
         <Stack.Screen name="translate" />
       </Stack>
     </View>
   );
 }
 
-// Reusable Tab Button Component
+// Reusable Tab Button Component (Icon Only)
 function TabButton({
-  title,
+  icon,
   onPress,
   active,
-}: Readonly<{ title: string; onPress: () => void; active: boolean }>) {
+}: Readonly<{
+  icon: keyof typeof Ionicons.glyphMap;
+  onPress: () => void;
+  active: boolean;
+}>) {
   return (
     <TouchableOpacity
       onPress={onPress}
-      style={[styles.tabButton, active && styles.activeTab]}
+      style={[active ? styles.activeTab : styles.tabButton]}
     >
-      <Text style={[styles.tabText, active && styles.activeText]}>{title}</Text>
+      <Ionicons name={icon} size={24} color={active ? "white" : "#563d30"} />
     </TouchableOpacity>
   );
 }
@@ -60,23 +67,25 @@ const styles = StyleSheet.create({
   tabContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
-    paddingVertical: 5,
-    backgroundColor: "#eee",
+    padding: 7,
+    borderRadius: 100,
+    width: "70%",
+    alignSelf: "center",
+    overflow: "hidden",
+    marginVertical: 20,
+    backgroundColor: "#e5dacb",
   },
   tabButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 25,
-    borderRadius: 10,
+    flex: 1,
+    padding: 10,
+    borderRadius: 100,
+    alignItems: "center",
   },
   activeTab: {
-    backgroundColor: "#007AFF", // Highlight color
-  },
-  tabText: {
-    fontSize: 16,
-    color: "black",
-  },
-  activeText: {
-    color: "white", // Highlighted text color
-    fontWeight: "bold",
+    backgroundColor: "#563d30", // Highlight color for active tab
+    flex: 1,
+    padding: 10,
+    borderRadius: 100,
+    alignItems: "center",
   },
 });
