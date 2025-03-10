@@ -6,7 +6,7 @@ export default function ToolsIndex() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace("/tools/exchange"); // Redirect to exchange
+    router.replace("/tools/currency-converter"); // Redirect to exchange
   }, []);
 
   return (
