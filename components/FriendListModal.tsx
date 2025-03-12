@@ -9,19 +9,17 @@ import {
   TextField,
 } from "react-native-ui-lib";
 import { KeyboardAvoidingView, Platform, TouchableOpacity } from "react-native";
-import {
-  GestureDetector,
-  Gesture,
-  ScrollView,
-} from "react-native-gesture-handler";
+import { ScrollView } from "react-native-gesture-handler";
 import Animated, {
   withSpring,
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import Dialog from "react-native-dialog";
 import Modal from "react-native-modal";
 import { Share } from "react-native";
+import { Portal } from "react-native-paper";
 
 const FriendListModal = ({
   translateY,
@@ -34,7 +32,7 @@ const FriendListModal = ({
   const [visibleFriends, setVisibleFriends] = useState(3);
   const animatedHeight = useSharedValue(225);
   const [selectedFriend, setSelectedFriend] = useState(null);
-  const [deleteConfirmVisible, setDeleteConfirmVisible] = useState(false);
+  const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [filteredFriendlist, setFilteredFriendlist] = useState(friendList);
 
   const shareText = async () => {
@@ -78,7 +76,7 @@ const FriendListModal = ({
 
   const confirmDeleteFriend = (friend) => {
     setSelectedFriend(friend);
-    setDeleteConfirmVisible(true);
+    setIsDialogVisible(true);
   };
 
   const handleDeleteFriend = () => {
@@ -87,37 +85,16 @@ const FriendListModal = ({
         (friend) => friend.id !== selectedFriend.id,
       );
 
-      // Cập nhật danh sách bạn bè trong state hoặc từ props
       setFilteredFriendlist(updatedList);
       onUpdateFriendList(updatedList);
 
-      // Kiểm tra nếu visibleFriends đang hiển thị toàn bộ danh sách hoặc bị giảm xuống dưới 3
       const newVisibleFriends = Math.min(visibleFriends, updatedList.length);
       setVisibleFriends(newVisibleFriends);
 
-      // Reset các state cần thiết
-      setDeleteConfirmVisible(false);
+      setIsDialogVisible(false);
       setSelectedFriend(null);
     }
   };
-
-  // Gesture để vuốt xuống đóng modal
-  const swipeDown = Gesture.Pan()
-    .onUpdate((event) => {
-      translateY.value = event.translationY > 0 ? event.translationY : 0;
-    })
-    .onEnd((event) => {
-      if (event.translationY > 100) {
-        closeModal();
-      } else {
-        translateY.value = withSpring(0);
-      }
-    });
-
-  // Animation đóng/mở modal
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: translateY.value }],
-  }));
 
   // Animation mở rộng input khi search
   const inputAnimatedStyle = useAnimatedStyle(() => ({
@@ -137,20 +114,41 @@ const FriendListModal = ({
   }));
 
   return (
-    <Modal
-      isVisible={visible}
-      onBackdropPress={closeModal} // Nhấn ngoài modal để đóng
-      swipeDirection="down"
-      onSwipeComplete={closeModal}
-      backdropOpacity={0.5}
-      style={{ margin: 0, justifyContent: "flex-end" }}
-    >
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1 }}
+    <>
+      {/* Confirm Delete Friend Dialog */}
+      <Portal>
+        <Dialog.Container visible={isDialogVisible}>
+          <Dialog.Title>Remove Friend</Dialog.Title>
+          <Dialog.Description>
+            Are you sure you want to remove{" "}
+            <Text style={{ fontWeight: "bold" }}>{selectedFriend?.name}</Text>{" "}
+            from your friends list?
+          </Dialog.Description>
+          <Dialog.Button
+            label="Cancel"
+            onPress={() => setIsDialogVisible(false)}
+          />
+          <Dialog.Button
+            label="Delete"
+            onPress={handleDeleteFriend}
+            color="red"
+          />
+        </Dialog.Container>
+      </Portal>
+
+      <Modal
+        isVisible={visible}
+        onBackdropPress={closeModal}
+        swipeDirection="down"
+        onSwipeComplete={closeModal}
+        backdropOpacity={0.5}
+        style={{ margin: 0, justifyContent: "flex-end" }}
       >
-        <GestureDetector gesture={swipeDown}>
-          <Animated.View
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={{ flex: 1 }}
+        >
+          <View
             style={[
               {
                 height: "95%",
@@ -159,7 +157,6 @@ const FriendListModal = ({
                 borderTopRightRadius: 20,
                 marginTop: "auto",
               },
-              animatedStyle,
             ]}
           >
             <View centerH marginV-10>
@@ -173,6 +170,8 @@ const FriendListModal = ({
                 }}
               />
             </View>
+
+            {/* Search input field */}
             {!isSearching ? (
               <Animated.View
                 style={[
@@ -233,6 +232,7 @@ const FriendListModal = ({
             )}
 
             <ScrollView style={{ padding: 20 }}>
+              {/* Friendlist */}
               <View row centerV gap-5 marginT-20 marginB-10>
                 <Ionicons name="people" size={25} color="black" />
                 <Text text60>Your friends</Text>
@@ -255,8 +255,8 @@ const FriendListModal = ({
                   ) : (
                     filteredFriendlist
                       .slice(0, visibleFriends)
-                      .map((friend, id) => (
-                        <View key={id} row spread paddingV-10 centerV>
+                      .map((friend, index) => (
+                        <View key={index} row spread paddingV-10 centerV>
                           <View row center gap-10>
                             <View
                               style={{
@@ -302,6 +302,7 @@ const FriendListModal = ({
                 )}
               </Card>
 
+              {/* Share request link */}
               <View row centerV gap-5 marginT-20 marginB-10>
                 <Ionicons name="paper-plane" size={25} color="black" />
                 <Text text60>Share your request link</Text>
@@ -333,43 +334,11 @@ const FriendListModal = ({
                 )}
               </Card>
             </ScrollView>
-          </Animated.View>
-        </GestureDetector>
-      </KeyboardAvoidingView>
-
-      <Modal
-        isVisible={deleteConfirmVisible}
-        style={{ backgroundColor: "transparent" }}
-      >
-        <View flex center style={{ backgroundColor: "rgba(0,0,0,0)" }}>
-          <Card
-            padding-20
-            width={300}
-            center
-            style={{ backgroundColor: "white", borderRadius: 10 }}
-          >
-            <Text text60>Remove Friend</Text>
-            <Text marginV-10>
-              Are you sure you want to remove{" "}
-              <Text style={{ fontWeight: "bold" }}>{selectedFriend?.name}</Text>{" "}
-              from your friends list?
-            </Text>
-
-            <View row spread gap-4>
-              <Button
-                label="Delete"
-                backgroundColor="red"
-                onPress={handleDeleteFriend}
-              />
-              <Button
-                label="Cancel"
-                onPress={() => setDeleteConfirmVisible(false)}
-              />
-            </View>
-          </Card>
-        </View>
+          </View>
+        </KeyboardAvoidingView>
       </Modal>
-    </Modal>
+    </>
   );
 };
+
 export default FriendListModal;

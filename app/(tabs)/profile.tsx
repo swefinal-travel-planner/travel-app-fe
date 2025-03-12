@@ -15,6 +15,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import * as ImagePicker from "expo-image-picker";
 import EditProfileModal from "@/components/EditProfileModal";
 import FriendListModal from "@/components/FriendListModal";
+import { PaperProvider } from "react-native-paper";
 
 const ProfileScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -105,7 +106,7 @@ const ProfileScreen = () => {
   };
 
   return (
-    <>
+    <PaperProvider>
       <GestureHandlerRootView
         style={{ flex: 1, backgroundColor: Colors.grey80, paddingTop: 30 }}
       >
@@ -275,7 +276,7 @@ const ProfileScreen = () => {
         />
       </GestureHandlerRootView>
       <StatusBar style="dark" />
-    </>
+    </PaperProvider>
   );
 };
 export default ProfileScreen;
