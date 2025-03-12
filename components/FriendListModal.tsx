@@ -3,7 +3,6 @@ import {
   View,
   Text,
   Colors,
-  Modal,
   Card,
   Avatar,
   Button,
@@ -11,9 +10,9 @@ import {
 } from "react-native-ui-lib";
 import { KeyboardAvoidingView, Platform, TouchableOpacity } from "react-native";
 import {
-  PanGestureHandler,
+  GestureDetector,
+  Gesture,
   ScrollView,
-  State,
 } from "react-native-gesture-handler";
 import Animated, {
   withSpring,
@@ -21,6 +20,7 @@ import Animated, {
   useSharedValue,
 } from "react-native-reanimated";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import Modal from "react-native-modal";
 import { Share } from "react-native";
 
 const FriendListModal = ({
@@ -101,19 +101,18 @@ const FriendListModal = ({
     }
   };
 
-  const onGestureEvent = (event) => {
-    translateY.value = event.nativeEvent.translationY;
-  };
-
-  const onHandlerStateChange = (event) => {
-    if (event.nativeEvent.state === State.END) {
-      if (event.nativeEvent.translationY > 100) {
+  // Gesture để vuốt xuống đóng modal
+  const swipeDown = Gesture.Pan()
+    .onUpdate((event) => {
+      translateY.value = event.translationY > 0 ? event.translationY : 0;
+    })
+    .onEnd((event) => {
+      if (event.translationY > 100) {
         closeModal();
       } else {
         translateY.value = withSpring(0);
       }
-    }
-  };
+    });
 
   // Animation đóng/mở modal
   const animatedStyle = useAnimatedStyle(() => ({
@@ -138,15 +137,19 @@ const FriendListModal = ({
   }));
 
   return (
-    <Modal visible={visible} animationType="slide" transparent>
+    <Modal
+      isVisible={visible}
+      onBackdropPress={closeModal} // Nhấn ngoài modal để đóng
+      swipeDirection="down"
+      onSwipeComplete={closeModal}
+      backdropOpacity={0.5}
+      style={{ margin: 0, justifyContent: "flex-end" }}
+    >
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
-        <PanGestureHandler
-          onGestureEvent={onGestureEvent}
-          onHandlerStateChange={onHandlerStateChange}
-        >
+        <GestureDetector gesture={swipeDown}>
           <Animated.View
             style={[
               {
@@ -309,37 +312,36 @@ const FriendListModal = ({
                 borderRadius={10}
                 style={{ backgroundColor: Colors.white }}
               >
-                {[
-                  { name: "Share your request link", icon: "link" },
-                  // { name: "Facebook", icon: "logo-facebook" },
-                  // { name: "Instagram", icon: "logo-instagram" },
-                  // { name: "LinkedIn", icon: "logo-linkedin" },
-                  // { name: "Tiktok", icon: "logo-tiktok" },
-                ].map((app, index) => (
-                  <TouchableOpacity key={index} onPress={shareText}>
-                    <View row spread centerV paddingV-10>
-                      <View row center gap-10>
-                        <View bg-black br100 width={50} height={50} center>
-                          <Ionicons name={app.icon} size={30} color="white" />
+                {[{ name: "Share your request link", icon: "link" }].map(
+                  (app, index) => (
+                    <TouchableOpacity key={index} onPress={shareText}>
+                      <View row spread centerV paddingV-10>
+                        <View row center gap-10>
+                          <View bg-black br100 width={50} height={50} center>
+                            <Ionicons name={app.icon} size={30} color="white" />
+                          </View>
+                          <Text>{app.name}</Text>
                         </View>
-                        <Text>{app.name}</Text>
+                        <Ionicons
+                          name="chevron-forward-outline"
+                          size={20}
+                          color="black"
+                        />
                       </View>
-                      <Ionicons
-                        name="chevron-forward-outline"
-                        size={20}
-                        color="black"
-                      />
-                    </View>
-                  </TouchableOpacity>
-                ))}
+                    </TouchableOpacity>
+                  ),
+                )}
               </Card>
             </ScrollView>
           </Animated.View>
-        </PanGestureHandler>
+        </GestureDetector>
       </KeyboardAvoidingView>
 
-      <Modal visible={deleteConfirmVisible} transparent animationType="fade">
-        <View flex center style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
+      <Modal
+        isVisible={deleteConfirmVisible}
+        style={{ backgroundColor: "transparent" }}
+      >
+        <View flex center style={{ backgroundColor: "rgba(0,0,0,0)" }}>
           <Card
             padding-20
             width={300}

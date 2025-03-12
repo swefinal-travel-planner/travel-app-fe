@@ -1,6 +1,13 @@
 import React, { useState } from "react";
-import { View, Text, Avatar, Card, Colors } from "react-native-ui-lib";
-import { TouchableOpacity, ScrollView, ActionSheetIOS } from "react-native";
+import {
+  View,
+  Text,
+  Avatar,
+  Card,
+  Colors,
+  ActionSheet,
+} from "react-native-ui-lib";
+import { TouchableOpacity, ScrollView, Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useSharedValue, withTiming } from "react-native-reanimated";
 import { StatusBar } from "expo-status-bar";
@@ -11,6 +18,7 @@ import FriendListModal from "@/components/FriendListModal";
 
 const ProfileScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
+  const [showActionSheet, setShowActionSheet] = useState(false);
   const [friendListModalVisible, setFriendListModalVisible] = useState(false);
   const translateY = useSharedValue(0); // Khởi tạo giá trị animation
   const [name, setName] = useState("채수빈");
@@ -37,6 +45,7 @@ const ProfileScreen = () => {
     },
   ]);
 
+  // Mở album ảnh
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -44,7 +53,6 @@ const ProfileScreen = () => {
       aspect: [1, 1],
       quality: 1,
     });
-
     if (!result.canceled) {
       setProfilePic({ uri: result.assets[0].uri });
     }
@@ -57,29 +65,13 @@ const ProfileScreen = () => {
       aspect: [1, 1],
       quality: 1,
     });
-
     if (!result.canceled) {
       setProfilePic({ uri: result.assets[0].uri });
     }
   };
 
-  // Hiển thị Action Sheet trên iOS
   const openActionSheet = () => {
-    ActionSheetIOS.showActionSheetWithOptions(
-      {
-        options: ["Take Photo", "Choose from Library", "Cancel"],
-        cancelButtonIndex: 2,
-        title: "Change your profile picture",
-        message: "Your profile picture is visible to all your friends",
-      },
-      (buttonIndex) => {
-        if (buttonIndex === 0) {
-          takePhoto(); // Chụp ảnh
-        } else if (buttonIndex === 1) {
-          pickImage(); // Chọn ảnh từ thư viện
-        }
-      },
-    );
+    setShowActionSheet(true);
   };
 
   const handleSave = (value, field) => {
@@ -121,7 +113,7 @@ const ProfileScreen = () => {
           {/* Avatar and name */}
           <View center>
             <TouchableOpacity
-              onPress={() => openActionSheet()}
+              onPress={openActionSheet}
               style={{
                 borderWidth: 5,
                 borderColor: "green",
@@ -138,7 +130,7 @@ const ProfileScreen = () => {
 
           {/* Friendlist */}
           <View row centerV gap-5 marginB-10>
-            <Ionicons name="person-add" size={20} color="black" />
+            <Ionicons name="person-add" size={25} color="black" />
             <Text>Friend</Text>
           </View>
           <Card
@@ -192,7 +184,7 @@ const ProfileScreen = () => {
                 <View row spread paddingV-10>
                   <View row center gap-10>
                     <View bg-black br100 width={36} height={36} center>
-                      <Ionicons name={item.icon} size={25} color="white" />
+                      <Ionicons name={item.icon} size={20} color="white" />
                     </View>
                     <Text>{item.title}</Text>
                   </View>
@@ -265,6 +257,21 @@ const ProfileScreen = () => {
           closeModal={closeFriendListModal}
           friendList={friendList}
           onUpdateFriendList={setFriendList}
+        />
+
+        <ActionSheet
+          visible={showActionSheet}
+          onDismiss={() => setShowActionSheet(false)}
+          useNativeIOS={Platform.OS === "ios" ? true : false}
+          options={[
+            { label: "Take Photo", onPress: takePhoto },
+            { label: "Choose from Library", onPress: pickImage },
+            {
+              label: "Cancel",
+              onPress: () => setShowActionSheet(false),
+              cancel: true,
+            },
+          ]}
         />
       </GestureHandlerRootView>
       <StatusBar style="dark" />
