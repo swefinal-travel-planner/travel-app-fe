@@ -16,7 +16,20 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 
-const EditProfileModal = ({ visible, closeModal, field, value, onSave }) => {
+interface EditProfileModalProps {
+  visible: boolean;
+  closeModal: () => void;
+  field: string;
+  value: string;
+  onSave: (value: string, field: string) => void;
+}
+const EditProfileModal: React.FC<EditProfileModalProps> = ({
+  visible,
+  closeModal,
+  field,
+  value,
+  onSave,
+}) => {
   const [tempValue, setTempValue] = useState(value);
   const [error, setError] = useState("");
   const translateY = useSharedValue(0);

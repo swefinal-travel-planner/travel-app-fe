@@ -17,19 +17,47 @@ import EditProfileModal from "@/components/EditProfileModal";
 import FriendListModal from "@/components/FriendListModal";
 import { PaperProvider } from "react-native-paper";
 
+interface Friend {
+  id: number;
+  name: string;
+  avatar: string;
+}
+
+interface settingSection {
+  title: string;
+  icon:
+    | "camera-outline"
+    | "pencil"
+    | "call-outline"
+    | "mail-outline"
+    | "trash-outline"
+    | "log-out-outline";
+}
+
 const ProfileScreen = () => {
-  const [modalVisible, setModalVisible] = useState(false);
-  const [showActionSheet, setShowActionSheet] = useState(false);
-  const [friendListModalVisible, setFriendListModalVisible] = useState(false);
   const translateY = useSharedValue(0); // Khởi tạo giá trị animation
-  const [name, setName] = useState("채수빈");
-  const [email, setEmail] = useState("csb@gmail.com");
-  const [phone, setPhone] = useState("4060001290");
-  const [selectedField, setSelectedField] = useState("Edit name");
+  const generalSection: settingSection[] = [
+    { title: "Edit profile picture", icon: "camera-outline" },
+    { title: "Edit name", icon: "pencil" },
+    { title: "Edit phone number", icon: "call-outline" },
+    { title: "Edit email", icon: "mail-outline" },
+  ];
+  const dangerSection: settingSection[] = [
+    { title: "Delete account", icon: "trash-outline" },
+    { title: "Log out", icon: "log-out-outline" },
+  ];
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [showActionSheet, setShowActionSheet] = useState<boolean>(false);
+  const [friendListModalVisible, setFriendListModalVisible] =
+    useState<boolean>(false);
+  const [name, setName] = useState<string>("채수빈");
+  const [email, setEmail] = useState<string>("csb@gmail.com");
+  const [phone, setPhone] = useState<string>("4060001290");
+  const [selectedField, setSelectedField] = useState<string>("Edit name");
   const [profilePic, setProfilePic] = useState(
     require("@/assets/images/alligator.jpg"),
   );
-  const [friendList, setFriendList] = useState([
+  const [friendList, setFriendList] = useState<Friend[]>([
     { id: 1, name: "John Doe", avatar: require("@/assets/images/capy.jpg") },
     { id: 2, name: "Jane Smith", avatar: require("@/assets/images/corgi.jpg") },
     {
@@ -75,7 +103,7 @@ const ProfileScreen = () => {
     setShowActionSheet(true);
   };
 
-  const handleSave = (value, field) => {
+  const handleSave = (value: string, field: string) => {
     field.includes("name")
       ? setName(value)
       : field.includes("phone")
@@ -84,7 +112,7 @@ const ProfileScreen = () => {
     closeModal();
   };
 
-  const openModal = (field) => {
+  const openModal = (field: string) => {
     setSelectedField(field);
     setModalVisible(true);
     translateY.value = withTiming(0, { duration: 200 }); // Hiển thị modal từ dưới lên
@@ -168,12 +196,7 @@ const ProfileScreen = () => {
             borderRadius={10}
             style={{ backgroundColor: Colors.white }}
           >
-            {[
-              { title: "Edit profile picture", icon: "camera-outline" },
-              { title: "Edit name", icon: "pencil" },
-              { title: "Edit phone number", icon: "call-outline" },
-              { title: "Edit email", icon: "mail-outline" },
-            ].map((item, index) => (
+            {generalSection.map((item, index) => (
               <TouchableOpacity
                 key={index}
                 onPress={
@@ -182,7 +205,7 @@ const ProfileScreen = () => {
                     : () => openModal(item.title)
                 }
               >
-                <View row spread paddingV-10>
+                <View row spread paddingV-10 centerV>
                   <View row center gap-10>
                     <View bg-black br100 width={36} height={36} center>
                       <Ionicons name={item.icon} size={20} color="white" />
@@ -212,12 +235,9 @@ const ProfileScreen = () => {
             borderRadius={10}
             style={{ backgroundColor: Colors.white }}
           >
-            {[
-              { title: "Delete account", icon: "trash-outline" },
-              { title: "Log out", icon: "log-out-outline" },
-            ].map((item, index) => (
+            {dangerSection.map((item, index) => (
               <TouchableOpacity key={index} onPress={() => alert(item.title)}>
-                <View row spread paddingV-10>
+                <View row spread paddingV-10 centerV>
                   <View row center gap-10>
                     <View bg-black br100 width={36} height={36} center>
                       <Ionicons name={item.icon} size={20} color="white" />
@@ -237,7 +257,6 @@ const ProfileScreen = () => {
 
         {/* Popup modal */}
         <EditProfileModal
-          translateY={translateY}
           value={
             selectedField === "Edit name"
               ? name

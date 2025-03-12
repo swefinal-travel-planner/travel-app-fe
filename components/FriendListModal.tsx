@@ -21,19 +21,34 @@ import Modal from "react-native-modal";
 import { Share } from "react-native";
 import { Portal } from "react-native-paper";
 
-const FriendListModal = ({
+interface Friend {
+  id: number;
+  name: string;
+  avatar: string;
+}
+
+interface FriendListModalProps {
+  translateY: Animated.SharedValue<number>;
+  visible: boolean;
+  closeModal: () => void;
+  friendList: Friend[];
+  onUpdateFriendList: (updatedList: Friend[]) => void;
+}
+
+const FriendListModal: React.FC<FriendListModalProps> = ({
   translateY,
   visible,
   closeModal,
   friendList,
   onUpdateFriendList,
 }) => {
-  const [isSearching, setIsSearching] = useState(false);
-  const [visibleFriends, setVisibleFriends] = useState(3);
+  const [isSearching, setIsSearching] = useState<boolean>(false);
+  const [visibleFriends, setVisibleFriends] = useState<number>(3);
   const animatedHeight = useSharedValue(225);
-  const [selectedFriend, setSelectedFriend] = useState(null);
-  const [isDialogVisible, setIsDialogVisible] = useState(false);
-  const [filteredFriendlist, setFilteredFriendlist] = useState(friendList);
+  const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
+  const [isDialogVisible, setIsDialogVisible] = useState<boolean>(false);
+  const [filteredFriendlist, setFilteredFriendlist] =
+    useState<Friend[]>(friendList);
 
   const shareText = async () => {
     try {
@@ -49,7 +64,12 @@ const FriendListModal = ({
           url, // Android hỗ trợ tách riêng
         },
       });
-      await Share.share(shareOptions);
+
+      if (shareOptions) {
+        await Share.share(shareOptions);
+      } else {
+        console.error("No valid share options available");
+      }
     } catch (error) {
       console.log("Error sharing:", error);
     }
@@ -74,7 +94,7 @@ const FriendListModal = ({
     );
   }, [visibleFriends]);
 
-  const confirmDeleteFriend = (friend) => {
+  const confirmDeleteFriend = (friend: Friend) => {
     setSelectedFriend(friend);
     setIsDialogVisible(true);
   };
