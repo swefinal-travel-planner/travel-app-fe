@@ -15,6 +15,7 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
+import { z } from "zod";
 
 interface EditProfileModalProps {
   visible: boolean;
@@ -38,6 +39,28 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
     setTempValue(value);
     setError("");
   }, [value, visible]);
+
+  // Schema validation với Zod
+  const validateInput = (input: string) => {
+    let schema;
+    if (field.includes("name")) {
+      schema = z
+        .string()
+        .min(1, "Name must be between 1 and 20 characters long")
+        .max(20, "Name must be between 2 and 20 characters long");
+    } else if (field.includes("phone")) {
+      schema = z.string().regex(/^\d{10}$/, "Invalid phone number");
+    } else {
+      schema = z.string().email("Invalid email address");
+    }
+
+    const result = schema.safeParse(input);
+    if (!result.success) {
+      setError(result.error.errors[0].message);
+    } else {
+      setError("");
+    }
+  };
 
   // Gesture để vuốt xuống đóng modal
   const swipeDown = Gesture.Pan()
@@ -96,7 +119,10 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
               }
               keyboardType={field.includes("phone") ? "phone-pad" : "default"}
               value={tempValue}
-              onChangeText={setTempValue}
+              onChangeText={(text: string) => {
+                setTempValue(text);
+                validateInput(text);
+              }}
             />
             {error ? <Text style={styles.error}>{error}</Text> : null}
 
