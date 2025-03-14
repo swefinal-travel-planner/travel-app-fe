@@ -308,7 +308,7 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
                     label={visibleFriends === 3 ? "Show more" : "Show less"}
                     marginT-10
                     backgroundColor={
-                      friendList.length < 4 ? Colors.grey5 : Colors.green5
+                      friendList.length < 4 ? Colors.grey5 : "#3F6453"
                     }
                     labelStyle={{ fontWeight: "bold" }}
                     style={{ width: "auto", alignSelf: "center" }}
@@ -333,25 +333,27 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
                 borderRadius={10}
                 style={{ backgroundColor: Colors.white }}
               >
-                {[{ name: "Share your request link", icon: "link" }].map(
-                  (app, index) => (
-                    <TouchableOpacity key={index} onPress={shareText}>
-                      <View row spread centerV paddingV-10>
-                        <View row center gap-10>
-                          <View bg-black br100 width={50} height={50} center>
-                            <Ionicons name={app.icon} size={30} color="white" />
-                          </View>
-                          <Text>{app.name}</Text>
-                        </View>
-                        <Ionicons
-                          name="chevron-forward-outline"
-                          size={20}
-                          color="black"
-                        />
+                <TouchableOpacity onPress={shareText}>
+                  <View row spread centerV paddingV-10>
+                    <View row center gap-10>
+                      <View
+                        style={{ backgroundColor: "#32ADE6" }}
+                        br100
+                        width={50}
+                        height={50}
+                        center
+                      >
+                        <Ionicons name="link" size={30} color="white" />
                       </View>
-                    </TouchableOpacity>
-                  ),
-                )}
+                      <Text>Share your request link</Text>
+                    </View>
+                    <Ionicons
+                      name="chevron-forward-outline"
+                      size={20}
+                      color="black"
+                    />
+                  </View>
+                </TouchableOpacity>
               </Card>
             </ScrollView>
           </View>

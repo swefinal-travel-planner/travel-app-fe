@@ -13,8 +13,8 @@ import { useSharedValue, withTiming } from "react-native-reanimated";
 import { StatusBar } from "expo-status-bar";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import * as ImagePicker from "expo-image-picker";
-import EditProfileModal from "@/components/EditProfileModal";
-import FriendListModal from "@/components/FriendListModal";
+import EditProfileModal from "./components/EditProfileModal";
+import FriendListModal from "./components/FriendListModal";
 import { PaperProvider } from "react-native-paper";
 
 interface Friend {
@@ -32,19 +32,24 @@ interface settingSection {
     | "mail-outline"
     | "trash-outline"
     | "log-out-outline";
+  bgColor: string;
 }
 
 const ProfileScreen = () => {
   const translateY = useSharedValue(0); // Khởi tạo giá trị animation
   const generalSection: settingSection[] = [
-    { title: "Edit profile picture", icon: "camera-outline" },
-    { title: "Edit name", icon: "pencil" },
-    { title: "Edit phone number", icon: "call-outline" },
-    { title: "Edit email", icon: "mail-outline" },
+    {
+      title: "Edit profile picture",
+      icon: "camera-outline",
+      bgColor: "#A259FF",
+    },
+    { title: "Edit name", icon: "pencil", bgColor: "#34C759" },
+    { title: "Edit phone number", icon: "call-outline", bgColor: "#FF9500" },
+    { title: "Edit email", icon: "mail-outline", bgColor: "#FFCC00" },
   ];
   const dangerSection: settingSection[] = [
-    { title: "Delete account", icon: "trash-outline" },
-    { title: "Log out", icon: "log-out-outline" },
+    { title: "Delete account", icon: "trash-outline", bgColor: "#FF3B30" },
+    { title: "Log out", icon: "log-out-outline", bgColor: "#8E8E93" },
   ];
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [showActionSheet, setShowActionSheet] = useState<boolean>(false);
@@ -136,7 +141,7 @@ const ProfileScreen = () => {
   return (
     <PaperProvider>
       <GestureHandlerRootView
-        style={{ flex: 1, backgroundColor: Colors.grey80, paddingTop: 30 }}
+        style={{ flex: 1, backgroundColor: "#F2F2F7", paddingTop: 30 }}
       >
         <ScrollView contentContainerStyle={{ padding: 20 }}>
           {/* Avatar and name */}
@@ -171,7 +176,13 @@ const ProfileScreen = () => {
             <TouchableOpacity onPress={openFriendListModal}>
               <View row spread paddingV-10 centerV>
                 <View row center gap-10>
-                  <View bg-black br100 width={36} height={36} center>
+                  <View
+                    style={{ backgroundColor: "#007AFF" }}
+                    br100
+                    width={36}
+                    height={36}
+                    center
+                  >
                     <Ionicons name="people" size={20} color="white" />
                   </View>
                   <Text>{friendList.length} Friends</Text>
@@ -207,7 +218,13 @@ const ProfileScreen = () => {
               >
                 <View row spread paddingV-10 centerV>
                   <View row center gap-10>
-                    <View bg-black br100 width={36} height={36} center>
+                    <View
+                      style={{ backgroundColor: item.bgColor }}
+                      br100
+                      width={36}
+                      height={36}
+                      center
+                    >
                       <Ionicons name={item.icon} size={20} color="white" />
                     </View>
                     <Text>{item.title}</Text>
@@ -239,7 +256,13 @@ const ProfileScreen = () => {
               <TouchableOpacity key={index} onPress={() => alert(item.title)}>
                 <View row spread paddingV-10 centerV>
                   <View row center gap-10>
-                    <View bg-black br100 width={36} height={36} center>
+                    <View
+                      style={{ backgroundColor: item.bgColor }}
+                      br100
+                      width={36}
+                      height={36}
+                      center
+                    >
                       <Ionicons name={item.icon} size={20} color="white" />
                     </View>
                     <Text>{item.title}</Text>

@@ -130,7 +130,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
             <TouchableOpacity
               style={[
                 styles.saveButton,
-                { backgroundColor: error ? "gray" : "#4CAF50" },
+                { backgroundColor: error ? "gray" : "#3F6453" },
               ]}
               onPress={() => onSave(tempValue, field)}
               disabled={!!error}
@@ -154,12 +154,12 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   modalContent: {
-    backgroundColor: "#fff",
+    backgroundColor: "#FFF",
     padding: 20,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    borderTopLeftRadius: 40,
+    borderTopRightRadius: 40,
     alignItems: "center",
-    height: "40%",
+    height: "80%",
   },
   dragHandle: {
     width: 40,
@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
   input: {
     width: "100%",
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: "#3F6453",
     borderRadius: 10,
     padding: 10,
     marginBottom: 10,
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
   saveButton: {
     width: "100%",
     padding: 15,
-    borderRadius: 10,
+    borderRadius: 30,
     alignItems: "center",
   },
   saveText: {
