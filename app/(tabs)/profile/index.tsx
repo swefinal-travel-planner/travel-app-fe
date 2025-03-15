@@ -1,26 +1,68 @@
 import React, { useState } from "react";
-import { View, Text, Avatar, Card, Colors } from "react-native-ui-lib";
-import { TouchableOpacity, ScrollView, ActionSheetIOS } from "react-native";
+import {
+  View,
+  Text,
+  Avatar,
+  Card,
+  Colors,
+  ActionSheet,
+} from "react-native-ui-lib";
+import { TouchableOpacity, ScrollView, Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useSharedValue, withTiming } from "react-native-reanimated";
 import { StatusBar } from "expo-status-bar";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import * as ImagePicker from "expo-image-picker";
-import EditProfileModal from "@/components/EditProfileModal";
-import FriendListModal from "@/components/FriendListModal";
+import EditProfileModal from "./components/EditProfileModal";
+import FriendListModal from "./components/FriendListModal";
+import { PaperProvider } from "react-native-paper";
+
+interface Friend {
+  id: number;
+  name: string;
+  avatar: string;
+}
+
+interface settingSection {
+  title: string;
+  icon:
+    | "camera-outline"
+    | "pencil"
+    | "call-outline"
+    | "mail-outline"
+    | "trash-outline"
+    | "log-out-outline";
+  bgColor: string;
+}
 
 const ProfileScreen = () => {
-  const [modalVisible, setModalVisible] = useState(false);
-  const [friendListModalVisible, setFriendListModalVisible] = useState(false);
   const translateY = useSharedValue(0); // Khởi tạo giá trị animation
-  const [name, setName] = useState("채수빈");
-  const [email, setEmail] = useState("csb@gmail.com");
-  const [phone, setPhone] = useState("4060001290");
-  const [selectedField, setSelectedField] = useState("Edit name");
+  const generalSection: settingSection[] = [
+    {
+      title: "Edit profile picture",
+      icon: "camera-outline",
+      bgColor: "#A259FF",
+    },
+    { title: "Edit name", icon: "pencil", bgColor: "#34C759" },
+    { title: "Edit phone number", icon: "call-outline", bgColor: "#FF9500" },
+    { title: "Edit email", icon: "mail-outline", bgColor: "#FFCC00" },
+  ];
+  const dangerSection: settingSection[] = [
+    { title: "Delete account", icon: "trash-outline", bgColor: "#FF3B30" },
+    { title: "Log out", icon: "log-out-outline", bgColor: "#8E8E93" },
+  ];
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [showActionSheet, setShowActionSheet] = useState<boolean>(false);
+  const [friendListModalVisible, setFriendListModalVisible] =
+    useState<boolean>(false);
+  const [name, setName] = useState<string>("채수빈");
+  const [email, setEmail] = useState<string>("csb@gmail.com");
+  const [phone, setPhone] = useState<string>("4060001290");
+  const [selectedField, setSelectedField] = useState<string>("Edit name");
   const [profilePic, setProfilePic] = useState(
     require("@/assets/images/alligator.jpg"),
   );
-  const [friendList, setFriendList] = useState([
+  const [friendList, setFriendList] = useState<Friend[]>([
     { id: 1, name: "John Doe", avatar: require("@/assets/images/capy.jpg") },
     { id: 2, name: "Jane Smith", avatar: require("@/assets/images/corgi.jpg") },
     {
@@ -37,6 +79,7 @@ const ProfileScreen = () => {
     },
   ]);
 
+  // Mở album ảnh
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -44,7 +87,6 @@ const ProfileScreen = () => {
       aspect: [1, 1],
       quality: 1,
     });
-
     if (!result.canceled) {
       setProfilePic({ uri: result.assets[0].uri });
     }
@@ -57,32 +99,16 @@ const ProfileScreen = () => {
       aspect: [1, 1],
       quality: 1,
     });
-
     if (!result.canceled) {
       setProfilePic({ uri: result.assets[0].uri });
     }
   };
 
-  // Hiển thị Action Sheet trên iOS
   const openActionSheet = () => {
-    ActionSheetIOS.showActionSheetWithOptions(
-      {
-        options: ["Take Photo", "Choose from Library", "Cancel"],
-        cancelButtonIndex: 2,
-        title: "Change your profile picture",
-        message: "Your profile picture is visible to all your friends",
-      },
-      (buttonIndex) => {
-        if (buttonIndex === 0) {
-          takePhoto(); // Chụp ảnh
-        } else if (buttonIndex === 1) {
-          pickImage(); // Chọn ảnh từ thư viện
-        }
-      },
-    );
+    setShowActionSheet(true);
   };
 
-  const handleSave = (value, field) => {
+  const handleSave = (value: string, field: string) => {
     field.includes("name")
       ? setName(value)
       : field.includes("phone")
@@ -91,7 +117,7 @@ const ProfileScreen = () => {
     closeModal();
   };
 
-  const openModal = (field) => {
+  const openModal = (field: string) => {
     setSelectedField(field);
     setModalVisible(true);
     translateY.value = withTiming(0, { duration: 200 }); // Hiển thị modal từ dưới lên
@@ -113,15 +139,15 @@ const ProfileScreen = () => {
   };
 
   return (
-    <>
+    <PaperProvider>
       <GestureHandlerRootView
-        style={{ flex: 1, backgroundColor: Colors.grey80, paddingTop: 30 }}
+        style={{ flex: 1, backgroundColor: "#F2F2F7", paddingTop: 30 }}
       >
         <ScrollView contentContainerStyle={{ padding: 20 }}>
           {/* Avatar and name */}
           <View center>
             <TouchableOpacity
-              onPress={() => openActionSheet()}
+              onPress={openActionSheet}
               style={{
                 borderWidth: 5,
                 borderColor: "green",
@@ -138,7 +164,7 @@ const ProfileScreen = () => {
 
           {/* Friendlist */}
           <View row centerV gap-5 marginB-10>
-            <Ionicons name="person-add" size={20} color="black" />
+            <Ionicons name="person-add" size={25} color="black" />
             <Text>Friend</Text>
           </View>
           <Card
@@ -150,7 +176,13 @@ const ProfileScreen = () => {
             <TouchableOpacity onPress={openFriendListModal}>
               <View row spread paddingV-10 centerV>
                 <View row center gap-10>
-                  <View bg-black br100 width={36} height={36} center>
+                  <View
+                    style={{ backgroundColor: "#007AFF" }}
+                    br100
+                    width={36}
+                    height={36}
+                    center
+                  >
                     <Ionicons name="people" size={20} color="white" />
                   </View>
                   <Text>{friendList.length} Friends</Text>
@@ -175,12 +207,7 @@ const ProfileScreen = () => {
             borderRadius={10}
             style={{ backgroundColor: Colors.white }}
           >
-            {[
-              { title: "Edit profile picture", icon: "camera-outline" },
-              { title: "Edit name", icon: "pencil" },
-              { title: "Edit phone number", icon: "call-outline" },
-              { title: "Edit email", icon: "mail-outline" },
-            ].map((item, index) => (
+            {generalSection.map((item, index) => (
               <TouchableOpacity
                 key={index}
                 onPress={
@@ -189,10 +216,16 @@ const ProfileScreen = () => {
                     : () => openModal(item.title)
                 }
               >
-                <View row spread paddingV-10>
+                <View row spread paddingV-10 centerV>
                   <View row center gap-10>
-                    <View bg-black br100 width={36} height={36} center>
-                      <Ionicons name={item.icon} size={25} color="white" />
+                    <View
+                      style={{ backgroundColor: item.bgColor }}
+                      br100
+                      width={36}
+                      height={36}
+                      center
+                    >
+                      <Ionicons name={item.icon} size={20} color="white" />
                     </View>
                     <Text>{item.title}</Text>
                   </View>
@@ -219,14 +252,17 @@ const ProfileScreen = () => {
             borderRadius={10}
             style={{ backgroundColor: Colors.white }}
           >
-            {[
-              { title: "Delete account", icon: "trash-outline" },
-              { title: "Log out", icon: "log-out-outline" },
-            ].map((item, index) => (
+            {dangerSection.map((item, index) => (
               <TouchableOpacity key={index} onPress={() => alert(item.title)}>
-                <View row spread paddingV-10>
+                <View row spread paddingV-10 centerV>
                   <View row center gap-10>
-                    <View bg-black br100 width={36} height={36} center>
+                    <View
+                      style={{ backgroundColor: item.bgColor }}
+                      br100
+                      width={36}
+                      height={36}
+                      center
+                    >
                       <Ionicons name={item.icon} size={20} color="white" />
                     </View>
                     <Text>{item.title}</Text>
@@ -244,7 +280,6 @@ const ProfileScreen = () => {
 
         {/* Popup modal */}
         <EditProfileModal
-          translateY={translateY}
           value={
             selectedField === "Edit name"
               ? name
@@ -266,9 +301,24 @@ const ProfileScreen = () => {
           friendList={friendList}
           onUpdateFriendList={setFriendList}
         />
+
+        <ActionSheet
+          visible={showActionSheet}
+          onDismiss={() => setShowActionSheet(false)}
+          useNativeIOS={Platform.OS === "ios" ? true : false}
+          options={[
+            { label: "Take Photo", onPress: takePhoto },
+            { label: "Choose from Library", onPress: pickImage },
+            {
+              label: "Cancel",
+              onPress: () => setShowActionSheet(false),
+              cancel: true,
+            },
+          ]}
+        />
       </GestureHandlerRootView>
       <StatusBar style="dark" />
-    </>
+    </PaperProvider>
   );
 };
 export default ProfileScreen;
