@@ -13,9 +13,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   GoogleSignin,
   isErrorWithCode,
-  isSuccessResponse,
   statusCodes,
 } from "@react-native-google-signin/google-signin";
+import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
+import { auth } from "@/firebaseConfig";
 
 import TextField from "@/components/input/TextField";
 import PasswordField from "@/components/input/PasswordField";
