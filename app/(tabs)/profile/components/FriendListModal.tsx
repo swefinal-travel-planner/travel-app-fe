@@ -3,39 +3,52 @@ import {
   View,
   Text,
   Colors,
-  Modal,
   Card,
   Avatar,
   Button,
   TextField,
 } from "react-native-ui-lib";
 import { KeyboardAvoidingView, Platform, TouchableOpacity } from "react-native";
-import {
-  PanGestureHandler,
-  ScrollView,
-  State,
-} from "react-native-gesture-handler";
+import { ScrollView } from "react-native-gesture-handler";
 import Animated, {
   withSpring,
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import Dialog from "react-native-dialog";
+import Modal from "react-native-modal";
 import { Share } from "react-native";
+import { Portal } from "react-native-paper";
 
-const FriendListModal = ({
+interface Friend {
+  id: number;
+  name: string;
+  avatar: string;
+}
+
+interface FriendListModalProps {
+  translateY: Animated.SharedValue<number>;
+  visible: boolean;
+  closeModal: () => void;
+  friendList: Friend[];
+  onUpdateFriendList: (updatedList: Friend[]) => void;
+}
+
+const FriendListModal: React.FC<FriendListModalProps> = ({
   translateY,
   visible,
   closeModal,
   friendList,
   onUpdateFriendList,
 }) => {
-  const [isSearching, setIsSearching] = useState(false);
-  const [visibleFriends, setVisibleFriends] = useState(3);
+  const [isSearching, setIsSearching] = useState<boolean>(false);
+  const [visibleFriends, setVisibleFriends] = useState<number>(3);
   const animatedHeight = useSharedValue(225);
-  const [selectedFriend, setSelectedFriend] = useState(null);
-  const [deleteConfirmVisible, setDeleteConfirmVisible] = useState(false);
-  const [filteredFriendlist, setFilteredFriendlist] = useState(friendList);
+  const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
+  const [isDialogVisible, setIsDialogVisible] = useState<boolean>(false);
+  const [filteredFriendlist, setFilteredFriendlist] =
+    useState<Friend[]>(friendList);
 
   const shareText = async () => {
     try {
@@ -51,7 +64,12 @@ const FriendListModal = ({
           url, // Android hỗ trợ tách riêng
         },
       });
-      await Share.share(shareOptions);
+
+      if (shareOptions) {
+        await Share.share(shareOptions);
+      } else {
+        console.error("No valid share options available");
+      }
     } catch (error) {
       console.log("Error sharing:", error);
     }
@@ -76,9 +94,9 @@ const FriendListModal = ({
     );
   }, [visibleFriends]);
 
-  const confirmDeleteFriend = (friend) => {
+  const confirmDeleteFriend = (friend: Friend) => {
     setSelectedFriend(friend);
-    setDeleteConfirmVisible(true);
+    setIsDialogVisible(true);
   };
 
   const handleDeleteFriend = () => {
@@ -87,38 +105,16 @@ const FriendListModal = ({
         (friend) => friend.id !== selectedFriend.id,
       );
 
-      // Cập nhật danh sách bạn bè trong state hoặc từ props
       setFilteredFriendlist(updatedList);
       onUpdateFriendList(updatedList);
 
-      // Kiểm tra nếu visibleFriends đang hiển thị toàn bộ danh sách hoặc bị giảm xuống dưới 3
       const newVisibleFriends = Math.min(visibleFriends, updatedList.length);
       setVisibleFriends(newVisibleFriends);
 
-      // Reset các state cần thiết
-      setDeleteConfirmVisible(false);
+      setIsDialogVisible(false);
       setSelectedFriend(null);
     }
   };
-
-  const onGestureEvent = (event) => {
-    translateY.value = event.nativeEvent.translationY;
-  };
-
-  const onHandlerStateChange = (event) => {
-    if (event.nativeEvent.state === State.END) {
-      if (event.nativeEvent.translationY > 100) {
-        closeModal();
-      } else {
-        translateY.value = withSpring(0);
-      }
-    }
-  };
-
-  // Animation đóng/mở modal
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: translateY.value }],
-  }));
 
   // Animation mở rộng input khi search
   const inputAnimatedStyle = useAnimatedStyle(() => ({
@@ -138,16 +134,41 @@ const FriendListModal = ({
   }));
 
   return (
-    <Modal visible={visible} animationType="slide" transparent>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1 }}
+    <>
+      {/* Confirm Delete Friend Dialog */}
+      <Portal>
+        <Dialog.Container visible={isDialogVisible}>
+          <Dialog.Title>Remove Friend</Dialog.Title>
+          <Dialog.Description>
+            Are you sure you want to remove{" "}
+            <Text style={{ fontWeight: "bold" }}>{selectedFriend?.name}</Text>{" "}
+            from your friends list?
+          </Dialog.Description>
+          <Dialog.Button
+            label="Cancel"
+            onPress={() => setIsDialogVisible(false)}
+          />
+          <Dialog.Button
+            label="Delete"
+            onPress={handleDeleteFriend}
+            color="red"
+          />
+        </Dialog.Container>
+      </Portal>
+
+      <Modal
+        isVisible={visible}
+        onBackdropPress={closeModal}
+        swipeDirection="down"
+        onSwipeComplete={closeModal}
+        backdropOpacity={0.5}
+        style={{ margin: 0, justifyContent: "flex-end" }}
       >
-        <PanGestureHandler
-          onGestureEvent={onGestureEvent}
-          onHandlerStateChange={onHandlerStateChange}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={{ flex: 1 }}
         >
-          <Animated.View
+          <View
             style={[
               {
                 height: "95%",
@@ -156,7 +177,6 @@ const FriendListModal = ({
                 borderTopRightRadius: 20,
                 marginTop: "auto",
               },
-              animatedStyle,
             ]}
           >
             <View centerH marginV-10>
@@ -170,6 +190,8 @@ const FriendListModal = ({
                 }}
               />
             </View>
+
+            {/* Search input field */}
             {!isSearching ? (
               <Animated.View
                 style={[
@@ -230,6 +252,7 @@ const FriendListModal = ({
             )}
 
             <ScrollView style={{ padding: 20 }}>
+              {/* Friendlist */}
               <View row centerV gap-5 marginT-20 marginB-10>
                 <Ionicons name="people" size={25} color="black" />
                 <Text text60>Your friends</Text>
@@ -252,8 +275,8 @@ const FriendListModal = ({
                   ) : (
                     filteredFriendlist
                       .slice(0, visibleFriends)
-                      .map((friend, id) => (
-                        <View key={id} row spread paddingV-10 centerV>
+                      .map((friend, index) => (
+                        <View key={index} row spread paddingV-10 centerV>
                           <View row center gap-10>
                             <View
                               style={{
@@ -285,7 +308,7 @@ const FriendListModal = ({
                     label={visibleFriends === 3 ? "Show more" : "Show less"}
                     marginT-10
                     backgroundColor={
-                      friendList.length < 4 ? Colors.grey5 : Colors.green5
+                      friendList.length < 4 ? Colors.grey5 : "#3F6453"
                     }
                     labelStyle={{ fontWeight: "bold" }}
                     style={{ width: "auto", alignSelf: "center" }}
@@ -299,6 +322,7 @@ const FriendListModal = ({
                 )}
               </Card>
 
+              {/* Share request link */}
               <View row centerV gap-5 marginT-20 marginB-10>
                 <Ionicons name="paper-plane" size={25} color="black" />
                 <Text text60>Share your request link</Text>
@@ -309,65 +333,34 @@ const FriendListModal = ({
                 borderRadius={10}
                 style={{ backgroundColor: Colors.white }}
               >
-                {[
-                  { name: "Share your request link", icon: "link" },
-                  // { name: "Facebook", icon: "logo-facebook" },
-                  // { name: "Instagram", icon: "logo-instagram" },
-                  // { name: "LinkedIn", icon: "logo-linkedin" },
-                  // { name: "Tiktok", icon: "logo-tiktok" },
-                ].map((app, index) => (
-                  <TouchableOpacity key={index} onPress={shareText}>
-                    <View row spread centerV paddingV-10>
-                      <View row center gap-10>
-                        <View bg-black br100 width={50} height={50} center>
-                          <Ionicons name={app.icon} size={30} color="white" />
-                        </View>
-                        <Text>{app.name}</Text>
+                <TouchableOpacity onPress={shareText}>
+                  <View row spread centerV paddingV-10>
+                    <View row center gap-10>
+                      <View
+                        style={{ backgroundColor: "#32ADE6" }}
+                        br100
+                        width={50}
+                        height={50}
+                        center
+                      >
+                        <Ionicons name="link" size={30} color="white" />
                       </View>
-                      <Ionicons
-                        name="chevron-forward-outline"
-                        size={20}
-                        color="black"
-                      />
+                      <Text>Share your request link</Text>
                     </View>
-                  </TouchableOpacity>
-                ))}
+                    <Ionicons
+                      name="chevron-forward-outline"
+                      size={20}
+                      color="black"
+                    />
+                  </View>
+                </TouchableOpacity>
               </Card>
             </ScrollView>
-          </Animated.View>
-        </PanGestureHandler>
-      </KeyboardAvoidingView>
-
-      <Modal visible={deleteConfirmVisible} transparent animationType="fade">
-        <View flex center style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
-          <Card
-            padding-20
-            width={300}
-            center
-            style={{ backgroundColor: "white", borderRadius: 10 }}
-          >
-            <Text text60>Remove Friend</Text>
-            <Text marginV-10>
-              Are you sure you want to remove{" "}
-              <Text style={{ fontWeight: "bold" }}>{selectedFriend?.name}</Text>{" "}
-              from your friends list?
-            </Text>
-
-            <View row spread gap-4>
-              <Button
-                label="Delete"
-                backgroundColor="red"
-                onPress={handleDeleteFriend}
-              />
-              <Button
-                label="Cancel"
-                onPress={() => setDeleteConfirmVisible(false)}
-              />
-            </View>
-          </Card>
-        </View>
+          </View>
+        </KeyboardAvoidingView>
       </Modal>
-    </Modal>
+    </>
   );
 };
+
 export default FriendListModal;

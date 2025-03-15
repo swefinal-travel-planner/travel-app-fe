@@ -9,6 +9,7 @@ export default function TabLayout() {
         headerShown: false,
         tabBarActiveTintColor: "#563D30",
         tabBarInactiveTintColor: "#A68372",
+        tabBarHideOnKeyboard: true,
         tabBarStyle: {
           paddingTop: 5,
           height: Platform.OS === "ios" ? 90 : 80,
