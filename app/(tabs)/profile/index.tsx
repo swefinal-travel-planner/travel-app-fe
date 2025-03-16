@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import {
   View,
   Text,
-  Avatar,
   Card,
   Colors,
   ActionSheet,
@@ -11,13 +10,14 @@ import {
 } from "react-native-ui-lib";
 import { TouchableOpacity, ScrollView, Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { useSharedValue, withTiming } from "react-native-reanimated";
 import { StatusBar } from "expo-status-bar";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import * as ImagePicker from "expo-image-picker";
 import EditProfileModal from "./components/EditProfileModal";
 import FriendListModal from "./components/FriendListModal";
 import { PaperProvider } from "react-native-paper";
+import { useNavigation } from "@react-navigation/native";
+import { Dimensions } from "react-native";
 
 interface Friend {
   id: number;
@@ -37,7 +37,7 @@ interface settingSection {
 }
 
 const ProfileScreen = () => {
-  const translateY = useSharedValue(0); // Khởi tạo giá trị animation
+  const navigation = useNavigation();
   const generalSection: settingSection[] = [
     {
       title: "Edit profile picture",
@@ -120,44 +120,40 @@ const ProfileScreen = () => {
   const openModal = (field: string) => {
     setSelectedField(field);
     setModalVisible(true);
-    translateY.value = withTiming(0, { duration: 200 }); // Hiển thị modal từ dưới lên
   };
 
   const closeModal = () => {
-    translateY.value = withTiming(800, { duration: 100 }); // Kéo xuống để ẩn modal
-    setTimeout(() => setModalVisible(false), 100);
+    setModalVisible(false);
   };
 
   const openFriendListModal = () => {
     setFriendListModalVisible(true);
-    translateY.value = withTiming(0, { duration: 200 });
   };
 
   const closeFriendListModal = () => {
-    translateY.value = withTiming(800, { duration: 100 });
-    setTimeout(() => setFriendListModalVisible(false), 100);
+    setFriendListModalVisible(false);
   };
 
   return (
     <PaperProvider>
       <GestureHandlerRootView style={{ flex: 1, backgroundColor: "#EEF8EF" }}>
-        <ScrollView contentContainerStyle={{ paddingHorizontal: 20 }}>
+        <ScrollView
+          contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 30 }}
+        >
           {/* Avatar and Personal Information */}
           <View center>
-            {/* <TouchableOpacity
-              onPress={openActionSheet}
-              style={{
-                borderWidth: 5,
-                borderColor: "green",
-                borderRadius: 100,
-                padding: 3,
-              }}
-            >
-              <Avatar size={120} source={profilePic} />
-            </TouchableOpacity> */}
-
             <View center marginB-60 style={{ position: "relative" }}>
-              <Image width={410} height={410} source={profilePic} />
+              <Image
+                source={profilePic}
+                style={{
+                  width: Dimensions.get("window").width - 30,
+                  height: Dimensions.get("window").width - 30,
+                  borderRadius: 20,
+                  borderWidth: 4,
+                  borderColor: "#3F6453",
+                  resizeMode: "cover",
+                }}
+              />
               <View
                 style={{
                   position: "absolute",
@@ -205,7 +201,11 @@ const ProfileScreen = () => {
             <View flex center padding-10 style={{ borderRightWidth: 1 }}>
               <Text text70>Number of Trips</Text>
               <Text text50BO>70</Text>
-              <Button label="Go to My trips" backgroundColor="#3F6453" />
+              <Button
+                label="Go to My trips"
+                backgroundColor="#3F6453"
+                onPress={() => navigation.navigate("my-trips")}
+              />
             </View>
 
             <View flex center padding-10>
@@ -348,7 +348,6 @@ const ProfileScreen = () => {
 
         {/* Friend list modal */}
         <FriendListModal
-          translateY={translateY}
           visible={friendListModalVisible}
           closeModal={closeFriendListModal}
           friendList={friendList}

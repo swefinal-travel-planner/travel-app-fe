@@ -28,7 +28,6 @@ interface Friend {
 }
 
 interface FriendListModalProps {
-  translateY: Animated.SharedValue<number>;
   visible: boolean;
   closeModal: () => void;
   friendList: Friend[];
@@ -36,7 +35,6 @@ interface FriendListModalProps {
 }
 
 const FriendListModal: React.FC<FriendListModalProps> = ({
-  translateY,
   visible,
   closeModal,
   friendList,
