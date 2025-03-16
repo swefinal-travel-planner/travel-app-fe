@@ -2,20 +2,22 @@ import React, { useState } from "react";
 import {
   View,
   Text,
-  Avatar,
   Card,
   Colors,
   ActionSheet,
+  Button,
+  Image,
 } from "react-native-ui-lib";
 import { TouchableOpacity, ScrollView, Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { useSharedValue, withTiming } from "react-native-reanimated";
 import { StatusBar } from "expo-status-bar";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import * as ImagePicker from "expo-image-picker";
 import EditProfileModal from "./components/EditProfileModal";
 import FriendListModal from "./components/FriendListModal";
 import { PaperProvider } from "react-native-paper";
+import { useNavigation } from "@react-navigation/native";
+import { Dimensions } from "react-native";
 
 interface Friend {
   id: number;
@@ -32,30 +34,28 @@ interface settingSection {
     | "mail-outline"
     | "trash-outline"
     | "log-out-outline";
-  bgColor: string;
 }
 
 const ProfileScreen = () => {
-  const translateY = useSharedValue(0); // Khởi tạo giá trị animation
+  const navigation = useNavigation();
   const generalSection: settingSection[] = [
     {
       title: "Edit profile picture",
       icon: "camera-outline",
-      bgColor: "#A259FF",
     },
-    { title: "Edit name", icon: "pencil", bgColor: "#34C759" },
-    { title: "Edit phone number", icon: "call-outline", bgColor: "#FF9500" },
-    { title: "Edit email", icon: "mail-outline", bgColor: "#FFCC00" },
+    { title: "Edit name", icon: "pencil" },
+    { title: "Edit phone number", icon: "call-outline" },
+    { title: "Edit email", icon: "mail-outline" },
   ];
   const dangerSection: settingSection[] = [
-    { title: "Delete account", icon: "trash-outline", bgColor: "#FF3B30" },
-    { title: "Log out", icon: "log-out-outline", bgColor: "#8E8E93" },
+    { title: "Delete account", icon: "trash-outline" },
+    { title: "Log out", icon: "log-out-outline" },
   ];
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [showActionSheet, setShowActionSheet] = useState<boolean>(false);
   const [friendListModalVisible, setFriendListModalVisible] =
     useState<boolean>(false);
-  const [name, setName] = useState<string>("채수빈");
+  const [name, setName] = useState<string>("Đặng Nhật Beo");
   const [email, setEmail] = useState<string>("csb@gmail.com");
   const [phone, setPhone] = useState<string>("4060001290");
   const [selectedField, setSelectedField] = useState<string>("Edit name");
@@ -120,46 +120,99 @@ const ProfileScreen = () => {
   const openModal = (field: string) => {
     setSelectedField(field);
     setModalVisible(true);
-    translateY.value = withTiming(0, { duration: 200 }); // Hiển thị modal từ dưới lên
   };
 
   const closeModal = () => {
-    translateY.value = withTiming(800, { duration: 100 }); // Kéo xuống để ẩn modal
-    setTimeout(() => setModalVisible(false), 100);
+    setModalVisible(false);
   };
 
   const openFriendListModal = () => {
     setFriendListModalVisible(true);
-    translateY.value = withTiming(0, { duration: 200 });
   };
 
   const closeFriendListModal = () => {
-    translateY.value = withTiming(800, { duration: 100 });
-    setTimeout(() => setFriendListModalVisible(false), 100);
+    setFriendListModalVisible(false);
   };
 
   return (
     <PaperProvider>
-      <GestureHandlerRootView
-        style={{ flex: 1, backgroundColor: "#F2F2F7", paddingTop: 30 }}
-      >
-        <ScrollView contentContainerStyle={{ padding: 20 }}>
-          {/* Avatar and name */}
+      <GestureHandlerRootView style={{ flex: 1, backgroundColor: "#EEF8EF" }}>
+        <ScrollView
+          contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 30 }}
+        >
+          {/* Avatar and Personal Information */}
           <View center>
-            <TouchableOpacity
-              onPress={openActionSheet}
-              style={{
-                borderWidth: 5,
-                borderColor: "green",
-                borderRadius: 100,
-                padding: 3,
-              }}
-            >
-              <Avatar size={120} source={profilePic} />
-            </TouchableOpacity>
-            <Text text50 marginT-10>
-              {name}
-            </Text>
+            <View center marginB-60 style={{ position: "relative" }}>
+              <Image
+                source={profilePic}
+                style={{
+                  width: Dimensions.get("window").width - 30,
+                  height: Dimensions.get("window").width - 30,
+                  borderRadius: 20,
+                  borderWidth: 4,
+                  borderColor: "#3F6453",
+                  resizeMode: "cover",
+                }}
+              />
+              <View
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  alignItems: "center",
+                  transform: [{ translateY: 40 }],
+                  backgroundColor: "#3F6453",
+                  paddingVertical: 10,
+                  paddingHorizontal: 20,
+                  marginHorizontal: 20,
+                  borderRadius: 10,
+                }}
+              >
+                <Text text50 marginT-10 color="white">
+                  {name}
+                </Text>
+                <View
+                  row
+                  style={{ alignItems: "baseline", justifyContent: "center" }}
+                >
+                  <Text text70 color="white">
+                    {" "}
+                    {phone}{" "}
+                  </Text>
+                  <Text color="white"> - </Text>
+                  <Text text70 color="white">
+                    {" "}
+                    {email}{" "}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+
+          <View
+            marginT-10
+            marginB-25
+            paddingV-10
+            row
+            backgroundColor="white"
+            style={{ borderWidth: 1, borderRadius: 10, overflow: "hidden" }}
+          >
+            <View flex center padding-10 style={{ borderRightWidth: 1 }}>
+              <Text text70>Number of Trips</Text>
+              <Text text50BO>70</Text>
+              <Button
+                label="Go to My trips"
+                backgroundColor="#3F6453"
+                onPress={() => navigation.navigate("my-trips")}
+              />
+            </View>
+
+            <View flex center padding-10>
+              <Text text70>Completed Trips</Text>
+              <Text text50BO>50</Text>
+              <Button label="View Trip history" backgroundColor="#3F6453" />
+            </View>
           </View>
 
           {/* Friendlist */}
@@ -177,7 +230,7 @@ const ProfileScreen = () => {
               <View row spread paddingV-10 centerV>
                 <View row center gap-10>
                   <View
-                    style={{ backgroundColor: "#007AFF" }}
+                    style={{ backgroundColor: "#3F6453" }}
                     br100
                     width={36}
                     height={36}
@@ -219,7 +272,7 @@ const ProfileScreen = () => {
                 <View row spread paddingV-10 centerV>
                   <View row center gap-10>
                     <View
-                      style={{ backgroundColor: item.bgColor }}
+                      style={{ backgroundColor: "#3F6453" }}
                       br100
                       width={36}
                       height={36}
@@ -257,7 +310,7 @@ const ProfileScreen = () => {
                 <View row spread paddingV-10 centerV>
                   <View row center gap-10>
                     <View
-                      style={{ backgroundColor: item.bgColor }}
+                      style={{ backgroundColor: "#3F6453" }}
                       br100
                       width={36}
                       height={36}
@@ -295,7 +348,6 @@ const ProfileScreen = () => {
 
         {/* Friend list modal */}
         <FriendListModal
-          translateY={translateY}
           visible={friendListModalVisible}
           closeModal={closeFriendListModal}
           friendList={friendList}
