@@ -13,9 +13,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   GoogleSignin,
   isErrorWithCode,
-  isSuccessResponse,
   statusCodes,
 } from "@react-native-google-signin/google-signin";
+import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
+import { auth } from "@/firebaseConfig";
 
 import TextField from "@/components/input/TextField";
 import PasswordField from "@/components/input/PasswordField";
@@ -70,12 +71,24 @@ export default function SignUp() {
   const handleGoogleLogin = async () => {
     try {
       await GoogleSignin.hasPlayServices();
-      const response = await GoogleSignin.signIn();
-      if (isSuccessResponse(response)) {
-        console.log(response.data);
+      const userInfo = await GoogleSignin.signIn();
+
+      if (userInfo && userInfo.data?.idToken) {
+        const googleCredential = GoogleAuthProvider.credential(
+          userInfo.data.idToken,
+        );
+
+        const firebaseUserCredential = await signInWithCredential(
+          auth,
+          googleCredential,
+        );
+
+        const user = firebaseUserCredential.user;
+        console.log("Firebase user:", user);
+
         router.replace("/(tabs)");
       } else {
-        console.log("Google sign-in cancelled");
+        console.log("Google sign-in cancelled or ID token missing");
       }
     } catch (error) {
       if (isErrorWithCode(error)) {
@@ -87,10 +100,10 @@ export default function SignUp() {
             // Android only, play services not available or outdated
             break;
           default:
-          // some other error happened
+            console.error("Google sign-in error:", error);
         }
       } else {
-        // an error that's not related to google sign in occurred
+        console.error("Google sign-in error:", error);
       }
     }
   };
