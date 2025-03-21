@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
   disabledBg: { backgroundColor: "#E5E5E5" },
   title: {
     fontSize: 14,
-    fontFamily: "NotoSerif_700Bold",
+    fontFamily: "NotoSerif_400Regular",
   },
   otpDisabledBg: {},
   primaryTitle: {

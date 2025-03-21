@@ -10,6 +10,7 @@ interface PressableOpacityProps {
 const PressableOpacity = ({
   children,
   onPress,
+  style,
   ...props
 }: PressableOpacityProps) => {
   const animated = useRef(new Animated.Value(1)).current;
@@ -17,14 +18,14 @@ const PressableOpacity = ({
   const fadeIn = () => {
     Animated.timing(animated, {
       toValue: 0.1,
-      duration: 100,
+      duration: 50,
       useNativeDriver: true,
     }).start();
   };
   const fadeOut = () => {
     Animated.timing(animated, {
       toValue: 1,
-      duration: 200,
+      duration: 70,
       useNativeDriver: true,
     }).start();
   };
@@ -36,7 +37,9 @@ const PressableOpacity = ({
       onPress={onPress}
       {...props}
     >
-      <Animated.View style={{ opacity: animated }}>{children}</Animated.View>
+      <Animated.View style={[style, { opacity: animated }]}>
+        {children}
+      </Animated.View>
     </Pressable>
   );
 };
