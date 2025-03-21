@@ -18,12 +18,18 @@ import {
 import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 import { auth } from "@/firebaseConfig";
 
+import axios from "axios";
+import api from "@/api/api";
+
 import TextField from "@/components/input/TextField";
 import PasswordField from "@/components/input/PasswordField";
 import Pressable from "@/components/Pressable";
 
 import styles from "../styles";
 import PressableOpacity from "@/components/PressableOpacity";
+
+// API url
+const url = process.env.EXPO_PUBLIC_API_URL;
 
 interface SignupFormData {
   name: string;
@@ -84,14 +90,30 @@ export default function SignUp() {
         );
 
         const user = firebaseUserCredential.user;
-        console.log("Firebase user:", user);
+
+        const payload = {
+          displayName: user.displayName || "",
+          email: user.email || "",
+          password: "googlelogin", // placeholder since password is not applicable for Google login
+          phoneNumber: user.phoneNumber || "",
+          photoURL: user.photoURL || "",
+          uid: user.uid,
+        };
+
+        console.log("Google login payload:", payload);
+
+        await api.post(`${url}/api/v1/auth/google-login`, payload);
+        console.log("yay");
 
         router.replace("/(tabs)");
       } else {
         console.log("Google sign-in cancelled or ID token missing");
       }
     } catch (error) {
-      if (isErrorWithCode(error)) {
+      if (axios.isAxiosError(error)) {
+        // handle errors coming from the API call
+        console.error("API error:", error.response?.data || error.message);
+      } else if (isErrorWithCode(error)) {
         switch (error.code) {
           case statusCodes.IN_PROGRESS:
             // operation (eg. sign in) already in progress
@@ -108,8 +130,26 @@ export default function SignUp() {
     }
   };
 
-  const onSubmit = (data: SignupFormData): void => {
-    router.push("/signup/otp");
+  // handle regular signup
+  const onSubmit = async (data: SignupFormData) => {
+    try {
+      const payload = {
+        email: data.email || "",
+        name: data.name || "",
+        password: data.password || "",
+      };
+
+      await api.post(`${url}/api/v1/auth/register`, payload);
+
+      router.replace("/login");
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        // handle errors coming from the API call
+        console.error("API error:", error.response?.data || error.message);
+      } else {
+        console.error("Signup error:", error);
+      }
+    }
   };
 
   return (

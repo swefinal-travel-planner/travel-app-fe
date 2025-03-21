@@ -13,9 +13,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   GoogleSignin,
   isErrorWithCode,
-  isSuccessResponse,
   statusCodes,
 } from "@react-native-google-signin/google-signin";
+import { auth } from "@/firebaseConfig";
+import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
+
+import api from "@/api/api";
+import axios from "axios";
 
 import TextField from "@/components/input/TextField";
 import PasswordField from "@/components/input/PasswordField";
@@ -23,8 +27,9 @@ import Pressable from "@/components/Pressable";
 import PressableOpacity from "@/components/PressableOpacity";
 
 import styles from "../styles";
-import { auth } from "@/firebaseConfig";
-import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
+
+// API url
+const url = process.env.EXPO_PUBLIC_API_URL;
 
 interface LoginFormData {
   email: string;
@@ -71,14 +76,30 @@ export default function Login() {
         );
 
         const user = firebaseUserCredential.user;
-        console.log("Firebase user:", user);
+
+        const payload = {
+          displayName: user.displayName || "",
+          email: user.email || "",
+          password: "googlelogin", // placeholder since password is not applicable for Google login
+          phoneNumber: user.phoneNumber || "",
+          photoURL: user.photoURL || "",
+          uid: user.uid,
+        };
+
+        console.log("Google login payload:", payload);
+
+        await api.post(`${url}/api/v1/auth/google-login`, payload);
+        console.log("yay");
 
         router.replace("/(tabs)");
       } else {
         console.log("Google sign-in cancelled or ID token missing");
       }
     } catch (error) {
-      if (isErrorWithCode(error)) {
+      if (axios.isAxiosError(error)) {
+        // handle errors coming from the API call
+        console.error("API error:", error.response?.data || error.message);
+      } else if (isErrorWithCode(error)) {
         switch (error.code) {
           case statusCodes.IN_PROGRESS:
             // operation (eg. sign in) already in progress
@@ -95,8 +116,24 @@ export default function Login() {
     }
   };
 
-  const onSubmit = (data: LoginFormData): void => {
-    router.replace("/(tabs)");
+  const onSubmit = async (data: LoginFormData) => {
+    try {
+      const payload = {
+        email: data.email || "",
+        password: data.password || "",
+      };
+
+      await api.post(`${url}/api/v1/auth/login`, payload);
+
+      router.replace("/(tabs)");
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        // handle errors coming from the API call
+        console.error("API error:", error.response?.data || error.message);
+      } else {
+        console.error("Login error:", error);
+      }
+    }
   };
 
   return (
