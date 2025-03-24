@@ -5,7 +5,12 @@ import PressableOpacity from "./PressableOpacity";
 
 interface PressableProps {
   title: string;
-  variant?: "primary" | "secondary" | "disabled" | "otpDisabled";
+  variant?:
+    | "primary"
+    | "invertedPrimary"
+    | "secondary"
+    | "disabled"
+    | "otpDisabled";
   onPress?: () => void;
   disabled?: boolean;
   style?: object;
@@ -36,7 +41,7 @@ export default Pressable;
 
 const styles = StyleSheet.create({
   wrapper: {
-    alignSelf: "stretch",
+    width: "100%",
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 100,
@@ -46,15 +51,21 @@ const styles = StyleSheet.create({
   primaryBg: {
     backgroundColor: "#3F6453",
   },
+  invertedPrimaryBg: {
+    backgroundColor: "#EEF8EF",
+  },
   secondaryBg: {},
   disabledBg: { backgroundColor: "#E5E5E5" },
   title: {
     fontSize: 14,
-    fontFamily: "NotoSerif_700Bold",
+    fontFamily: "NotoSerif_400Regular",
   },
   otpDisabledBg: {},
   primaryTitle: {
     color: "#FFFFFF",
+  },
+  invertedPrimaryTitle: {
+    color: "#3F6453",
   },
   secondaryTitle: {
     color: "#3F6453",

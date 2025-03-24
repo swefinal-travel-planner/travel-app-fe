@@ -150,7 +150,7 @@ export default function Login() {
           title="Log in"
           onPress={handleSubmit(onSubmit)}
           variant="primary"
-          style={{ marginVertical: 20 }}
+          style={styles.button}
         />
 
         <Text style={[styles.text, { alignSelf: "center", marginBottom: 8 }]}>

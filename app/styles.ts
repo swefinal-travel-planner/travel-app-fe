@@ -4,10 +4,8 @@ export default StyleSheet.create({
   mainContainer: {
     flex: 1,
     backgroundColor: "#FFFFFF",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 80,
-    paddingHorizontal: 40,
+    paddingVertical: 40,
+    paddingHorizontal: 24,
   },
   mainText: {
     fontSize: 20,
