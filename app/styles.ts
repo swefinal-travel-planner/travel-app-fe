@@ -5,7 +5,7 @@ export default StyleSheet.create({
     flex: 1,
     backgroundColor: "#FFFFFF",
     paddingVertical: 40,
-    paddingHorizontal: 40,
+    paddingHorizontal: 24,
   },
   mainText: {
     fontSize: 20,

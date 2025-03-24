@@ -82,7 +82,6 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     borderRadius: 8,
-    borderWidth: 2,
     borderColor: "#A68372",
   },
   overlay: {

@@ -15,6 +15,11 @@ export default StyleSheet.create({
   other: {
     backgroundColor: "#EEF8EF",
   },
+  button: {
+    width: "100%",
+    alignSelf: "stretch",
+    marginVertical: 20,
+  },
   title: {
     color: "#3F6453",
     fontSize: 28,

@@ -35,6 +35,7 @@ const PressableOpacity = ({
       onPressIn={fadeIn}
       onPressOut={fadeOut}
       onPress={onPress}
+      style={{ alignSelf: "stretch", justifyContent: "center" }}
       {...props}
     >
       <Animated.View style={[style, { opacity: animated }]}>

@@ -184,7 +184,7 @@ export default function SignUp() {
           title="Sign up"
           variant="primary"
           onPress={handleSubmit(onSubmit)}
-          style={{ marginVertical: 20 }}
+          style={styles.button}
         />
 
         <Text style={[styles.text, { alignSelf: "center", marginBottom: 8 }]}>
