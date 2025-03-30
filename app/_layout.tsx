@@ -5,9 +5,10 @@ import {
 } from "@expo-google-fonts/noto-serif";
 import * as SplashScreen from "expo-splash-screen";
 import { Stack } from "expo-router";
-import { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // prevent the splash screen from hiding before the font finishes loading
 SplashScreen.preventAutoHideAsync();
@@ -17,6 +18,8 @@ export default function RootLayout() {
     NotoSerif_400Regular,
     NotoSerif_700Bold,
   });
+
+  const [queryClient] = useState(() => new QueryClient());
 
   useEffect(() => {
     if (loaded || error) {
@@ -34,11 +37,13 @@ export default function RootLayout() {
   }
 
   return (
-    <View style={{ flex: 1 }}>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-    </View>
+    <QueryClientProvider client={queryClient}>
+      <View style={{ flex: 1 }}>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="+not-found" />
+        </Stack>
+      </View>
+    </QueryClientProvider>
   );
 }

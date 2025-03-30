@@ -1,4 +1,4 @@
-import { APIgetCurrencies } from "@/api/tools/APIcurrency";
+import { apiGetCurrencies } from "@/api/tools/ApiCurrency";
 import CurrencySelection from "@/components/CurrencySelection";
 import Currencies from "@/constants/currencies";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -10,6 +10,7 @@ import {
   TextInput,
   TouchableOpacity,
 } from "react-native";
+import { View } from "react-native-ui-lib";
 
 export default function CurrencyConverter() {
   const [amount, setAmount] = useState("");
@@ -21,7 +22,7 @@ export default function CurrencyConverter() {
   // Function to handle conversion
   const handleExchange = async () => {
     try {
-      const rate = await APIgetCurrencies(
+      const rate = await apiGetCurrencies(
         originalCurrency.abbreviation.toLowerCase(),
         convertedCurrency.abbreviation.toLowerCase(),
       );
@@ -57,7 +58,7 @@ export default function CurrencyConverter() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <SafeAreaView style={styles.originalCurrencyBox}>
+      <View style={styles.originalCurrencyBox}>
         <CurrencySelection
           onSelect={(currency) => setOriginalCurrency(currency)}
           initial={originalCurrency}
@@ -66,19 +67,19 @@ export default function CurrencyConverter() {
         {/* Input Field */}
         <TextInput
           style={styles.input}
-          placeholder="Insert amount"
-          keyboardType="numeric"
           value={amount}
+          placeholder="Enter amount"
           onChangeText={setAmount}
+          keyboardType="numeric"
         />
-      </SafeAreaView>
+      </View>
 
       {/* Swap Button */}
       <TouchableOpacity style={styles.swapButton} onPress={swapCurrencies}>
         <Ionicons name="swap-vertical" size={20} color="#563d30" />
       </TouchableOpacity>
 
-      <SafeAreaView style={styles.convertedCurrencyBox}>
+      <View style={styles.convertedCurrencyBox}>
         <CurrencySelection
           onSelect={(currency) => setConvertedCurrency(currency)}
           initial={convertedCurrency}
@@ -87,7 +88,7 @@ export default function CurrencyConverter() {
         <Text style={styles.resultText}>
           {convertedAmount ? `${convertedAmount}` : "Converted amount"}
         </Text>
-      </SafeAreaView>
+      </View>
     </SafeAreaView>
   );
 }
@@ -95,6 +96,7 @@ export default function CurrencyConverter() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop: 100,
     position: "relative",
     justifyContent: "flex-start",
     alignItems: "center",
@@ -114,11 +116,12 @@ const styles = StyleSheet.create({
   input: {
     height: 50,
     fontSize: 25,
-    width: "100%",
-    textAlign: "center",
     color: "#563d30",
     paddingTop: 10,
     marginBottom: 30,
+    marginHorizontal: 10,
+    backgroundColor: "white",
+    textAlign: "center",
   },
   resultText: {
     color: "#563d30",
@@ -132,7 +135,7 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     padding: 20,
     position: "absolute",
-    top: 120,
+    top: 220,
     zIndex: 1,
   },
   swapText: {
