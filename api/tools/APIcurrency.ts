@@ -2,7 +2,7 @@ import api from "../api";
 
 const url = process.env.EXPO_PUBLIC_CURRENCY_API_URL;
 
-export async function APIgetCurrencies(
+export async function apiGetCurrencies(
   originCurrency: string,
   convertedCurrency: string,
 ): Promise<number> {
