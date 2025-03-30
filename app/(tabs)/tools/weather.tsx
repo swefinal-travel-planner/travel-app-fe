@@ -27,7 +27,7 @@ export default function Weather() {
     isLoading,
     error,
   } = useQuery<WeatherResponse>({
-    queryKey: ["weather", "Ho_Chi_Minh", 7, "yes", false],
+    queryKey: ["weather", "Ho_Chi_Minh", 7, "yes"],
     queryFn: ApiGetWeather,
   });
 
