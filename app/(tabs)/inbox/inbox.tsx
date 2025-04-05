@@ -150,6 +150,7 @@ export default function Inbox() {
               labelStyle={{
                 color: activeCategory === cat ? "white" : Colors.grey30,
                 fontWeight: "500",
+                fontSize: 16,
               }}
             />
           ))}

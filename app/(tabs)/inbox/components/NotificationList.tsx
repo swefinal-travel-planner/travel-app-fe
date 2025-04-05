@@ -1,6 +1,6 @@
 import React from "react";
 import { Notification } from "@/app/type";
-import { ScrollView, TouchableOpacity } from "react-native";
+import { Pressable, ScrollView, TouchableOpacity } from "react-native";
 import { View, Text, Drawer, Colors, Avatar } from "react-native-ui-lib";
 
 interface NotificationListProps {
@@ -25,17 +25,32 @@ function NotificationList({
               background: Colors.red30,
               onPress: () => removeNotification(notif.id),
             },
+            ...(notif.type === "actionable" && notif.unread
+              ? [
+                  {
+                    text: "Accept",
+                    background: Colors.green30,
+                    onPress: () => markAsRead(notif.id),
+                  },
+                  {
+                    text: "Reject",
+                    background: Colors.yellow30,
+                    onPress: () => markAsRead(notif.id),
+                  },
+                ]
+              : []),
           ]}
-          onFullSwipeRight={() => removeNotification(notif.id)}
           style={{
             borderRadius: 10,
             borderColor: notif.unread ? "#D3B7A8" : Colors.grey50,
             borderWidth: 2,
             marginBottom: 10,
           }}
+          fullSwipeRight
+          onFullSwipeRight={() => removeNotification(notif.id)}
         >
-          <TouchableOpacity onPress={() => markAsRead(notif.id)}>
-            <View row paddingH-15 paddingV-20 backgroundColor="white" br10>
+          <Pressable onPress={() => markAsRead(notif.id)}>
+            <View row paddingH-15 paddingV-20 backgroundColor="white">
               <View
                 center
                 style={{
@@ -68,7 +83,7 @@ function NotificationList({
                 )}
               </View>
             </View>
-          </TouchableOpacity>
+          </Pressable>
         </Drawer>
       ))}
     </ScrollView>
