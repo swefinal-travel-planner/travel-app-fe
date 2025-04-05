@@ -18,6 +18,7 @@ import FriendListModal from "./components/FriendListModal";
 import { PaperProvider } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import { Dimensions } from "react-native";
+import { useThemeStore } from "@/store/useThemeStore";
 
 interface Friend {
   id: number;
@@ -25,7 +26,7 @@ interface Friend {
   avatar: string;
 }
 
-interface settingSection {
+interface SettingSection {
   title: string;
   icon:
     | "camera-outline"
@@ -33,12 +34,13 @@ interface settingSection {
     | "call-outline"
     | "mail-outline"
     | "trash-outline"
-    | "log-out-outline";
+    | "log-out-outline"
+    | "color-palette-outline";
 }
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
-  const generalSection: settingSection[] = [
+  const generalSection: SettingSection[] = [
     {
       title: "Edit profile picture",
       icon: "camera-outline",
@@ -47,10 +49,12 @@ const ProfileScreen = () => {
     { title: "Edit phone number", icon: "call-outline" },
     { title: "Edit email", icon: "mail-outline" },
   ];
-  const dangerSection: settingSection[] = [
+  const dangerSection: SettingSection[] = [
+    { title: "Change theme", icon: "color-palette-outline" },
     { title: "Delete account", icon: "trash-outline" },
     { title: "Log out", icon: "log-out-outline" },
   ];
+  const { toggleTheme } = useThemeStore();
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [showActionSheet, setShowActionSheet] = useState<boolean>(false);
   const [friendListModalVisible, setFriendListModalVisible] =
@@ -306,7 +310,7 @@ const ProfileScreen = () => {
             style={{ backgroundColor: Colors.white }}
           >
             {dangerSection.map((item, index) => (
-              <TouchableOpacity key={index} onPress={() => alert(item.title)}>
+              <TouchableOpacity key={index} onPress={() => toggleTheme()}>
                 <View row spread paddingV-10 centerV>
                   <View row center gap-10>
                     <View
