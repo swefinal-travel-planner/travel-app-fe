@@ -19,26 +19,21 @@ function NotificationList({
       {notificationList.map((notif) => (
         <Drawer
           key={notif.id}
+          leftItem={
+            notif.type === "actionable"
+              ? {
+                  text: notif.unread ? "Accept" : "Accepted",
+                  background: notif.unread ? Colors.green30 : Colors.grey50,
+                  onPress: notif.unread ? () => markAsRead(notif.id) : () => {},
+                }
+              : undefined
+          }
           rightItems={[
             {
               text: "Delete",
               background: Colors.red30,
               onPress: () => removeNotification(notif.id),
             },
-            ...(notif.type === "actionable" && notif.unread
-              ? [
-                  {
-                    text: "Accept",
-                    background: Colors.green30,
-                    onPress: () => markAsRead(notif.id),
-                  },
-                  {
-                    text: "Reject",
-                    background: Colors.yellow30,
-                    onPress: () => markAsRead(notif.id),
-                  },
-                ]
-              : []),
           ]}
           style={{
             borderRadius: 10,
@@ -46,10 +41,19 @@ function NotificationList({
             borderWidth: 2,
             marginBottom: 10,
           }}
+          disableHaptic
           fullSwipeRight
           onFullSwipeRight={() => removeNotification(notif.id)}
+          fullSwipeLeft={notif.unread}
+          onFullSwipeLeft={() => markAsRead(notif.id)}
         >
-          <Pressable onPress={() => markAsRead(notif.id)}>
+          <Pressable
+            onPress={
+              notif.type === "navigable"
+                ? () => markAsRead(notif.id)
+                : undefined
+            }
+          >
             <View row paddingH-15 paddingV-20 backgroundColor="white">
               <View
                 center

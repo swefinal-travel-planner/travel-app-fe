@@ -92,6 +92,18 @@ export default function Inbox() {
       senderAvatar: require("@/assets/images/capy.jpg"),
       unread: false,
     },
+    {
+      id: 8,
+      title: "Lời mời kết bạn",
+      message: "An Nguyễn đã gửi cho bạn một lời mời kết bạn.",
+      type: "actionable",
+      category: "friend",
+      date: "2025-04-04",
+      time: "10:30:50",
+      sender: "An Nguyễn",
+      senderAvatar: require("@/assets/images/capy.jpg"),
+      unread: true,
+    },
   ]);
 
   const categories: (NotificationCategory | "all")[] = [
