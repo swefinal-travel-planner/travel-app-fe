@@ -57,9 +57,9 @@ export default function ResetPassword() {
         password: data.password || "",
       };
 
-      console.log("Payload:", payload);
-
       await api.post(`${url}/auth/reset-password`, payload);
+
+      clearRequest(); // clear the request in the store
 
       router.replace("/login");
     } catch (error) {
