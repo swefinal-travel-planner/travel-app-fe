@@ -5,4 +5,7 @@ const api = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
+export const url =
+  process.env.EXPO_PUBLIC_API_URL || "http://localhost:3000/api/v1";
+
 export default api;

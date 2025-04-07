@@ -4,7 +4,7 @@ import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import TextField from "@/components/input/TextField";
+import CustomTextField from "@/components/input/CustomTextField";
 import Pressable from "@/components/Pressable";
 
 import styles from "../styles";
@@ -46,7 +46,7 @@ export default function ForgotPassword() {
           control={control}
           name="email"
           render={({ field: { onChange, onBlur, value } }) => (
-            <TextField
+            <CustomTextField
               onBlur={onBlur}
               leftIcon="mail-outline"
               type="email"

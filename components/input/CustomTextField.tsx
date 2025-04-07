@@ -18,7 +18,7 @@ interface TextFieldProps {
 }
 
 // custom text field component
-const TextField: React.FC<TextFieldProps> = ({
+const CustomTextField: React.FC<TextFieldProps> = ({
   placeholder,
   label,
   rightIcon,
@@ -56,4 +56,4 @@ const TextField: React.FC<TextFieldProps> = ({
   );
 };
 
-export default TextField;
+export default CustomTextField;
