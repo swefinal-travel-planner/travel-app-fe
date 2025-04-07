@@ -4,6 +4,11 @@ import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import { usePwdResetStore } from "@/lib/usePwdResetStore";
+
+import api, { url } from "@/api/api";
+import axios from "axios";
+
 import CustomTextField from "@/components/input/CustomTextField";
 import Pressable from "@/components/Pressable";
 
@@ -22,6 +27,7 @@ const schema = z.object({
 
 export default function ForgotPassword() {
   const router = useRouter();
+  const setEmail = usePwdResetStore((state) => state.setEmail);
 
   // initialize form
   const {
@@ -32,8 +38,24 @@ export default function ForgotPassword() {
     resolver: zodResolver(schema),
   });
 
-  const onSubmit = (data: ForgotFormData): void => {
-    router.push("/forgot/otp");
+  const onSubmit = async (data: ForgotFormData): Promise<void> => {
+    try {
+      // set the email in the store
+      setEmail(data.email);
+
+      await api.post(`${url}/auth/reset-password/send-otp`, {
+        email: data.email,
+      });
+
+      router.push("/forgot/otp");
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        // handle errors coming from the API call
+        console.error("API error:", error.response?.data || error.message);
+      } else {
+        console.error("Password reset email error:", error);
+      }
+    }
   };
 
   return (

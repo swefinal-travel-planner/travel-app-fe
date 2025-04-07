@@ -2,25 +2,54 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "expo-router";
 import { Text, View, Keyboard, TouchableWithoutFeedback } from "react-native";
 
+import { usePwdResetStore } from "@/lib/usePwdResetStore";
+
+import axios from "axios";
+import api, { url } from "@/api/api";
+
 import OtpField from "@/components/input/OtpField";
 import Pressable from "@/components/Pressable";
 
 import styles from "../styles";
 
 export default function ForgotPasswordOtp() {
+  const email = usePwdResetStore((state) => state.email);
+  const setOtp = usePwdResetStore((state) => state.setOtp);
+
   const [resendDisabled, setResendDisabled] = useState(true);
   const [isFilled, setIsFilled] = useState(false);
   const [countdown, setCountdown] = useState(60);
 
   const router = useRouter();
 
-  const handlePress = () => {
-    router.replace("/forgot/reset");
+  const onOtpFilled = async (otp: string) => {
+    try {
+      setOtp(otp); // set the OTP in the store
+
+      // verify the OTP
+      await api.post(`${url}/auth/reset-password/verify-otp`, {
+        email: email,
+        otp: otp,
+      });
+
+      router.replace("/forgot/reset");
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        // handle errors coming from the API call
+        console.error("API error:", error.response?.data || error.message);
+        setIsFilled(false);
+      } else {
+        console.error("Password reset OTP error:", error);
+        setIsFilled(false);
+      }
+    }
   };
 
   const onOtpChanged = (otp: string) => {
     setIsFilled(otp.length === 6);
   };
+
+  const handlePress = async () => {};
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -49,7 +78,7 @@ export default function ForgotPasswordOtp() {
           inbox.
         </Text>
 
-        <OtpField onChanged={onOtpChanged} />
+        <OtpField onChanged={onOtpChanged} onFilled={onOtpFilled} />
 
         <Pressable
           title="Verify"
