@@ -4,6 +4,11 @@ import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import { usePwdResetStore } from "@/lib/usePwdResetStore";
+
+import api, { url } from "@/api/api";
+import axios from "axios";
+
 import PasswordField from "@/components/input/PasswordField";
 import Pressable from "@/components/Pressable";
 
@@ -29,6 +34,9 @@ const schema = z
 
 export default function ResetPassword() {
   const router = useRouter();
+  const email = usePwdResetStore((state) => state.email);
+  const otp = usePwdResetStore((state) => state.otp);
+  const clearRequest = usePwdResetStore((state) => state.clearRequest);
 
   // initialize form
   const {
@@ -41,8 +49,27 @@ export default function ResetPassword() {
 
   const errorMessage = errors.password?.message || errors.repPassword?.message;
 
-  const onSubmit = (data: ResetFormData): void => {
-    router.replace("/login");
+  const onSubmit = async (data: ResetFormData): Promise<void> => {
+    try {
+      const payload = {
+        email: email || "",
+        oTP: otp || "",
+        password: data.password || "",
+      };
+
+      await api.post(`${url}/auth/reset-password`, payload);
+
+      clearRequest(); // clear the request in the store
+
+      router.replace("/login");
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        // handle errors coming from the API call
+        console.error("API error:", error.response?.data || error.message);
+      } else {
+        console.error("Password reset error:", error);
+      }
+    }
   };
 
   return (

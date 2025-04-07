@@ -18,18 +18,17 @@ import {
 import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 import { auth } from "@/firebaseConfig";
 
-import axios from "axios";
-import api from "@/api/api";
+import { useSignupStore } from "@/lib/useSignupStore";
 
-import TextField from "@/components/input/TextField";
+import axios from "axios";
+import api, { url } from "@/api/api";
+
+import CustomTextField from "@/components/input/CustomTextField";
 import PasswordField from "@/components/input/PasswordField";
 import Pressable from "@/components/Pressable";
 
 import styles from "../styles";
 import PressableOpacity from "@/components/PressableOpacity";
-
-// API url
-const url = process.env.EXPO_PUBLIC_API_URL;
 
 interface SignupFormData {
   name: string;
@@ -58,6 +57,7 @@ const schema = z
 
 export default function SignUp() {
   const router = useRouter();
+  const setRequest = useSignupStore((state) => state.setRequest);
 
   // initialize form
   const {
@@ -90,6 +90,7 @@ export default function SignUp() {
         );
 
         const user = firebaseUserCredential.user;
+        const idToken = await user.getIdToken();
 
         const payload = {
           displayName: user.displayName || "",
@@ -97,12 +98,12 @@ export default function SignUp() {
           password: "googlelogin", // placeholder since password is not applicable for Google login
           phoneNumber: user.phoneNumber || "",
           photoURL: user.photoURL || "",
-          uid: user.uid,
+          id_token: idToken,
         };
 
         console.log("Google login payload:", payload);
 
-        await api.post(`${url}/api/v1/auth/google-login`, payload);
+        await api.post(`${url}/auth/google-login`, payload);
         console.log("yay");
 
         router.replace("/(tabs)");
@@ -139,9 +140,12 @@ export default function SignUp() {
         password: data.password || "",
       };
 
-      await api.post(`${url}/api/v1/auth/register`, payload);
+      // set the signup request in the store
+      setRequest({ ...payload });
 
-      router.replace("/login");
+      await api.post(`${url}/auth/register/send-otp`, { email: payload.email });
+
+      router.push("/signup/otp");
     } catch (error) {
       if (axios.isAxiosError(error)) {
         // handle errors coming from the API call
@@ -164,7 +168,7 @@ export default function SignUp() {
           control={control}
           name="name"
           render={({ field: { onChange, onBlur, value } }) => (
-            <TextField
+            <CustomTextField
               onBlur={onBlur}
               leftIcon="person-outline"
               type="name"
@@ -179,7 +183,7 @@ export default function SignUp() {
           control={control}
           name="email"
           render={({ field: { onChange, onBlur, value } }) => (
-            <TextField
+            <CustomTextField
               onBlur={onBlur}
               leftIcon="mail-outline"
               type="email"
