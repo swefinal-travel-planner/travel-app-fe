@@ -1,3 +1,4 @@
+import { useGlobalStyles } from "@/styles/globalStyles";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Stack, usePathname, useRouter } from "expo-router";
 import { useEffect } from "react";
@@ -6,18 +7,19 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 export default function ToolLayout() {
   const router = useRouter();
   const pathname = usePathname();
+  const styles = useGlobalStyles();
 
   useEffect(() => {
     router.replace("/(tabs)/tools/currency-converter");
   }, []);
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.safeAreaContainer}>
       {/* Tools Top Tabs with Icons Only */}
-      <View style={styles.tabContainer}>
+      <View style={localStyles.floatingTabContainer}>
         <TabButton
           icon="cloud"
-          active={pathname.includes("weather")}
+          active={pathname.includes("weather") || pathname.includes("forecast")}
           onPress={() => router.push("/(tabs)/tools/weather")}
         />
         <TabButton
@@ -33,10 +35,11 @@ export default function ToolLayout() {
       </View>
 
       {/* Nested Stack Navigator */}
-      <Stack screenOptions={{ headerShown: false }}>
+      <Stack screenOptions={{ headerShown: false, contentStyle: { flex: 1 } }}>
         <Stack.Screen name="weather" />
         <Stack.Screen name="currency-converter" />
         <Stack.Screen name="translate" />
+        <Stack.Screen name="forecast" />
       </Stack>
     </View>
   );
@@ -55,36 +58,36 @@ function TabButton({
   return (
     <TouchableOpacity
       onPress={onPress}
-      style={[active ? styles.activeTab : styles.tabButton]}
+      style={[active ? localStyles.activeTab : localStyles.tabButton]}
     >
-      <Ionicons name={icon} size={24} color={active ? "white" : "#563d30"} />
+      <Ionicons name={icon} size={15} color={"#563d30"} />
     </TouchableOpacity>
   );
 }
 
-// Styles
-const styles = StyleSheet.create({
-  tabContainer: {
+const localStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  floatingTabContainer: {
     flexDirection: "row",
-    justifyContent: "space-around",
-    padding: 7,
+    padding: 6,
     borderRadius: 100,
-    width: "70%",
-    alignSelf: "center",
-    overflow: "hidden",
-    marginVertical: 20,
     backgroundColor: "#e5dacb",
+    justifyContent: "center",
+    position: "absolute",
+    top: 20,
+    alignSelf: "center",
+    zIndex: 10,
   },
   tabButton: {
-    flex: 1,
-    padding: 10,
+    padding: 15,
     borderRadius: 100,
     alignItems: "center",
   },
   activeTab: {
-    backgroundColor: "#563d30", // Highlight color for active tab
-    flex: 1,
-    padding: 10,
+    backgroundColor: "white",
+    padding: 15,
     borderRadius: 100,
     alignItems: "center",
   },
