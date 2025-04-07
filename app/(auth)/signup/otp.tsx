@@ -14,6 +14,7 @@ import styles from "../styles";
 
 export default function SignUpOtp() {
   const request = useSignupStore((state) => state.request);
+  const clearRequest = useSignupStore((state) => state.clearRequest);
 
   const [resendDisabled, setResendDisabled] = useState(true);
   const [isFilled, setIsFilled] = useState(false);
@@ -32,6 +33,7 @@ export default function SignUpOtp() {
       // if the OTP is verified successfully, call the register API
       if (response.status === 204 || response.status === 200) {
         await api.post(`${url}/auth/register`, { ...request, otp: otp });
+        clearRequest();
         router.replace("/signup/allergies");
       } else {
         console.error("OTP verification failed:", response);
