@@ -31,14 +31,14 @@ interface FriendListModalProps {
   visible: boolean;
   closeModal: () => void;
   friendList: Friend[];
-  onUpdateFriendList: (updatedList: Friend[]) => void;
+  //onUpdateFriendList: (updatedList: Friend[]) => void;
 }
 
 const FriendListModal: React.FC<FriendListModalProps> = ({
   visible,
   closeModal,
   friendList,
-  onUpdateFriendList,
+  //onUpdateFriendList,
 }) => {
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [visibleFriends, setVisibleFriends] = useState<number>(3);
@@ -47,6 +47,7 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
   const [isDialogVisible, setIsDialogVisible] = useState<boolean>(false);
   const [filteredFriendlist, setFilteredFriendlist] =
     useState<Friend[]>(friendList);
+  const [searchInput, setSearchInput] = useState("");
 
   const shareText = async () => {
     try {
@@ -235,6 +236,10 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
                     marginR-10
                     keyboardType="default"
                     placeholder="Search or Add a new friend"
+                    value={searchInput}
+                    onChangeText={(text) => {
+                      setSearchInput(text);
+                    }}
                   />
                 </Animated.View>
 
