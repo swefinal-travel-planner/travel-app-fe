@@ -18,7 +18,7 @@ function NotificationList({
     <ScrollView>
       {notificationList.map((notif) => (
         <Drawer
-          key={notif.id}
+          key={`${notif.id}-${notif.unread ? "unread" : "read"}`}
           leftItem={
             notif.type === "actionable"
               ? {
