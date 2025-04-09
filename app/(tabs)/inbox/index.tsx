@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, Colors, Chip } from "react-native-ui-lib";
 import { ScrollView } from "react-native";
-import { Notification, NotificationCategory } from "@/app/type";
+import { Notification, NotificationCategory } from "@/lib/types/Notification";
 import NotificationList from "./components/NotificationList";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
