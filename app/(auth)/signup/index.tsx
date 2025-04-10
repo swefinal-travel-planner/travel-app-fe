@@ -29,6 +29,7 @@ import Pressable from "@/components/Pressable";
 
 import styles from "../styles";
 import PressableOpacity from "@/components/PressableOpacity";
+import saveLoginInfo from "@/utils/saveLoginInfo";
 
 interface SignupFormData {
   name: string;
@@ -101,14 +102,19 @@ export default function SignUp() {
           id_token: idToken,
         };
 
-        console.log("Google login payload:", payload);
+        const response = await api.post(`${url}/auth/google-login`, payload);
 
-        await api.post(`${url}/auth/google-login`, payload);
-        console.log("yay");
+        await saveLoginInfo(
+          response.data.data.userId,
+          response.data.data.accessToken,
+          response.data.data.refreshToken,
+          response.data.data.email,
+          response.data.data.name,
+        );
 
         router.replace("/(tabs)");
       } else {
-        console.log("Google sign-in cancelled or ID token missing");
+        console.error("Google sign-in cancelled or ID token missing");
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
