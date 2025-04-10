@@ -1,5 +1,5 @@
 import React from "react";
-import { Notification } from "@/app/type";
+import { Notification } from "@/lib/types/Notification";
 import { Pressable, ScrollView } from "react-native";
 import { View, Text, Drawer, Colors, Avatar } from "react-native-ui-lib";
 
@@ -18,7 +18,7 @@ function NotificationList({
     <ScrollView>
       {notificationList.map((notif) => (
         <Drawer
-          key={notif.id}
+          key={`${notif.id}-${notif.unread ? "unread" : "read"}`}
           leftItem={
             notif.type === "actionable"
               ? {
