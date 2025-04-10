@@ -39,7 +39,11 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "@react-native-google-signin/google-signin"
+      "@react-native-google-signin/google-signin",
+      "expo-secure-store",
+      {
+        "configureAndroidBackup": true
+      }
     ],
     "experiments": {
       "typedRoutes": true
