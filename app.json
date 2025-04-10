@@ -40,10 +40,12 @@
         }
       ],
       "@react-native-google-signin/google-signin",
-      "expo-secure-store",
-      {
-        "configureAndroidBackup": true
-      }
+      [
+        "expo-secure-store",
+        {
+          "configureAndroidBackup": true
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
