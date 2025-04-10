@@ -1,7 +1,8 @@
+import i18n from "@/i18n";
 import { colorPalettes, Theme, ThemeName } from "@/styles/Itheme";
 import { create } from "zustand";
 
-type Language = "en" | "vn";
+type Language = "en" | "vi";
 
 interface ThemeState {
   themeName: ThemeName;
@@ -21,5 +22,8 @@ export const useThemeStore = create<ThemeState>((set) => ({
       theme: colorPalettes[name],
     }));
   },
-  setLanguage: (lang: Language) => set(() => ({ language: lang })),
+  setLanguage: (lang) => {
+    i18n.changeLanguage(lang);
+    set({ language: lang });
+  },
 }));

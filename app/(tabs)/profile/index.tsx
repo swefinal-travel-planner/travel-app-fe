@@ -19,6 +19,7 @@ import { PaperProvider } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import { Dimensions } from "react-native";
 import { useThemeStore } from "@/store/useThemeStore";
+import { set } from "react-hook-form";
 
 interface Friend {
   id: number;
@@ -54,7 +55,8 @@ const ProfileScreen = () => {
     { title: "Delete account", icon: "trash-outline" },
     { title: "Log out", icon: "log-out-outline" },
   ];
-  const { toggleTheme } = useThemeStore();
+  const { setTheme } = useThemeStore();
+  const { setLanguage } = useThemeStore();
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [showActionSheet, setShowActionSheet] = useState<boolean>(false);
   const [friendListModalVisible, setFriendListModalVisible] =
@@ -310,7 +312,13 @@ const ProfileScreen = () => {
             style={{ backgroundColor: Colors.white }}
           >
             {dangerSection.map((item, index) => (
-              <TouchableOpacity key={index} onPress={() => toggleTheme()}>
+              <TouchableOpacity
+                key={index}
+                onPress={() => {
+                  setTheme("dark");
+                  setLanguage("vi");
+                }}
+              >
                 <View row spread paddingV-10 centerV>
                   <View row center gap-10>
                     <View
