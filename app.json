@@ -41,6 +41,12 @@
       ],
       "@react-native-google-signin/google-signin",
       "expo-localization"
+      [
+        "expo-secure-store",
+        {
+          "configureAndroidBackup": true
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

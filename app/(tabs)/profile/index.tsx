@@ -20,6 +20,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Dimensions } from "react-native";
 import { useThemeStore } from "@/store/useThemeStore";
 import { set } from "react-hook-form";
+import { useQuery } from "@tanstack/react-query";
 
 interface Friend {
   id: number;
@@ -68,22 +69,37 @@ const ProfileScreen = () => {
   const [profilePic, setProfilePic] = useState(
     require("@/assets/images/alligator.jpg"),
   );
-  const [friendList, setFriendList] = useState<Friend[]>([
-    { id: 1, name: "John Doe", avatar: require("@/assets/images/capy.jpg") },
-    { id: 2, name: "Jane Smith", avatar: require("@/assets/images/corgi.jpg") },
-    {
-      id: 3,
-      name: "Alice Johnson",
-      avatar: require("@/assets/images/pig.jpg"),
-    },
-    { id: 4, name: "John Doe", avatar: require("@/assets/images/capy.jpg") },
-    { id: 5, name: "Jane Smith", avatar: require("@/assets/images/corgi.jpg") },
-    {
-      id: 6,
-      name: "Alice Johnson",
-      avatar: require("@/assets/images/pig.jpg"),
-    },
-  ]);
+  // const [friendList, setFriendList] = useState<Friend[]>([
+  //   { id: 1, name: "John Doe", avatar: require("@/assets/images/capy.jpg") },
+  //   { id: 2, name: "Jane Smith", avatar: require("@/assets/images/corgi.jpg") },
+  //   {
+  //     id: 3,
+  //     name: "Alice Johnson",
+  //     avatar: require("@/assets/images/pig.jpg"),
+  //   },
+  //   { id: 4, name: "John Doe", avatar: require("@/assets/images/capy.jpg") },
+  //   { id: 5, name: "Jane Smith", avatar: require("@/assets/images/corgi.jpg") },
+  //   {
+  //     id: 6,
+  //     name: "Alice Johnson",
+  //     avatar: require("@/assets/images/pig.jpg"),
+  //   },
+  // ]);
+
+  const fetchFriends = async (): Promise<Friend[]> => {
+    const response = await fetch("http://localhost:3000/api/v1/friends");
+    if (!response.ok) throw new Error("Failed to fetch friends");
+    return response.json();
+  };
+
+  const {
+    data: friendList = [],
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["friends"],
+    queryFn: fetchFriends,
+  });
 
   // Mở album ảnh
   const pickImage = async () => {
@@ -230,9 +246,15 @@ const ProfileScreen = () => {
             marginB-25
             padding-15
             borderRadius={10}
-            style={{ backgroundColor: Colors.white }}
+            style={{
+              backgroundColor:
+                isError || isLoading ? Colors.grey60 : Colors.white,
+            }}
           >
-            <TouchableOpacity onPress={openFriendListModal}>
+            <TouchableOpacity
+              onPress={openFriendListModal}
+              disabled={isLoading || isError}
+            >
               <View row spread paddingV-10 centerV>
                 <View row center gap-10>
                   <View
@@ -244,8 +266,15 @@ const ProfileScreen = () => {
                   >
                     <Ionicons name="people" size={20} color="white" />
                   </View>
-                  <Text>{friendList.length} Friends</Text>
+                  {isLoading ? (
+                    <Text>Loading friends...</Text>
+                  ) : isError ? (
+                    <Text>Error loading friends</Text>
+                  ) : (
+                    <Text>{friendList.length} Friends</Text>
+                  )}
                 </View>
+
                 <Ionicons
                   name="chevron-forward-outline"
                   size={20}
@@ -363,7 +392,7 @@ const ProfileScreen = () => {
           visible={friendListModalVisible}
           closeModal={closeFriendListModal}
           friendList={friendList}
-          onUpdateFriendList={setFriendList}
+          //onUpdateFriendList={setFriendList}
         />
 
         <ActionSheet

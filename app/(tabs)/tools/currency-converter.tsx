@@ -1,4 +1,4 @@
-import { apiGetCurrencies } from "@/api/tools/ApiCurrency";
+import { apiGetCurrencies } from "@/api/tools/APIcurrency";
 import CurrencySelection from "@/components/CurrencySelection";
 import Currencies from "@/constants/currencies";
 import Ionicons from "@expo/vector-icons/Ionicons";

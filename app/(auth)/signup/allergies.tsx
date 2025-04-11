@@ -10,7 +10,7 @@ import {
 } from "react-native";
 
 import Pressable from "@/components/Pressable";
-import TextField from "@/components/input/TextField";
+import CustomTextField from "@/components/input/CustomTextField";
 import Chip from "@/components/Chip";
 
 import styles from "../styles";
@@ -33,7 +33,7 @@ export default function SignUpAllergies() {
   const router = useRouter();
 
   const handlePress = () => {
-    router.replace("/(tabs)");
+    router.replace("/login");
   };
 
   const handleSelect = (value: string) => {
@@ -59,7 +59,7 @@ export default function SignUpAllergies() {
           Do you have any allergies we should know about?
         </Text>
 
-        <TextField
+        <CustomTextField
           placeholder="Type to search"
           leftIcon="search-outline"
           onChange={setQuery}

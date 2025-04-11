@@ -18,18 +18,17 @@ import {
 import { auth } from "@/firebaseConfig";
 import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 
-import api from "@/api/api";
+import saveLoginInfo from "@/utils/saveLoginInfo";
+
+import api, { url } from "@/api/api";
 import axios from "axios";
 
-import TextField from "@/components/input/TextField";
+import CustomTextField from "@/components/input/CustomTextField";
 import PasswordField from "@/components/input/PasswordField";
 import Pressable from "@/components/Pressable";
 import PressableOpacity from "@/components/PressableOpacity";
 
 import styles from "../styles";
-
-// API url
-const url = process.env.EXPO_PUBLIC_API_URL;
 
 interface LoginFormData {
   email: string;
@@ -76,6 +75,7 @@ export default function Login() {
         );
 
         const user = firebaseUserCredential.user;
+        const idToken = await user.getIdToken();
 
         const payload = {
           displayName: user.displayName || "",
@@ -83,17 +83,22 @@ export default function Login() {
           password: "googlelogin", // placeholder since password is not applicable for Google login
           phoneNumber: user.phoneNumber || "",
           photoURL: user.photoURL || "",
-          uid: user.uid,
+          id_token: idToken,
         };
 
-        console.log("Google login payload:", payload);
+        const response = await api.post(`${url}/auth/google-login`, payload);
 
-        await api.post(`${url}/api/v1/auth/google-login`, payload);
-        console.log("yay");
+        await saveLoginInfo(
+          response.data.data.userId,
+          response.data.data.accessToken,
+          response.data.data.refreshToken,
+          response.data.data.email,
+          response.data.data.name,
+        );
 
         router.replace("/(tabs)");
       } else {
-        console.log("Google sign-in cancelled or ID token missing");
+        console.error("Google sign-in cancelled or ID token missing");
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -116,6 +121,7 @@ export default function Login() {
     }
   };
 
+  // handle regular login
   const onSubmit = async (data: LoginFormData) => {
     try {
       const payload = {
@@ -123,7 +129,15 @@ export default function Login() {
         password: data.password || "",
       };
 
-      await api.post(`${url}/api/v1/auth/login`, payload);
+      const response = await api.post(`${url}/auth/login`, payload);
+
+      await saveLoginInfo(
+        response.data.data.userId,
+        response.data.data.accessToken,
+        response.data.data.refreshToken,
+        response.data.data.email,
+        response.data.data.name,
+      );
 
       router.replace("/(tabs)");
     } catch (error) {
@@ -148,7 +162,7 @@ export default function Login() {
           control={control}
           name="email"
           render={({ field: { onChange, onBlur, value } }) => (
-            <TextField
+            <CustomTextField
               onBlur={onBlur}
               leftIcon="mail-outline"
               type="email"
