@@ -7,41 +7,34 @@ export const useGlobalStyles = () => {
   return StyleSheet.create({
     safeAreaContainer: {
       flex: 1,
-      padding: layout.spacing.small,
+      padding: 10,
     },
     container: {
       flex: 1,
-      padding: layout.spacing.medium,
-      borderRadius: layout.borderRadius.small,
+      padding: 20,
+      borderRadius: 10,
     },
     text: {
-      color: colors.text,
-      fontSize: typography.fontSize.medium,
-      fontFamily: typography.fontFamily,
+      color: "red",
+      fontSize: 10,
     },
     title: {
-      color: colors.text,
-      fontSize: typography.fontSize.large,
+      color: "red",
     },
     button: {
-      backgroundColor: colors.primary,
-      padding: layout.spacing.medium,
-      borderRadius: layout.borderRadius.small,
+      padding: 20,
+      borderRadius: 10,
       alignItems: "center",
       justifyContent: "center",
-      ...layout.shadow, // Apply shadow globally
     },
 
     buttonText: {
       color: "#FFFFFF",
     },
     card: {
-      backgroundColor: colors.background,
-      padding: layout.spacing.medium,
-      borderRadius: layout.borderRadius.small,
+      padding: 20,
+      borderRadius: 10,
       borderWidth: 1,
-      borderColor: colors.border,
-      ...layout.shadow,
     },
   });
 };
