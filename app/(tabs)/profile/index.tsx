@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -20,6 +20,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Dimensions } from "react-native";
 import { useThemeStore } from "@/store/useThemeStore";
 import { useQuery } from "@tanstack/react-query";
+import * as SecureStore from "expo-secure-store";
 
 interface Friend {
   id: number;
@@ -84,10 +85,42 @@ const ProfileScreen = () => {
   //   },
   // ]);
 
+  // const Demo = async () => {
+  //   const value = await SecureStore.getItemAsync("key");
+  // };
+
+  useEffect(() => {
+    const getUserInfo = async () => {
+      const name = await SecureStore.getItemAsync("name");
+      const email = await SecureStore.getItemAsync("email");
+      if (name && email) {
+        setName(name);
+        setEmail(email);
+      }
+    };
+    getUserInfo();
+  }, []);
+
   const fetchFriends = async (): Promise<Friend[]> => {
-    const response = await fetch("http://localhost:3000/api/v1/friends");
-    if (!response.ok) throw new Error("Failed to fetch friends");
-    return response.json();
+    try {
+      const accessToken = await SecureStore.getItemAsync("accessToken");
+      const response = await fetch("http://10.0.2.2:3000/api/v1/friends", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      return data ?? [];
+    } catch (error) {
+      console.log("Fetch friends failed:", error);
+      throw error;
+    }
   };
 
   const {
@@ -196,11 +229,11 @@ const ProfileScreen = () => {
                   row
                   style={{ alignItems: "baseline", justifyContent: "center" }}
                 >
-                  <Text text70 color="white">
+                  {/* <Text text70 color="white">
                     {" "}
                     {phone}{" "}
-                  </Text>
-                  <Text color="white"> - </Text>
+                  </Text> */}
+                  {/* <Text color="white"> - </Text> */}
                   <Text text70 color="white">
                     {" "}
                     {email}{" "}
