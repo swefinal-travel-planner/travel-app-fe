@@ -40,6 +40,8 @@ interface SettingSection {
     | "color-palette-outline";
 }
 
+const url = process.env.EXPO_PUBLIC_API_URL;
+
 const ProfileScreen = () => {
   const navigation = useNavigation();
   const generalSection: SettingSection[] = [
@@ -104,7 +106,7 @@ const ProfileScreen = () => {
   const fetchFriends = async (): Promise<Friend[]> => {
     try {
       const accessToken = await SecureStore.getItemAsync("accessToken");
-      const response = await fetch("http://10.0.2.2:3000/api/v1/friends", {
+      const response = await fetch(`${url}/friends`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -116,7 +118,7 @@ const ProfileScreen = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      return data ?? [];
+      return data.data ?? [];
     } catch (error) {
       console.log("Fetch friends failed:", error);
       throw error;
