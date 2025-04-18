@@ -20,6 +20,9 @@ import Dialog from "react-native-dialog";
 import Modal from "react-native-modal";
 import { Share } from "react-native";
 import { Portal } from "react-native-paper";
+import { z } from "zod";
+import { useMutation } from "@tanstack/react-query";
+import * as SecureStore from "expo-secure-store";
 
 interface Friend {
   id: number;
@@ -34,6 +37,11 @@ interface FriendListModalProps {
   //onUpdateFriendList: (updatedList: Friend[]) => void;
 }
 
+const url = process.env.EXPO_PUBLIC_API_URL;
+
+// schema for search friend
+const emailSchema = z.string().email({ message: "Invalid email format" });
+
 const FriendListModal: React.FC<FriendListModalProps> = ({
   visible,
   closeModal,
@@ -45,6 +53,7 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
   const animatedHeight = useSharedValue(225);
   const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
   const [isDialogVisible, setIsDialogVisible] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
   const [filteredFriendlist, setFilteredFriendlist] =
     useState<Friend[]>(friendList);
   const [searchInput, setSearchInput] = useState("");
@@ -105,7 +114,7 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
       );
 
       setFilteredFriendlist(updatedList);
-      onUpdateFriendList(updatedList);
+      //onUpdateFriendList(updatedList);
 
       const newVisibleFriends = Math.min(visibleFriends, updatedList.length);
       setVisibleFriends(newVisibleFriends);
@@ -114,6 +123,48 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
       setSelectedFriend(null);
     }
   };
+
+  const handleSearch = async () => {
+    const result = emailSchema.safeParse(searchInput);
+    if (!result.success) {
+      setError(result.error.errors[0].message);
+      return;
+    }
+
+    setError(null);
+
+    searchFriendMutation.mutate(searchInput);
+  };
+
+  const searchFriendMutation = useMutation({
+    mutationFn: async (email: string) => {
+      try {
+        const token = await SecureStore.getItemAsync("accessToken");
+
+        const response = await fetch(`${url}/users?userEmail=${email}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          const errorBody = await response.json();
+          throw new Error(
+            errorBody.message || `HTTP Error: ${response.status}`,
+          );
+        }
+
+        const data = await response.json();
+        return data.data;
+      } catch (err) {
+        console.error("Error in mutationFn:", err);
+        throw err;
+      }
+    },
+    onError: (err) => {
+      console.log("Mutation failed!", err);
+    },
+  });
 
   // Animation mở rộng input khi search
   const inputAnimatedStyle = useAnimatedStyle(() => ({
@@ -228,7 +279,9 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
                     inputAnimatedStyle,
                   ]}
                 >
-                  <Ionicons name="search" size={25} color="black" />
+                  <TouchableOpacity onPress={handleSearch}>
+                    <Ionicons name="search" size={25} color="black" />
+                  </TouchableOpacity>
                   <TextField
                     autoFocus
                     padding-5
@@ -249,8 +302,45 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
                   color="black"
                   labelStyle={{ fontWeight: "bold" }}
                   br50
-                  onPress={() => setIsSearching(false)}
+                  onPress={() => {
+                    setIsSearching(false);
+                    setSearchInput("");
+                    setError(null);
+                    searchFriendMutation.reset();
+                  }}
                 />
+              </View>
+            )}
+
+            {error && (
+              <View paddingH-25>
+                <Text color="red">{error}</Text>
+              </View>
+            )}
+
+            {searchFriendMutation.isPending && (
+              <Text color="gray">Searching...</Text>
+            )}
+
+            {searchFriendMutation.data && (
+              <View row spread centerV paddingH-20 marginT-10>
+                <View row centerV gap-10>
+                  <View
+                    style={{
+                      borderWidth: 3,
+                      borderColor: "green",
+                      borderRadius: 100,
+                      padding: 3,
+                    }}
+                  >
+                    <Avatar
+                      size={40}
+                      source={require("@/assets/images/pig.jpg")}
+                    />
+                  </View>
+                  <Text text60>{searchFriendMutation.data.username}</Text>
+                </View>
+                <Button label="Add" backgroundColor="#3F6453" />
               </View>
             )}
 
