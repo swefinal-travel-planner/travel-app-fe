@@ -70,26 +70,6 @@ const ProfileScreen = () => {
   const [profilePic, setProfilePic] = useState(
     require("@/assets/images/alligator.jpg"),
   );
-  // const [friendList, setFriendList] = useState<Friend[]>([
-  //   { id: 1, name: "John Doe", avatar: require("@/assets/images/capy.jpg") },
-  //   { id: 2, name: "Jane Smith", avatar: require("@/assets/images/corgi.jpg") },
-  //   {
-  //     id: 3,
-  //     name: "Alice Johnson",
-  //     avatar: require("@/assets/images/pig.jpg"),
-  //   },
-  //   { id: 4, name: "John Doe", avatar: require("@/assets/images/capy.jpg") },
-  //   { id: 5, name: "Jane Smith", avatar: require("@/assets/images/corgi.jpg") },
-  //   {
-  //     id: 6,
-  //     name: "Alice Johnson",
-  //     avatar: require("@/assets/images/pig.jpg"),
-  //   },
-  // ]);
-
-  // const Demo = async () => {
-  //   const value = await SecureStore.getItemAsync("key");
-  // };
 
   useEffect(() => {
     const getUserInfo = async () => {

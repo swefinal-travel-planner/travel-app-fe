@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { View, Text, Colors, Card, Avatar, Button } from "react-native-ui-lib";
 import {
-  View,
-  Text,
-  Colors,
-  Card,
-  Avatar,
-  Button,
-  TextField,
-} from "react-native-ui-lib";
-import { KeyboardAvoidingView, Platform, TouchableOpacity } from "react-native";
+  KeyboardAvoidingView,
+  Platform,
+  TouchableOpacity,
+  TextInput,
+} from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import Animated, {
   withSpring,
@@ -25,6 +22,7 @@ import { useMutation } from "@tanstack/react-query";
 import * as SecureStore from "expo-secure-store";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Controller } from "react-hook-form";
 
 interface Friend {
   id: number;
@@ -43,7 +41,9 @@ const url = process.env.EXPO_PUBLIC_API_URL;
 
 // schema for search friend
 const searchSchema = z.object({
-  email: z.string().email({ message: "Invalid email format" }),
+  email: z
+    .string({ required_error: "Email cannot be empty" })
+    .email({ message: "Invalid email format" }),
 });
 
 const FriendListModal: React.FC<FriendListModalProps> = ({
@@ -127,6 +127,7 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
   };
 
   const {
+    control,
     register,
     handleSubmit,
     setValue,
@@ -286,17 +287,18 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
                   <TouchableOpacity onPress={handleSubmit(onSubmit)}>
                     <Ionicons name="search" size={25} color="black" />
                   </TouchableOpacity>
-                  <TextField
-                    autoFocus
-                    padding-5
-                    marginH-5
-                    marginR-10
-                    keyboardType="default"
-                    {...register("email")}
-                    placeholder="Search or Add a new friend"
-                    onChangeText={(text) =>
-                      setValue("email", text, { shouldValidate: true })
-                    }
+                  <Controller
+                    control={control}
+                    name="email"
+                    render={({ field: { onChange, value } }) => (
+                      <TextInput
+                        style={{ flexGrow: 1 }}
+                        keyboardType="default"
+                        placeholder="Add a new friend"
+                        value={value}
+                        onChangeText={onChange}
+                      />
+                    )}
                   />
                 </Animated.View>
 
@@ -322,7 +324,9 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
             )}
 
             {searchFriendMutation.isPending && (
-              <Text color="gray">Searching...</Text>
+              <View marginV-10 center>
+                <Text color="gray">Searching...</Text>
+              </View>
             )}
 
             {searchFriendMutation.data && (
