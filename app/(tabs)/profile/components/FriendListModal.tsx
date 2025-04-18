@@ -23,6 +23,8 @@ import { Portal } from "react-native-paper";
 import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
 import * as SecureStore from "expo-secure-store";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 interface Friend {
   id: number;
@@ -40,7 +42,9 @@ interface FriendListModalProps {
 const url = process.env.EXPO_PUBLIC_API_URL;
 
 // schema for search friend
-const emailSchema = z.string().email({ message: "Invalid email format" });
+const searchSchema = z.object({
+  email: z.string().email({ message: "Invalid email format" }),
+});
 
 const FriendListModal: React.FC<FriendListModalProps> = ({
   visible,
@@ -53,10 +57,8 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
   const animatedHeight = useSharedValue(225);
   const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
   const [isDialogVisible, setIsDialogVisible] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
   const [filteredFriendlist, setFilteredFriendlist] =
     useState<Friend[]>(friendList);
-  const [searchInput, setSearchInput] = useState("");
 
   const shareText = async () => {
     try {
@@ -124,16 +126,18 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
     }
   };
 
-  const handleSearch = async () => {
-    const result = emailSchema.safeParse(searchInput);
-    if (!result.success) {
-      setError(result.error.errors[0].message);
-      return;
-    }
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(searchSchema),
+  });
 
-    setError(null);
-
-    searchFriendMutation.mutate(searchInput);
+  const onSubmit = (data: { email: string }) => {
+    searchFriendMutation.mutate(data.email);
   };
 
   const searchFriendMutation = useMutation({
@@ -279,7 +283,7 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
                     inputAnimatedStyle,
                   ]}
                 >
-                  <TouchableOpacity onPress={handleSearch}>
+                  <TouchableOpacity onPress={handleSubmit(onSubmit)}>
                     <Ionicons name="search" size={25} color="black" />
                   </TouchableOpacity>
                   <TextField
@@ -288,11 +292,11 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
                     marginH-5
                     marginR-10
                     keyboardType="default"
+                    {...register("email")}
                     placeholder="Search or Add a new friend"
-                    value={searchInput}
-                    onChangeText={(text) => {
-                      setSearchInput(text);
-                    }}
+                    onChangeText={(text) =>
+                      setValue("email", text, { shouldValidate: true })
+                    }
                   />
                 </Animated.View>
 
@@ -304,17 +308,16 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
                   br50
                   onPress={() => {
                     setIsSearching(false);
-                    setSearchInput("");
-                    setError(null);
                     searchFriendMutation.reset();
+                    reset();
                   }}
                 />
               </View>
             )}
 
-            {error && (
+            {errors.email && (
               <View paddingH-25>
-                <Text color="red">{error}</Text>
+                <Text color="red">{errors.email.message}</Text>
               </View>
             )}
 
