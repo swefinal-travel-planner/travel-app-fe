@@ -6,9 +6,14 @@ import {
   Card,
   Avatar,
   Button,
-  TextField,
+  Toast,
 } from "react-native-ui-lib";
-import { KeyboardAvoidingView, Platform, TouchableOpacity } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  TouchableOpacity,
+  TextInput,
+} from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import Animated, {
   withSpring,
@@ -20,12 +25,12 @@ import Dialog from "react-native-dialog";
 import Modal from "react-native-modal";
 import { Share } from "react-native";
 import { Portal } from "react-native-paper";
-
-interface Friend {
-  id: number;
-  name: string;
-  avatar: string;
-}
+import { z } from "zod";
+import { useMutation } from "@tanstack/react-query";
+import * as SecureStore from "expo-secure-store";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Friend } from "@/lib/types/Profile";
 
 interface FriendListModalProps {
   visible: boolean;
@@ -33,6 +38,15 @@ interface FriendListModalProps {
   friendList: Friend[];
   //onUpdateFriendList: (updatedList: Friend[]) => void;
 }
+
+const url = process.env.EXPO_PUBLIC_API_URL;
+
+// schema for search friend
+const searchSchema = z.object({
+  email: z
+    .string({ required_error: "Email cannot be empty" })
+    .email({ message: "Invalid email format" }),
+});
 
 const FriendListModal: React.FC<FriendListModalProps> = ({
   visible,
@@ -47,7 +61,6 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
   const [isDialogVisible, setIsDialogVisible] = useState<boolean>(false);
   const [filteredFriendlist, setFilteredFriendlist] =
     useState<Friend[]>(friendList);
-  const [searchInput, setSearchInput] = useState("");
 
   const shareText = async () => {
     try {
@@ -77,6 +90,7 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
   useEffect(() => {
     setIsSearching(false);
     setVisibleFriends(friendList.length > 3 ? 3 : friendList.length);
+    setFilteredFriendlist(friendList);
   }, [visible]);
 
   useEffect(() => {
@@ -105,7 +119,7 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
       );
 
       setFilteredFriendlist(updatedList);
-      onUpdateFriendList(updatedList);
+      //onUpdateFriendList(updatedList);
 
       const newVisibleFriends = Math.min(visibleFriends, updatedList.length);
       setVisibleFriends(newVisibleFriends);
@@ -114,6 +128,91 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
       setSelectedFriend(null);
     }
   };
+
+  const {
+    control,
+    watch,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(searchSchema),
+  });
+
+  const onSubmit = (data: { email: string }) => {
+    searchFriendMutation.mutate(data.email);
+  };
+
+  const searchFriendMutation = useMutation({
+    mutationFn: async (email: string) => {
+      try {
+        const token = await SecureStore.getItemAsync("accessToken");
+
+        const response = await fetch(`${url}/users?userEmail=${email}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          const errorBody = await response.json();
+          throw new Error(
+            errorBody.message || `HTTP Error: ${response.status}`,
+          );
+        }
+
+        const data = await response.json();
+        return data.data;
+      } catch (err) {
+        console.error("Error in mutationFn:", err);
+        throw err;
+      }
+    },
+    onError: (err) => {
+      console.log("Mutation failed!", err);
+    },
+  });
+
+  const addFriendMutation = useMutation({
+    mutationFn: async () => {
+      try {
+        const emailValue = watch("email");
+        const token = await SecureStore.getItemAsync("accessToken");
+
+        const response = await fetch(`${url}/invitation-friends`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            receiverEmail: emailValue,
+          }),
+          method: "POST",
+        });
+
+        if (!response.ok) {
+          const errorBody = await response.json();
+          throw new Error(
+            errorBody.message || `HTTP Error: ${response.status}`,
+          );
+        }
+      } catch (err) {
+        console.error("Error in mutationFn:", err);
+        throw err;
+      }
+    },
+    onError: (err) => {
+      console.log("Mutation failed!", err);
+    },
+    onSuccess: () => {
+      Toast.show("Friend added successfully", {
+        position: "bottom",
+        duration: 2000,
+      });
+      setIsSearching(false);
+      searchFriendMutation.reset();
+      reset();
+    },
+  });
 
   // Animation mở rộng input khi search
   const inputAnimatedStyle = useAnimatedStyle(() => ({
@@ -228,18 +327,21 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
                     inputAnimatedStyle,
                   ]}
                 >
-                  <Ionicons name="search" size={25} color="black" />
-                  <TextField
-                    autoFocus
-                    padding-5
-                    marginH-5
-                    marginR-10
-                    keyboardType="default"
-                    placeholder="Search or Add a new friend"
-                    value={searchInput}
-                    onChangeText={(text) => {
-                      setSearchInput(text);
-                    }}
+                  <TouchableOpacity onPress={handleSubmit(onSubmit)}>
+                    <Ionicons name="search" size={25} color="black" />
+                  </TouchableOpacity>
+                  <Controller
+                    control={control}
+                    name="email"
+                    render={({ field: { onChange, value } }) => (
+                      <TextInput
+                        style={{ flexGrow: 1, marginLeft: 10 }}
+                        keyboardType="default"
+                        placeholder="Add a new friend"
+                        value={value}
+                        onChangeText={onChange}
+                      />
+                    )}
                   />
                 </Animated.View>
 
@@ -249,7 +351,52 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
                   color="black"
                   labelStyle={{ fontWeight: "bold" }}
                   br50
-                  onPress={() => setIsSearching(false)}
+                  onPress={() => {
+                    setIsSearching(false);
+                    searchFriendMutation.reset();
+                    reset();
+                  }}
+                />
+              </View>
+            )}
+
+            {errors.email && (
+              <View paddingH-25>
+                <Text color="red">{errors.email.message}</Text>
+              </View>
+            )}
+
+            {searchFriendMutation.isPending && (
+              <View marginV-10 center>
+                <Text color="gray">Searching...</Text>
+              </View>
+            )}
+
+            {/* handle thêm trường hợp user không tồn tại */}
+            {searchFriendMutation.isSuccess && (
+              <View row spread centerV paddingH-20 marginT-10>
+                <View row centerV gap-10>
+                  <View
+                    style={{
+                      borderWidth: 3,
+                      borderColor: "green",
+                      borderRadius: 100,
+                      padding: 3,
+                    }}
+                  >
+                    <Avatar
+                      size={40}
+                      source={require("@/assets/images/pig.jpg")}
+                    />
+                  </View>
+                  <Text text60>{searchFriendMutation.data.username}</Text>
+                </View>
+                <Button
+                  label="Add"
+                  backgroundColor="#3F6453"
+                  onPress={() => {
+                    addFriendMutation.mutate();
+                  }}
                 />
               </View>
             )}
@@ -289,7 +436,11 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
                                 padding: 3,
                               }}
                             >
-                              <Avatar size={40} source={friend.avatar} />
+                              {/* <Avatar size={40} source={friend.avatar} /> */}
+                              <Avatar
+                                size={40}
+                                source={require("@/assets/images/pig.jpg")}
+                              />
                             </View>
                             <Text text60>{friend.name}</Text>
                           </View>
