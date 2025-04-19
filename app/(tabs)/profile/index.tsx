@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react'
 import {
   View,
   Text,
@@ -7,21 +7,21 @@ import {
   ActionSheet,
   Button,
   Image,
-} from "react-native-ui-lib";
-import { TouchableOpacity, ScrollView, Platform } from "react-native";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { StatusBar } from "expo-status-bar";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import * as ImagePicker from "expo-image-picker";
-import EditProfileModal from "./components/EditProfileModal";
-import FriendListModal from "./components/FriendListModal";
-import { PaperProvider } from "react-native-paper";
-import { useNavigation } from "@react-navigation/native";
-import { Dimensions } from "react-native";
-import { useThemeStore } from "@/store/useThemeStore";
-import { useQuery } from "@tanstack/react-query";
-import * as SecureStore from "expo-secure-store";
-import { Friend } from "@/lib/types/Profile";
+} from 'react-native-ui-lib'
+import { TouchableOpacity, ScrollView, Platform } from 'react-native'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import { StatusBar } from 'expo-status-bar'
+import Ionicons from '@expo/vector-icons/Ionicons'
+import * as ImagePicker from 'expo-image-picker'
+import EditProfileModal from './components/EditProfileModal'
+import FriendListModal from './components/FriendListModal'
+import { PaperProvider } from 'react-native-paper'
+import { useNavigation } from '@react-navigation/native'
+import { Dimensions } from 'react-native'
+//import { useThemeStore } from "@/store/useThemeStore";
+import { useQuery } from '@tanstack/react-query'
+import * as SecureStore from 'expo-secure-store'
+import { Friend } from '@/lib/types/Profile'
 
 interface SettingSection {
   title: string
@@ -35,7 +35,7 @@ interface SettingSection {
     | 'color-palette-outline'
 }
 
-const url = process.env.EXPO_PUBLIC_API_URL;
+const url = process.env.EXPO_PUBLIC_API_URL
 
 const ProfileScreen = () => {
   const navigation = useNavigation()
@@ -53,8 +53,8 @@ const ProfileScreen = () => {
     { title: 'Delete account', icon: 'trash-outline' },
     { title: 'Log out', icon: 'log-out-outline' },
   ]
-  const { setTheme } = useThemeStore()
-  const { setLanguage } = useThemeStore()
+  //const { setTheme } = useThemeStore()
+  //const { setLanguage } = useThemeStore()
   const [modalVisible, setModalVisible] = useState<boolean>(false)
   const [showActionSheet, setShowActionSheet] = useState<boolean>(false)
   const [friendListModalVisible, setFriendListModalVisible] =
@@ -64,55 +64,55 @@ const ProfileScreen = () => {
   const [phone, setPhone] = useState<string>('4060001290')
   const [selectedField, setSelectedField] = useState<string>('Edit name')
   const [profilePic, setProfilePic] = useState(
-    require("@/assets/images/alligator.jpg"),
-  );
+    require('@/assets/images/alligator.jpg')
+  )
 
   useEffect(() => {
     const getUserInfo = async () => {
-      const name = await SecureStore.getItemAsync("name");
-      const email = await SecureStore.getItemAsync("email");
+      const name = await SecureStore.getItemAsync('name')
+      const email = await SecureStore.getItemAsync('email')
       if (name && email) {
-        setName(name);
-        setEmail(email);
+        setName(name)
+        setEmail(email)
       }
-    };
-    getUserInfo();
-  }, []);
+    }
+    getUserInfo()
+  }, [])
 
   const fetchFriends = async () => {
     try {
-      const accessToken = await SecureStore.getItemAsync("accessToken");
+      const accessToken = await SecureStore.getItemAsync('accessToken')
       const response = await fetch(`${url}/friends`, {
-        method: "GET",
+        method: 'GET',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${accessToken}`,
         },
-      });
+      })
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`HTTP error! status: ${response.status}`)
       }
 
-      const data = await response.json();
+      const data = await response.json()
       const friends: Friend[] = (data.data ?? []).map((f: any) => ({
         id: f.id,
         name: f.username,
-        avatar: f.imageURL || "",
-      }));
-      return friends;
+        avatar: f.imageURL || '',
+      }))
+      return friends
     } catch (error) {
-      console.log("Fetch friends failed:", error);
-      throw error;
+      console.log('Fetch friends failed:', error)
+      throw error
     }
-  };
+  }
 
   const {
     data: friendList = [],
     isLoading,
     isError,
   } = useQuery<Friend[]>({
-    queryKey: ["friends"],
+    queryKey: ['friends'],
     queryFn: fetchFriends,
   })
 
@@ -359,8 +359,8 @@ const ProfileScreen = () => {
               <TouchableOpacity
                 key={index}
                 onPress={() => {
-                  setTheme('dark')
-                  setLanguage('vi')
+                  //setTheme('dark')
+                  //setLanguage('vi')
                 }}
               >
                 <View row spread paddingV-10 centerV>
