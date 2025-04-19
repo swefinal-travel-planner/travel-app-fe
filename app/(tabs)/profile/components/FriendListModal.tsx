@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Colors, Card, Avatar, Button } from "react-native-ui-lib";
+import {
+  View,
+  Text,
+  Colors,
+  Card,
+  Avatar,
+  Button,
+  Toast,
+} from "react-native-ui-lib";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -20,9 +28,8 @@ import { Portal } from "react-native-paper";
 import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
 import * as SecureStore from "expo-secure-store";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller } from "react-hook-form";
 
 interface Friend {
   id: number;
@@ -128,6 +135,7 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
 
   const {
     control,
+    watch,
     handleSubmit,
     reset,
     formState: { errors },
@@ -166,6 +174,47 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
     },
     onError: (err) => {
       console.log("Mutation failed!", err);
+    },
+  });
+
+  const addFriendMutation = useMutation({
+    mutationFn: async () => {
+      try {
+        const emailValue = watch("email");
+        const token = await SecureStore.getItemAsync("accessToken");
+
+        const response = await fetch(`${url}/invitation-friends`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            receiverEmail: emailValue,
+          }),
+          method: "POST",
+        });
+
+        if (!response.ok) {
+          const errorBody = await response.json();
+          throw new Error(
+            errorBody.message || `HTTP Error: ${response.status}`,
+          );
+        }
+      } catch (err) {
+        console.error("Error in mutationFn:", err);
+        throw err;
+      }
+    },
+    onError: (err) => {
+      console.log("Mutation failed!", err);
+    },
+    onSuccess: () => {
+      Toast.show("Friend added successfully", {
+        position: "bottom",
+        duration: 2000,
+      });
+      setIsSearching(false);
+      searchFriendMutation.reset();
+      reset();
     },
   });
 
@@ -346,7 +395,13 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
                   </View>
                   <Text text60>{searchFriendMutation.data.username}</Text>
                 </View>
-                <Button label="Add" backgroundColor="#3F6453" />
+                <Button
+                  label="Add"
+                  backgroundColor="#3F6453"
+                  onPress={() => {
+                    addFriendMutation.mutate();
+                  }}
+                />
               </View>
             )}
 
