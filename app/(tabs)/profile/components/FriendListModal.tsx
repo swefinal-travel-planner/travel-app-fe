@@ -128,9 +128,7 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
 
   const {
     control,
-    register,
     handleSubmit,
-    setValue,
     reset,
     formState: { errors },
   } = useForm({
@@ -292,7 +290,7 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
                     name="email"
                     render={({ field: { onChange, value } }) => (
                       <TextInput
-                        style={{ flexGrow: 1 }}
+                        style={{ flexGrow: 1, marginLeft: 10 }}
                         keyboardType="default"
                         placeholder="Add a new friend"
                         value={value}
@@ -329,7 +327,8 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
               </View>
             )}
 
-            {searchFriendMutation.data && (
+            {/* handle thêm trường hợp user không tồn tại */}
+            {searchFriendMutation.isSuccess && (
               <View row spread centerV paddingH-20 marginT-10>
                 <View row centerV gap-10>
                   <View
