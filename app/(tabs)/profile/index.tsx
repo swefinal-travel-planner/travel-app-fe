@@ -21,12 +21,7 @@ import { Dimensions } from "react-native";
 import { useThemeStore } from "@/store/useThemeStore";
 import { useQuery } from "@tanstack/react-query";
 import * as SecureStore from "expo-secure-store";
-
-interface Friend {
-  id: number;
-  name: string;
-  avatar: string;
-}
+import { Friend } from "@/lib/types/Profile";
 
 interface SettingSection {
   title: string;
@@ -83,7 +78,7 @@ const ProfileScreen = () => {
     getUserInfo();
   }, []);
 
-  const fetchFriends = async (): Promise<Friend[]> => {
+  const fetchFriends = async () => {
     try {
       const accessToken = await SecureStore.getItemAsync("accessToken");
       const response = await fetch(`${url}/friends`, {
@@ -97,8 +92,14 @@ const ProfileScreen = () => {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
+
       const data = await response.json();
-      return data.data ?? [];
+      const friends: Friend[] = (data.data ?? []).map((f: any) => ({
+        id: f.id,
+        name: f.username,
+        avatar: f.imageURL || "",
+      }));
+      return friends;
     } catch (error) {
       console.log("Fetch friends failed:", error);
       throw error;
@@ -109,7 +110,7 @@ const ProfileScreen = () => {
     data: friendList = [],
     isLoading,
     isError,
-  } = useQuery({
+  } = useQuery<Friend[]>({
     queryKey: ["friends"],
     queryFn: fetchFriends,
   });

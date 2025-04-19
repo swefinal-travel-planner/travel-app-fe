@@ -30,12 +30,7 @@ import { useMutation } from "@tanstack/react-query";
 import * as SecureStore from "expo-secure-store";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
-interface Friend {
-  id: number;
-  name: string;
-  avatar: string;
-}
+import { Friend } from "@/lib/types/Profile";
 
 interface FriendListModalProps {
   visible: boolean;
@@ -95,6 +90,7 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
   useEffect(() => {
     setIsSearching(false);
     setVisibleFriends(friendList.length > 3 ? 3 : friendList.length);
+    setFilteredFriendlist(friendList);
   }, [visible]);
 
   useEffect(() => {
@@ -440,7 +436,11 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
                                 padding: 3,
                               }}
                             >
-                              <Avatar size={40} source={friend.avatar} />
+                              {/* <Avatar size={40} source={friend.avatar} /> */}
+                              <Avatar
+                                size={40}
+                                source={require("@/assets/images/pig.jpg")}
+                              />
                             </View>
                             <Text text60>{friend.name}</Text>
                           </View>
