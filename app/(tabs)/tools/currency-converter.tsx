@@ -3,6 +3,7 @@ import CurrencySelection from "@/components/CurrencySelection";
 import Currencies from "@/constants/currencies";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   SafeAreaView,
   StyleSheet,
@@ -18,6 +19,7 @@ export default function CurrencyConverter() {
   const [originalCurrency, setOriginalCurrency] = useState(Currencies[0]);
   const [convertedCurrency, setConvertedCurrency] = useState(Currencies[32]);
   const [exchangeRate, setExchangeRate] = useState(0);
+  const { t } = useTranslation();
 
   // Function to handle conversion
   const handleExchange = async () => {
@@ -68,7 +70,7 @@ export default function CurrencyConverter() {
         <TextInput
           style={styles.input}
           value={amount}
-          placeholder="Enter amount"
+          placeholder={t("currencyConverter.enterAmount")}
           onChangeText={setAmount}
           keyboardType="numeric"
         />
@@ -86,7 +88,9 @@ export default function CurrencyConverter() {
         />
         {/* Result Display */}
         <Text style={styles.resultText}>
-          {convertedAmount ? `${convertedAmount}` : "Converted amount"}
+          {convertedAmount
+            ? `${convertedAmount}`
+            : t("currencyConverter.result")}
         </Text>
       </View>
     </SafeAreaView>

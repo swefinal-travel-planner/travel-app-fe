@@ -24,44 +24,45 @@ import * as SecureStore from "expo-secure-store";
 import { Friend } from "@/lib/types/Profile";
 
 interface SettingSection {
-  title: string;
+  title: string
   icon:
-    | "camera-outline"
-    | "pencil"
-    | "call-outline"
-    | "mail-outline"
-    | "trash-outline"
-    | "log-out-outline"
-    | "color-palette-outline";
+    | 'camera-outline'
+    | 'pencil'
+    | 'call-outline'
+    | 'mail-outline'
+    | 'trash-outline'
+    | 'log-out-outline'
+    | 'color-palette-outline'
 }
 
 const url = process.env.EXPO_PUBLIC_API_URL;
 
 const ProfileScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation()
   const generalSection: SettingSection[] = [
     {
-      title: "Edit profile picture",
-      icon: "camera-outline",
+      title: 'Edit profile picture',
+      icon: 'camera-outline',
     },
-    { title: "Edit name", icon: "pencil" },
-    { title: "Edit phone number", icon: "call-outline" },
-    { title: "Edit email", icon: "mail-outline" },
-  ];
+    { title: 'Edit name', icon: 'pencil' },
+    { title: 'Edit phone number', icon: 'call-outline' },
+    { title: 'Edit email', icon: 'mail-outline' },
+  ]
   const dangerSection: SettingSection[] = [
-    { title: "Change theme", icon: "color-palette-outline" },
-    { title: "Delete account", icon: "trash-outline" },
-    { title: "Log out", icon: "log-out-outline" },
-  ];
-  const { toggleTheme } = useThemeStore();
-  const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [showActionSheet, setShowActionSheet] = useState<boolean>(false);
+    { title: 'Change theme', icon: 'color-palette-outline' },
+    { title: 'Delete account', icon: 'trash-outline' },
+    { title: 'Log out', icon: 'log-out-outline' },
+  ]
+  const { setTheme } = useThemeStore()
+  const { setLanguage } = useThemeStore()
+  const [modalVisible, setModalVisible] = useState<boolean>(false)
+  const [showActionSheet, setShowActionSheet] = useState<boolean>(false)
   const [friendListModalVisible, setFriendListModalVisible] =
-    useState<boolean>(false);
-  const [name, setName] = useState<string>("Đặng Nhật Beo");
-  const [email, setEmail] = useState<string>("csb@gmail.com");
-  const [phone, setPhone] = useState<string>("4060001290");
-  const [selectedField, setSelectedField] = useState<string>("Edit name");
+    useState<boolean>(false)
+  const [name, setName] = useState<string>('Đặng Nhật Beo')
+  const [email, setEmail] = useState<string>('csb@gmail.com')
+  const [phone, setPhone] = useState<string>('4060001290')
+  const [selectedField, setSelectedField] = useState<string>('Edit name')
   const [profilePic, setProfilePic] = useState(
     require("@/assets/images/alligator.jpg"),
   );
@@ -113,7 +114,7 @@ const ProfileScreen = () => {
   } = useQuery<Friend[]>({
     queryKey: ["friends"],
     queryFn: fetchFriends,
-  });
+  })
 
   // Mở album ảnh
   const pickImage = async () => {
@@ -122,11 +123,11 @@ const ProfileScreen = () => {
       allowsEditing: true,
       aspect: [1, 1],
       quality: 1,
-    });
+    })
     if (!result.canceled) {
-      setProfilePic({ uri: result.assets[0].uri });
+      setProfilePic({ uri: result.assets[0].uri })
     }
-  };
+  }
 
   // Mở camera
   const takePhoto = async () => {
@@ -134,71 +135,71 @@ const ProfileScreen = () => {
       allowsEditing: true,
       aspect: [1, 1],
       quality: 1,
-    });
+    })
     if (!result.canceled) {
-      setProfilePic({ uri: result.assets[0].uri });
+      setProfilePic({ uri: result.assets[0].uri })
     }
-  };
+  }
 
   const openActionSheet = () => {
-    setShowActionSheet(true);
-  };
+    setShowActionSheet(true)
+  }
 
   const handleSave = (value: string, field: string) => {
-    field.includes("name")
+    field.includes('name')
       ? setName(value)
-      : field.includes("phone")
+      : field.includes('phone')
         ? setPhone(value)
-        : setEmail(value);
-    closeModal();
-  };
+        : setEmail(value)
+    closeModal()
+  }
 
   const openModal = (field: string) => {
-    setSelectedField(field);
-    setModalVisible(true);
-  };
+    setSelectedField(field)
+    setModalVisible(true)
+  }
 
   const closeModal = () => {
-    setModalVisible(false);
-  };
+    setModalVisible(false)
+  }
 
   const openFriendListModal = () => {
-    setFriendListModalVisible(true);
-  };
+    setFriendListModalVisible(true)
+  }
 
   const closeFriendListModal = () => {
-    setFriendListModalVisible(false);
-  };
+    setFriendListModalVisible(false)
+  }
 
   return (
     <PaperProvider>
-      <GestureHandlerRootView style={{ flex: 1, backgroundColor: "#EEF8EF" }}>
+      <GestureHandlerRootView style={{ flex: 1, backgroundColor: '#EEF8EF' }}>
         <ScrollView
           contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 30 }}
         >
           {/* Avatar and Personal Information */}
           <View center>
-            <View center marginB-60 style={{ position: "relative" }}>
+            <View center marginB-60 style={{ position: 'relative' }}>
               <Image
                 source={profilePic}
                 style={{
-                  width: Dimensions.get("window").width - 30,
-                  height: Dimensions.get("window").width - 30,
+                  width: Dimensions.get('window').width - 30,
+                  height: Dimensions.get('window').width - 30,
                   borderRadius: 20,
                   borderWidth: 4,
-                  borderColor: "#3F6453",
-                  resizeMode: "cover",
+                  borderColor: '#3F6453',
+                  resizeMode: 'cover',
                 }}
               />
               <View
                 style={{
-                  position: "absolute",
+                  position: 'absolute',
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  alignItems: "center",
+                  alignItems: 'center',
                   transform: [{ translateY: 40 }],
-                  backgroundColor: "#3F6453",
+                  backgroundColor: '#3F6453',
                   paddingVertical: 10,
                   paddingHorizontal: 20,
                   marginHorizontal: 20,
@@ -210,7 +211,7 @@ const ProfileScreen = () => {
                 </Text>
                 <View
                   row
-                  style={{ alignItems: "baseline", justifyContent: "center" }}
+                  style={{ alignItems: 'baseline', justifyContent: 'center' }}
                 >
                   {/* <Text text70 color="white">
                     {" "}
@@ -218,8 +219,8 @@ const ProfileScreen = () => {
                   </Text> */}
                   {/* <Text color="white"> - </Text> */}
                   <Text text70 color="white">
-                    {" "}
-                    {email}{" "}
+                    {' '}
+                    {email}{' '}
                   </Text>
                 </View>
               </View>
@@ -232,7 +233,7 @@ const ProfileScreen = () => {
             paddingV-10
             row
             backgroundColor="white"
-            style={{ borderWidth: 1, borderRadius: 10, overflow: "hidden" }}
+            style={{ borderWidth: 1, borderRadius: 10, overflow: 'hidden' }}
           >
             <View flex center padding-10 style={{ borderRightWidth: 1 }}>
               <Text text70>Number of Trips</Text>
@@ -240,7 +241,7 @@ const ProfileScreen = () => {
               <Button
                 label="Go to My trips"
                 backgroundColor="#3F6453"
-                onPress={() => navigation.navigate("my-trips")}
+                onPress={() => navigation.navigate('my-trips')}
               />
             </View>
 
@@ -272,7 +273,7 @@ const ProfileScreen = () => {
               <View row spread paddingV-10 centerV>
                 <View row center gap-10>
                   <View
-                    style={{ backgroundColor: "#3F6453" }}
+                    style={{ backgroundColor: '#3F6453' }}
                     br100
                     width={36}
                     height={36}
@@ -313,7 +314,7 @@ const ProfileScreen = () => {
               <TouchableOpacity
                 key={index}
                 onPress={
-                  item.title.includes("picture")
+                  item.title.includes('picture')
                     ? openActionSheet
                     : () => openModal(item.title)
                 }
@@ -321,7 +322,7 @@ const ProfileScreen = () => {
                 <View row spread paddingV-10 centerV>
                   <View row center gap-10>
                     <View
-                      style={{ backgroundColor: "#3F6453" }}
+                      style={{ backgroundColor: '#3F6453' }}
                       br100
                       width={36}
                       height={36}
@@ -355,11 +356,17 @@ const ProfileScreen = () => {
             style={{ backgroundColor: Colors.white }}
           >
             {dangerSection.map((item, index) => (
-              <TouchableOpacity key={index} onPress={() => toggleTheme()}>
+              <TouchableOpacity
+                key={index}
+                onPress={() => {
+                  setTheme('dark')
+                  setLanguage('vi')
+                }}
+              >
                 <View row spread paddingV-10 centerV>
                   <View row center gap-10>
                     <View
-                      style={{ backgroundColor: "#3F6453" }}
+                      style={{ backgroundColor: '#3F6453' }}
                       br100
                       width={36}
                       height={36}
@@ -383,9 +390,9 @@ const ProfileScreen = () => {
         {/* Popup modal */}
         <EditProfileModal
           value={
-            selectedField === "Edit name"
+            selectedField === 'Edit name'
               ? name
-              : selectedField === "Edit phone number"
+              : selectedField === 'Edit phone number'
                 ? phone
                 : email
           }
@@ -406,12 +413,12 @@ const ProfileScreen = () => {
         <ActionSheet
           visible={showActionSheet}
           onDismiss={() => setShowActionSheet(false)}
-          useNativeIOS={Platform.OS === "ios" ? true : false}
+          useNativeIOS={Platform.OS === 'ios' ? true : false}
           options={[
-            { label: "Take Photo", onPress: takePhoto },
-            { label: "Choose from Library", onPress: pickImage },
+            { label: 'Take Photo', onPress: takePhoto },
+            { label: 'Choose from Library', onPress: pickImage },
             {
-              label: "Cancel",
+              label: 'Cancel',
               onPress: () => setShowActionSheet(false),
               cancel: true,
             },
@@ -420,6 +427,6 @@ const ProfileScreen = () => {
       </GestureHandlerRootView>
       <StatusBar style="dark" />
     </PaperProvider>
-  );
-};
-export default ProfileScreen;
+  )
+}
+export default ProfileScreen

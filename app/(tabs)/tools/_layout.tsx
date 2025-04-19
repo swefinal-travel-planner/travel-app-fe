@@ -1,13 +1,17 @@
-import { useGlobalStyles } from "@/styles/globalStyles";
+import { IconSize, Padding, Radius } from "@/constants/theme";
+import { useThemeStyle } from "@/hooks/useThemeStyle";
+import { colorPalettes } from "@/styles/Itheme";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Stack, usePathname, useRouter } from "expo-router";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 
 export default function ToolLayout() {
   const router = useRouter();
   const pathname = usePathname();
-  const styles = useGlobalStyles();
+
+  const theme = useThemeStyle();
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   useEffect(() => {
     router.replace("/(tabs)/tools/currency-converter");
@@ -16,7 +20,7 @@ export default function ToolLayout() {
   return (
     <View style={styles.safeAreaContainer}>
       {/* Tools Top Tabs with Icons Only */}
-      <View style={localStyles.floatingTabContainer}>
+      <View style={styles.floatingTabContainer}>
         <TabButton
           icon="cloud"
           active={pathname.includes("weather") || pathname.includes("forecast")}
@@ -55,40 +59,50 @@ function TabButton({
   onPress: () => void;
   active: boolean;
 }>) {
+  const theme = useThemeStyle();
+  const styles = useMemo(() => createStyles(theme), [theme]);
+
   return (
     <TouchableOpacity
       onPress={onPress}
-      style={[active ? localStyles.activeTab : localStyles.tabButton]}
+      style={[active ? styles.activeTab : styles.tabButton]}
     >
-      <Ionicons name={icon} size={15} color={"#563d30"} />
+      <Ionicons name={icon} size={IconSize.XS} color={"#563d30"} />
     </TouchableOpacity>
   );
 }
 
-const localStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  floatingTabContainer: {
-    flexDirection: "row",
-    padding: 6,
-    borderRadius: 100,
-    backgroundColor: "#e5dacb",
-    justifyContent: "center",
-    position: "absolute",
-    top: 20,
-    alignSelf: "center",
-    zIndex: 10,
-  },
-  tabButton: {
-    padding: 15,
-    borderRadius: 100,
-    alignItems: "center",
-  },
-  activeTab: {
-    backgroundColor: "white",
-    padding: 15,
-    borderRadius: 100,
-    alignItems: "center",
-  },
-});
+const createStyles = (theme: typeof colorPalettes.light) =>
+  StyleSheet.create({
+    safeAreaContainer: {
+      flex: 1,
+      padding: Padding.NORMAL,
+      backgroundColor: theme.background,
+    },
+    container: {
+      flex: 1,
+    },
+    floatingTabContainer: {
+      flexDirection: "row",
+      padding: Padding.NORMAL,
+      borderRadius: Radius.FULL,
+      backgroundColor: theme.primary,
+      justifyContent: "center",
+      position: "absolute",
+      top: 20,
+      alignSelf: "center",
+      zIndex: 10,
+    },
+    tabButton: {
+      padding: 15,
+      borderRadius: Radius.NORMAL,
+      alignItems: "center",
+      backgroundColor: "transparent",
+    },
+    activeTab: {
+      backgroundColor: theme.text,
+      padding: 15,
+      borderRadius: 100,
+      alignItems: "center",
+    },
+  });
