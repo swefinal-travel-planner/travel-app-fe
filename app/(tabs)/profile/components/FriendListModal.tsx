@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react'
 import {
   View,
   Text,
@@ -7,46 +7,46 @@ import {
   Avatar,
   Button,
   Toast,
-} from "react-native-ui-lib";
+} from 'react-native-ui-lib'
 import {
   KeyboardAvoidingView,
   Platform,
   TouchableOpacity,
   TextInput,
-} from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
+} from 'react-native'
+import { ScrollView } from 'react-native-gesture-handler'
 import Animated, {
   withSpring,
   useAnimatedStyle,
   useSharedValue,
-} from "react-native-reanimated";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import Dialog from "react-native-dialog";
-import Modal from "react-native-modal";
-import { Share } from "react-native";
-import { Portal } from "react-native-paper";
-import { z } from "zod";
-import { useMutation } from "@tanstack/react-query";
-import * as SecureStore from "expo-secure-store";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Friend } from "@/lib/types/Profile";
+} from 'react-native-reanimated'
+import Ionicons from '@expo/vector-icons/Ionicons'
+import Dialog from 'react-native-dialog'
+import Modal from 'react-native-modal'
+import { Share } from 'react-native'
+import { Portal } from 'react-native-paper'
+import { z } from 'zod'
+import { useMutation } from '@tanstack/react-query'
+import * as SecureStore from 'expo-secure-store'
+import { useForm, Controller } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Friend } from '@/lib/types/Profile'
 
 interface FriendListModalProps {
-  visible: boolean;
-  closeModal: () => void;
-  friendList: Friend[];
+  visible: boolean
+  closeModal: () => void
+  friendList: Friend[]
   //onUpdateFriendList: (updatedList: Friend[]) => void;
 }
 
-const url = process.env.EXPO_PUBLIC_API_URL;
+const url = process.env.EXPO_PUBLIC_API_URL
 
 // schema for search friend
 const searchSchema = z.object({
   email: z
-    .string({ required_error: "Email cannot be empty" })
-    .email({ message: "Invalid email format" }),
-});
+    .string({ required_error: 'Email cannot be empty' })
+    .email({ message: 'Invalid email format' }),
+})
 
 const FriendListModal: React.FC<FriendListModalProps> = ({
   visible,
@@ -54,18 +54,18 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
   friendList,
   //onUpdateFriendList,
 }) => {
-  const [isSearching, setIsSearching] = useState<boolean>(false);
-  const [visibleFriends, setVisibleFriends] = useState<number>(3);
-  const animatedHeight = useSharedValue(225);
-  const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
-  const [isDialogVisible, setIsDialogVisible] = useState<boolean>(false);
+  const [isSearching, setIsSearching] = useState<boolean>(false)
+  const [visibleFriends, setVisibleFriends] = useState<number>(3)
+  const animatedHeight = useSharedValue(225)
+  const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null)
+  const [isDialogVisible, setIsDialogVisible] = useState<boolean>(false)
   const [filteredFriendlist, setFilteredFriendlist] =
-    useState<Friend[]>(friendList);
+    useState<Friend[]>(friendList)
 
   const shareText = async () => {
     try {
-      const message = "Test sharing invitation from Trip 🚀";
-      const url = "https://example.com";
+      const message = 'Test sharing invitation from Trip 🚀'
+      const url = 'https://example.com'
 
       const shareOptions = Platform.select({
         ios: {
@@ -75,23 +75,23 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
           message,
           url, // Android hỗ trợ tách riêng
         },
-      });
+      })
 
       if (shareOptions) {
-        await Share.share(shareOptions);
+        await Share.share(shareOptions)
       } else {
-        console.error("No valid share options available");
+        console.error('No valid share options available')
       }
     } catch (error) {
-      console.log("Error sharing:", error);
+      console.log('Error sharing:', error)
     }
-  };
+  }
 
   useEffect(() => {
-    setIsSearching(false);
-    setVisibleFriends(friendList.length > 3 ? 3 : friendList.length);
-    setFilteredFriendlist(friendList);
-  }, [visible]);
+    setIsSearching(false)
+    setVisibleFriends(friendList.length > 3 ? 3 : friendList.length)
+    setFilteredFriendlist(friendList)
+  }, [visible])
 
   useEffect(() => {
     animatedHeight.value = withSpring(
@@ -103,31 +103,31 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
       {
         damping: 100,
         stiffness: 120,
-      },
-    );
-  }, [visibleFriends]);
+      }
+    )
+  }, [visibleFriends])
 
   const confirmDeleteFriend = (friend: Friend) => {
-    setSelectedFriend(friend);
-    setIsDialogVisible(true);
-  };
+    setSelectedFriend(friend)
+    setIsDialogVisible(true)
+  }
 
   const handleDeleteFriend = () => {
     if (selectedFriend) {
       const updatedList = friendList.filter(
-        (friend) => friend.id !== selectedFriend.id,
-      );
+        (friend) => friend.id !== selectedFriend.id
+      )
 
-      setFilteredFriendlist(updatedList);
+      setFilteredFriendlist(updatedList)
       //onUpdateFriendList(updatedList);
 
-      const newVisibleFriends = Math.min(visibleFriends, updatedList.length);
-      setVisibleFriends(newVisibleFriends);
+      const newVisibleFriends = Math.min(visibleFriends, updatedList.length)
+      setVisibleFriends(newVisibleFriends)
 
-      setIsDialogVisible(false);
-      setSelectedFriend(null);
+      setIsDialogVisible(false)
+      setSelectedFriend(null)
     }
-  };
+  }
 
   const {
     control,
@@ -137,47 +137,45 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
     formState: { errors },
   } = useForm({
     resolver: zodResolver(searchSchema),
-  });
+  })
 
   const onSubmit = (data: { email: string }) => {
-    searchFriendMutation.mutate(data.email);
-  };
+    searchFriendMutation.mutate(data.email)
+  }
 
   const searchFriendMutation = useMutation({
     mutationFn: async (email: string) => {
       try {
-        const token = await SecureStore.getItemAsync("accessToken");
+        const token = await SecureStore.getItemAsync('accessToken')
 
         const response = await fetch(`${url}/users?userEmail=${email}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        });
+        })
 
         if (!response.ok) {
-          const errorBody = await response.json();
-          throw new Error(
-            errorBody.message || `HTTP Error: ${response.status}`,
-          );
+          const errorBody = await response.json()
+          throw new Error(errorBody.message || `HTTP Error: ${response.status}`)
         }
 
-        const data = await response.json();
-        return data.data;
+        const data = await response.json()
+        return data.data
       } catch (err) {
-        console.error("Error in mutationFn:", err);
-        throw err;
+        console.error('Error in mutationFn:', err)
+        throw err
       }
     },
     onError: (err) => {
-      console.log("Mutation failed!", err);
+      console.log('Mutation failed!', err)
     },
-  });
+  })
 
   const addFriendMutation = useMutation({
     mutationFn: async () => {
       try {
-        const emailValue = watch("email");
-        const token = await SecureStore.getItemAsync("accessToken");
+        const emailValue = watch('email')
+        const token = await SecureStore.getItemAsync('accessToken')
 
         const response = await fetch(`${url}/invitation-friends`, {
           headers: {
@@ -186,50 +184,48 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
           body: JSON.stringify({
             receiverEmail: emailValue,
           }),
-          method: "POST",
-        });
+          method: 'POST',
+        })
 
         if (!response.ok) {
-          const errorBody = await response.json();
-          throw new Error(
-            errorBody.message || `HTTP Error: ${response.status}`,
-          );
+          const errorBody = await response.json()
+          throw new Error(errorBody.message || `HTTP Error: ${response.status}`)
         }
       } catch (err) {
-        console.error("Error in mutationFn:", err);
-        throw err;
+        console.error('Error in mutationFn:', err)
+        throw err
       }
     },
     onError: (err) => {
-      console.log("Mutation failed!", err);
+      console.log('Mutation failed!', err)
     },
     onSuccess: () => {
-      Toast.show("Friend added successfully", {
-        position: "bottom",
+      Toast.show('Friend added successfully', {
+        position: 'bottom',
         duration: 2000,
-      });
-      setIsSearching(false);
-      searchFriendMutation.reset();
-      reset();
+      })
+      setIsSearching(false)
+      searchFriendMutation.reset()
+      reset()
     },
-  });
+  })
 
   // Animation mở rộng input khi search
   const inputAnimatedStyle = useAnimatedStyle(() => ({
     width: withSpring(isSearching ? 280 : 0, { damping: 15, stiffness: 120 }),
     opacity: withSpring(isSearching ? 1 : 0),
-  }));
+  }))
 
   // Animation mở rộng label khi đóng search
   const labelAnimatedStyle = useAnimatedStyle(() => ({
     width: withSpring(isSearching ? 280 : 370, { damping: 15, stiffness: 120 }),
     opacity: withSpring(isSearching ? 0 : 1),
-  }));
+  }))
 
   // Animation mở rộng/thu gọn FriendList
   const animatedFriendListStyle = useAnimatedStyle(() => ({
     height: animatedHeight.value,
-  }));
+  }))
 
   return (
     <>
@@ -238,8 +234,8 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
         <Dialog.Container visible={isDialogVisible}>
           <Dialog.Title>Remove Friend</Dialog.Title>
           <Dialog.Description>
-            Are you sure you want to remove{" "}
-            <Text style={{ fontWeight: "bold" }}>{selectedFriend?.name}</Text>{" "}
+            Are you sure you want to remove{' '}
+            <Text style={{ fontWeight: 'bold' }}>{selectedFriend?.name}</Text>{' '}
             from your friends list?
           </Dialog.Description>
           <Dialog.Button
@@ -260,20 +256,20 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
         swipeDirection="down"
         onSwipeComplete={closeModal}
         backdropOpacity={0.5}
-        style={{ margin: 0, justifyContent: "flex-end" }}
+        style={{ margin: 0, justifyContent: 'flex-end' }}
       >
         <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={{ flex: 1 }}
         >
           <View
             style={[
               {
-                height: "95%",
+                height: '95%',
                 backgroundColor: Colors.white,
                 borderTopLeftRadius: 20,
                 borderTopRightRadius: 20,
-                marginTop: "auto",
+                marginTop: 'auto',
               },
             ]}
           >
@@ -294,12 +290,12 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
               <Animated.View
                 style={[
                   {
-                    alignSelf: "flex-start",
+                    alignSelf: 'flex-start',
                     borderRadius: 20,
                     padding: 15,
-                    width: "90%",
+                    width: '90%',
                     marginLeft: 20,
-                    backgroundColor: "#f0f0f0",
+                    backgroundColor: '#f0f0f0',
                   },
                   labelAnimatedStyle,
                 ]}
@@ -318,9 +314,9 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
                 <Animated.View
                   style={[
                     {
-                      flexDirection: "row",
-                      alignItems: "center",
-                      backgroundColor: "#f0f0f0",
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      backgroundColor: '#f0f0f0',
                       padding: 15,
                       borderRadius: 60,
                     },
@@ -349,12 +345,12 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
                   label="Cancel"
                   backgroundColor={Colors.white}
                   color="black"
-                  labelStyle={{ fontWeight: "bold" }}
+                  labelStyle={{ fontWeight: 'bold' }}
                   br50
                   onPress={() => {
-                    setIsSearching(false);
-                    searchFriendMutation.reset();
-                    reset();
+                    setIsSearching(false)
+                    searchFriendMutation.reset()
+                    reset()
                   }}
                 />
               </View>
@@ -373,20 +369,20 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
             )}
 
             {/* handle thêm trường hợp user không tồn tại */}
-            {searchFriendMutation.isSuccess && (
+            {searchFriendMutation.isSuccess && searchFriendMutation.data && (
               <View row spread centerV paddingH-20 marginT-10>
                 <View row centerV gap-10>
                   <View
                     style={{
                       borderWidth: 3,
-                      borderColor: "green",
+                      borderColor: 'green',
                       borderRadius: 100,
                       padding: 3,
                     }}
                   >
                     <Avatar
                       size={40}
-                      source={require("@/assets/images/pig.jpg")}
+                      source={require('@/assets/images/pig.jpg')}
                     />
                   </View>
                   <Text text60>{searchFriendMutation.data.username}</Text>
@@ -395,9 +391,17 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
                   label="Add"
                   backgroundColor="#3F6453"
                   onPress={() => {
-                    addFriendMutation.mutate();
+                    addFriendMutation.mutate()
                   }}
                 />
+              </View>
+            )}
+
+            {searchFriendMutation.isSuccess && !searchFriendMutation.data && (
+              <View>
+                <Text color="red" center marginT-10>
+                  User does not exist!
+                </Text>
               </View>
             )}
 
@@ -414,10 +418,10 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
                 style={{ backgroundColor: Colors.white }}
               >
                 <Animated.View
-                  style={[{ overflow: "hidden" }, animatedFriendListStyle]}
+                  style={[{ overflow: 'hidden' }, animatedFriendListStyle]}
                 >
                   {filteredFriendlist.length === 0 ? (
-                    <View center style={{ height: "100%" }}>
+                    <View center style={{ height: '100%' }}>
                       <Text text70>
                         Share your request link to add new friend
                       </Text>
@@ -431,7 +435,7 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
                             <View
                               style={{
                                 borderWidth: 3,
-                                borderColor: "green",
+                                borderColor: 'green',
                                 borderRadius: 100,
                                 padding: 3,
                               }}
@@ -439,7 +443,7 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
                               {/* <Avatar size={40} source={friend.avatar} /> */}
                               <Avatar
                                 size={40}
-                                source={require("@/assets/images/pig.jpg")}
+                                source={require('@/assets/images/pig.jpg')}
                               />
                             </View>
                             <Text text60>{friend.name}</Text>
@@ -459,17 +463,17 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
                 </Animated.View>
                 {filteredFriendlist.length > 3 && (
                   <Button
-                    label={visibleFriends === 3 ? "Show more" : "Show less"}
+                    label={visibleFriends === 3 ? 'Show more' : 'Show less'}
                     marginT-10
                     backgroundColor={
-                      friendList.length < 4 ? Colors.grey5 : "#3F6453"
+                      friendList.length < 4 ? Colors.grey5 : '#3F6453'
                     }
-                    labelStyle={{ fontWeight: "bold" }}
-                    style={{ width: "auto", alignSelf: "center" }}
+                    labelStyle={{ fontWeight: 'bold' }}
+                    style={{ width: 'auto', alignSelf: 'center' }}
                     disabled={friendList.length < 4}
                     onPress={() =>
                       setVisibleFriends(
-                        visibleFriends === 3 ? friendList.length : 3,
+                        visibleFriends === 3 ? friendList.length : 3
                       )
                     }
                   />
@@ -491,7 +495,7 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
                   <View row spread centerV paddingV-10>
                     <View row center gap-10>
                       <View
-                        style={{ backgroundColor: "#32ADE6" }}
+                        style={{ backgroundColor: '#32ADE6' }}
                         br100
                         width={50}
                         height={50}
@@ -514,7 +518,7 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
         </KeyboardAvoidingView>
       </Modal>
     </>
-  );
-};
+  )
+}
 
-export default FriendListModal;
+export default FriendListModal
