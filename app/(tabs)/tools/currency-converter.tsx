@@ -1,4 +1,5 @@
 import { apiGetCurrencies } from '@/api/tools/APIcurrency'
+import { UniversalPicker } from '@/components/CommonPicker'
 import CurrencySelection from '@/components/CurrencySelection'
 import Currencies from '@/constants/currencies'
 import Ionicons from '@expo/vector-icons/Ionicons'
@@ -61,9 +62,15 @@ export default function CurrencyConverter() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.originalCurrencyBox}>
-        <CurrencySelection
-          onSelect={(currency) => setOriginalCurrency(currency)}
-          initial={originalCurrency}
+        <UniversalPicker
+          data={Currencies}
+          keyExtractor={(item) => item.abbreviation}
+          labelExtractor={(item) =>
+            item.abbreviation.toUpperCase() + ' - ' + item.name
+          }
+          iconExtractor={(item) => item.image}
+          initialValue={Currencies[0]}
+          onSelect={(selected) => console.log(selected)}
         />
 
         {/* Input Field */}
@@ -105,6 +112,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
     paddingHorizontal: 10,
+    backgroundColor: '#f5f5f5',
   },
   originalCurrencyBox: {
     width: '100%',
