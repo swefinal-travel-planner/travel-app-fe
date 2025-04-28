@@ -68,7 +68,7 @@ export default function Translate() {
         <Picker
           placeholder="Select target language"
           value={targetLang}
-          onChange={(item) => setTargetLang(item?.toString() ?? sourceLang)}
+          onChange={(item) => setTargetLang(item?.toString() ?? targetLang)}
           topBarProps={{ title: 'Target Language' }}
           style={styles.picker}
           items={LANGUAGES.map((lang) => ({
