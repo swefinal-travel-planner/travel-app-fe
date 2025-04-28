@@ -38,3 +38,12 @@ yarn-error.*
 *.tsbuildinfo
 
 app-example
+
+# Firebase credentials
+travel-app-229d7-firebase-adminsdk-fbsvc-893e2354e5.json
+*-firebase-adminsdk-*.json
+*-adminsdk-*.json
+
+# Other credential files
+*.service-account.json
+*credentials*.json
