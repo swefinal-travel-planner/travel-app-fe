@@ -28,7 +28,7 @@ export async function ApiTranslate(
 
     return data.result[0].text || '' // Assuming the API returns an array of translations
   } catch (error) {
-    console.error('Error fetching currency data:', error)
+    console.error('Error fetching translation data:', error)
     throw error
   }
 }
