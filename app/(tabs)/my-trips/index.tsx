@@ -1,0 +1,211 @@
+import React, { useState } from 'react'
+import {
+  View,
+  Text,
+  Button,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+  TextInput,
+} from 'react-native'
+import { useNavigation } from '@react-navigation/native'
+import TripCard from '@/components/TripCard'
+import { Trip } from '@/lib/types/Trip'
+import Ionicons from '@expo/vector-icons/Ionicons'
+
+const sampleTrips: Trip[] = [
+  {
+    id: '1',
+    image:
+      'https://lh3.googleusercontent.com/p/AF1QipPwjfXoTp4uuEBODAptmwg054U6pzYeLUhS9W-o=s1360-w1360-h1020',
+    title: 'Hà Giang Loop Adventure',
+    city: 'Hà Giang',
+    start_date: '2025-05-10',
+    days: 4,
+    budget: 500,
+    num_members: 5,
+    location_attributes: ['mountains', 'viewpoints'],
+    food_attributes: ['local', 'street food'],
+    special_requirements: ['helmet', 'raincoat'],
+    medical_conditions: [],
+    status: 'not_started',
+    pinned: true,
+  },
+  {
+    id: '2',
+    image:
+      'https://lh3.googleusercontent.com/p/AF1QipPwjfXoTp4uuEBODAptmwg054U6pzYeLUhS9W-o=s1360-w1360-h1020',
+    title: 'Đà Lạt Chill Trip',
+    city: 'Đà Lạt',
+    start_date: '2025-06-01',
+    days: 3,
+    budget: 300,
+    num_members: 3,
+    location_attributes: ['lake', 'market'],
+    food_attributes: ['vegetarian', 'coffee'],
+    special_requirements: ['jacket'],
+    medical_conditions: ['asthma'],
+    status: 'in_progress',
+    pinned: false,
+  },
+  {
+    id: '3',
+    image:
+      'https://lh3.googleusercontent.com/p/AF1QipPwjfXoTp4uuEBODAptmwg054U6pzYeLUhS9W-o=s1360-w1360-h1020',
+    title: 'Nha Trang Beach Break',
+    city: 'Nha Trang',
+    start_date: '2025-07-15',
+    days: 5,
+    budget: 700,
+    num_members: 4,
+    location_attributes: ['beach', 'resort'],
+    food_attributes: ['seafood'],
+    special_requirements: [],
+    medical_conditions: [],
+    status: 'completed',
+    pinned: true,
+  },
+  {
+    id: '4',
+    image:
+      'https://lh3.googleusercontent.com/p/AF1QipPwjfXoTp4uuEBODAptmwg054U6pzYeLUhS9W-o=s1360-w1360-h1020',
+    title: 'Nha Trang Beach Break',
+    city: 'Nha Trang',
+    start_date: '2025-07-15',
+    days: 5,
+    budget: 700,
+    num_members: 4,
+    location_attributes: ['beach', 'resort'],
+    food_attributes: ['seafood'],
+    special_requirements: [],
+    medical_conditions: [],
+    status: 'completed',
+    pinned: true,
+  },
+  {
+    id: '5',
+    image:
+      'https://lh3.googleusercontent.com/p/AF1QipPwjfXoTp4uuEBODAptmwg054U6pzYeLUhS9W-o=s1360-w1360-h1020',
+    title: 'Nha Trang Beach Break',
+    city: 'Nha Trang',
+    start_date: '2025-07-15',
+    days: 5,
+    budget: 700,
+    num_members: 4,
+    location_attributes: ['beach', 'resort'],
+    food_attributes: ['seafood'],
+    special_requirements: [],
+    medical_conditions: [],
+    status: 'completed',
+    pinned: true,
+  },
+]
+
+export default function MyTrips() {
+  const [trips, setTrips] = useState<Trip[]>(sampleTrips)
+  const [search, setSearch] = useState('')
+  const navigation = useNavigation()
+
+  const filteredTrips = trips.filter((trip) =>
+    trip.title.toLowerCase().includes(search.toLowerCase())
+  )
+
+  return (
+    <View style={tripDetailStyles.container}>
+      {/* Thanh tìm kiếm */}
+      <View style={tripDetailStyles.searchContainer}>
+        <Ionicons
+          name="search"
+          size={18}
+          color="#A68372"
+          style={{ marginRight: 8 }}
+        />
+        <TextInput
+          style={tripDetailStyles.searchInput}
+          placeholder="Search for your trips..."
+          value={search}
+          onChangeText={setSearch}
+          placeholderTextColor="#CDB8A5"
+        />
+      </View>
+
+      {/* Divider */}
+      <View style={tripDetailStyles.divider} />
+
+      {/* Danh sách chuyến đi */}
+      {filteredTrips.length <= 0 ? (
+        <View style={tripDetailStyles.emptyContainer}>
+          <Text style={tripDetailStyles.message}>
+            Bạn chưa có chuyến đi nào.
+          </Text>
+          <Button
+            title="Tạo chuyến đi"
+            onPress={() => navigation.navigate('CreateTrip')}
+          />
+        </View>
+      ) : (
+        <FlatList
+          data={trips}
+          renderItem={({ item }) => (
+            <TripCard
+              tripName={item.title}
+              tripImage={item.image}
+              days={item.days}
+              num_members={item.num_members}
+              budget={item.budget}
+              isPinned={item.pinned}
+            />
+          )}
+          keyExtractor={(item) => item.id}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={tripDetailStyles.listContent}
+          ItemSeparatorComponent={() => <View style={{ height: 24 }} />}
+        />
+      )}
+    </View>
+  )
+}
+
+const tripDetailStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingTop: 16,
+    backgroundColor: '#FFF',
+    alignItems: 'center',
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FCF4E8',
+    borderRadius: 24,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    marginHorizontal: 16,
+    marginBottom: 16,
+    width: 340,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 14,
+    color: '#563D30',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#E5DACB',
+    width: '90%',
+    alignSelf: 'center',
+    marginBottom: 16,
+  },
+  listContent: {
+    paddingBottom: 32,
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 40,
+  },
+  message: {
+    fontSize: 16,
+    marginBottom: 16,
+  },
+})
