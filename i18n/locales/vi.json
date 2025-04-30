@@ -1,4 +1,5 @@
 {
   "currencyConverter.enterAmount": "Nhập số tiền",
-  "currencyConverter.result": "Kết quả"
+  "currencyConverter.result": "Kết quả",
+  "myTrip.searchTextInput.placeholder": "Tìm kiếm chuyến đi"
 }

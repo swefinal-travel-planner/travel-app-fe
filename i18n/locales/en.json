@@ -1,4 +1,5 @@
 {
   "currencyConverter.enterAmount": "Enter amount",
-  "currencyConverter.result": "Result"
+  "currencyConverter.result": "Result",
+  "myTrip.searchTextInput.placeholder": "Search for a trip"
 }
