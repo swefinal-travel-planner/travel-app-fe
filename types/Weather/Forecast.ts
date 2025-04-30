@@ -1,3 +1,9 @@
 interface Forecast {
-  forecastday: ForecastDay[];
+  forecastday: ForecastDay[]
+}
+
+interface ForecastDay {
+  date: string
+  day: CurrentWeather
+  hour: CurrentWeather[]
 }

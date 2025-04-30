@@ -1,23 +1,22 @@
-import React, { useState } from "react";
-import { TextInput, View } from "react-native";
-import Ionicons from "@expo/vector-icons/Ionicons";
+import Ionicons from '@expo/vector-icons/Ionicons'
+import React from 'react'
+import { TextInput, View, Text } from 'react-native'
 
-import styles from "./styles";
+import styles from './styles'
 
 interface TextFieldProps {
-  placeholder: string;
-  label?: string;
-  rightIcon?: string;
-  leftIcon?: string;
-  error?: string;
-  required?: boolean;
-  type?: string;
-  value?: string;
-  onChange?: (text: string) => void;
-  onBlur?: () => void;
+  placeholder: string
+  label?: string
+  rightIcon?: string
+  leftIcon?: string
+  error?: string
+  required?: boolean
+  type?: string
+  value?: string
+  onChange?: (text: string) => void
+  onBlur?: () => void
 }
 
-// custom text field component
 const CustomTextField: React.FC<TextFieldProps> = ({
   placeholder,
   label,
@@ -38,22 +37,23 @@ const CustomTextField: React.FC<TextFieldProps> = ({
       <TextInput
         numberOfLines={1}
         style={styles.input}
-        placeholder={placeholder ? placeholder : ""}
+        placeholder={placeholder || ''}
         placeholderTextColor="#3F6453"
         onChangeText={(value) => {
-          if (onChange) onChange(value);
+          if (onChange) onChange(value)
         }}
         onBlur={() => {
-          if (onBlur) onBlur();
+          if (onBlur) onBlur()
         }}
         underlineColorAndroid="transparent"
-        autoComplete={type ? (type as any) : "none"}
+        autoComplete={type ? (type as any) : 'none'}
       />
       {rightIcon && (
         <Ionicons name={rightIcon as any} style={styles.rightIcon} size={24} />
       )}
+      {error && <Text style={styles.errorText}>{error}</Text>}
     </View>
-  );
-};
+  )
+}
 
-export default CustomTextField;
+export default CustomTextField

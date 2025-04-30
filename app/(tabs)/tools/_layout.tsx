@@ -3,7 +3,7 @@ import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { colorPalettes } from '@/styles/Itheme'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { Stack, usePathname, useRouter } from 'expo-router'
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { StyleSheet, TouchableOpacity, View } from 'react-native'
 
 export default function ToolLayout() {
@@ -12,9 +12,7 @@ export default function ToolLayout() {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
 
-  useEffect(() => {
-    router.replace('/(tabs)/tools/currency-converter')
-  }, [])
+  console.log(pathname)
 
   return (
     <View style={styles.safeAreaContainer}>
@@ -22,17 +20,20 @@ export default function ToolLayout() {
       <View style={styles.floatingNavContainer}>
         <TabButton
           icon="cloud"
-          active={pathname.includes('weather') || pathname.includes('forecast')}
+          active={
+            pathname.startsWith('/tools/weather') ||
+            pathname.includes('forecast')
+          }
           onPress={() => router.push('/(tabs)/tools/weather')}
         />
         <TabButton
           icon="cash"
-          active={pathname.includes('currency-converter')}
+          active={pathname.startsWith('/tools/currency-converter')}
           onPress={() => router.push('/(tabs)/tools/currency-converter')}
         />
         <TabButton
           icon="language"
-          active={pathname.includes('translate')}
+          active={pathname.startsWith('/tools/translate')}
           onPress={() => router.push('/(tabs)/tools/translate')}
         />
       </View>
