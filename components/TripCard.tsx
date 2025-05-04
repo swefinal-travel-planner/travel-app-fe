@@ -6,26 +6,30 @@ import Ionicons from '@expo/vector-icons/Ionicons'
 import PressableOpacity from './PressableOpacity'
 
 interface TripCardProps {
+  tripId: string
   tripName: string
   tripImage: string
   days: number
   num_members: number
   budget: number
   isPinned: boolean
+  onPress: () => void
 }
 
 const TripCard: React.FC<TripCardProps> = ({
+  tripId,
   tripName,
   tripImage,
   days,
   num_members,
   budget,
   isPinned,
+  onPress,
 }) => {
   const [pinned, setPinned] = useState(isPinned)
 
   return (
-    <PressableOpacity style={styles.wrapper}>
+    <PressableOpacity style={styles.wrapper} onPress={onPress}>
       <View style={styles.imageContainer}>
         <Image source={{ uri: tripImage }} style={styles.image} />
 

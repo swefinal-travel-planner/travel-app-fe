@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   TextInput,
 } from 'react-native'
-import { useNavigation } from '@react-navigation/native'
+import { useRouter } from 'expo-router'
 import TripCard from '@/components/TripCard'
 import { Trip } from '@/lib/types/Trip'
 import Ionicons from '@expo/vector-icons/Ionicons'
@@ -104,7 +104,7 @@ const sampleTrips: Trip[] = [
 export default function MyTrips() {
   const [trips, setTrips] = useState<Trip[]>(sampleTrips)
   const [search, setSearch] = useState('')
-  const navigation = useNavigation()
+  const router = useRouter()
 
   const filteredTrips = trips.filter((trip) =>
     trip.title.toLowerCase().includes(search.toLowerCase())
@@ -138,22 +138,23 @@ export default function MyTrips() {
           <Text style={tripDetailStyles.message}>
             Bạn chưa có chuyến đi nào.
           </Text>
-          <Button
-            title="Tạo chuyến đi"
-            onPress={() => navigation.navigate('CreateTrip')}
-          />
+          <Button title="Tạo chuyến đi" />
         </View>
       ) : (
         <FlatList
           data={trips}
           renderItem={({ item }) => (
             <TripCard
+              tripId={item.id}
               tripName={item.title}
               tripImage={item.image}
               days={item.days}
               num_members={item.num_members}
               budget={item.budget}
               isPinned={item.pinned}
+              onPress={() =>
+                router.push(`/my-trips/trip-detail/${item.id}` as const)
+              }
             />
           )}
           keyExtractor={(item) => item.id}
