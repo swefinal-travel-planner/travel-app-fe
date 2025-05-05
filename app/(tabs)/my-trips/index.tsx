@@ -153,7 +153,7 @@ export default function MyTrips() {
               budget={item.budget}
               isPinned={item.pinned}
               onPress={() =>
-                router.push(`/my-trips/trip-detail/${item.id}` as const)
+                router.push(`/my-trips/${item.id}/details` as const)
               }
             />
           )}
