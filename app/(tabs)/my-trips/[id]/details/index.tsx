@@ -40,14 +40,12 @@ const TripDetailScreen = () => {
     },
   ])
 
-  // Hàm xử lý khi kết thúc việc kéo thả
   const handleDragEnd = ({ data }) => {
     setTripItems(data)
-    // Ở đây bạn có thể gọi API để cập nhật thứ tự trên server
+    // gọi api
     console.log('Thứ tự mới đã được lưu:', data)
   }
 
-  // Render mỗi địa điểm
   const renderItem = ({ item, drag, isActive }: RenderItemParams<any>) => {
     return (
       <ScaleDecorator>
@@ -72,7 +70,7 @@ const TripDetailScreen = () => {
             <Image
               source={{ uri: item.image }}
               style={styles.placeImage}
-              defaultSource={require('@/assets/images/alligator.jpg')} // Thay thế bằng ảnh placeholder của bạn
+              defaultSource={require('@/assets/images/alligator.jpg')}
             />
             <View style={styles.textContainer}>
               <Text style={styles.placeName}>{item.name}</Text>
