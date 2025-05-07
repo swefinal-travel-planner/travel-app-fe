@@ -1,10 +1,8 @@
-// app/my-trips/[id]/_layout.tsx
 import React, { useEffect, useState } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native'
 import { Stack, Tabs, useLocalSearchParams, useRouter } from 'expo-router'
 import { Trip } from '@/lib/types/Trip'
 
-// Giả lập việc lấy dữ liệu chuyến đi từ ID
 const sampleTrips: Trip[] = [
   {
     id: '1',
@@ -45,54 +43,52 @@ export default function TripDetailLayout() {
   }
 
   return (
-    <View style={{ backgroundColor: '#FFF' }}>
-      <Tabs
-        screenOptions={{
-          headerShown: false,
-          tabBarActiveTintColor: '#563D30',
-          tabBarInactiveTintColor: '#A68372',
-          tabBarPosition: 'top',
-          tabBarIcon: () => null,
-          tabBarStyle: {
-            elevation: 0,
-            backgroundColor: '#FFF',
-            height: 60,
-            marginBottom: 10,
-            borderBottomWidth: 1,
-            borderBottomColor: '#A68372',
-          },
-          tabBarLabelStyle: {
-            fontSize: 20,
-            textTransform: 'none',
-            fontFamily: 'NotoSerif_400Regular',
-            //borderBottomWidth: 2,
-            //borderBottomColor: '#E5DACB',
-          },
+    <Tabs
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: '#563D30',
+        tabBarInactiveTintColor: '#A68372',
+        tabBarPosition: 'top',
+        tabBarIcon: () => null,
+        tabBarStyle: {
+          elevation: 0,
+          backgroundColor: '#FFF',
+          height: 60,
+          marginBottom: 10,
+          borderBottomWidth: 1,
+          borderBottomColor: '#A68372',
+        },
+        tabBarLabelStyle: {
+          fontSize: 20,
+          textTransform: 'none',
+          fontFamily: 'NotoSerif_400Regular',
+          //borderBottomWidth: 2,
+          //borderBottomColor: '#E5DACB',
+        },
+      }}
+    >
+      <Tabs.Screen
+        name="details"
+        options={{
+          title: 'Details',
+          tabBarLabel: 'Details',
         }}
-      >
-        <Tabs.Screen
-          name="details"
-          options={{
-            title: 'Details',
-            tabBarLabel: 'Details',
-          }}
-        />
-        <Tabs.Screen
-          name="companions"
-          options={{
-            title: 'Companions',
-            tabBarLabel: 'Companions',
-          }}
-        />
-        <Tabs.Screen
-          name="album"
-          options={{
-            title: 'Album',
-            tabBarLabel: 'Album',
-          }}
-        />
-      </Tabs>
-    </View>
+      />
+      <Tabs.Screen
+        name="companions"
+        options={{
+          title: 'Companions',
+          tabBarLabel: 'Companions',
+        }}
+      />
+      <Tabs.Screen
+        name="album"
+        options={{
+          title: 'Album',
+          tabBarLabel: 'Album',
+        }}
+      />
+    </Tabs>
   )
 }
 
