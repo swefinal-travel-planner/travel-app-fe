@@ -32,7 +32,7 @@ export default function AiCreateTripScreen() {
   return (
     <View style={styles.safeAreaContainer}>
       <CreateTripNavigationBar
-        type="ai"
+        type={TRIP_TYPES.AI}
         theme={theme}
         goback={goBack}
         currentStep={currentStep}
