@@ -1,17 +1,19 @@
-import React, { useState } from 'react'
+import CreateTripButton from '@/components/Buttons/CreateTripButton'
+import TripCard from '@/components/TripCard'
+import { useThemeStyle } from '@/hooks/useThemeStyle'
+import { Trip } from '@/lib/types/Trip'
+import { colorPalettes } from '@/styles/Itheme'
+import Ionicons from '@expo/vector-icons/Ionicons'
+import { useRouter } from 'expo-router'
+import React, { useMemo, useState } from 'react'
 import {
-  View,
-  Text,
   Button,
   FlatList,
   StyleSheet,
-  TouchableOpacity,
+  Text,
   TextInput,
+  View,
 } from 'react-native'
-import { useNavigation } from '@react-navigation/native'
-import TripCard from '@/components/TripCard'
-import { Trip } from '@/lib/types/Trip'
-import Ionicons from '@expo/vector-icons/Ionicons'
 
 const sampleTrips: Trip[] = [
   {
@@ -104,108 +106,117 @@ const sampleTrips: Trip[] = [
 export default function MyTrips() {
   const [trips, setTrips] = useState<Trip[]>(sampleTrips)
   const [search, setSearch] = useState('')
-  const navigation = useNavigation()
+  const router = useRouter()
+  const theme = useThemeStyle()
+  const styles = useMemo(() => createStyles(theme), [theme])
 
   const filteredTrips = trips.filter((trip) =>
     trip.title.toLowerCase().includes(search.toLowerCase())
   )
 
   return (
-    <View style={tripDetailStyles.container}>
-      {/* Thanh tìm kiếm */}
-      <View style={tripDetailStyles.searchContainer}>
-        <Ionicons
-          name="search"
-          size={18}
-          color="#A68372"
-          style={{ marginRight: 8 }}
-        />
-        <TextInput
-          style={tripDetailStyles.searchInput}
-          placeholder="Search for your trips..."
-          value={search}
-          onChangeText={setSearch}
-          placeholderTextColor="#CDB8A5"
-        />
-      </View>
-
-      {/* Divider */}
-      <View style={tripDetailStyles.divider} />
-
-      {/* Danh sách chuyến đi */}
-      {filteredTrips.length <= 0 ? (
-        <View style={tripDetailStyles.emptyContainer}>
-          <Text style={tripDetailStyles.message}>
-            Bạn chưa có chuyến đi nào.
-          </Text>
-          <Button
-            title="Tạo chuyến đi"
-            onPress={() => navigation.navigate('CreateTrip')}
+    <View style={{ flex: 1, backgroundColor: theme.background }}>
+      <View style={styles.container}>
+        {/* Thanh tìm kiếm */}
+        <View style={styles.searchContainer}>
+          <Ionicons
+            name="search"
+            size={18}
+            color="#A68372"
+            style={{ marginRight: 8 }}
+          />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search for your trips..."
+            value={search}
+            onChangeText={setSearch}
+            placeholderTextColor="#CDB8A5"
           />
         </View>
-      ) : (
-        <FlatList
-          data={trips}
-          renderItem={({ item }) => (
-            <TripCard
-              tripName={item.title}
-              tripImage={item.image}
-              days={item.days}
-              num_members={item.num_members}
-              budget={item.budget}
-              isPinned={item.pinned}
+
+        {/* Divider */}
+        <View style={styles.divider} />
+
+        {/* Danh sách chuyến đi */}
+        {filteredTrips.length <= 0 ? (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.message}>Bạn chưa có chuyến đi nào.</Text>
+            <Button
+              title="Tạo chuyến đi"
+              onPress={() => router.navigate('/my-trips/welcome-create')}
             />
-          )}
-          keyExtractor={(item) => item.id}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={tripDetailStyles.listContent}
-          ItemSeparatorComponent={() => <View style={{ height: 24 }} />}
-        />
-      )}
+          </View>
+        ) : (
+          <FlatList
+            data={trips}
+            renderItem={({ item }) => (
+              <TripCard
+                tripName={item.title}
+                tripImage={item.image}
+                days={item.days}
+                num_members={item.num_members}
+                budget={item.budget}
+                isPinned={item.pinned}
+              />
+            )}
+            keyExtractor={(item) => item.id}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.listContent}
+            ItemSeparatorComponent={() => <View style={{ height: 24 }} />}
+          />
+        )}
+
+        {/* Nút tạo chuyến đi */}
+      </View>
+      <CreateTripButton
+        color={theme.primary}
+        onPress={() => router.navigate('/my-trips/welcome-create')}
+      />
     </View>
   )
 }
 
-const tripDetailStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: 16,
-    backgroundColor: '#FFF',
-    alignItems: 'center',
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FCF4E8',
-    borderRadius: 24,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    marginHorizontal: 16,
-    marginBottom: 16,
-    width: 340,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 14,
-    color: '#563D30',
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#E5DACB',
-    width: '90%',
-    alignSelf: 'center',
-    marginBottom: 16,
-  },
-  listContent: {
-    paddingBottom: 32,
-  },
-  emptyContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 40,
-  },
-  message: {
-    fontSize: 16,
-    marginBottom: 16,
-  },
-})
+const createStyles = (theme: typeof colorPalettes.light) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      paddingTop: 16,
+      backgroundColor: theme.white,
+      alignItems: 'center',
+    },
+    searchContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: '#FCF4E8',
+      borderRadius: 24,
+      paddingHorizontal: 16,
+      paddingVertical: 10,
+      marginHorizontal: 16,
+      marginBottom: 16,
+      width: 340,
+    },
+    searchInput: {
+      flex: 1,
+      fontSize: 14,
+      color: theme.normal,
+    },
+    divider: {
+      height: 1,
+      backgroundColor: '#E5DACB',
+      width: '90%',
+      alignSelf: 'center',
+      marginBottom: 16,
+    },
+    listContent: {
+      paddingBottom: 32,
+    },
+    emptyContainer: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingTop: 40,
+    },
+    message: {
+      fontSize: 16,
+      marginBottom: 16,
+    },
+  })

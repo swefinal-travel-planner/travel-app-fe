@@ -48,3 +48,6 @@ travel-app-229d7-firebase-adminsdk-fbsvc-893e2354e5.json
 # Other credential files
 *.service-account.json
 *credentials*.json
+
+# App
+app.json
