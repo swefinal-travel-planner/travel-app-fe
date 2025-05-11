@@ -115,7 +115,7 @@ export default function MyTrips() {
   )
 
   return (
-    <View style={{ flex: 1, backgroundColor: 'red' }}>
+    <View style={{ flex: 1, backgroundColor: theme.background }}>
       <View style={styles.container}>
         {/* Thanh tìm kiếm */}
         <View style={styles.searchContainer}>
