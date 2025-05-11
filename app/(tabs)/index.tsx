@@ -1,4 +1,4 @@
-import { Link } from "expo-router";
+import { Link } from 'expo-router'
 import {
   Text,
   View,
@@ -6,52 +6,52 @@ import {
   FlatList,
   ScrollView,
   Dimensions,
-} from "react-native";
+} from 'react-native'
 
-import SpotCard from "@/components/SpotCard";
-import CarouselSpotCard from "@/components/CarouselSpotCard";
-import Pressable from "@/components/Pressable";
+import SpotCard from '@/components/SpotCard'
+import CarouselSpotCard from '@/components/CarouselSpotCard'
+import Pressable from '@/components/Pressable'
 
-import styles from "../styles";
-import { Carousel } from "react-native-ui-lib";
+import styles from '../styles'
+import { Carousel } from 'react-native-ui-lib'
 
 const data = [
   {
-    spotName: "War Remnants Museum",
-    spotLocation: "28 Võ Văn Tần, Phường Võ Thị Sáu, Quận 3, Hồ Chí Minh",
+    spotName: 'War Remnants Museum',
+    spotLocation: '28 Võ Văn Tần, Phường Võ Thị Sáu, Quận 3, Hồ Chí Minh',
     spotImage:
-      "https://lh3.googleusercontent.com/p/AF1QipPwjfXoTp4uuEBODAptmwg054U6pzYeLUhS9W-o=s1360-w1360-h1020",
+      'https://lh3.googleusercontent.com/p/AF1QipPwjfXoTp4uuEBODAptmwg054U6pzYeLUhS9W-o=s1360-w1360-h1020',
     isSaved: false,
   },
   {
-    spotName: "Le Quy Don High School",
-    spotLocation: "110 Nguyễn Thị Minh Khai, Phường 6, Quận 3, Hồ Chí Minh",
+    spotName: 'Le Quy Don High School',
+    spotLocation: '110 Nguyễn Thị Minh Khai, Phường 6, Quận 3, Hồ Chí Minh',
     spotImage:
-      "https://lh5.googleusercontent.com/p/AF1QipMtzP5eSZmnAm8xzqo4yvC6dqgALsMgj33CZXWu=w408-h725-k-no",
+      'https://lh5.googleusercontent.com/p/AF1QipMtzP5eSZmnAm8xzqo4yvC6dqgALsMgj33CZXWu=w408-h725-k-no',
     isSaved: false,
   },
   {
-    spotName: "Co.opmart Nguyễn Đình Chiểu",
-    spotLocation: "168 Nguyễn Đình Chiểu, Phường 6, Quận 3, Hồ Chí Minh",
+    spotName: 'Co.opmart Nguyễn Đình Chiểu',
+    spotLocation: '168 Nguyễn Đình Chiểu, Phường 6, Quận 3, Hồ Chí Minh',
     spotImage:
-      "https://lh5.googleusercontent.com/p/AF1QipOYQjPY1L6dzxJYj7t-eTSl8_5FyGWdFwsri3d8=w408-h306-k-no",
+      'https://lh5.googleusercontent.com/p/AF1QipOYQjPY1L6dzxJYj7t-eTSl8_5FyGWdFwsri3d8=w408-h306-k-no',
     isSaved: false,
   },
   {
-    spotName: "HCMC Cultural Palace for Labors",
+    spotName: 'HCMC Cultural Palace for Labors',
     spotLocation:
-      "55B Nguyễn Thị Minh Khai, Phường Bến Thành, Quận 1, Hồ Chí Minh",
+      '55B Nguyễn Thị Minh Khai, Phường Bến Thành, Quận 1, Hồ Chí Minh',
     spotImage:
-      "https://lh5.googleusercontent.com/p/AF1QipPqWjKxgEF2SvrpljDjKqR6-u2tfItMBpUzjOT5=w408-h725-k-no",
+      'https://lh5.googleusercontent.com/p/AF1QipPqWjKxgEF2SvrpljDjKqR6-u2tfItMBpUzjOT5=w408-h725-k-no',
     isSaved: false,
   },
-];
+]
 
-const hasTrip = true;
+const hasTrip = true
 
 // get screen width for responsive sizing
-const { width: screenWidth } = Dimensions.get("window");
-const cardWidth = screenWidth - 120; // account for margins and padding
+const { width: screenWidth } = Dimensions.get('window')
+const cardWidth = screenWidth - 120 // account for margins and padding
 
 const Index = () => {
   return (
@@ -82,7 +82,7 @@ const Index = () => {
                 }}
                 containerMarginHorizontal={0}
                 pageControlPosition={Carousel.pageControlPositions.UNDER}
-                pageControlProps={{ color: "#A68372" }}
+                pageControlProps={{ color: '#A68372' }}
               >
                 {data.map((item, index) => (
                   <CarouselSpotCard key={index} {...item} />
@@ -90,7 +90,7 @@ const Index = () => {
               </Carousel>
 
               <Pressable
-                title={"View trip details"}
+                title={'View trip details'}
                 style={homeStyles.button}
                 variant="primary"
               ></Pressable>
@@ -100,7 +100,7 @@ const Index = () => {
               <Text style={styles.mainText}>Your next great trip awaits!</Text>
 
               <Pressable
-                title={"Plan a new trip"}
+                title={'Plan a new trip'}
                 style={homeStyles.button}
                 variant="primary"
               ></Pressable>
@@ -139,21 +139,21 @@ const Index = () => {
         />
       </View>
     </ScrollView>
-  );
-};
+  )
+}
 
-export default Index;
+export default Index
 
 const homeStyles = StyleSheet.create({
   container: {
-    alignItems: "flex-start",
-    width: "100%",
+    alignItems: 'flex-start',
+    width: '100%',
   },
   scrollContent: {
     flexGrow: 1,
-    width: "100%",
-    alignItems: "center",
-    justifyContent: "flex-start",
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
     paddingBottom: 80,
   },
   list: {
@@ -166,36 +166,36 @@ const homeStyles = StyleSheet.create({
   subText: {
     fontSize: 16,
     marginBottom: 4,
-    color: "#563D30",
-    fontFamily: "NotoSerif_400Regular",
+    color: '#563D30',
+    fontFamily: 'NotoSerif_400Regular',
   },
   mainText: {
     fontSize: 20,
-    color: "#563D30",
-    fontFamily: "NotoSerif_400Regular",
+    color: '#563D30',
+    fontFamily: 'NotoSerif_400Regular',
     marginBottom: 12,
   },
   hugeText: {
     fontSize: 28,
-    color: "#563D30",
-    fontFamily: "NotoSerif_400Regular",
+    color: '#563D30',
+    fontFamily: 'NotoSerif_400Regular',
   },
   topCenter: {
-    width: "100%",
-    alignItems: "center",
-    justifyContent: "center",
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   currentTrip: {
-    width: "100%",
+    width: '100%',
     borderRadius: 12,
     marginVertical: 24,
     padding: 20,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     borderWidth: 1,
-    borderColor: "#A68372",
+    borderColor: '#A68372',
   },
   button: {
     marginTop: 16,
   },
-});
+})

@@ -1,8 +1,9 @@
 import CreateTripNavigationBar from '@/components/CreateTripComponents/CreateTripNavigationBar'
-import { createManualTripSteps } from '@/constants/createTrip'
+import { createManualTripSteps, TRIP_TYPES } from '@/constants/createTrip'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { colorPalettes } from '@/styles/Itheme'
-import React, { useMemo, useState } from 'react'
+import { useRouter } from 'expo-router'
+import React, { useEffect, useMemo, useState } from 'react'
 import { StyleSheet } from 'react-native'
 import { View } from 'react-native-ui-lib'
 
@@ -11,6 +12,7 @@ export default function ManualCreateTripScreen() {
   const styles = useMemo(() => createStyles(theme), [theme])
   const [currentStep, setCurrentStep] = useState(0)
   const StepComponent = createManualTripSteps[currentStep]
+  const router = useRouter()
 
   const goNext = () => {
     if (currentStep < createManualTripSteps.length - 1) {
@@ -22,11 +24,19 @@ export default function ManualCreateTripScreen() {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1)
     }
+    if (currentStep === 0) {
+      router.back()
+    }
   }
+
+  useEffect(() => {
+    console.log('Current Step:', currentStep)
+  }, [currentStep])
 
   return (
     <View style={styles.safeAreaContainer}>
       <CreateTripNavigationBar
+        type={TRIP_TYPES.MANUAL}
         theme={theme}
         goback={goBack}
         currentStep={currentStep}

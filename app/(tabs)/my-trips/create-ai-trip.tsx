@@ -2,6 +2,7 @@ import CreateTripNavigationBar from '@/components/CreateTripComponents/CreateTri
 import { createAiTripSteps } from '@/constants/createTrip'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { colorPalettes } from '@/styles/Itheme'
+import { useRouter } from 'expo-router'
 import React, { useMemo, useState } from 'react'
 import { StyleSheet } from 'react-native'
 import { View } from 'react-native-ui-lib'
@@ -11,6 +12,7 @@ export default function AiCreateTripScreen() {
   const styles = useMemo(() => createStyles(theme), [theme])
   const [currentStep, setCurrentStep] = useState(0)
   const StepComponent = createAiTripSteps[currentStep]
+  const router = useRouter()
 
   const goNext = () => {
     if (currentStep < createAiTripSteps.length - 1) {
@@ -21,6 +23,9 @@ export default function AiCreateTripScreen() {
   const goBack = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1)
+    }
+    if (currentStep === 0) {
+      router.back()
     }
   }
 

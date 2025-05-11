@@ -1,6 +1,7 @@
 import {
   createAiTripSteps,
   createManualTripSteps,
+  TRIP_TYPES,
 } from '@/constants/createTrip'
 import { colorPalettes } from '@/styles/Itheme'
 import Ionicons from '@expo/vector-icons/Ionicons'
@@ -9,7 +10,7 @@ import { StyleSheet, View } from 'react-native'
 import { Button, ProgressBar } from 'react-native-ui-lib'
 
 type CreateTripNavigationBarProps = {
-  type?: 'manual' | 'ai'
+  type: string
   theme: typeof colorPalettes.light
   currentStep: number
   goback: () => void
@@ -22,7 +23,9 @@ export default function CreateTripNavigationBar({
   type,
 }: Readonly<CreateTripNavigationBarProps>) {
   const numberOfSteps =
-    type === 'manual' ? createManualTripSteps.length : createAiTripSteps.length
+    type === TRIP_TYPES.MANUAL
+      ? createManualTripSteps.length
+      : createAiTripSteps.length
 
   return (
     <View style={styles.createTripNavigationBar}>
