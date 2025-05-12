@@ -64,7 +64,7 @@ export default TripCard
 
 const styles = StyleSheet.create({
   wrapper: {
-    width: 340,
+    width: 360,
     height: 206,
     alignItems: 'center',
     justifyContent: 'flex-start',

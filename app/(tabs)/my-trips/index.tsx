@@ -181,9 +181,8 @@ const tripDetailStyles = StyleSheet.create({
     borderRadius: 24,
     paddingHorizontal: 16,
     paddingVertical: 10,
-    marginHorizontal: 16,
     marginBottom: 16,
-    width: 340,
+    width: 360,
   },
   searchInput: {
     flex: 1,
