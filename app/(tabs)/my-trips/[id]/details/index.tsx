@@ -10,10 +10,12 @@ import {
   StatusBar,
 } from 'react-native'
 import Ionicons from '@expo/vector-icons/Ionicons'
+import { useRouter } from 'expo-router'
 
-const TripDetailViewScreen = ({ navigation }) => {
+const TripDetailViewScreen = () => {
   // Dữ liệu mẫu cho chuyến đi
   const tripData = {
+    tripId: '1',
     destination: 'Ho Chi Minh City',
     dateRange: '11/11/2024 - 15/11/2024',
     totalCost: '7000 USD',
@@ -39,28 +41,24 @@ const TripDetailViewScreen = ({ navigation }) => {
             id: '2',
             name: 'Bến Nhà Rồng',
             address: 'Quận 4, Thành phố Hồ Chí Minh',
-            timeSlot: '13:00 - 15:00',
             image: require('@/assets/images/alligator.jpg'),
           },
           {
             id: '3',
             name: 'Phố đi bộ Nguyễn Huệ',
             address: 'Quận 1, Thành phố Hồ Chí Minh',
-            timeSlot: '18:00 - 20:00',
             image: require('@/assets/images/alligator.jpg'),
           },
           {
             id: '4',
-            name: 'Phố đi bộ Nguyễn Huệ',
+            name: 'Chợ Bến Thành',
             address: 'Quận 1, Thành phố Hồ Chí Minh',
-            timeSlot: '18:00 - 20:00',
             image: require('@/assets/images/alligator.jpg'),
           },
           {
             id: '5',
-            name: 'Phố đi bộ Nguyễn Huệ',
-            address: 'Quận 1, Thành phố Hồ Chí Minh',
-            timeSlot: '18:00 - 20:00',
+            name: 'Bảo tàng Chứng tích Chiến tranh',
+            address: 'Quận 3, Thành phố Hồ Chí Minh',
             image: require('@/assets/images/alligator.jpg'),
           },
         ],
@@ -69,9 +67,17 @@ const TripDetailViewScreen = ({ navigation }) => {
   }
 
   const [activeDay, setActiveDay] = useState(0)
+  const router = useRouter()
 
   const handleEditTrip = () => {
-    navigation.navigate('TripDetailEditScreen', { tripData })
+    router.push({
+      pathname: `my-trips/${tripData.tripId}/details/modify`,
+      params: {
+        tripData: JSON.stringify(tripData.days[activeDay].spots),
+        tripDate: tripData.days[activeDay].date,
+        tripDay: tripData.days[activeDay].day,
+      },
+    })
   }
 
   const [activeTab, setActiveTab] = useState('Details')
@@ -184,7 +190,8 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: 16,
+    paddingHorizontal: 16,
+    marginTop: 16,
   },
   tripCard: {
     backgroundColor: '#fff',

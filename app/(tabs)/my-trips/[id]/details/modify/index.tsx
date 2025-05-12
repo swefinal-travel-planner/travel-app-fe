@@ -1,52 +1,75 @@
-import React, { useState } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native'
+import React, { useState, useEffect } from 'react'
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  Alert,
+} from 'react-native'
 import DraggableFlatList, {
   ScaleDecorator,
   RenderItemParams,
 } from 'react-native-draggable-flatlist'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import Ionicons from '@expo/vector-icons/Ionicons'
+import { useLocalSearchParams, useRouter } from 'expo-router'
 
-const TripDetailScreen = () => {
-  // Dữ liệu mẫu cho các địa điểm trong trip
-  const [tripItems, setTripItems] = useState([
-    {
-      id: '1',
-      name: 'Bảo tàng Lịch sử',
-      timeSlot: '9:00 - 11:00',
-      address: '123 Đường Lịch sử, Hà Nội',
-      image: 'https://example.com/museum.jpg',
-    },
-    {
-      id: '2',
-      name: 'Nhà hàng Hương Việt',
-      timeSlot: '12:00 - 13:30',
-      address: '45 Đường Ẩm thực, Hà Nội',
-      image: 'https://example.com/restaurant.jpg',
-    },
-    {
-      id: '3',
-      name: 'Công viên Thống Nhất',
-      timeSlot: '14:00 - 16:00',
-      address: '78 Đường Công viên, Hà Nội',
-      image: 'https://example.com/park.jpg',
-    },
-    {
-      id: '4',
-      name: 'Phố đi bộ Hồ Gươm',
-      timeSlot: '17:00 - 19:00',
-      address: 'Phố đi bộ, Hà Nội',
-      image: 'https://example.com/walking-street.jpg',
-    },
-  ])
+type SpotItem = {
+  id: string
+  name: string
+  address: string
+  timeSlot?: string
+  image: any
+}
 
-  const handleDragEnd = ({ data }) => {
+const TripDetailModifyScreen = () => {
+  const router = useRouter()
+  const { tripData, tripDate, tripDay } = useLocalSearchParams()
+  const [tripItems, setTripItems] = useState<SpotItem[]>([])
+
+  // Parse the passed trip data when the component mounts
+  useEffect(() => {
+    try {
+      if (tripData) {
+        const parsedTripData = JSON.parse(tripData as string)
+        setTripItems(parsedTripData)
+      }
+    } catch (error) {
+      console.error('Error parsing trip data:', error)
+      Alert.alert('Error', 'Could not load trip data')
+    }
+  }, [tripData])
+
+  const handleDragEnd = ({ data }: { data: SpotItem[] }) => {
     setTripItems(data)
-    // gọi api
     console.log('Thứ tự mới đã được lưu:', data)
   }
 
-  const renderItem = ({ item, drag, isActive }: RenderItemParams<any>) => {
+  const handleDeleteItem = (itemToDelete: SpotItem) => {
+    Alert.alert('Delete Spot', 'Are you sure you want to delete this spot?', [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: () => {
+          const updatedItems = tripItems.filter(
+            (item) => item.id !== itemToDelete.id
+          )
+          setTripItems(updatedItems)
+        },
+      },
+    ])
+  }
+
+  const handleGoBack = () => {
+    router.back()
+  }
+
+  const renderItem = ({ item, drag, isActive }: RenderItemParams<SpotItem>) => {
     return (
       <ScaleDecorator>
         <TouchableOpacity
@@ -54,55 +77,77 @@ const TripDetailScreen = () => {
           onLongPress={drag}
           disabled={isActive}
           style={[
-            styles.tripItemContainer,
-            { backgroundColor: isActive ? '#f0f0f0' : 'white' },
+            styles.spotCard,
+            { backgroundColor: isActive ? '#f0f0f0' : '#FFFFFF' },
           ]}
         >
           <View style={styles.dragHandle}>
             <Ionicons name="menu-outline" size={24} color="#666" />
           </View>
 
-          <View style={styles.timeContainer}>
-            <Text style={styles.timeText}>{item.timeSlot}</Text>
-          </View>
-
-          <View style={styles.infoContainer}>
+          <View style={styles.spotImageContainer}>
             <Image
-              source={{ uri: item.image }}
-              style={styles.placeImage}
-              defaultSource={require('@/assets/images/alligator.jpg')}
+              source={item.image || require('@/assets/images/alligator.jpg')}
+              style={styles.spotImage}
             />
-            <View style={styles.textContainer}>
-              <Text style={styles.placeName}>{item.name}</Text>
-              <Text style={styles.placeAddress} numberOfLines={1}>
-                {item.address}
-              </Text>
+          </View>
+          <View style={styles.spotDetails}>
+            <Text style={styles.spotName}>{item.name}</Text>
+            <View style={styles.spotLocationContainer}>
+              <Ionicons name="location" size={14} color="#888" />
+              <Text style={styles.spotAddress}>{item.address}</Text>
             </View>
           </View>
+
+          <TouchableOpacity
+            style={styles.deleteButton}
+            onPress={() => handleDeleteItem(item)}
+          >
+            <Ionicons name="trash-outline" size={24} color="#FF6B6B" />
+          </TouchableOpacity>
         </TouchableOpacity>
       </ScaleDecorator>
     )
   }
 
   return (
-    <GestureHandlerRootView>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Chi tiết chuyến đi</Text>
-          <Text style={styles.headerSubtitle}>Ngày 1 - Hà Nội</Text>
-          <Text style={styles.dragInstructions}>
-            Nhấn giữ và kéo để sắp xếp lại thứ tự
-          </Text>
-        </View>
-
-        <DraggableFlatList
-          data={tripItems}
-          onDragEnd={handleDragEnd}
-          keyExtractor={(item) => item.id}
-          renderItem={renderItem}
-          contentContainerStyle={styles.listContent}
-        />
+    <GestureHandlerRootView style={styles.container}>
+      {/* Header and Back button */}
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
+          <Ionicons name="arrow-back-outline" size={24} color="#000" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Modify trip</Text>
       </View>
+
+      {/* Day Navigation */}
+      <View style={styles.dayNavigationContainer}>
+        <Text style={styles.dayText}>
+          Day {tripDay} ({tripDate})
+        </Text>
+      </View>
+
+      {/* Add button */}
+      <TouchableOpacity
+        style={styles.addButtonContainer}
+        onPress={() => {
+          // TODO: Implement add new spot functionality
+          Alert.alert('Add Spot', 'Add new spot functionality coming soon')
+        }}
+      >
+        <View style={styles.addButtonBorder}>
+          <Ionicons name="add" size={24} color="#000" />
+        </View>
+      </TouchableOpacity>
+
+      {/* Draggable list item */}
+      <DraggableFlatList
+        data={tripItems}
+        onDragEnd={handleDragEnd}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+        contentContainerStyle={styles.listContent}
+      />
     </GestureHandlerRootView>
   )
 }
@@ -110,86 +155,97 @@ const TripDetailScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#fff',
   },
   header: {
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: 16,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+  },
+  backButton: {
+    marginRight: 16,
   },
   headerTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
+    fontSize: 24,
+    textAlign: 'center',
+    flex: 1,
   },
-  headerSubtitle: {
-    fontSize: 16,
-    color: '#666',
-    marginTop: 4,
+  dayNavigationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  dragInstructions: {
-    fontSize: 14,
-    color: '#888',
-    fontStyle: 'italic',
-    marginTop: 8,
+  dayText: {
+    textAlign: 'center',
+    fontSize: 20,
+    fontWeight: '500',
+    color: '#563D30',
+  },
+  addButtonContainer: {
+    alignSelf: 'center',
+    backgroundColor: '#EEF8EF',
+    borderRadius: 30,
+    padding: 16,
+    marginVertical: 16,
+  },
+  addButtonBorder: {
+    borderWidth: 2,
+    borderColor: 'black',
+    borderRadius: 10,
   },
   listContent: {
-    padding: 16,
+    paddingHorizontal: 16,
   },
-  tripItemContainer: {
+  spotCard: {
     flexDirection: 'row',
+    borderRadius: 12,
     marginBottom: 12,
-    borderRadius: 8,
-    backgroundColor: 'white',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 2,
     overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#E5DACB',
+    alignItems: 'center',
   },
   dragHandle: {
-    width: 40,
+    marginHorizontal: 8,
+  },
+  spotImageContainer: {
+    width: 120,
+    height: 80,
+    padding: 8,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRightWidth: 1,
-    borderRightColor: '#eee',
   },
-  timeContainer: {
-    justifyContent: 'center',
-    paddingHorizontal: 10,
-    borderRightWidth: 1,
-    borderRightColor: '#eee',
+  spotImage: {
+    width: '100%',
+    height: '100%',
+    borderColor: '#D3B7A8',
+    borderWidth: 2,
+    borderRadius: 8,
   },
-  timeText: {
-    fontSize: 12,
-    color: '#555',
-    fontWeight: '500',
-  },
-  infoContainer: {
+  spotDetails: {
     flex: 1,
+    padding: 12,
+    justifyContent: 'center',
+  },
+  spotName: {
+    fontSize: 15,
+    fontWeight: '500',
+    marginBottom: 6,
+    color: '#563D30',
+  },
+  spotLocationContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 10,
   },
-  placeImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 4,
-    marginRight: 10,
+  spotAddress: {
+    fontSize: 13,
+    color: '#A68372',
+    marginLeft: 4,
   },
-  textContainer: {
-    flex: 1,
-  },
-  placeName: {
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  placeAddress: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 2,
+  deleteButton: {
+    padding: 8,
   },
 })
 
-export default TripDetailScreen
+export default TripDetailModifyScreen
