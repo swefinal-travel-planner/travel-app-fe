@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native'
 import { Stack, Tabs, useLocalSearchParams, useRouter } from 'expo-router'
 import { Trip } from '@/lib/types/Trip'
+import Ionicons from '@expo/vector-icons/Ionicons'
 
 const sampleTrips: Trip[] = [
   {
@@ -43,6 +44,13 @@ export default function TripDetailLayout() {
   }
 
   return (
+    // <View>
+    //   {/* Header */}
+    //   <View style={styles.header}>
+    //     <TouchableOpacity>
+    //       <Ionicons name="arrow-back" size={24} color="#000" />
+    //     </TouchableOpacity>
+    //   </View>
     <Tabs
       screenOptions={{
         headerShown: false,
@@ -54,7 +62,6 @@ export default function TripDetailLayout() {
           elevation: 0,
           backgroundColor: '#FFF',
           height: 60,
-          marginBottom: 10,
           borderBottomWidth: 1,
           borderBottomColor: '#A68372',
         },
@@ -89,10 +96,19 @@ export default function TripDetailLayout() {
         }}
       />
     </Tabs>
+    // </View>
   )
 }
 
 const styles = StyleSheet.create({
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: '#fff',
+  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
