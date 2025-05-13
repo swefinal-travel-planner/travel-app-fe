@@ -155,13 +155,14 @@ const TripDetailModifyScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
   },
   header: {
     justifyContent: 'space-between',
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
+    paddingHorizontal: 22,
+    paddingVertical: 10,
   },
   backButton: {
     marginRight: 16,
@@ -195,7 +196,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   listContent: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
   },
   spotCard: {
     flexDirection: 'row',

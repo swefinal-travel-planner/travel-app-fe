@@ -187,10 +187,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
+    paddingHorizontal: 22,
   },
   content: {
     flex: 1,
-    paddingHorizontal: 16,
     marginTop: 16,
   },
   tripCard: {
