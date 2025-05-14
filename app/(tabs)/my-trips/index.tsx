@@ -14,10 +14,6 @@ import {
   TextInput,
   View,
 } from 'react-native'
-import { useRouter } from 'expo-router'
-import TripCard from '@/components/TripCard'
-import { Trip } from '@/lib/types/Trip'
-import Ionicons from '@expo/vector-icons/Ionicons'
 
 const sampleTrips: Trip[] = [
   {
@@ -119,9 +115,9 @@ export default function MyTrips() {
   )
 
   return (
-    <View style={tripDetailStyles.container}>
+    <View style={styles.container}>
       {/* Thanh tìm kiếm */}
-      <View style={tripDetailStyles.searchContainer}>
+      <View style={styles.searchContainer}>
         <Ionicons
           name="search"
           size={18}
@@ -129,7 +125,7 @@ export default function MyTrips() {
           style={{ marginRight: 8 }}
         />
         <TextInput
-          style={tripDetailStyles.searchInput}
+          style={styles.searchInput}
           placeholder="Search for your trips..."
           value={search}
           onChangeText={setSearch}
@@ -138,14 +134,12 @@ export default function MyTrips() {
       </View>
 
       {/* Divider */}
-      <View style={tripDetailStyles.divider} />
+      <View style={styles.divider} />
 
       {/* Danh sách chuyến đi */}
       {filteredTrips.length <= 0 ? (
-        <View style={tripDetailStyles.emptyContainer}>
-          <Text style={tripDetailStyles.message}>
-            Bạn chưa có chuyến đi nào.
-          </Text>
+        <View style={styles.emptyContainer}>
+          <Text style={styles.message}>Bạn chưa có chuyến đi nào.</Text>
           <Button title="Tạo chuyến đi" />
         </View>
       ) : (
@@ -164,32 +158,17 @@ export default function MyTrips() {
                 router.push(`/my-trips/${item.id}/details` as const)
               }
             />
-          </View>
-        ) : (
-          <FlatList
-            data={trips}
-            renderItem={({ item }) => (
-              <TripCard
-                tripName={item.title}
-                tripImage={item.image}
-                days={item.days}
-                num_members={item.num_members}
-                budget={item.budget}
-                isPinned={item.pinned}
-              />
-            )}
-            keyExtractor={(item) => item.id}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.listContent}
-            ItemSeparatorComponent={() => <View style={{ height: 24 }} />}
-          />
-        )}
-
-        {/* Nút tạo chuyến đi */}
-      </View>
+          )}
+          keyExtractor={(item) => item.id}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.listContent}
+          ItemSeparatorComponent={() => <View style={{ height: 24 }} />}
+        />
+      )}
+      {/* Nút tạo chuyến đi */}
       <CreateTripButton
-        color={theme.primary}
-        onPress={() => router.navigate('/my-trips/welcome-create')}
+        onPress={() => router.push('/my-trips/welcome-create')}
+        color={colorPalettes.light.primary}
       />
     </View>
   )
@@ -203,16 +182,16 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       backgroundColor: theme.white,
       alignItems: 'center',
     },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FCF4E8',
-    borderRadius: 24,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    marginBottom: 16,
-    width: 360,
-  },
+    searchContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: '#FCF4E8',
+      borderRadius: 24,
+      paddingHorizontal: 16,
+      paddingVertical: 10,
+      marginBottom: 16,
+      width: 360,
+    },
     searchInput: {
       flex: 1,
       fontSize: 14,
