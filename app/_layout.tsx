@@ -1,6 +1,6 @@
 import { GoogleSignin } from '@react-native-google-signin/google-signin'
 import React, { useEffect, useRef, useState } from 'react'
-import { Platform } from 'react-native'
+import { Platform, SafeAreaView, View } from 'react-native'
 import {
   NotoSerif_400Regular,
   NotoSerif_700Bold,

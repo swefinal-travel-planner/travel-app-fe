@@ -16,6 +16,7 @@ import { Carousel } from 'react-native-ui-lib'
 import { colorPalettes } from '@/styles/Itheme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { useMemo } from 'react'
+import styles from '../styles'
 
 const data = [
   {
@@ -215,4 +216,57 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     button: {
       marginTop: 16,
     },
+      container: {
+    alignItems: 'flex-start',
+    width: '100%',
+  },
+  scrollContent: {
+    flexGrow: 1,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    paddingBottom: 80,
+  },
+  list: {
+    flexGrow: 0,
+    marginHorizontal: -40,
+  },
+  listContent: {
+    paddingHorizontal: 40,
+  },
+  subText: {
+    fontSize: 16,
+    marginBottom: 4,
+    color: '#563D30',
+    fontFamily: 'NotoSerif_400Regular',
+  },
+  mainText: {
+    fontSize: 20,
+    color: '#563D30',
+    fontFamily: 'NotoSerif_400Regular',
+    marginBottom: 12,
+  },
+  hugeText: {
+    fontSize: 28,
+    color: '#563D30',
+    fontFamily: 'NotoSerif_400Regular',
+  },
+  topCenter: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  currentTrip: {
+    width: '100%',
+    borderRadius: 12,
+    marginVertical: 24,
+    padding: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#A68372',
+  },
+  button: {
+    marginTop: 16,
+  },
   })
