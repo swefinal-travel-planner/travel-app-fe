@@ -114,7 +114,6 @@ export default function MyTrips() {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
 
-
   const filteredTrips = trips.filter((trip) =>
     trip.title.toLowerCase().includes(search.toLowerCase())
   )
@@ -195,6 +194,7 @@ export default function MyTrips() {
     </View>
   )
 }
+
 const createStyles = (theme: typeof colorPalettes.light) =>
   StyleSheet.create({
     container: {

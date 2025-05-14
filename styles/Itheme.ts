@@ -18,8 +18,8 @@ export const colorPalettes = {
     surface: '#1e1e1e', // Dark surface
     primary: '#4f8968', // Brighter primary for visibility
     primarySubtle: '#1a2e25', // Darker subtle primary
-    black: '#000000',
-    white: '#ffffff',
+    black: '#ffffff',
+    white: '#121212',
   },
   pink: {
     normal: '#563d30',

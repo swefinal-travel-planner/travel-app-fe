@@ -1,5 +1,5 @@
 import CreateTripNavigationBar from '@/components/CreateTripComponents/CreateTripNavigationBar'
-import { createAiTripSteps } from '@/constants/createTrip'
+import { createAiTripSteps, TRIP_TYPES } from '@/constants/createTrip'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { colorPalettes } from '@/styles/Itheme'
 import { useRouter } from 'expo-router'

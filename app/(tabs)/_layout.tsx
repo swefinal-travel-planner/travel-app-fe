@@ -1,23 +1,26 @@
-import { Tabs } from "expo-router";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import { Platform } from "react-native";
+import { Tabs } from 'expo-router'
+import Ionicons from '@expo/vector-icons/Ionicons'
+import { Platform } from 'react-native'
+import { useThemeStyle } from '@/hooks/useThemeStyle'
+import { useMemo } from 'react'
+import { colorPalettes } from '@/styles/Itheme'
+import { StyleSheet } from 'react-native'
 
 export default function TabLayout() {
+  const theme = useThemeStyle()
+  const styles = useMemo(() => createStyles(theme), [theme])
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: "#563D30",
-        tabBarInactiveTintColor: "#A68372",
+        tabBarActiveTintColor: theme.normal,
+        tabBarInactiveTintColor: '#A68372',
         tabBarHideOnKeyboard: true,
-        tabBarStyle: {
-          paddingTop: 5,
-          height: Platform.OS === "ios" ? 90 : 80,
-          borderColor: "#A68372",
-        },
+        tabBarStyle: styles.tabBarStyle,
         tabBarLabelStyle: {
           marginTop: 2,
-          fontFamily: "NotoSerif_400Regular",
+          fontFamily: 'NotoSerif_400Regular',
           fontSize: 12,
         },
       }}
@@ -25,10 +28,10 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Home",
+          title: 'Home',
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
-              name={focused ? "home" : "home-outline"}
+              name={focused ? 'home' : 'home-outline'}
               color={color}
               size={24}
             />
@@ -39,10 +42,10 @@ export default function TabLayout() {
       <Tabs.Screen
         name="my-trips"
         options={{
-          title: "My trips",
+          title: 'My trips',
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
-              name={focused ? "compass" : "compass-outline"}
+              name={focused ? 'compass' : 'compass-outline'}
               color={color}
               size={24}
             />
@@ -53,10 +56,10 @@ export default function TabLayout() {
       <Tabs.Screen
         name="tools"
         options={{
-          title: "Tools",
+          title: 'Tools',
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
-              name={focused ? "grid" : "grid-outline"}
+              name={focused ? 'grid' : 'grid-outline'}
               color={color}
               size={24}
             />
@@ -67,10 +70,10 @@ export default function TabLayout() {
       <Tabs.Screen
         name="inbox"
         options={{
-          title: "Inbox",
+          title: 'Inbox',
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
-              name={focused ? "file-tray" : "file-tray-outline"}
+              name={focused ? 'file-tray' : 'file-tray-outline'}
               color={color}
               size={24}
             />
@@ -81,10 +84,10 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: "Profile",
+          title: 'Profile',
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
-              name={focused ? "person" : "person-outline"}
+              name={focused ? 'person' : 'person-outline'}
               color={color}
               size={24}
             />
@@ -92,5 +95,15 @@ export default function TabLayout() {
         }}
       />
     </Tabs>
-  );
+  )
 }
+
+const createStyles = (theme: typeof colorPalettes.light) =>
+  StyleSheet.create({
+    tabBarStyle: {
+      paddingTop: 5,
+      height: Platform.OS === 'ios' ? 90 : 80,
+      borderColor: theme.subtle2,
+      backgroundColor: theme.surface,
+    },
+  })

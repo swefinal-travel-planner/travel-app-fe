@@ -12,8 +12,11 @@ import SpotCard from '@/components/SpotCard'
 import CarouselSpotCard from '@/components/CarouselSpotCard'
 import Pressable from '@/components/Pressable'
 
-import styles from '../styles'
 import { Carousel } from 'react-native-ui-lib'
+import { colorPalettes } from '@/styles/Itheme'
+import { useThemeStyle } from '@/hooks/useThemeStyle'
+import { useMemo } from 'react'
+import styles from '../styles'
 
 const data = [
   {
@@ -54,23 +57,26 @@ const { width: screenWidth } = Dimensions.get('window')
 const cardWidth = screenWidth - 120 // account for margins and padding
 
 const Index = () => {
+  const theme = useThemeStyle()
+  const styles = useMemo(() => createStyles(theme), [theme])
+
   return (
     <ScrollView
       style={styles.mainContainer}
-      contentContainerStyle={homeStyles.scrollContent}
+      contentContainerStyle={styles.scrollContent}
     >
-      <View style={homeStyles.container}>
-        <View style={homeStyles.topCenter}>
-          <Text style={homeStyles.hugeText}>Welcome back, bro!</Text>
+      <View style={styles.container}>
+        <View style={styles.topCenter}>
+          <Text style={styles.hugeText}>Welcome back, bro!</Text>
 
           <Link href="/signup" style={styles.mainButton}>
             Go to Signup screen
           </Link>
 
           {hasTrip ? (
-            <View style={homeStyles.currentTrip}>
-              <Text style={homeStyles.subText}>This morning's plan</Text>
-              <Text style={homeStyles.mainText}>Ho Chi Minh City</Text>
+            <View style={styles.currentTrip}>
+              <Text style={styles.subText}>This morning's plan</Text>
+              <Text style={styles.mainText}>Ho Chi Minh City</Text>
 
               <Carousel
                 pagingEnabled
@@ -91,31 +97,31 @@ const Index = () => {
 
               <Pressable
                 title={'View trip details'}
-                style={homeStyles.button}
+                style={styles.button}
                 variant="primary"
               ></Pressable>
             </View>
           ) : (
-            <View style={homeStyles.currentTrip}>
+            <View style={styles.currentTrip}>
               <Text style={styles.mainText}>Your next great trip awaits!</Text>
 
               <Pressable
                 title={'Plan a new trip'}
-                style={homeStyles.button}
+                style={styles.button}
                 variant="primary"
               ></Pressable>
             </View>
           )}
         </View>
 
-        <Text style={[styles.mainText, homeStyles.mainText]}>
+        <Text style={[styles.mainText, styles.mainText]}>
           Cool spots near you
         </Text>
 
         <FlatList
           horizontal={true}
-          style={[homeStyles.list, { marginBottom: 28 }]}
-          contentContainerStyle={homeStyles.listContent}
+          style={[styles.list, { marginBottom: 28 }]}
+          contentContainerStyle={styles.listContent}
           data={data}
           renderItem={({ item }) => <SpotCard {...item} />}
           keyExtractor={(item) => item.spotName}
@@ -123,14 +129,14 @@ const Index = () => {
           showsHorizontalScrollIndicator={false}
         />
 
-        <Text style={[styles.mainText, homeStyles.mainText]}>
+        <Text style={[styles.mainText, styles.mainText]}>
           Spots you've visited
         </Text>
 
         <FlatList
           horizontal={true}
-          style={homeStyles.list}
-          contentContainerStyle={homeStyles.listContent}
+          style={styles.list}
+          contentContainerStyle={styles.listContent}
           data={data}
           renderItem={({ item }) => <SpotCard {...item} />}
           keyExtractor={(item) => item.spotName}
@@ -144,8 +150,73 @@ const Index = () => {
 
 export default Index
 
-const homeStyles = StyleSheet.create({
-  container: {
+const createStyles = (theme: typeof colorPalettes.light) =>
+  StyleSheet.create({
+    mainContainer: {
+      flex: 1,
+      backgroundColor: theme.white,
+      paddingVertical: 40,
+      paddingHorizontal: 24,
+    },
+    mainText: {
+      fontSize: 20,
+      color: theme.normal,
+      fontFamily: 'NotoSerif_400Regular',
+    },
+    mainButton: {
+      fontSize: 20,
+      fontFamily: 'NotoSerif_400Regular',
+      textDecorationLine: 'underline',
+      color: theme.normal,
+    },
+    container: {
+      alignItems: 'flex-start',
+      width: '100%',
+    },
+    scrollContent: {
+      flexGrow: 1,
+      width: '100%',
+      alignItems: 'center',
+      justifyContent: 'flex-start',
+      paddingBottom: 80,
+    },
+    list: {
+      flexGrow: 0,
+      marginHorizontal: -40,
+    },
+    listContent: {
+      paddingHorizontal: 40,
+    },
+    subText: {
+      fontSize: 16,
+      marginBottom: 4,
+      color: theme.normal,
+      fontFamily: 'NotoSerif_400Regular',
+    },
+    hugeText: {
+      fontSize: 28,
+      color: theme.normal,
+      fontFamily: 'NotoSerif_400Regular',
+    },
+    topCenter: {
+      width: '100%',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    currentTrip: {
+      width: '100%',
+      borderRadius: 12,
+      marginVertical: 24,
+      padding: 20,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderWidth: 1,
+      borderColor: '#A68372',
+    },
+    button: {
+      marginTop: 16,
+    },
+      container: {
     alignItems: 'flex-start',
     width: '100%',
   },
@@ -198,4 +269,4 @@ const homeStyles = StyleSheet.create({
   button: {
     marginTop: 16,
   },
-})
+  })

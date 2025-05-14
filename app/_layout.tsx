@@ -1,7 +1,6 @@
 import { GoogleSignin } from '@react-native-google-signin/google-signin'
 import React, { useEffect, useRef, useState } from 'react'
 import { Platform, SafeAreaView, View } from 'react-native'
-
 import {
   NotoSerif_400Regular,
   NotoSerif_700Bold,
@@ -12,15 +11,14 @@ import Constants from 'expo-constants'
 import * as Notifications from 'expo-notifications'
 import { Stack } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
-
+import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { StatusBar } from 'expo-status-bar'
 
 // prevent the splash screen from hiding before the font finishes loading
 SplashScreen.preventAutoHideAsync()
 
-Mapbox.setAccessToken(
-  'pk.eyJ1Ijoia3JlZW1hMTYwMiIsImEiOiJjbWE4Y3l6dWExYXRjMmlvb3RseTA0dnJyIn0.yIfYI-z-xewqy5LEF-VM5Q'
-)
+Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN ?? '')
 
 // configure notification handler
 Notifications.setNotificationHandler({
@@ -115,6 +113,8 @@ export default function RootLayout() {
     }
   }, [loaded, error])
 
+  const theme = useThemeStyle()
+
   useEffect(() => {
     registerForPushNotificationsAsync()
       .then((token) => setExpoPushToken(token ?? ''))
@@ -146,13 +146,14 @@ export default function RootLayout() {
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <SafeAreaView style={{ flex: 1 }}>
+    <>
+      <StatusBar style="auto" />
+      <QueryClientProvider client={queryClient}>
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />
         </Stack>
-      </SafeAreaView>
-    </QueryClientProvider>
+      </QueryClientProvider>
+    </>
   )
 }
