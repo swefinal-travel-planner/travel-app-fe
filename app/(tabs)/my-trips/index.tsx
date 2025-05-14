@@ -1,12 +1,18 @@
-import React, { useState } from 'react'
+import CreateTripButton from '@/components/Buttons/CreateTripButton'
+import TripCard from '@/components/TripCard'
+import { useThemeStyle } from '@/hooks/useThemeStyle'
+import { Trip } from '@/lib/types/Trip'
+import { colorPalettes } from '@/styles/Itheme'
+import Ionicons from '@expo/vector-icons/Ionicons'
+import { useRouter } from 'expo-router'
+import React, { useMemo, useState } from 'react'
 import {
-  View,
-  Text,
   Button,
   FlatList,
   StyleSheet,
-  TouchableOpacity,
+  Text,
   TextInput,
+  View,
 } from 'react-native'
 import { useRouter } from 'expo-router'
 import TripCard from '@/components/TripCard'
@@ -105,6 +111,9 @@ export default function MyTrips() {
   const [trips, setTrips] = useState<Trip[]>(sampleTrips)
   const [search, setSearch] = useState('')
   const router = useRouter()
+  const theme = useThemeStyle()
+  const styles = useMemo(() => createStyles(theme), [theme])
+
 
   const filteredTrips = trips.filter((trip) =>
     trip.title.toLowerCase().includes(search.toLowerCase())
@@ -156,24 +165,44 @@ export default function MyTrips() {
                 router.push(`/my-trips/${item.id}/details` as const)
               }
             />
-          )}
-          keyExtractor={(item) => item.id}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={tripDetailStyles.listContent}
-          ItemSeparatorComponent={() => <View style={{ height: 24 }} />}
-        />
-      )}
+          </View>
+        ) : (
+          <FlatList
+            data={trips}
+            renderItem={({ item }) => (
+              <TripCard
+                tripName={item.title}
+                tripImage={item.image}
+                days={item.days}
+                num_members={item.num_members}
+                budget={item.budget}
+                isPinned={item.pinned}
+              />
+            )}
+            keyExtractor={(item) => item.id}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.listContent}
+            ItemSeparatorComponent={() => <View style={{ height: 24 }} />}
+          />
+        )}
+
+        {/* Nút tạo chuyến đi */}
+      </View>
+      <CreateTripButton
+        color={theme.primary}
+        onPress={() => router.navigate('/my-trips/welcome-create')}
+      />
     </View>
   )
 }
-
-const tripDetailStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: 16,
-    backgroundColor: '#FFF',
-    alignItems: 'center',
-  },
+const createStyles = (theme: typeof colorPalettes.light) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      paddingTop: 16,
+      backgroundColor: theme.white,
+      alignItems: 'center',
+    },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -184,28 +213,28 @@ const tripDetailStyles = StyleSheet.create({
     marginBottom: 16,
     width: 360,
   },
-  searchInput: {
-    flex: 1,
-    fontSize: 14,
-    color: '#563D30',
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#E5DACB',
-    width: '90%',
-    alignSelf: 'center',
-    marginBottom: 16,
-  },
-  listContent: {
-    paddingBottom: 32,
-  },
-  emptyContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 40,
-  },
-  message: {
-    fontSize: 16,
-    marginBottom: 16,
-  },
-})
+    searchInput: {
+      flex: 1,
+      fontSize: 14,
+      color: theme.normal,
+    },
+    divider: {
+      height: 1,
+      backgroundColor: '#E5DACB',
+      width: '90%',
+      alignSelf: 'center',
+      marginBottom: 16,
+    },
+    listContent: {
+      paddingBottom: 32,
+    },
+    emptyContainer: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingTop: 40,
+    },
+    message: {
+      fontSize: 16,
+      marginBottom: 16,
+    },
+  })

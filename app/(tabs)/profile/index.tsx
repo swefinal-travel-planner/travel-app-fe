@@ -241,7 +241,7 @@ const ProfileScreen = () => {
               <Button
                 label="Go to My trips"
                 backgroundColor="#3F6453"
-                onPress={() => navigation.navigate('my-trips')}
+                onPress={() => navigation.navigate('my-trips/index')}
               />
             </View>
 
