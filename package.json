@@ -66,6 +66,7 @@
     "react-native-actions-sheet": "^0.9.7",
     "react-native-calendars": "^1.1312.0",
     "react-native-dialog": "^9.3.0",
+    "react-native-draggable-flatlist": "^4.0.3",
     "react-native-gesture-handler": "~2.20.2",
     "react-native-haptic-feedback": "^2.3.3",
     "react-native-modal": "^14.0.0-rc.0",
