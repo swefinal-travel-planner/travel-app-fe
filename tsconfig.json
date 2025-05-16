@@ -13,6 +13,8 @@
     "**/*.tsx",
     ".vscode/_layout.tsx",
     "firebaseConfig.ts",
-    "app/(tabs)/my-trips/[tripId]/(tabs)"
+    "app/(tabs)/my-trips/[tripId]/(tabs)",
+    ".expo/types/**/*.ts",
+    "expo-env.d.ts"
   ]
 }

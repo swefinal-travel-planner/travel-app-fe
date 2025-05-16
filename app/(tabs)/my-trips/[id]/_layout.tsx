@@ -1,14 +1,8 @@
-import React, { useEffect, useState } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native'
-import {
-  Stack,
-  Tabs,
-  useLocalSearchParams,
-  useRouter,
-  useSegments,
-} from 'expo-router'
 import { Trip } from '@/lib/types/Trip'
 import Ionicons from '@expo/vector-icons/Ionicons'
+import { Tabs, useLocalSearchParams, useRouter, useSegments } from 'expo-router'
+import React, { useEffect, useState } from 'react'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 const sampleTrips: Trip[] = [
   {
@@ -70,15 +64,14 @@ export default function TripDetailLayout() {
           tabBarPosition: 'top',
           tabBarStyle: {
             elevation: 0,
-            backgroundColor: '#FFF',
-            height: isModifyScreen ? 0 : 30,
+            backgroundColor: '#FFFFFF',
+            height: isModifyScreen ? 0 : 40,
             borderBottomWidth: isModifyScreen ? 0 : 1,
             borderBottomColor: '#A68372',
+            paddingTop: 0,
           },
           tabBarItemStyle: {
-            alignItems: 'center',
-            justifyContent: 'center',
-            height: 60,
+            height: 40,
           },
           tabBarLabelStyle: {
             fontSize: 20,
@@ -122,7 +115,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 22,
     backgroundColor: '#fff',
-    paddingVertical: 14,
+
+    paddingTop: 20,
   },
   loadingContainer: {
     flex: 1,
