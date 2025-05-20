@@ -1,5 +1,4 @@
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import { StatusBar } from 'expo-status-bar'
 import React, { useState } from 'react'
 import {
   Image,
@@ -28,34 +27,25 @@ export default function TripCompanionsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar />
-      <ScrollView style={styles.content}>
-        {companions.length > 0 ? (
-          companions.map((companion) => (
-            <View
-              key={companion.id}
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginBottom: 16,
-              }}
-            >
-              <Image
-                source={{ uri: companion.avatar }}
-                style={{
-                  width: 50,
-                  height: 50,
-                  borderRadius: 25,
-                  marginRight: 16,
-                }}
-              />
-              <Text style={{ fontSize: 18 }}>{companion.name}</Text>
-            </View>
-          ))
-        ) : (
-          <Text style={styles.emptyCompanionText}>You're travelling solo.</Text>
-        )}
-      </ScrollView>
+      <View style={{ flex: 1 }}>
+        <ScrollView style={styles.content}>
+          {companions.length > 0 ? (
+            companions.map((companion) => (
+              <View key={companion.id} style={styles.companionItem}>
+                <Image
+                  source={{ uri: companion.avatar }}
+                  style={styles.image}
+                />
+                <Text style={{ fontSize: 18 }}>{companion.name}</Text>
+              </View>
+            ))
+          ) : (
+            <Text style={styles.emptyCompanionText}>
+              You're travelling solo.
+            </Text>
+          )}
+        </ScrollView>
+      </View>
 
       {/* Add Companions Button */}
       <View style={styles.buttonContainer}>
@@ -63,7 +53,7 @@ export default function TripCompanionsScreen() {
           style={styles.addButton}
           onPress={handleAddCompanions}
         >
-          <Text style={styles.addButtonText}>Edit</Text>
+          <Text style={styles.addButtonText}>Add companions</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -77,12 +67,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 22,
   },
   content: {
-    flex: 1,
+    flexGrow: 0,
     marginTop: 16,
     borderWidth: 2,
     borderColor: '#E5DACB',
     borderRadius: 8,
     padding: 16,
+  },
+  companionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    marginVertical: 8,
+  },
+  image: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 16,
   },
   emptyCompanionText: {
     textAlign: 'center',
