@@ -2,6 +2,15 @@
   "name": "travel-app-fe",
   "main": "expo-router/entry",
   "version": "1.0.0",
+  "sonar": {
+    "projectKey": "travel-app-fe",
+    "projectName": "My Local Repo",
+    "projectVersion": "1.0",
+    "sources": "./src",
+    "host": {
+      "url": "http://localhost:9000"
+    }
+  },
   "scripts": {
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
