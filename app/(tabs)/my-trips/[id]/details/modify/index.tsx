@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from 'react'
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  Alert,
-} from 'react-native'
-import DraggableFlatList, {
-  ScaleDecorator,
-  RenderItemParams,
-} from 'react-native-draggable-flatlist'
-import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useLocalSearchParams, useRouter } from 'expo-router'
+import React, { useEffect, useState } from 'react'
+import {
+  Alert,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native'
+import DraggableFlatList, {
+  RenderItemParams,
+  ScaleDecorator,
+} from 'react-native-draggable-flatlist'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 type SpotItem = {
   id: string
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 22,
-    paddingVertical: 10,
+    paddingVertical: 16,
   },
   backButton: {
     marginRight: 16,
