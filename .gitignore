@@ -23,7 +23,7 @@ ios/
 .metro-health-check*
 
 # SonarQube
-.scannerwork/** */
+.scannerwork/** 
 
 # debug
 npm-debug.*
