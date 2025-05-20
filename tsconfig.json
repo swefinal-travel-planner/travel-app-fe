@@ -16,5 +16,6 @@
     "app/(tabs)/my-trips/[tripId]/(tabs)",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-  ]
+  ],
+  "exclude": ["node_modules", "build", "dist"]
 }
