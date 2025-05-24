@@ -1,10 +1,9 @@
-import { Tabs } from 'expo-router'
-import Ionicons from '@expo/vector-icons/Ionicons'
-import { Platform } from 'react-native'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
-import { useMemo } from 'react'
 import { colorPalettes } from '@/styles/Itheme'
-import { StyleSheet } from 'react-native'
+import Ionicons from '@expo/vector-icons/Ionicons'
+import { Tabs } from 'expo-router'
+import { useMemo } from 'react'
+import { Platform, StyleSheet } from 'react-native'
 
 export default function TabLayout() {
   const theme = useThemeStyle()
@@ -14,13 +13,13 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: theme.normal,
-        tabBarInactiveTintColor: '#A68372',
+        tabBarActiveTintColor: theme.primary,
+        tabBarInactiveTintColor: theme.disabled,
         tabBarHideOnKeyboard: true,
         tabBarStyle: styles.tabBarStyle,
         tabBarLabelStyle: {
           marginTop: 2,
-          fontFamily: 'NotoSerif_400Regular',
+          fontFamily: 'PlusJakartaSans_400Regular',
           fontSize: 12,
         },
       }}
@@ -103,7 +102,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     tabBarStyle: {
       paddingTop: 5,
       height: Platform.OS === 'ios' ? 90 : 80,
-      borderColor: theme.subtle2,
-      backgroundColor: theme.surface,
+      borderColor: theme.disabled,
+      backgroundColor: theme.white,
     },
   })

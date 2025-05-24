@@ -1,16 +1,18 @@
+import { useThemeStyle } from '@/hooks/useThemeStyle'
+import { colorPalettes } from '@/styles/Itheme'
+import AntDesign from '@expo/vector-icons/AntDesign'
+import { Fragment, ReactNode, useEffect, useMemo, useState } from 'react'
 import {
   FlatList,
+  Image,
   Modal,
   Pressable,
   StyleSheet,
   Text,
-  View,
-  Image,
-  ViewStyle,
   TextStyle,
+  View,
+  ViewStyle,
 } from 'react-native'
-import AntDesign from '@expo/vector-icons/AntDesign'
-import { useEffect, useState, ReactNode, Fragment } from 'react'
 
 interface UniversalPickerProps<T> {
   data: T[]
@@ -37,6 +39,9 @@ export function UniversalPicker<T>({
   style,
   textStyle,
 }: Readonly<UniversalPickerProps<T>>) {
+  const theme = useThemeStyle()
+  const styles = useMemo(() => createStyles(theme), [theme])
+
   const [modalVisible, setModalVisible] = useState(false)
   const [selected, setSelected] = useState<T | undefined>(
     initialValue ?? data[0]
@@ -112,47 +117,48 @@ export function UniversalPicker<T>({
   )
 }
 
-const styles = StyleSheet.create({
-  button: {
-    flexDirection: 'row',
-    padding: 10,
-    alignItems: 'center',
-  },
-  icon: {
-    width: 32,
-    height: 32,
-    marginRight: 10,
-    resizeMode: 'contain',
-  },
-  iconSmall: {
-    width: 24,
-    height: 24,
-    marginRight: 10,
-    resizeMode: 'contain',
-  },
-  text: {
-    fontSize: 18,
-    marginRight: 5,
-  },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.4)',
-  },
-  modal: {
-    backgroundColor: 'white',
-    width: '100%',
-    padding: 16,
-  },
-  item: {
-    flexDirection: 'row',
-    padding: 12,
-    borderBottomColor: '#eee',
-    borderBottomWidth: 1,
-    alignItems: 'center',
-  },
-  label: {
-    fontSize: 18,
-  },
-})
+const createStyles = (theme: typeof colorPalettes.light) =>
+  StyleSheet.create({
+    button: {
+      flexDirection: 'row',
+      padding: 10,
+      alignItems: 'center',
+    },
+    icon: {
+      width: 32,
+      height: 32,
+      marginRight: 10,
+      resizeMode: 'contain',
+    },
+    iconSmall: {
+      width: 24,
+      height: 24,
+      marginRight: 10,
+      resizeMode: 'contain',
+    },
+    text: {
+      fontSize: 18,
+      marginRight: 5,
+    },
+    modalOverlay: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'rgba(0,0,0,0.4)',
+    },
+    modal: {
+      backgroundColor: 'white',
+      width: '100%',
+      padding: 16,
+    },
+    item: {
+      flexDirection: 'row',
+      padding: 12,
+      borderBottomColor: '#eee',
+      borderBottomWidth: 1,
+      alignItems: 'center',
+    },
+    label: {
+      fontSize: 18,
+    },
+  })

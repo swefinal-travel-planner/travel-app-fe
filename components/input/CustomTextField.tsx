@@ -1,8 +1,9 @@
 import Ionicons from '@expo/vector-icons/Ionicons'
-import React from 'react'
-import { TextInput, View, Text } from 'react-native'
+import React, { useMemo } from 'react'
+import { Text, TextInput, View } from 'react-native'
 
-import styles from './styles'
+import { useThemeStyle } from '@/hooks/useThemeStyle'
+import { createStyles } from './styles'
 
 interface TextFieldProps {
   placeholder: string
@@ -29,6 +30,9 @@ const CustomTextField: React.FC<TextFieldProps> = ({
   onBlur,
   value,
 }) => {
+  const theme = useThemeStyle()
+  const styles = useMemo(() => createStyles(theme), [theme])
+
   return (
     <View style={styles.wrapper}>
       {leftIcon && (

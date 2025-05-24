@@ -1,9 +1,9 @@
+import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/styles/Itheme'
 import React, { useEffect, useState } from 'react'
+import { StyleSheet } from 'react-native'
 import { Button, Text, View } from 'react-native-ui-lib'
 import DateRangeField from '../Pickers/DateRangeField'
-import { StyleSheet } from 'react-native'
-import { FontFamily, FontSize } from '@/constants/font'
 
 type TripLengthProps = {
   theme: typeof colorPalettes.light
@@ -23,11 +23,11 @@ export default function TripLength({
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.textQuestion, { color: theme.normal }]}>
+      <Text style={[styles.textQuestion, { color: theme.primary }]}>
         When will your trip start and end?
       </Text>
       <View style={styles.textFieldContainer}>
-        <Text style={[styles.textField, { color: theme.normal }]}>
+        <Text style={[styles.textField, { color: theme.primary }]}>
           Select a date range
         </Text>
         <DateRangeField
@@ -36,7 +36,7 @@ export default function TripLength({
           setStartDate={setStartDate}
           setEndDate={setEndDate}
         />
-        <Text style={[styles.textField, { color: theme.normal }]}>
+        <Text style={[styles.textField, { color: theme.primary }]}>
           Number of days:{' '}
           {startDate && endDate
             ? (new Date(endDate).getTime() - new Date(startDate).getTime()) /

@@ -1,33 +1,37 @@
-import { useRouter } from "expo-router";
-import { Text, View, Keyboard, TouchableWithoutFeedback } from "react-native";
-import { useForm, Controller } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useRouter } from 'expo-router'
+import { Controller, useForm } from 'react-hook-form'
+import { Keyboard, Text, TouchableWithoutFeedback, View } from 'react-native'
+import { z } from 'zod'
 
-import { usePwdResetStore } from "@/lib/usePwdResetStore";
+import { usePwdResetStore } from '@/lib/usePwdResetStore'
 
-import api, { url } from "@/api/api";
-import axios from "axios";
+import api, { url } from '@/api/api'
+import axios from 'axios'
 
-import CustomTextField from "@/components/input/CustomTextField";
-import Pressable from "@/components/Pressable";
-
-import styles from "../styles";
+import CustomTextField from '@/components/input/CustomTextField'
+import Pressable from '@/components/Pressable'
+import { useThemeStyle } from '@/hooks/useThemeStyle'
+import { useMemo } from 'react'
+import { createStyles } from '../styles'
 
 interface ForgotFormData {
-  email: string;
+  email: string
 }
 
 // form validation schema
 const schema = z.object({
   email: z
-    .string({ required_error: "Please enter your email address" })
-    .email({ message: "Invalid email address" }),
-});
+    .string({ required_error: 'Please enter your email address' })
+    .email({ message: 'Invalid email address' }),
+})
 
 export default function ForgotPassword() {
-  const router = useRouter();
-  const setEmail = usePwdResetStore((state) => state.setEmail);
+  const theme = useThemeStyle()
+  const styles = useMemo(() => createStyles(theme), [theme])
+
+  const router = useRouter()
+  const setEmail = usePwdResetStore((state) => state.setEmail)
 
   // initialize form
   const {
@@ -36,31 +40,31 @@ export default function ForgotPassword() {
     formState: { errors },
   } = useForm({
     resolver: zodResolver(schema),
-  });
+  })
 
   const onSubmit = async (data: ForgotFormData): Promise<void> => {
     try {
       // set the email in the store
-      setEmail(data.email);
+      setEmail(data.email)
 
       await api.post(`${url}/auth/reset-password/send-otp`, {
         email: data.email,
-      });
+      })
 
-      router.push("/forgot/otp");
+      router.push('/forgot/otp')
     } catch (error) {
       if (axios.isAxiosError(error)) {
         // handle errors coming from the API call
-        console.error("API error:", error.response?.data || error.message);
+        console.error('API error:', error.response?.data || error.message)
       } else {
-        console.error("Password reset email error:", error);
+        console.error('Password reset email error:', error)
       }
     }
-  };
+  }
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <View style={[styles.container, styles.login]}>
+      <View style={styles.container}>
         <Text style={styles.title}>Forgot your password?</Text>
         <Text style={styles.subtitle}>Enter your email to get started.</Text>
 
@@ -86,10 +90,9 @@ export default function ForgotPassword() {
         <Pressable
           title="Next"
           onPress={handleSubmit(onSubmit)}
-          variant="primary"
-          style={{ marginVertical: 20 }}
+          style={{ ...styles.primaryButton, marginVertical: 20 }}
         />
       </View>
     </TouchableWithoutFeedback>
-  );
+  )
 }

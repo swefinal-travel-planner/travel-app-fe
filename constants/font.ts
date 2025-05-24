@@ -9,10 +9,10 @@ export const FontSize = {
 }
 
 export const FontFamily = {
-  REGULAR: 'NotoSerif_400Regular',
-  BOLD: 'NotoSerif_700Bold',
-  ITALIC: 'NotoSerif_400Italic',
-  BOLD_ITALIC: 'NotoSerif_700Bold_Italic',
+  REGULAR: 'PlusJakartaSans_400Regular',
+  BOLD: 'PlusJakartaSans_700Bold',
+  ITALIC: 'PlusJakartaSans_400Italic',
+  BOLD_ITALIC: 'PlusJakartaSans_700Bold_Italic',
   MONO: 'CourierPrime_400Regular',
   MONO_BOLD: 'CourierPrime_700Bold',
 }

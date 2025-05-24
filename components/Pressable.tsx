@@ -1,79 +1,60 @@
-import React from "react";
-import { Text, StyleSheet } from "react-native";
+import React, { useMemo } from 'react'
+import { StyleSheet, Text } from 'react-native'
 
-import PressableOpacity from "./PressableOpacity";
+import { useThemeStyle } from '@/hooks/useThemeStyle'
+import { colorPalettes } from '@/styles/Itheme'
+import PressableOpacity from './PressableOpacity'
 
 interface PressableProps {
-  title: string;
-  variant?:
-    | "primary"
-    | "invertedPrimary"
-    | "secondary"
-    | "disabled"
-    | "otpDisabled";
-  onPress?: () => void;
-  disabled?: boolean;
-  style?: object;
+  title: string
+  onPress?: () => void
+  disabled?: boolean
+  style?: ButtonStyleProps
+}
+
+interface ButtonStyleProps {
+  backgroundColor: string
+  color: string
+  [key: string]: any
 }
 
 // custom button component
 const Pressable: React.FC<PressableProps> = ({
   title,
-  variant,
   onPress,
   disabled,
   style,
 }) => {
+  const theme = useThemeStyle()
+  const styles = useMemo(() => createStyles(theme), [theme])
+
   return (
     <PressableOpacity
       onPress={onPress}
       disabled={disabled}
-      style={[styles.wrapper, styles[`${variant || "primary"}Bg`], style]}
+      style={[styles.wrapper, style]}
     >
-      <Text style={[styles.title, styles[`${variant || "primary"}Title`]]}>
+      <Text style={[styles.title, style && { color: style.color }]}>
         {title}
       </Text>
     </PressableOpacity>
-  );
-};
+  )
+}
 
-export default Pressable;
+export default Pressable
 
-const styles = StyleSheet.create({
-  wrapper: {
-    width: "100%",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 100,
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-  },
-  primaryBg: {
-    backgroundColor: "#3F6453",
-  },
-  invertedPrimaryBg: {
-    backgroundColor: "#EEF8EF",
-  },
-  secondaryBg: {},
-  disabledBg: { backgroundColor: "#E5E5E5" },
-  title: {
-    fontSize: 14,
-    fontFamily: "NotoSerif_400Regular",
-  },
-  otpDisabledBg: {},
-  primaryTitle: {
-    color: "#FFFFFF",
-  },
-  invertedPrimaryTitle: {
-    color: "#3F6453",
-  },
-  secondaryTitle: {
-    color: "#3F6453",
-  },
-  disabledTitle: {
-    color: "#4B4B4B",
-  },
-  otpDisabledTitle: {
-    color: "#4B4B4B",
-  },
-});
+const createStyles = (theme: typeof colorPalettes.light) =>
+  StyleSheet.create({
+    wrapper: {
+      width: '100%',
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderRadius: 100,
+      paddingHorizontal: 16,
+      paddingVertical: 16,
+    },
+    title: {
+      fontSize: 14,
+      fontFamily: 'PlusJakartaSans_400Regular',
+    },
+  })

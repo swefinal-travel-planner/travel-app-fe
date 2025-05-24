@@ -1,58 +1,62 @@
-import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useRouter } from 'expo-router'
+import { useEffect, useMemo, useState } from 'react'
 import {
-  Text,
-  View,
   Keyboard,
-  TouchableWithoutFeedback,
   KeyboardAvoidingView,
   Platform,
-} from "react-native";
+  Text,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native'
 
-import Pressable from "@/components/Pressable";
-import CustomTextField from "@/components/input/CustomTextField";
-import Chip from "@/components/Chip";
+import { useThemeStyle } from '@/hooks/useThemeStyle'
+import { createStyles } from '../styles'
 
-import styles from "../styles";
+import Chip from '@/components/Chip'
+import Pressable from '@/components/Pressable'
+import CustomTextField from '@/components/input/CustomTextField'
 
 const data = [
-  { id: "1", value: "🥜 Peanuts" },
-  { id: "2", value: "🌾 Gluten" },
-  { id: "3", value: "🥛 Dairy" },
-  { id: "4", value: "🦀 Shellfish" },
-  { id: "5", value: "🫘 Soy" },
-  { id: "6", value: "🥚 Eggs" },
-  { id: "7", value: "🐟 Fish" },
-];
+  { id: '1', value: '🥜 Peanuts' },
+  { id: '2', value: '🌾 Gluten' },
+  { id: '3', value: '🥛 Dairy' },
+  { id: '4', value: '🦀 Shellfish' },
+  { id: '5', value: '🫘 Soy' },
+  { id: '6', value: '🥚 Eggs' },
+  { id: '7', value: '🐟 Fish' },
+]
 
 export default function SignUpAllergies() {
-  const [query, setQuery] = useState<string>("");
-  const [selected, setSelected] = useState<string[]>([]);
-  const [hasSelectedItem, setHasSelectedItem] = useState<boolean>(false);
+  const theme = useThemeStyle()
+  const styles = useMemo(() => createStyles(theme), [theme])
 
-  const router = useRouter();
+  const [query, setQuery] = useState<string>('')
+  const [selected, setSelected] = useState<string[]>([])
+  const [hasSelectedItem, setHasSelectedItem] = useState<boolean>(false)
+
+  const router = useRouter()
 
   const handlePress = () => {
-    router.replace("/login");
-  };
+    router.replace('/login')
+  }
 
   const handleSelect = (value: string) => {
-    setSelected([...selected, value]);
-  };
+    setSelected([...selected, value])
+  }
 
   const handleDeselect = (value: string) => {
-    setSelected(selected.filter((item) => item !== value));
-  };
+    setSelected(selected.filter((item) => item !== value))
+  }
 
   useEffect(() => {
-    setHasSelectedItem(selected.length > 0);
-  }, [selected]);
+    setHasSelectedItem(selected.length > 0)
+  }, [selected])
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <KeyboardAvoidingView
-        style={[styles.container, styles.other]}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <Text style={styles.title}>Allergy info</Text>
         <Text style={styles.subtitle}>
@@ -66,11 +70,11 @@ export default function SignUpAllergies() {
         />
 
         <View
-          style={{ flexDirection: "row", flexWrap: "wrap", marginVertical: 12 }}
+          style={{ flexDirection: 'row', flexWrap: 'wrap', marginVertical: 12 }}
         >
           {data
             .filter((item) =>
-              item.value.toLowerCase().includes(query.toLowerCase()),
+              item.value.toLowerCase().includes(query.toLowerCase())
             )
             .map((item) => (
               <Chip
@@ -85,17 +89,16 @@ export default function SignUpAllergies() {
         <Pressable
           title="Save"
           onPress={handlePress}
-          variant={hasSelectedItem ? "primary" : "disabled"}
           disabled={!hasSelectedItem}
-          style={{ marginTop: 36 }}
+          style={{
+            marginTop: 36,
+            backgroundColor: hasSelectedItem ? theme.primary : theme.disabled,
+            color: hasSelectedItem ? theme.white : theme.text,
+          }}
         />
 
-        <Pressable
-          onPress={handlePress}
-          title="Skip for now"
-          variant="secondary"
-        />
+        <Pressable onPress={handlePress} title="Skip for now" />
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
-  );
+  )
 }

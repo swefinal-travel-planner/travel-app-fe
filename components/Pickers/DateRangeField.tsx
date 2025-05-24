@@ -1,16 +1,18 @@
 import { FontFamily } from '@/constants/font'
 import { Radius } from '@/constants/theme'
-import React, { useState } from 'react'
+import { useThemeStyle } from '@/hooks/useThemeStyle'
+import { colorPalettes } from '@/styles/Itheme'
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5'
+import React, { useMemo, useState } from 'react'
 import {
-  View,
+  Modal,
+  Pressable,
+  StyleSheet,
   Text,
   TouchableOpacity,
-  Modal,
-  StyleSheet,
-  Pressable,
+  View,
 } from 'react-native'
 import { Calendar, DateData } from 'react-native-calendars'
-import FontAwesome5 from '@expo/vector-icons/FontAwesome5'
 
 type DateRangeFieldProps = {
   startDate: string | null
@@ -25,6 +27,9 @@ const DateRangeField = ({
   setStartDate,
   setEndDate,
 }: DateRangeFieldProps) => {
+  const theme = useThemeStyle()
+  const styles = useMemo(() => createStyles(theme), [theme])
+
   const [modalVisible, setModalVisible] = useState(false)
 
   // Temp state for selection before confirmation
@@ -142,57 +147,58 @@ const DateRangeField = ({
   )
 }
 
-const styles = StyleSheet.create({
-  container: { width: '100%' },
-  field: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: Radius.FULL,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    backgroundColor: '#f9f9f9',
-  },
-  icon: {
-    fontSize: 18,
-    marginRight: 8,
-  },
-  fieldText: {
-    color: '#333',
-    fontSize: 16,
-    fontFamily: FontFamily.REGULAR,
-  },
-  modalBackdrop: {
-    flex: 1,
-    backgroundColor: '#00000088',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  modalContent: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    overflow: 'hidden',
-  },
-  buttons: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    padding: 10,
-  },
-  btn: {
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 6,
-    marginLeft: 10,
-  },
-  cancelText: {
-    color: '#555',
-  },
-  confirmText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-})
+const createStyles = (theme: typeof colorPalettes.light) =>
+  StyleSheet.create({
+    container: { width: '100%' },
+    field: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: '#ccc',
+      borderRadius: Radius.FULL,
+      paddingVertical: 12,
+      paddingHorizontal: 20,
+      backgroundColor: '#f9f9f9',
+    },
+    icon: {
+      fontSize: 18,
+      marginRight: 8,
+    },
+    fieldText: {
+      color: '#333',
+      fontSize: 16,
+      fontFamily: FontFamily.REGULAR,
+    },
+    modalBackdrop: {
+      flex: 1,
+      backgroundColor: '#00000088',
+      justifyContent: 'center',
+      padding: 20,
+    },
+    modalContent: {
+      backgroundColor: 'white',
+      borderRadius: 10,
+      overflow: 'hidden',
+    },
+    buttons: {
+      flexDirection: 'row',
+      justifyContent: 'flex-end',
+      padding: 10,
+    },
+    btn: {
+      paddingVertical: 10,
+      paddingHorizontal: 15,
+      borderRadius: 6,
+      marginLeft: 10,
+    },
+    cancelText: {
+      color: '#555',
+    },
+    confirmText: {
+      color: 'white',
+      fontWeight: 'bold',
+    },
+  })
 
 export default DateRangeField

@@ -18,7 +18,7 @@ export default function ChooseLocation({
   const [selectedValue, setSelectedValue] = React.useState<string>('')
   return (
     <View style={[styles.container, { backgroundColor: theme.white }]}>
-      <Text style={[styles.text, { color: theme.normal }]}>
+      <Text style={[styles.text, { color: theme.primary }]}>
         Where is your trip located ?
       </Text>
       <Picker

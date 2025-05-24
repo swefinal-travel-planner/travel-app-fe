@@ -1,64 +1,70 @@
-import { useRouter, Link } from "expo-router";
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Link, useRouter } from 'expo-router'
+import { Controller, useForm } from 'react-hook-form'
 import {
-  Text,
-  View,
-  Keyboard,
-  TouchableWithoutFeedback,
   Image,
-} from "react-native";
-import { useForm, Controller } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+  Keyboard,
+  Text,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native'
+import { z } from 'zod'
 
+import { auth } from '@/firebaseConfig'
 import {
   GoogleSignin,
   isErrorWithCode,
   statusCodes,
-} from "@react-native-google-signin/google-signin";
-import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
-import { auth } from "@/firebaseConfig";
+} from '@react-native-google-signin/google-signin'
+import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth'
 
-import { useSignupStore } from "@/lib/useSignupStore";
+import { useSignupStore } from '@/lib/useSignupStore'
 
-import axios from "axios";
-import api, { url } from "@/api/api";
+import api, { url } from '@/api/api'
+import axios from 'axios'
 
-import CustomTextField from "@/components/input/CustomTextField";
-import PasswordField from "@/components/input/PasswordField";
-import Pressable from "@/components/Pressable";
+import { useThemeStyle } from '@/hooks/useThemeStyle'
+import { useMemo } from 'react'
+import { createStyles } from '../styles'
 
-import styles from "../styles";
-import PressableOpacity from "@/components/PressableOpacity";
-import saveLoginInfo from "@/utils/saveLoginInfo";
+import CustomTextField from '@/components/input/CustomTextField'
+import PasswordField from '@/components/input/PasswordField'
+import Pressable from '@/components/Pressable'
+import PressableOpacity from '@/components/PressableOpacity'
+
+import saveLoginInfo from '@/utils/saveLoginInfo'
 
 interface SignupFormData {
-  name: string;
-  email: string;
-  password: string;
+  name: string
+  email: string
+  password: string
 }
 
 // form validation schema
 const schema = z
   .object({
     name: z
-      .string({ required_error: "Please enter your name" })
-      .min(2, { message: "Your name must be at least 2 characters long" }),
+      .string({ required_error: 'Please enter your name' })
+      .min(2, { message: 'Your name must be at least 2 characters long' }),
     email: z
-      .string({ required_error: "Please enter your email address" })
-      .email({ message: "Invalid email address" }),
+      .string({ required_error: 'Please enter your email address' })
+      .email({ message: 'Invalid email address' }),
     password: z
-      .string({ required_error: "Please enter your password" })
-      .min(8, { message: "Password must have at least 8 characters" }),
-    repPassword: z.string({ required_error: "Please confirm your password" }),
+      .string({ required_error: 'Please enter your password' })
+      .min(8, { message: 'Password must have at least 8 characters' }),
+    repPassword: z.string({ required_error: 'Please confirm your password' }),
   })
   .refine((data) => data.password === data.repPassword, {
-    message: "Passwords do not match",
-    path: ["repPassword"],
-  });
+    message: 'Passwords do not match',
+    path: ['repPassword'],
+  })
 
 export default function SignUp() {
-  const router = useRouter();
-  const setRequest = useSignupStore((state) => state.setRequest);
+  const theme = useThemeStyle()
+  const styles = useMemo(() => createStyles(theme), [theme])
+
+  const router = useRouter()
+  const setRequest = useSignupStore((state) => state.setRequest)
 
   // initialize form
   const {
@@ -67,104 +73,104 @@ export default function SignUp() {
     formState: { errors },
   } = useForm({
     resolver: zodResolver(schema),
-  });
+  })
 
   const errorMessage =
     errors.name?.message ||
     errors.email?.message ||
     errors.password?.message ||
-    errors.repPassword?.message;
+    errors.repPassword?.message
 
   const handleGoogleLogin = async () => {
     try {
-      await GoogleSignin.hasPlayServices();
-      const userInfo = await GoogleSignin.signIn();
+      await GoogleSignin.hasPlayServices()
+      const userInfo = await GoogleSignin.signIn()
 
       if (userInfo && userInfo.data?.idToken) {
         const googleCredential = GoogleAuthProvider.credential(
-          userInfo.data.idToken,
-        );
+          userInfo.data.idToken
+        )
 
         const firebaseUserCredential = await signInWithCredential(
           auth,
-          googleCredential,
-        );
+          googleCredential
+        )
 
-        const user = firebaseUserCredential.user;
-        const idToken = await user.getIdToken();
+        const user = firebaseUserCredential.user
+        const idToken = await user.getIdToken()
 
         const payload = {
-          displayName: user.displayName || "",
-          email: user.email || "",
-          password: "googlelogin", // placeholder since password is not applicable for Google login
-          phoneNumber: user.phoneNumber || "",
-          photoURL: user.photoURL || "",
+          displayName: user.displayName || '',
+          email: user.email || '',
+          password: 'googlelogin', // placeholder since password is not applicable for Google login
+          phoneNumber: user.phoneNumber || '',
+          photoURL: user.photoURL || '',
           id_token: idToken,
-        };
+        }
 
-        const response = await api.post(`${url}/auth/google-login`, payload);
+        const response = await api.post(`${url}/auth/google-login`, payload)
 
         await saveLoginInfo(
           response.data.data.userId,
           response.data.data.accessToken,
           response.data.data.refreshToken,
           response.data.data.email,
-          response.data.data.name,
-        );
+          response.data.data.name
+        )
 
-        router.replace("/(tabs)");
+        router.replace('/(tabs)')
       } else {
-        console.error("Google sign-in cancelled or ID token missing");
+        console.error('Google sign-in cancelled or ID token missing')
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
         // handle errors coming from the API call
-        console.error("API error:", error.response?.data || error.message);
+        console.error('API error:', error.response?.data || error.message)
       } else if (isErrorWithCode(error)) {
         switch (error.code) {
           case statusCodes.IN_PROGRESS:
             // operation (eg. sign in) already in progress
-            break;
+            break
           case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
             // Android only, play services not available or outdated
-            break;
+            break
           default:
-            console.error("Google sign-in error:", error);
+            console.error('Google sign-in error:', error)
         }
       } else {
-        console.error("Google sign-in error:", error);
+        console.error('Google sign-in error:', error)
       }
     }
-  };
+  }
 
   // handle regular signup
   const onSubmit = async (data: SignupFormData) => {
     try {
       const payload = {
-        email: data.email || "",
-        name: data.name || "",
-        password: data.password || "",
-      };
+        email: data.email || '',
+        name: data.name || '',
+        password: data.password || '',
+      }
 
       // set the signup request in the store
-      setRequest({ ...payload });
+      setRequest({ ...payload })
 
-      await api.post(`${url}/auth/register/send-otp`, { email: payload.email });
+      await api.post(`${url}/auth/register/send-otp`, { email: payload.email })
 
-      router.push("/signup/otp");
+      router.push('/signup/otp')
     } catch (error) {
       if (axios.isAxiosError(error)) {
         // handle errors coming from the API call
-        console.error("API error:", error.response?.data || error.message);
+        console.error('API error:', error.response?.data || error.message)
       } else {
-        console.error("Signup error:", error);
+        console.error('Signup error:', error)
       }
     }
-  };
+  }
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <View style={[styles.container, styles.other]}>
+      <View style={styles.container}>
         <Text style={styles.title}>Hi!</Text>
         <Text style={styles.subtitle}>
           Let us make trip planning fast and easy.
@@ -232,19 +238,18 @@ export default function SignUp() {
 
         <Pressable
           title="Sign up"
-          variant="primary"
           onPress={handleSubmit(onSubmit)}
-          style={styles.button}
+          style={styles.primaryButton}
         />
 
-        <Text style={[styles.text, { alignSelf: "center", marginBottom: 8 }]}>
+        <Text style={[styles.text, { alignSelf: 'center', marginBottom: 8 }]}>
           or continue with
         </Text>
 
         <View style={styles.socials}>
           <PressableOpacity onPress={handleGoogleLogin}>
             <Image
-              source={require("@/assets/images/google.png")}
+              source={require('@/assets/images/google.png')}
               style={styles.socialIcon}
             />
           </PressableOpacity>
@@ -258,5 +263,5 @@ export default function SignUp() {
         </View>
       </View>
     </TouchableWithoutFeedback>
-  );
+  )
 }

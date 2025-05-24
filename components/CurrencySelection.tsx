@@ -1,37 +1,42 @@
+import { useThemeStyle } from '@/hooks/useThemeStyle'
+import { colorPalettes } from '@/styles/Itheme'
+import AntDesign from '@expo/vector-icons/AntDesign'
+import { useEffect, useMemo, useState } from 'react'
 import {
   FlatList,
+  Image,
+  Modal,
   Pressable,
   StyleSheet,
   Text,
   View,
-  Modal,
-  Image,
-} from "react-native";
-import AntDesign from "@expo/vector-icons/AntDesign";
-import { useEffect, useState } from "react";
-import Currencies from "../constants/currencies";
+} from 'react-native'
+import Currencies from '../constants/currencies'
 
-type Currency = (typeof Currencies)[number];
+type Currency = (typeof Currencies)[number]
 
 interface CurrencySelectionProps {
-  onSelect: (currency: Currency) => void;
-  initial?: (typeof Currencies)[number];
+  onSelect: (currency: Currency) => void
+  initial?: (typeof Currencies)[number]
 }
 
 export default function CurrencySelection({
   onSelect,
   initial,
 }: Readonly<CurrencySelectionProps>) {
-  const [modalVisible, setModalVisible] = useState(false);
+  const theme = useThemeStyle()
+  const styles = useMemo(() => createStyles(theme), [theme])
+
+  const [modalVisible, setModalVisible] = useState(false)
   const [selectedCurrency, setSelectedCurrency] = useState<Currency>(
-    initial || Currencies[0],
-  );
+    initial || Currencies[0]
+  )
 
   useEffect(() => {
     if (initial) {
-      setSelectedCurrency(initial);
+      setSelectedCurrency(initial)
     }
-  }, [initial]);
+  }, [initial])
 
   return (
     <View>
@@ -63,9 +68,9 @@ export default function CurrencySelection({
                 <Pressable
                   style={styles.currencyItem}
                   onPress={() => {
-                    setSelectedCurrency(item);
-                    onSelect(item);
-                    setModalVisible(false);
+                    setSelectedCurrency(item)
+                    onSelect(item)
+                    setModalVisible(false)
                   }}
                 >
                   <Image source={item.image} style={styles.flagItemIcon} />
@@ -77,49 +82,50 @@ export default function CurrencySelection({
         </View>
       </Modal>
     </View>
-  );
+  )
 }
 
-const styles = StyleSheet.create({
-  selectCurrencyButton: {
-    flexDirection: "row",
-    padding: 10,
-    alignItems: "center",
-  },
+const createStyles = (theme: typeof colorPalettes.light) =>
+  StyleSheet.create({
+    selectCurrencyButton: {
+      flexDirection: 'row',
+      padding: 10,
+      alignItems: 'center',
+    },
 
-  flagIcon: {
-    width: 40,
-    height: 40,
-    marginRight: 10,
-  },
-  buttonText: {
-    fontSize: 20,
-    marginRight: 5,
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContent: {
-    backgroundColor: "white",
-    padding: 20,
-    width: "100%",
-  },
-  currencyItem: {
-    padding: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  currencyText: {
-    fontSize: 18,
-  },
+    flagIcon: {
+      width: 40,
+      height: 40,
+      marginRight: 10,
+    },
+    buttonText: {
+      fontSize: 20,
+      marginRight: 5,
+    },
+    modalContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    modalContent: {
+      backgroundColor: 'white',
+      padding: 20,
+      width: '100%',
+    },
+    currencyItem: {
+      padding: 15,
+      borderBottomWidth: 1,
+      borderBottomColor: '#ccc',
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    currencyText: {
+      fontSize: 18,
+    },
 
-  flagItemIcon: {
-    width: 30,
-    height: 30,
-    marginRight: 15,
-  },
-});
+    flagItemIcon: {
+      width: 30,
+      height: 30,
+      marginRight: 15,
+    },
+  })

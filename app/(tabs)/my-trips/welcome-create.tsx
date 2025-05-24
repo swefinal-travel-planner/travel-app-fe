@@ -1,10 +1,10 @@
-import { useThemeStyle } from '@/hooks/useThemeStyle'
-import React, { useMemo } from 'react'
-import { Button, View } from 'react-native-ui-lib'
-import { StyleSheet, Text } from 'react-native'
-import { colorPalettes } from '@/styles/Itheme'
 import { FontFamily, FontSize } from '@/constants/font'
+import { useThemeStyle } from '@/hooks/useThemeStyle'
+import { colorPalettes } from '@/styles/Itheme'
 import { useRouter } from 'expo-router'
+import React, { useMemo } from 'react'
+import { StyleSheet, Text } from 'react-native'
+import { Button, View } from 'react-native-ui-lib'
 
 export default function WelcomeCreateScreen() {
   const theme = useThemeStyle()
@@ -30,7 +30,7 @@ export default function WelcomeCreateScreen() {
           </Text>
         </Button>
         <Button
-          backgroundColor={theme.primarySubtle}
+          backgroundColor={theme.secondary}
           onPress={() => router.push('/(tabs)/my-trips/create-manual-trip')}
         >
           <Text style={[styles.buttonText, { color: theme.black }]}>

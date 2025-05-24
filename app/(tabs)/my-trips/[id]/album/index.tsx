@@ -1,6 +1,8 @@
+import { useThemeStyle } from '@/hooks/useThemeStyle'
+import { colorPalettes } from '@/styles/Itheme'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useRouter } from 'expo-router'
-import React from 'react'
+import React, { useMemo } from 'react'
 import {
   Image,
   SafeAreaView,
@@ -13,6 +15,9 @@ import {
 } from 'react-native'
 
 export default function AlbumScreen() {
+  const theme = useThemeStyle()
+  const styles = useMemo(() => createStyles(theme), [theme])
+
   const router = useRouter()
 
   // Sample data for the album images
@@ -72,67 +77,68 @@ export default function AlbumScreen() {
   )
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 22,
-  },
-  scrollView: {
-    flex: 1,
-    paddingVertical: 16,
-  },
-  albumGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  albumItem: {
-    width: '30%',
-    marginBottom: 24,
-  },
-  imageContainer: {
-    aspectRatio: 0.75,
-    backgroundColor: '#E8DED1',
-    borderRadius: 8,
-    borderWidth: 2,
-    borderColor: '#A68372',
-  },
-  image: {
-    width: '100%',
-    height: '100%',
-  },
-  imagePlaceholder: {
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  placeholderImage: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 8,
-  },
-  imageTitle: {
-    textAlign: 'center',
-    marginTop: 8,
-    fontSize: 12,
-    color: '#000000',
-  },
-  addPhotoBorder: {
-    alignSelf: 'center',
-    backgroundColor: '#A68372',
-    borderRadius: 30,
-    padding: 10,
-  },
-  addPhotoButton: {
-    backgroundColor: '#E8DED1',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  addButtonText: {
-    fontSize: 28,
-    fontWeight: '300',
-    color: '#8D7B68',
-  },
-})
+const createStyles = (theme: typeof colorPalettes.light) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: '#FFFFFF',
+      paddingHorizontal: 22,
+    },
+    scrollView: {
+      flex: 1,
+      paddingVertical: 16,
+    },
+    albumGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'space-between',
+    },
+    albumItem: {
+      width: '30%',
+      marginBottom: 24,
+    },
+    imageContainer: {
+      aspectRatio: 0.75,
+      backgroundColor: '#E8DED1',
+      borderRadius: 8,
+      borderWidth: 2,
+      borderColor: '#A68372',
+    },
+    image: {
+      width: '100%',
+      height: '100%',
+    },
+    imagePlaceholder: {
+      width: '100%',
+      height: '100%',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    placeholderImage: {
+      width: '100%',
+      height: '100%',
+      borderRadius: 8,
+    },
+    imageTitle: {
+      textAlign: 'center',
+      marginTop: 8,
+      fontSize: 12,
+      color: '#000000',
+    },
+    addPhotoBorder: {
+      alignSelf: 'center',
+      backgroundColor: '#A68372',
+      borderRadius: 30,
+      padding: 10,
+    },
+    addPhotoButton: {
+      backgroundColor: '#E8DED1',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    addButtonText: {
+      fontSize: 28,
+      fontWeight: '300',
+      color: '#8D7B68',
+    },
+  })

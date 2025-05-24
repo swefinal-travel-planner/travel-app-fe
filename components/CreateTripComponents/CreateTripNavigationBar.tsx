@@ -37,12 +37,12 @@ export default function CreateTripNavigationBar({
         fullWidth={true}
         avoidInnerPaddings={true}
       >
-        <Ionicons name="arrow-back" size={20} color={theme.normal} />
+        <Ionicons name="arrow-back" size={20} color={theme.primary} />
       </Button>
       <ProgressBar
         progress={(currentStep / numberOfSteps) * 100}
-        progressColor={theme.normal}
-        style={[styles.progressBar, { backgroundColor: theme.surface }]}
+        progressColor={theme.primary}
+        style={[styles.progressBar, { backgroundColor: theme.secondary }]}
       />
     </View>
   )

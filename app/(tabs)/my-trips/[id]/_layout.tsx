@@ -103,7 +103,7 @@ export default function TripDetailLayout() {
           tabBarLabelStyle: {
             fontSize: 20,
             textTransform: 'none',
-            fontFamily: 'NotoSerif_400Regular',
+            fontFamily: 'PlusJakartaSans_400Regular',
           },
           tabBarIconStyle: {
             display: 'none',
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     marginLeft: 15,
     fontSize: 18,
-    fontFamily: 'NotoSerif_500Medium',
+    fontFamily: 'PlusJakartaSans_500Medium',
     color: '#563D30',
   },
   loadingContainer: {
@@ -173,12 +173,12 @@ const styles = StyleSheet.create({
   tabBarLabel: {
     fontSize: 20,
     textTransform: 'none',
-    fontFamily: 'NotoSerif_400Regular',
+    fontFamily: 'PlusJakartaSans_400Regular',
     color: '#A68372',
   },
   tabBarLabelActive: {
     color: '#563D30',
-    fontFamily: 'NotoSerif_700Bold',
+    fontFamily: 'PlusJakartaSans_700Bold',
   },
   tabIndicator: {
     position: 'absolute',
