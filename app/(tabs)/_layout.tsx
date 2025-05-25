@@ -1,10 +1,9 @@
-import { Tabs } from 'expo-router'
-import Ionicons from '@expo/vector-icons/Ionicons'
-import { Platform } from 'react-native'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
-import { useMemo } from 'react'
 import { colorPalettes } from '@/styles/Itheme'
-import { StyleSheet } from 'react-native'
+import Ionicons from '@expo/vector-icons/Ionicons'
+import { Tabs } from 'expo-router'
+import { useMemo } from 'react'
+import { Platform, Pressable, StyleSheet } from 'react-native'
 
 export default function TabLayout() {
   const theme = useThemeStyle()
@@ -29,6 +28,10 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
+          headerPressColor: 'transparent',
+          tabBarButton: (props) => (
+            <Pressable {...props} android_ripple={null} />
+          ),
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? 'home' : 'home-outline'}
@@ -50,6 +53,9 @@ export default function TabLayout() {
               size={24}
             />
           ),
+          tabBarButton: (props) => (
+            <Pressable {...props} android_ripple={null} />
+          ),
         }}
       />
 
@@ -57,12 +63,16 @@ export default function TabLayout() {
         name="tools"
         options={{
           title: 'Tools',
+          headerPressColor: 'transparent',
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? 'grid' : 'grid-outline'}
               color={color}
               size={24}
             />
+          ),
+          tabBarButton: (props) => (
+            <Pressable {...props} android_ripple={null} />
           ),
         }}
       />
@@ -78,6 +88,9 @@ export default function TabLayout() {
               size={24}
             />
           ),
+          tabBarButton: (props) => (
+            <Pressable {...props} android_ripple={null} />
+          ),
         }}
       />
 
@@ -91,6 +104,9 @@ export default function TabLayout() {
               color={color}
               size={24}
             />
+          ),
+          tabBarButton: (props) => (
+            <Pressable {...props} android_ripple={null} />
           ),
         }}
       />

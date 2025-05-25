@@ -9,17 +9,19 @@ export const colorPalettes = {
     primarySubtle: '#eef8ef',
     black: '#000000',
     white: '#ffffff',
+    error: '#d32f2f', // Error color
   },
   dark: {
     normal: '#e0e0e0', // Light text for dark mode
     subtle1: '#b0b0b0', // Lighter for contrast
     subtle2: '#808080', // Adjusted for dark mode
-    background: '#121212', // Dark background
+    background: '#563d30', // Dark background
     surface: '#1e1e1e', // Dark surface
     primary: '#4f8968', // Brighter primary for visibility
     primarySubtle: '#1a2e25', // Darker subtle primary
     black: '#ffffff',
-    white: '#121212',
+    white: '#231813',
+    error: '#d32f2f', // Error color
   },
   pink: {
     normal: '#563d30',
@@ -31,6 +33,7 @@ export const colorPalettes = {
     primarySubtle: '#f8bbd0',
     black: '#000000',
     white: '#ffffff',
+    error: '#d32f2f', // Error color
   },
   blue: {
     normal: '#563d30',
@@ -42,6 +45,7 @@ export const colorPalettes = {
     primarySubtle: '#bbdefb',
     black: '#000000',
     white: '#ffffff',
+    error: '#d32f2f', // Error color
   },
 }
 
