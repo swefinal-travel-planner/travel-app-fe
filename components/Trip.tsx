@@ -1,4 +1,4 @@
-import { ITrip } from '@/types/Trip/Trip'
+import { Trip } from '@/types/Trip/Trip'
 import { Text, StyleSheet } from 'react-native'
 import React, { useMemo } from 'react'
 import { View } from 'react-native-ui-lib'
@@ -9,7 +9,7 @@ import { Image } from 'expo-image'
 
 const blurhash = 'this-is-a-blurhash'
 
-export default function Trip({ trip }: Readonly<{ trip: ITrip }>) {
+export default function TripCard({ trip }: Readonly<{ trip: Trip }>) {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
 

@@ -1,42 +1,42 @@
-import { useRouter } from "expo-router";
-import { Text, View, Keyboard, TouchableWithoutFeedback } from "react-native";
-import { useForm, Controller } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useRouter } from 'expo-router'
+import { Controller, useForm } from 'react-hook-form'
+import { Keyboard, Text, TouchableWithoutFeedback, View } from 'react-native'
+import { z } from 'zod'
 
-import { usePwdResetStore } from "@/lib/usePwdResetStore";
+import { usePwdResetStore } from '@/lib/usePwdResetStore'
 
-import api, { url } from "@/api/api";
-import axios from "axios";
+import api, { url } from '@/services/api/api'
+import axios from 'axios'
 
-import PasswordField from "@/components/input/PasswordField";
-import Pressable from "@/components/Pressable";
+import PasswordField from '@/components/input/PasswordField'
+import Pressable from '@/components/Pressable'
 
-import styles from "../styles";
+import styles from '../styles'
 
 interface ResetFormData {
-  password: string;
-  repPassword: string;
+  password: string
+  repPassword: string
 }
 
 // form validation schema
 const schema = z
   .object({
     password: z
-      .string({ required_error: "Please enter your password" })
-      .min(8, { message: "Password must have at least 8 characters" }),
-    repPassword: z.string({ required_error: "Please confirm your password" }),
+      .string({ required_error: 'Please enter your password' })
+      .min(8, { message: 'Password must have at least 8 characters' }),
+    repPassword: z.string({ required_error: 'Please confirm your password' }),
   })
   .refine((data) => data.password === data.repPassword, {
-    message: "Passwords do not match",
-    path: ["repPassword"],
-  });
+    message: 'Passwords do not match',
+    path: ['repPassword'],
+  })
 
 export default function ResetPassword() {
-  const router = useRouter();
-  const email = usePwdResetStore((state) => state.email);
-  const otp = usePwdResetStore((state) => state.otp);
-  const clearRequest = usePwdResetStore((state) => state.clearRequest);
+  const router = useRouter()
+  const email = usePwdResetStore((state) => state.email)
+  const otp = usePwdResetStore((state) => state.otp)
+  const clearRequest = usePwdResetStore((state) => state.clearRequest)
 
   // initialize form
   const {
@@ -45,32 +45,32 @@ export default function ResetPassword() {
     formState: { errors },
   } = useForm({
     resolver: zodResolver(schema),
-  });
+  })
 
-  const errorMessage = errors.password?.message || errors.repPassword?.message;
+  const errorMessage = errors.password?.message || errors.repPassword?.message
 
   const onSubmit = async (data: ResetFormData): Promise<void> => {
     try {
       const payload = {
-        email: email || "",
-        oTP: otp || "",
-        password: data.password || "",
-      };
+        email: email || '',
+        oTP: otp || '',
+        password: data.password || '',
+      }
 
-      await api.post(`${url}/auth/reset-password`, payload);
+      await api.post(`${url}/auth/reset-password`, payload)
 
-      clearRequest(); // clear the request in the store
+      clearRequest() // clear the request in the store
 
-      router.replace("/login");
+      router.replace('/login')
     } catch (error) {
       if (axios.isAxiosError(error)) {
         // handle errors coming from the API call
-        console.error("API error:", error.response?.data || error.message);
+        console.error('API error:', error.response?.data || error.message)
       } else {
-        console.error("Password reset error:", error);
+        console.error('Password reset error:', error)
       }
     }
-  };
+  }
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -116,5 +116,5 @@ export default function ResetPassword() {
         />
       </View>
     </TouchableWithoutFeedback>
-  );
+  )
 }

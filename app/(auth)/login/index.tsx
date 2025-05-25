@@ -1,52 +1,52 @@
-import { useRouter, Link } from "expo-router";
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Link, useRouter } from 'expo-router'
+import { Controller, useForm } from 'react-hook-form'
 import {
-  Text,
-  View,
-  Keyboard,
-  TouchableWithoutFeedback,
   Image,
-} from "react-native";
-import { useForm, Controller } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+  Keyboard,
+  Text,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native'
+import { z } from 'zod'
 
+import { auth } from '@/firebaseConfig'
 import {
   GoogleSignin,
   isErrorWithCode,
   statusCodes,
-} from "@react-native-google-signin/google-signin";
-import { auth } from "@/firebaseConfig";
-import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
+} from '@react-native-google-signin/google-signin'
+import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth'
 
-import saveLoginInfo from "@/utils/saveLoginInfo";
+import saveLoginInfo from '@/utils/saveLoginInfo'
 
-import api, { url } from "@/api/api";
-import axios from "axios";
+import api, { url } from '@/services/api/api'
+import axios from 'axios'
 
-import CustomTextField from "@/components/input/CustomTextField";
-import PasswordField from "@/components/input/PasswordField";
-import Pressable from "@/components/Pressable";
-import PressableOpacity from "@/components/PressableOpacity";
+import CustomTextField from '@/components/input/CustomTextField'
+import PasswordField from '@/components/input/PasswordField'
+import Pressable from '@/components/Pressable'
+import PressableOpacity from '@/components/PressableOpacity'
 
-import styles from "../styles";
+import styles from '../styles'
 
 interface LoginFormData {
-  email: string;
-  password: string;
+  email: string
+  password: string
 }
 
 // form validation schema
 const schema = z.object({
   email: z
-    .string({ required_error: "Please enter your email address" })
-    .email({ message: "Invalid email address" }),
+    .string({ required_error: 'Please enter your email address' })
+    .email({ message: 'Invalid email address' }),
   password: z
-    .string({ required_error: "Please enter your password" })
-    .min(8, { message: "Password must have at least 8 characters" }),
-});
+    .string({ required_error: 'Please enter your password' })
+    .min(8, { message: 'Password must have at least 8 characters' }),
+})
 
 export default function Login() {
-  const router = useRouter();
+  const router = useRouter()
 
   // initialize form
   const {
@@ -55,100 +55,100 @@ export default function Login() {
     formState: { errors },
   } = useForm({
     resolver: zodResolver(schema),
-  });
+  })
 
-  const errorMessage = errors.email?.message || errors.password?.message;
+  const errorMessage = errors.email?.message || errors.password?.message
 
   const handleGoogleLogin = async () => {
     try {
-      await GoogleSignin.hasPlayServices();
-      const userInfo = await GoogleSignin.signIn();
+      await GoogleSignin.hasPlayServices()
+      const userInfo = await GoogleSignin.signIn()
 
       if (userInfo && userInfo.data?.idToken) {
         const googleCredential = GoogleAuthProvider.credential(
-          userInfo.data.idToken,
-        );
+          userInfo.data.idToken
+        )
 
         const firebaseUserCredential = await signInWithCredential(
           auth,
-          googleCredential,
-        );
+          googleCredential
+        )
 
-        const user = firebaseUserCredential.user;
-        const idToken = await user.getIdToken();
+        const user = firebaseUserCredential.user
+        const idToken = await user.getIdToken()
 
         const payload = {
-          displayName: user.displayName || "",
-          email: user.email || "",
-          password: "googlelogin", // placeholder since password is not applicable for Google login
-          phoneNumber: user.phoneNumber || "",
-          photoURL: user.photoURL || "",
+          displayName: user.displayName || '',
+          email: user.email || '',
+          password: 'googlelogin', // placeholder since password is not applicable for Google login
+          phoneNumber: user.phoneNumber || '',
+          photoURL: user.photoURL || '',
           id_token: idToken,
-        };
+        }
 
-        const response = await api.post(`${url}/auth/google-login`, payload);
+        const response = await api.post(`${url}/auth/google-login`, payload)
 
         await saveLoginInfo(
           response.data.data.userId,
           response.data.data.accessToken,
           response.data.data.refreshToken,
           response.data.data.email,
-          response.data.data.name,
-        );
+          response.data.data.name
+        )
 
-        router.replace("/(tabs)");
+        router.replace('/(tabs)')
       } else {
-        console.error("Google sign-in cancelled or ID token missing");
+        console.error('Google sign-in cancelled or ID token missing')
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
         // handle errors coming from the API call
-        console.error("API error:", error.response?.data || error.message);
+        console.error('API error:', error.response?.data || error.message)
       } else if (isErrorWithCode(error)) {
         switch (error.code) {
           case statusCodes.IN_PROGRESS:
             // operation (eg. sign in) already in progress
-            break;
+            break
           case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
             // Android only, play services not available or outdated
-            break;
+            break
           default:
-            console.error("Google sign-in error:", error);
+            console.error('Google sign-in error:', error)
         }
       } else {
-        console.error("Google sign-in error:", error);
+        console.error('Google sign-in error:', error)
       }
     }
-  };
+  }
 
   // handle regular login
   const onSubmit = async (data: LoginFormData) => {
     try {
       const payload = {
-        email: data.email || "",
-        password: data.password || "",
-      };
+        email: data.email || '',
+        password: data.password || '',
+      }
 
-      const response = await api.post(`${url}/auth/login`, payload);
+      const response = await api.post(`${url}/auth/login`, payload)
 
       await saveLoginInfo(
         response.data.data.userId,
         response.data.data.accessToken,
         response.data.data.refreshToken,
         response.data.data.email,
-        response.data.data.name,
-      );
+        response.data.data.name
+      )
 
-      router.replace("/(tabs)");
+      router.replace('/(tabs)')
     } catch (error) {
       if (axios.isAxiosError(error)) {
         // handle errors coming from the API call
-        console.error("API error:", error.response?.data || error.message);
+        console.error('API error:', error.response?.data || error.message)
       } else {
-        console.error("Login error:", error);
+        console.error('Login error:', error)
       }
     }
-  };
+  }
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -188,7 +188,7 @@ export default function Login() {
         />
 
         <Link
-          style={[styles.link, { alignSelf: "flex-end", marginTop: -8 }]}
+          style={[styles.link, { alignSelf: 'flex-end', marginTop: -8 }]}
           dismissTo
           href="/forgot"
         >
@@ -204,14 +204,14 @@ export default function Login() {
           style={styles.button}
         />
 
-        <Text style={[styles.text, { alignSelf: "center", marginBottom: 8 }]}>
+        <Text style={[styles.text, { alignSelf: 'center', marginBottom: 8 }]}>
           or continue with
         </Text>
 
         <View style={styles.socials}>
           <PressableOpacity onPress={handleGoogleLogin}>
             <Image
-              source={require("@/assets/images/google.png")}
+              source={require('@/assets/images/google.png')}
               style={styles.socialIcon}
             />
           </PressableOpacity>
@@ -226,5 +226,5 @@ export default function Login() {
         </View>
       </View>
     </TouchableWithoutFeedback>
-  );
+  )
 }

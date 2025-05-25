@@ -1,10 +1,10 @@
-import { ApiTranslate } from '@/api/tools/ApiTranslate'
 import { Padding, Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
+import { ApiTranslate } from '@/services/api/tools/ApiTranslate'
 import { colorPalettes } from '@/styles/Itheme'
-import { Picker } from 'react-native-ui-lib'
 import React, { useMemo, useState } from 'react'
 import { Button, StyleSheet, Text, TextInput, View } from 'react-native'
+import { Picker } from 'react-native-ui-lib'
 
 const LANGUAGES = [
   { code: 'en', label: 'English' },

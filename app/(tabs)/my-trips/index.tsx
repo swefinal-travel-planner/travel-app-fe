@@ -178,7 +178,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      paddingTop: 16,
+      paddingTop: 50,
       backgroundColor: theme.white,
       alignItems: 'center',
     },

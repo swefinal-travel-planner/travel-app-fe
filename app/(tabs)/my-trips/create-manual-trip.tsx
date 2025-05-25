@@ -53,6 +53,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       justifyContent: 'center',
       alignItems: 'center',
       backgroundColor: '#eef8ef',
+      paddingTop: 55,
     },
     container: {
       flex: 1,

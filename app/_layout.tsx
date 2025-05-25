@@ -1,19 +1,19 @@
-import { GoogleSignin } from '@react-native-google-signin/google-signin'
-import React, { useEffect, useRef, useState } from 'react'
-import { Platform, SafeAreaView, View } from 'react-native'
+import { useThemeStyle } from '@/hooks/useThemeStyle'
 import {
   NotoSerif_400Regular,
   NotoSerif_700Bold,
   useFonts,
 } from '@expo-google-fonts/noto-serif'
+import { GoogleSignin } from '@react-native-google-signin/google-signin'
 import Mapbox from '@rnmapbox/maps'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import Constants from 'expo-constants'
 import * as Notifications from 'expo-notifications'
 import { Stack } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
-import { useThemeStyle } from '@/hooks/useThemeStyle'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { StatusBar } from 'expo-status-bar'
+import React, { useEffect, useRef, useState } from 'react'
+import { Platform } from 'react-native'
 
 // prevent the splash screen from hiding before the font finishes loading
 SplashScreen.preventAutoHideAsync()

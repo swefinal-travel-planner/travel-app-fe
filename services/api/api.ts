@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { getItemAsync } from 'expo-secure-store'
 
 const api = axios.create({
   timeout: 5000,
@@ -7,7 +8,14 @@ const api = axios.create({
 
 // Log request before sending
 api.interceptors.request.use(
-  (config) => {
+  async (config) => {
+    // You can replace this with your own token retrieval logic
+    const accessToken = await getItemAsync('accessToken')
+
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`
+    }
+
     console.log('Sending Request:', {
       url: config.url,
       method: config.method,
@@ -15,6 +23,7 @@ api.interceptors.request.use(
       data: config.data,
       headers: config.headers,
     })
+
     return config
   },
   (error) => {
