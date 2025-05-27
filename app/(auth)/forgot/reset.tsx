@@ -12,7 +12,9 @@ import axios from 'axios'
 import PasswordField from '@/components/input/PasswordField'
 import Pressable from '@/components/Pressable'
 
-import styles from '../styles'
+import { useThemeStyle } from '@/hooks/useThemeStyle'
+import { useMemo } from 'react'
+import { createStyles } from '../styles'
 
 interface ResetFormData {
   password: string
@@ -33,6 +35,9 @@ const schema = z
   })
 
 export default function ResetPassword() {
+  const theme = useThemeStyle()
+  const styles = useMemo(() => createStyles(theme), [theme])
+
   const router = useRouter()
   const email = usePwdResetStore((state) => state.email)
   const otp = usePwdResetStore((state) => state.otp)
@@ -74,7 +79,7 @@ export default function ResetPassword() {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <View style={[styles.container, styles.login]}>
+      <View style={styles.container}>
         <Text style={styles.title}>Reset your password</Text>
         <Text style={styles.subtitle}>Enter your new password.</Text>
 
@@ -111,8 +116,7 @@ export default function ResetPassword() {
         <Pressable
           title="Confirm"
           onPress={handleSubmit(onSubmit)}
-          variant="primary"
-          style={{ marginVertical: 20 }}
+          style={{ ...styles.primaryButton, marginVertical: 20 }}
         />
       </View>
     </TouchableWithoutFeedback>

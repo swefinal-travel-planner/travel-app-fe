@@ -1,9 +1,3 @@
-import { useThemeStyle } from '@/hooks/useThemeStyle'
-import {
-  NotoSerif_400Regular,
-  NotoSerif_700Bold,
-  useFonts,
-} from '@expo-google-fonts/noto-serif'
 import { GoogleSignin } from '@react-native-google-signin/google-signin'
 import Mapbox from '@rnmapbox/maps'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -84,11 +78,6 @@ async function registerForPushNotificationsAsync() {
 }
 
 export default function RootLayout() {
-  const [loaded, error] = useFonts({
-    NotoSerif_400Regular,
-    NotoSerif_700Bold,
-  })
-
   const [queryClient] = useState(() => new QueryClient())
 
   const [expoPushToken, setExpoPushToken] = useState('')
@@ -101,19 +90,15 @@ export default function RootLayout() {
   const responseListener = useRef<Notifications.EventSubscription>()
 
   useEffect(() => {
-    if (loaded || error) {
-      SplashScreen.hideAsync()
+    SplashScreen.hideAsync()
 
-      // configure Google sign-in
-      GoogleSignin.configure({
-        webClientId:
-          '490333496504-qe9p6s4an7ub4ros021q2p6kda9hakhm.apps.googleusercontent.com', // client ID of type WEB for your server. Required to get the `idToken` on the user object, and for offline access.
-        scopes: ['https://www.googleapis.com/auth/drive.readonly'], // what API you want to access on behalf of the user, default is email and profile
-      })
-    }
-  }, [loaded, error])
-
-  const theme = useThemeStyle()
+    // configure Google sign-in
+    GoogleSignin.configure({
+      webClientId:
+        '490333496504-qe9p6s4an7ub4ros021q2p6kda9hakhm.apps.googleusercontent.com', // client ID of type WEB for your server. Required to get the `idToken` on the user object, and for offline access.
+      scopes: ['https://www.googleapis.com/auth/drive.readonly'], // what API you want to access on behalf of the user, default is email and profile
+    })
+  }, [])
 
   useEffect(() => {
     registerForPushNotificationsAsync()
@@ -140,10 +125,6 @@ export default function RootLayout() {
         Notifications.removeNotificationSubscription(responseListener.current)
     }
   }, [])
-
-  if (!loaded && !error) {
-    return null
-  }
 
   return (
     <>

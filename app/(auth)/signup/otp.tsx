@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Keyboard, Text, TouchableWithoutFeedback, View } from 'react-native'
 
 import { useSignupStore } from '@/lib/useSignupStore'
@@ -7,12 +7,16 @@ import { useSignupStore } from '@/lib/useSignupStore'
 import api, { url } from '@/services/api/api'
 import axios from 'axios'
 
+import { useThemeStyle } from '@/hooks/useThemeStyle'
+import { createStyles } from '../styles'
+
 import OtpField from '@/components/input/OtpField'
 import Pressable from '@/components/Pressable'
 
-import styles from '../styles'
-
 export default function SignUpOtp() {
+  const theme = useThemeStyle()
+  const styles = useMemo(() => createStyles(theme), [theme])
+
   const request = useSignupStore((state) => state.request)
   const clearRequest = useSignupStore((state) => state.clearRequest)
 
@@ -76,7 +80,7 @@ export default function SignUpOtp() {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <View style={[styles.container, styles.other]}>
+      <View style={styles.container}>
         <Text style={styles.title}>Verify signup</Text>
         <Text style={styles.subtitle}>
           A verification code was sent to your email address. Please check your
@@ -87,10 +91,9 @@ export default function SignUpOtp() {
 
         <Pressable
           title="Verify"
-          variant={isFilled ? 'primary' : 'disabled'}
           disabled={!isFilled}
           onPress={handlePress}
-          style={{ marginTop: 36 }}
+          style={styles.primaryButton}
         />
 
         <Pressable
@@ -99,7 +102,6 @@ export default function SignUpOtp() {
               ? `Send another code in ${countdown} seconds`
               : 'Send another code'
           }
-          variant={resendDisabled ? 'otpDisabled' : 'secondary'}
           disabled={resendDisabled}
           onPress={() => setResendDisabled(true)}
         />

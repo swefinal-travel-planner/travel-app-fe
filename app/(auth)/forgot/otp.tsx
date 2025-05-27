@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Keyboard, Text, TouchableWithoutFeedback, View } from 'react-native'
 
 import { usePwdResetStore } from '@/lib/usePwdResetStore'
@@ -10,9 +10,13 @@ import axios from 'axios'
 import OtpField from '@/components/input/OtpField'
 import Pressable from '@/components/Pressable'
 
-import styles from '../styles'
+import { useThemeStyle } from '@/hooks/useThemeStyle'
+import { createStyles } from '../styles'
 
 export default function ForgotPasswordOtp() {
+  const theme = useThemeStyle()
+  const styles = useMemo(() => createStyles(theme), [theme])
+
   const email = usePwdResetStore((state) => state.email)
   const setOtp = usePwdResetStore((state) => state.setOtp)
 
@@ -71,7 +75,7 @@ export default function ForgotPasswordOtp() {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <View style={[styles.container, styles.login]}>
+      <View style={styles.container}>
         <Text style={styles.title}>Verify email</Text>
         <Text style={styles.subtitle}>
           A verification code was sent to your email address. Please check your
@@ -81,22 +85,18 @@ export default function ForgotPasswordOtp() {
         <OtpField onChanged={onOtpChanged} onFilled={onOtpFilled} />
 
         <Pressable
-          title="Verify"
-          variant={isFilled ? 'primary' : 'disabled'}
-          disabled={!isFilled}
-          onPress={handlePress}
-          style={{ marginTop: 36 }}
-        />
-
-        <Pressable
           title={
             resendDisabled
               ? `Send another code in ${countdown} seconds`
               : 'Send another code'
           }
-          variant={resendDisabled ? 'otpDisabled' : 'secondary'}
           disabled={resendDisabled}
           onPress={() => setResendDisabled(true)}
+          style={{
+            marginTop: 36,
+            backgroundColor: resendDisabled ? theme.primary : theme.disabled,
+            color: resendDisabled ? theme.white : theme.text,
+          }}
         />
       </View>
     </TouchableWithoutFeedback>

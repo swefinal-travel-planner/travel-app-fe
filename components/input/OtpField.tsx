@@ -1,14 +1,17 @@
-import React, { useState } from "react";
-import { OtpInput } from "react-native-otp-entry";
-
-import styles from "./styles";
+import { useThemeStyle } from '@/hooks/useThemeStyle'
+import React, { useMemo } from 'react'
+import { OtpInput } from 'react-native-otp-entry'
+import { createStyles } from './styles'
 
 interface OtpFieldProps {
-  onChanged?: (otp: string) => void;
-  onFilled?: (otp: string) => void;
+  onChanged?: (otp: string) => void
+  onFilled?: (otp: string) => void
 }
 
 const OtpField: React.FC<OtpFieldProps> = ({ onChanged, onFilled }) => {
+  const theme = useThemeStyle()
+  const styles = useMemo(() => createStyles(theme), [theme])
+
   return (
     <OtpInput
       numberOfDigits={6}
@@ -27,7 +30,7 @@ const OtpField: React.FC<OtpFieldProps> = ({ onChanged, onFilled }) => {
         focusedPinCodeContainerStyle: styles.focusedPinCodeContainer,
       }}
     />
-  );
-};
+  )
+}
 
-export default OtpField;
+export default OtpField

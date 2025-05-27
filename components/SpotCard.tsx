@@ -1,15 +1,15 @@
-import { useState } from "react";
-import { View, Text, StyleSheet, Image } from "react-native";
+import { useState } from 'react'
+import { Image, StyleSheet, Text, View } from 'react-native'
 
-import Ionicons from "@expo/vector-icons/Ionicons";
+import Ionicons from '@expo/vector-icons/Ionicons'
 
-import PressableOpacity from "./PressableOpacity";
+import PressableOpacity from './PressableOpacity'
 
 interface SpotCardProps {
-  spotName: string;
-  spotLocation: string;
-  spotImage: string;
-  isSaved: boolean;
+  spotName: string
+  spotLocation: string
+  spotImage: string
+  isSaved: boolean
 }
 
 const SpotCard: React.FC<SpotCardProps> = ({
@@ -18,7 +18,7 @@ const SpotCard: React.FC<SpotCardProps> = ({
   spotImage,
   isSaved,
 }) => {
-  const [saved, setSaved] = useState(isSaved);
+  const [saved, setSaved] = useState(isSaved)
 
   return (
     <PressableOpacity style={styles.wrapper}>
@@ -30,7 +30,7 @@ const SpotCard: React.FC<SpotCardProps> = ({
           onPress={() => setSaved(!saved)}
         >
           <Ionicons
-            name={saved ? "bookmark" : "bookmark-outline"}
+            name={saved ? 'bookmark' : 'bookmark-outline'}
             size={20}
             color="white"
           />
@@ -42,7 +42,7 @@ const SpotCard: React.FC<SpotCardProps> = ({
           {spotName}
         </Text>
 
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <Ionicons
             name="location-outline"
             size={16}
@@ -56,64 +56,64 @@ const SpotCard: React.FC<SpotCardProps> = ({
         </View>
       </View>
     </PressableOpacity>
-  );
-};
+  )
+}
 
-export default SpotCard;
+export default SpotCard
 
 const styles = StyleSheet.create({
   wrapper: {
     width: 256,
     height: 206,
-    alignItems: "center",
-    justifyContent: "flex-start",
+    alignItems: 'center',
+    justifyContent: 'flex-start',
     borderRadius: 12,
     padding: 16,
     borderWidth: 1,
-    borderColor: "#A68372",
+    borderColor: '#A68372',
   },
   imageContainer: {
-    width: "100%",
+    width: '100%',
     height: 120,
-    position: "relative",
+    position: 'relative',
     marginBottom: 8,
   },
   image: {
-    width: "100%",
-    height: "100%",
+    width: '100%',
+    height: '100%',
     borderRadius: 8,
-    borderColor: "#A68372",
+    borderColor: '#A68372',
   },
   overlay: {
-    position: "absolute",
+    position: 'absolute',
     top: -112,
     right: 8,
-    color: "#fff",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    color: '#fff',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     padding: 6,
     borderRadius: 4,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   spotInfo: {
-    width: "100%",
-    flexDirection: "column",
-    justifyContent: "flex-start",
-    alignItems: "flex-start",
+    width: '100%',
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
     marginBottom: 8,
   },
   name: {
-    color: "#563D30",
-    fontFamily: "NotoSerif_400Regular",
+    color: '#563D30',
+    fontFamily: 'PlusJakartaSans_400Regular',
     fontSize: 16,
-    clip: "ellipsis",
+    clip: 'ellipsis',
     marginTop: 2,
   },
   location: {
-    color: "#A68372",
-    fontFamily: "NotoSerif_400Regular",
+    color: '#A68372',
+    fontFamily: 'PlusJakartaSans_400Regular',
     fontSize: 12,
-    clip: "ellipsis",
+    clip: 'ellipsis',
     marginTop: 4,
   },
-});
+})

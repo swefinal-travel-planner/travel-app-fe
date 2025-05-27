@@ -195,7 +195,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     searchInput: {
       flex: 1,
       fontSize: 14,
-      color: theme.normal,
+      color: theme.text,
     },
     divider: {
       height: 1,

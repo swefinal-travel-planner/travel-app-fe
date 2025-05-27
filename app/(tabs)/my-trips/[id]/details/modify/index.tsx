@@ -1,6 +1,8 @@
+import { useThemeStyle } from '@/hooks/useThemeStyle'
+import { colorPalettes } from '@/styles/Itheme'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import {
   Alert,
   Image,
@@ -24,6 +26,9 @@ type SpotItem = {
 }
 
 const TripDetailModifyScreen = () => {
+  const theme = useThemeStyle()
+  const styles = useMemo(() => createStyles(theme), [theme])
+
   const router = useRouter()
   const { tripData, tripDate, tripDay } = useLocalSearchParams()
   const [tripItems, setTripItems] = useState<SpotItem[]>([])
@@ -152,101 +157,102 @@ const TripDetailModifyScreen = () => {
   )
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  header: {
-    justifyContent: 'space-between',
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 22,
-    paddingVertical: 16,
-  },
-  backButton: {
-    marginRight: 16,
-  },
-  headerTitle: {
-    fontSize: 24,
-    textAlign: 'center',
-    flex: 1,
-  },
-  dayNavigationContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  dayText: {
-    textAlign: 'center',
-    fontSize: 20,
-    fontWeight: '500',
-    color: '#563D30',
-  },
-  addButtonContainer: {
-    alignSelf: 'center',
-    backgroundColor: '#EEF8EF',
-    borderRadius: 30,
-    padding: 16,
-    marginVertical: 16,
-  },
-  addButtonBorder: {
-    borderWidth: 2,
-    borderColor: 'black',
-    borderRadius: 10,
-  },
-  listContent: {
-    paddingHorizontal: 20,
-  },
-  spotCard: {
-    flexDirection: 'row',
-    borderRadius: 12,
-    marginBottom: 12,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#E5DACB',
-    alignItems: 'center',
-  },
-  dragHandle: {
-    marginHorizontal: 8,
-  },
-  spotImageContainer: {
-    width: 120,
-    height: 80,
-    padding: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  spotImage: {
-    width: '100%',
-    height: '100%',
-    borderColor: '#D3B7A8',
-    borderWidth: 2,
-    borderRadius: 8,
-  },
-  spotDetails: {
-    flex: 1,
-    padding: 12,
-    justifyContent: 'center',
-  },
-  spotName: {
-    fontSize: 15,
-    fontWeight: '500',
-    marginBottom: 6,
-    color: '#563D30',
-  },
-  spotLocationContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  spotAddress: {
-    fontSize: 13,
-    color: '#A68372',
-    marginLeft: 4,
-  },
-  deleteButton: {
-    padding: 8,
-  },
-})
+const createStyles = (theme: typeof colorPalettes.light) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: '#FFFFFF',
+    },
+    header: {
+      justifyContent: 'space-between',
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 22,
+      paddingVertical: 16,
+    },
+    backButton: {
+      marginRight: 16,
+    },
+    headerTitle: {
+      fontSize: 24,
+      textAlign: 'center',
+      flex: 1,
+    },
+    dayNavigationContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    dayText: {
+      textAlign: 'center',
+      fontSize: 20,
+      fontWeight: '500',
+      color: '#563D30',
+    },
+    addButtonContainer: {
+      alignSelf: 'center',
+      backgroundColor: '#EEF8EF',
+      borderRadius: 30,
+      padding: 16,
+      marginVertical: 16,
+    },
+    addButtonBorder: {
+      borderWidth: 2,
+      borderColor: 'black',
+      borderRadius: 10,
+    },
+    listContent: {
+      paddingHorizontal: 20,
+    },
+    spotCard: {
+      flexDirection: 'row',
+      borderRadius: 12,
+      marginBottom: 12,
+      overflow: 'hidden',
+      borderWidth: 1,
+      borderColor: '#E5DACB',
+      alignItems: 'center',
+    },
+    dragHandle: {
+      marginHorizontal: 8,
+    },
+    spotImageContainer: {
+      width: 120,
+      height: 80,
+      padding: 8,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    spotImage: {
+      width: '100%',
+      height: '100%',
+      borderColor: '#D3B7A8',
+      borderWidth: 2,
+      borderRadius: 8,
+    },
+    spotDetails: {
+      flex: 1,
+      padding: 12,
+      justifyContent: 'center',
+    },
+    spotName: {
+      fontSize: 15,
+      fontWeight: '500',
+      marginBottom: 6,
+      color: '#563D30',
+    },
+    spotLocationContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    spotAddress: {
+      fontSize: 13,
+      color: '#A68372',
+      marginLeft: 4,
+    },
+    deleteButton: {
+      padding: 8,
+    },
+  })
 
 export default TripDetailModifyScreen

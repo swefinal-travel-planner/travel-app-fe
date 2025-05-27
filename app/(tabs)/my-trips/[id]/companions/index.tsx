@@ -1,5 +1,7 @@
+import { useThemeStyle } from '@/hooks/useThemeStyle'
+import { colorPalettes } from '@/styles/Itheme'
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import {
   Image,
   SafeAreaView,
@@ -10,6 +12,9 @@ import {
   View,
 } from 'react-native'
 export default function TripCompanionsScreen() {
+  const theme = useThemeStyle()
+  const styles = useMemo(() => createStyles(theme), [theme])
+
   const router = useRouter()
   const params = useLocalSearchParams()
   const tripId = params.tripId
@@ -60,51 +65,52 @@ export default function TripCompanionsScreen() {
   )
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 22,
-  },
-  content: {
-    flexGrow: 0,
-    marginTop: 16,
-    borderWidth: 2,
-    borderColor: '#E5DACB',
-    borderRadius: 8,
-    padding: 16,
-  },
-  companionItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '100%',
-    marginVertical: 8,
-  },
-  image: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 16,
-  },
-  emptyCompanionText: {
-    textAlign: 'center',
-    fontSize: 20,
-    fontWeight: 'semibold',
-    color: '#563D30',
-  },
-  buttonContainer: {
-    margin: 16,
-    backgroundColor: 'transparent',
-  },
-  addButton: {
-    backgroundColor: '#3F6453',
-    borderRadius: 24,
-    paddingVertical: 16,
-    alignItems: 'center',
-  },
-  addButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '500',
-  },
-})
+const createStyles = (theme: typeof colorPalettes.light) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: '#FFFFFF',
+      paddingHorizontal: 22,
+    },
+    content: {
+      flexGrow: 0,
+      marginTop: 16,
+      borderWidth: 2,
+      borderColor: '#E5DACB',
+      borderRadius: 8,
+      padding: 16,
+    },
+    companionItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      width: '100%',
+      marginVertical: 8,
+    },
+    image: {
+      width: 50,
+      height: 50,
+      borderRadius: 25,
+      marginRight: 16,
+    },
+    emptyCompanionText: {
+      textAlign: 'center',
+      fontSize: 20,
+      fontWeight: 'semibold',
+      color: '#563D30',
+    },
+    buttonContainer: {
+      margin: 16,
+      backgroundColor: 'transparent',
+    },
+    addButton: {
+      backgroundColor: '#3F6453',
+      borderRadius: 24,
+      paddingVertical: 16,
+      alignItems: 'center',
+    },
+    addButtonText: {
+      color: '#fff',
+      fontSize: 16,
+      fontWeight: '500',
+    },
+  })

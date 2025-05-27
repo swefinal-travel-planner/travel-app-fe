@@ -1,10 +1,10 @@
-import { useRef } from "react";
-import { Pressable, Animated } from "react-native";
+import { useRef } from 'react'
+import { Animated, Pressable } from 'react-native'
 
 interface PressableOpacityProps {
-  children: React.ReactNode;
-  [key: string]: any;
-  onPress?: () => void;
+  children: React.ReactNode
+  [key: string]: any
+  onPress?: () => void
 }
 
 const PressableOpacity = ({
@@ -13,36 +13,36 @@ const PressableOpacity = ({
   style,
   ...props
 }: PressableOpacityProps) => {
-  const animated = useRef(new Animated.Value(1)).current;
+  const animated = useRef(new Animated.Value(1)).current
 
   const fadeIn = () => {
     Animated.timing(animated, {
       toValue: 0.1,
       duration: 50,
       useNativeDriver: true,
-    }).start();
-  };
+    }).start()
+  }
   const fadeOut = () => {
     Animated.timing(animated, {
       toValue: 1,
       duration: 70,
       useNativeDriver: true,
-    }).start();
-  };
+    }).start()
+  }
 
   return (
     <Pressable
       onPressIn={fadeIn}
       onPressOut={fadeOut}
       onPress={onPress}
-      style={{ alignSelf: "stretch", justifyContent: "center" }}
+      style={{ alignSelf: 'stretch', justifyContent: 'center' }}
       {...props}
     >
       <Animated.View style={[style, { opacity: animated }]}>
         {children}
       </Animated.View>
     </Pressable>
-  );
-};
+  )
+}
 
-export default PressableOpacity;
+export default PressableOpacity

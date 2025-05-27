@@ -13,13 +13,13 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: theme.normal,
-        tabBarInactiveTintColor: '#A68372',
+        tabBarActiveTintColor: theme.primary,
+        tabBarInactiveTintColor: theme.disabled,
         tabBarHideOnKeyboard: true,
         tabBarStyle: styles.tabBarStyle,
         tabBarLabelStyle: {
           marginTop: 2,
-          fontFamily: 'NotoSerif_400Regular',
+          fontFamily: 'PlusJakartaSans_400Regular',
           fontSize: 12,
         },
       }}
@@ -119,7 +119,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     tabBarStyle: {
       paddingTop: 5,
       height: Platform.OS === 'ios' ? 90 : 80,
-      borderColor: theme.subtle2,
-      backgroundColor: theme.surface,
+      borderColor: theme.disabled,
+      backgroundColor: theme.white,
     },
   })

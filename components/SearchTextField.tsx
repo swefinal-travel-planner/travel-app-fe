@@ -1,6 +1,8 @@
+import { useThemeStyle } from '@/hooks/useThemeStyle'
+import { colorPalettes } from '@/styles/Itheme'
 import Ionicons from '@expo/vector-icons/Ionicons'
-import React from 'react'
-import { TextInput, View, Text, StyleSheet } from 'react-native'
+import React, { useMemo } from 'react'
+import { StyleSheet, Text, TextInput, View } from 'react-native'
 
 interface TextFieldProps {
   placeholder: string
@@ -27,6 +29,9 @@ export default function SearchTextField({
   onBlur,
   value,
 }: Readonly<TextFieldProps>) {
+  const theme = useThemeStyle()
+  const styles = useMemo(() => createStyles(theme), [theme])
+
   return (
     <View style={styles.wrapper}>
       {leftIcon && (
@@ -54,56 +59,57 @@ export default function SearchTextField({
   )
 }
 
-const styles = StyleSheet.create({
-  wrapper: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#FCF4E8',
-    borderRadius: 100,
-    borderWidth: 1,
-    borderColor: '#3F6453',
-    paddingHorizontal: 8,
-    paddingVertical: 8,
-  },
-  leftIcon: {
-    color: '#3F6453',
-    marginLeft: 12,
-  },
-  rightIcon: {
-    color: '#3F6453',
-    marginRight: 12,
-  },
-  input: {
-    flex: 1,
-    marginHorizontal: 12,
-    paddingVertical: 12,
-    paddingRight: 12,
-    paddingLeft: 0,
-    borderRadius: 100,
-    backgroundColor: '#FCF4E8',
-    color: '#3F6453',
-    fontFamily: 'NotoSerif_400Regular',
-  },
-  pinCodeContainer: {
-    borderRadius: 0,
-    borderWidth: 0,
-    borderBottomWidth: 1,
-    borderColor: '#3F6453',
-  },
-  pinCodeText: {
-    fontFamily: 'NotoSerif_400Regular',
-    fontSize: 36,
-    color: '#3F6453',
-  },
-  focusedPinCodeContainer: {
-    borderBottomWidth: 2,
-    borderColor: '#3F6453',
-  },
-  errorText: {
-    color: '#FF0000',
-    fontSize: 12,
-    marginTop: 4,
-    marginLeft: 12,
-  },
-})
+const createStyles = (theme: typeof colorPalettes.light) =>
+  StyleSheet.create({
+    wrapper: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: '#FCF4E8',
+      borderRadius: 100,
+      borderWidth: 1,
+      borderColor: '#3F6453',
+      paddingHorizontal: 8,
+      paddingVertical: 8,
+    },
+    leftIcon: {
+      color: '#3F6453',
+      marginLeft: 12,
+    },
+    rightIcon: {
+      color: '#3F6453',
+      marginRight: 12,
+    },
+    input: {
+      flex: 1,
+      marginHorizontal: 12,
+      paddingVertical: 12,
+      paddingRight: 12,
+      paddingLeft: 0,
+      borderRadius: 100,
+      backgroundColor: '#FCF4E8',
+      color: '#3F6453',
+      fontFamily: 'PlusJakartaSans_400Regular',
+    },
+    pinCodeContainer: {
+      borderRadius: 0,
+      borderWidth: 0,
+      borderBottomWidth: 1,
+      borderColor: '#3F6453',
+    },
+    pinCodeText: {
+      fontFamily: 'PlusJakartaSans_400Regular',
+      fontSize: 36,
+      color: '#3F6453',
+    },
+    focusedPinCodeContainer: {
+      borderBottomWidth: 2,
+      borderColor: '#3F6453',
+    },
+    errorText: {
+      color: '#FF0000',
+      fontSize: 12,
+      marginTop: 4,
+      marginLeft: 12,
+    },
+  })

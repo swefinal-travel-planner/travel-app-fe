@@ -1,8 +1,8 @@
-import { useRouter } from 'expo-router'
-import { Text, View, Keyboard, TouchableWithoutFeedback } from 'react-native'
-import { useForm, Controller } from 'react-hook-form'
-import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useRouter } from 'expo-router'
+import { Controller, useForm } from 'react-hook-form'
+import { Keyboard, Text, TouchableWithoutFeedback, View } from 'react-native'
+import { z } from 'zod'
 
 import { usePwdResetStore } from '@/lib/usePwdResetStore'
 
@@ -12,7 +12,10 @@ import axios from 'axios'
 import CustomTextField from '@/components/input/CustomTextField'
 import Pressable from '@/components/Pressable'
 
-import styles from '../styles'
+import { useThemeStyle } from '@/hooks/useThemeStyle'
+import { useMemo } from 'react'
+import { createStyles } from '../styles'
+
 
 interface ForgotFormData {
   email: string
@@ -26,6 +29,9 @@ const schema = z.object({
 })
 
 export default function ForgotPassword() {
+  const theme = useThemeStyle()
+  const styles = useMemo(() => createStyles(theme), [theme])
+
   const router = useRouter()
   const setEmail = usePwdResetStore((state) => state.setEmail)
 
@@ -60,7 +66,7 @@ export default function ForgotPassword() {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <View style={[styles.container, styles.login]}>
+      <View style={styles.container}>
         <Text style={styles.title}>Forgot your password?</Text>
         <Text style={styles.subtitle}>Enter your email to get started.</Text>
 
@@ -86,8 +92,7 @@ export default function ForgotPassword() {
         <Pressable
           title="Next"
           onPress={handleSubmit(onSubmit)}
-          variant="primary"
-          style={{ marginVertical: 20 }}
+          style={{ ...styles.primaryButton, marginVertical: 20 }}
         />
       </View>
     </TouchableWithoutFeedback>

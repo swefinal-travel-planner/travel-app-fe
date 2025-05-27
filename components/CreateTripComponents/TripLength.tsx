@@ -50,12 +50,12 @@ export default function TripLength({
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.textQuestion, { color: theme.normal }]}>
+      <Text style={[styles.textQuestion, { color: theme.primary }]}>
         When will your trip start and end?
       </Text>
 
       <View style={styles.textFieldContainer}>
-        <Text style={[styles.textField, { color: theme.normal }]}>
+        <Text style={[styles.textField, { color: theme.primary }]}>
           Select a date range
         </Text>
         <DateRangeField
@@ -64,7 +64,7 @@ export default function TripLength({
           setStartDate={setStartDate}
           setEndDate={setEndDate}
         />
-        <Text style={[styles.textField, { color: theme.normal }]}>
+        <Text style={[styles.textField, { color: theme.primary }]}>
           Number of days:{' '}
           {startDate && endDate ? getDayDiff(startDate, endDate) : '--'}
         </Text>

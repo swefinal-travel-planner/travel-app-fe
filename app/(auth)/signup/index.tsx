@@ -23,13 +23,16 @@ import { useSignupStore } from '@/lib/useSignupStore'
 import api, { url } from '@/services/api/api'
 import axios from 'axios'
 
+import { useThemeStyle } from '@/hooks/useThemeStyle'
+import { useMemo } from 'react'
+import { createStyles } from '../styles'
+
 import CustomTextField from '@/components/input/CustomTextField'
 import PasswordField from '@/components/input/PasswordField'
 import Pressable from '@/components/Pressable'
-
 import PressableOpacity from '@/components/PressableOpacity'
+
 import saveLoginInfo from '@/utils/saveLoginInfo'
-import styles from '../styles'
 
 interface SignupFormData {
   name: string
@@ -57,6 +60,9 @@ const schema = z
   })
 
 export default function SignUp() {
+  const theme = useThemeStyle()
+  const styles = useMemo(() => createStyles(theme), [theme])
+
   const router = useRouter()
   const setRequest = useSignupStore((state) => state.setRequest)
 
@@ -164,7 +170,7 @@ export default function SignUp() {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <View style={[styles.container, styles.other]}>
+      <View style={styles.container}>
         <Text style={styles.title}>Hi!</Text>
         <Text style={styles.subtitle}>
           Let us make trip planning fast and easy.
@@ -232,9 +238,8 @@ export default function SignUp() {
 
         <Pressable
           title="Sign up"
-          variant="primary"
           onPress={handleSubmit(onSubmit)}
-          style={styles.button}
+          style={styles.primaryButton}
         />
 
         <Text style={[styles.text, { alignSelf: 'center', marginBottom: 8 }]}>

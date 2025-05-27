@@ -1,8 +1,10 @@
-import { useState } from 'react'
-import { View, Text, StyleSheet, Image } from 'react-native'
+import { useMemo, useState } from 'react'
+import { Image, StyleSheet, Text, View } from 'react-native'
 
 import Ionicons from '@expo/vector-icons/Ionicons'
 
+import { useThemeStyle } from '@/hooks/useThemeStyle'
+import { colorPalettes } from '@/styles/Itheme'
 import PressableOpacity from './PressableOpacity'
 
 interface TripCardProps {
@@ -26,6 +28,9 @@ const TripCard: React.FC<TripCardProps> = ({
   isPinned,
   onPress,
 }) => {
+  const theme = useThemeStyle()
+  const styles = useMemo(() => createStyles(theme), [theme])
+
   const [pinned, setPinned] = useState(isPinned)
 
   return (
@@ -62,59 +67,60 @@ const TripCard: React.FC<TripCardProps> = ({
 
 export default TripCard
 
-const styles = StyleSheet.create({
-  wrapper: {
-    width: 360,
-    height: 206,
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    borderRadius: 12,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: '#A68372',
-  },
-  imageContainer: {
-    width: '100%',
-    height: 120,
-    position: 'relative',
-    marginBottom: 8,
-  },
-  image: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 8,
-    borderColor: '#A68372',
-  },
-  overlay: {
-    position: 'absolute',
-    top: -112,
-    right: 8,
-    color: '#fff',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    padding: 6,
-    borderRadius: 4,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  spotInfo: {
-    width: '100%',
-    flexDirection: 'column',
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
-    marginBottom: 8,
-  },
-  name: {
-    color: '#563D30',
-    fontFamily: 'NotoSerif_400Regular',
-    fontSize: 16,
-    clip: 'ellipsis',
-    marginTop: 2,
-  },
-  location: {
-    color: '#A68372',
-    fontFamily: 'NotoSerif_400Regular',
-    fontSize: 12,
-    clip: 'ellipsis',
-    marginTop: 4,
-  },
-})
+const createStyles = (theme: typeof colorPalettes.light) =>
+  StyleSheet.create({
+    wrapper: {
+      width: 360,
+      height: 206,
+      alignItems: 'center',
+      justifyContent: 'flex-start',
+      borderRadius: 12,
+      padding: 16,
+      borderWidth: 1,
+      borderColor: '#A68372',
+    },
+    imageContainer: {
+      width: '100%',
+      height: 120,
+      position: 'relative',
+      marginBottom: 8,
+    },
+    image: {
+      width: '100%',
+      height: '100%',
+      borderRadius: 8,
+      borderColor: '#A68372',
+    },
+    overlay: {
+      position: 'absolute',
+      top: -112,
+      right: 8,
+      color: '#fff',
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      padding: 6,
+      borderRadius: 4,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    spotInfo: {
+      width: '100%',
+      flexDirection: 'column',
+      justifyContent: 'flex-start',
+      alignItems: 'flex-start',
+      marginBottom: 8,
+    },
+    name: {
+      color: '#563D30',
+      fontFamily: 'PlusJakartaSans_400Regular',
+      fontSize: 16,
+      clip: 'ellipsis',
+      marginTop: 2,
+    },
+    location: {
+      color: '#A68372',
+      fontFamily: 'PlusJakartaSans_400Regular',
+      fontSize: 12,
+      clip: 'ellipsis',
+      marginTop: 4,
+    },
+  })

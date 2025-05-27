@@ -1,21 +1,21 @@
 import { Link } from 'expo-router'
 import {
-  Text,
-  View,
-  StyleSheet,
+  Dimensions,
   FlatList,
   ScrollView,
-  Dimensions,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native'
 
-import SpotCard from '@/components/SpotCard'
-import CarouselSpotCard from '@/components/CarouselSpotCard'
+import SpotCard from '@/components/CarouselSpotCard'
 import Pressable from '@/components/Pressable'
+import SpotCard from '@/components/SpotCard'
 
-import { Carousel } from 'react-native-ui-lib'
-import { colorPalettes } from '@/styles/Itheme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
+import { colorPalettes } from '@/styles/Itheme'
 import { useMemo } from 'react'
+import { Carousel } from 'react-native-ui-lib'
 
 const data = [
   {
@@ -97,7 +97,6 @@ const Index = () => {
               <Pressable
                 title={'View trip details'}
                 style={styles.button}
-                variant="primary"
               ></Pressable>
             </View>
           ) : (
@@ -107,7 +106,6 @@ const Index = () => {
               <Pressable
                 title={'Plan a new trip'}
                 style={styles.button}
-                variant="primary"
               ></Pressable>
             </View>
           )}
@@ -157,16 +155,11 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       paddingVertical: 40,
       paddingHorizontal: 24,
     },
-    mainText: {
-      fontSize: 20,
-      color: theme.normal,
-      fontFamily: 'NotoSerif_400Regular',
-    },
     mainButton: {
       fontSize: 20,
-      fontFamily: 'NotoSerif_400Regular',
+      fontFamily: 'PlusJakartaSans_400Regular',
       textDecorationLine: 'underline',
-      color: theme.normal,
+      color: theme.text,
     },
     container: {
       alignItems: 'flex-start',
@@ -189,13 +182,19 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     subText: {
       fontSize: 16,
       marginBottom: 4,
-      color: theme.normal,
-      fontFamily: 'NotoSerif_400Regular',
+      color: theme.text,
+      fontFamily: 'PlusJakartaSans_400Regular',
+    },
+    mainText: {
+      fontSize: 20,
+      color: theme.primary,
+      fontFamily: 'PlusJakartaSans_400Regular',
+      marginBottom: 12,
     },
     hugeText: {
       fontSize: 28,
-      color: theme.normal,
-      fontFamily: 'NotoSerif_400Regular',
+      color: theme.primary,
+      fontFamily: 'PlusJakartaSans_400Regular',
     },
     topCenter: {
       width: '100%',
@@ -209,10 +208,11 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       padding: 20,
       alignItems: 'center',
       justifyContent: 'center',
-      borderWidth: 1,
-      borderColor: '#A68372',
+      backgroundColor: theme.secondary,
     },
     button: {
       marginTop: 16,
+      backgroundColor: theme.primary,
+      color: theme.white,
     },
   })

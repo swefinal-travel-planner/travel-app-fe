@@ -28,7 +28,7 @@
     "**/*": "prettier --write --ignore-unknown"
   },
   "dependencies": {
-    "@expo-google-fonts/noto-serif": "^0.2.3",
+    "@expo-google-fonts/plus-jakarta-sans": "^0.3.0",
     "@expo/react-native-action-sheet": "^4.1.1",
     "@expo/vector-icons": "^14.0.2",
     "@hookform/resolvers": "^4.1.3",

@@ -27,8 +27,10 @@ import CustomTextField from '@/components/input/CustomTextField'
 import PasswordField from '@/components/input/PasswordField'
 import Pressable from '@/components/Pressable'
 import PressableOpacity from '@/components/PressableOpacity'
-
-import styles from '../styles'
+        
+import { useThemeStyle } from '@/hooks/useThemeStyle'
+import { useMemo } from 'react'
+import { createStyles } from '../styles'
 
 interface LoginFormData {
   email: string
@@ -46,6 +48,9 @@ const schema = z.object({
 })
 
 export default function Login() {
+  const theme = useThemeStyle()
+  const styles = useMemo(() => createStyles(theme), [theme])
+
   const router = useRouter()
 
   // initialize form
@@ -152,7 +157,7 @@ export default function Login() {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <View style={[styles.container, styles.login]}>
+      <View style={styles.container}>
         <Text style={styles.title}>Welcome back!</Text>
         <Text style={styles.subtitle}>
           Log in to get back to trip planning with us.
@@ -200,8 +205,7 @@ export default function Login() {
         <Pressable
           title="Log in"
           onPress={handleSubmit(onSubmit)}
-          variant="primary"
-          style={styles.button}
+          style={styles.primaryButton}
         />
 
         <Text style={[styles.text, { alignSelf: 'center', marginBottom: 8 }]}>
