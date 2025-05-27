@@ -9,6 +9,7 @@ export const colorPalettes = {
     text: '#4C585B',
     black: '#000000',
     white: '#ffffff',
+    error: '#d32f2f', // Error color
   },
   dark: {
     primary: '#1A434E',
@@ -20,6 +21,7 @@ export const colorPalettes = {
     text: '#1D292C',
     black: '#000000',
     white: '#ffffff',
+    error: '#d32f2f', // Error color
   },
 }
 

@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native'
 
-import CarouselSpotCard from '@/components/CarouselSpotCard'
+import SpotCard from '@/components/CarouselSpotCard'
 import Pressable from '@/components/Pressable'
 import SpotCard from '@/components/SpotCard'
 

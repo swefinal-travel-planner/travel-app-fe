@@ -1,7 +1,7 @@
-import { ApiGetWeather } from "@/api/tools/ApiWeather";
-import { WeatherResponse } from "@/types/Weather/WeatherResponse";
-import { formatDayInWeek } from "@/utils/Datetime";
-import { useQuery } from "@tanstack/react-query";
+import { ApiGetWeather } from '@/services/api/tools/ApiWeather'
+import { WeatherResponse } from '@/types/Weather/WeatherResponse'
+import { formatDayInWeek } from '@/utils/Datetime'
+import { useQuery } from '@tanstack/react-query'
 import {
   ActivityIndicator,
   Image,
@@ -9,8 +9,8 @@ import {
   StyleSheet,
   Text,
   View,
-} from "react-native";
-import { moderateScale } from "react-native-size-matters";
+} from 'react-native'
+import { moderateScale } from 'react-native-size-matters'
 
 export default function Forecast() {
   const {
@@ -18,12 +18,12 @@ export default function Forecast() {
     isLoading,
     error,
   } = useQuery<WeatherResponse>({
-    queryKey: ["weather", "Ho_Chi_Minh", 5, "yes"],
+    queryKey: ['weather', 'Ho_Chi_Minh', 5, 'yes'],
     queryFn: ApiGetWeather,
-  });
+  })
 
-  if (isLoading) return <ActivityIndicator size="large" />;
-  if (error) return <Text>Error loading forecast data.</Text>;
+  if (isLoading) return <ActivityIndicator size="large" />
+  if (error) return <Text>Error loading forecast data.</Text>
 
   return (
     <SafeAreaView style={styles.forecastContainer}>
@@ -47,7 +47,7 @@ export default function Forecast() {
         ))}
       </View>
     </SafeAreaView>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -55,15 +55,15 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 80,
     paddingHorizontal: 15,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
   },
   forecastItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     padding: 10,
     borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
+    borderBottomColor: '#ccc',
   },
   dayText: {
     width: 60, // Ensure consistent width for text elements
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
     fontSize: moderateScale(14),
     width: 120, // Ensure consistent width for text elements
     marginLeft: 10,
-    color: "#333",
+    color: '#333',
   },
   forecastImage: {
     width: 40,
@@ -80,8 +80,8 @@ const styles = StyleSheet.create({
   },
   numberText: {
     fontSize: moderateScale(14),
-    color: "#333",
+    color: '#333',
     width: 50, // Ensure consistent width for text elements
-    textAlign: "right", // Align text to the right
+    textAlign: 'right', // Align text to the right
   },
-});
+})

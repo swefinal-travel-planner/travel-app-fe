@@ -1,5 +1,5 @@
-import { ApiGetWeather } from '@/api/tools/ApiWeather'
 import { dayImages, nightImages } from '@/constants/weatherImages'
+import { ApiGetWeather } from '@/services/api/tools/ApiWeather'
 import { WeatherResponse } from '@/types/Weather/WeatherResponse'
 import { formatDayMonthDate, formatTimeAMPM } from '@/utils/Datetime'
 import EvilIcons from '@expo/vector-icons/EvilIcons'

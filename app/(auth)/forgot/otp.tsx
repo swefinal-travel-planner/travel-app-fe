@@ -4,11 +4,12 @@ import { Keyboard, Text, TouchableWithoutFeedback, View } from 'react-native'
 
 import { usePwdResetStore } from '@/lib/usePwdResetStore'
 
-import api, { url } from '@/api/api'
+import api, { url } from '@/services/api/api'
 import axios from 'axios'
 
 import OtpField from '@/components/input/OtpField'
 import Pressable from '@/components/Pressable'
+
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { createStyles } from '../styles'
 

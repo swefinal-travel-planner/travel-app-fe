@@ -20,13 +20,14 @@ import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth'
 
 import saveLoginInfo from '@/utils/saveLoginInfo'
 
-import api, { url } from '@/api/api'
+import api, { url } from '@/services/api/api'
 import axios from 'axios'
 
 import CustomTextField from '@/components/input/CustomTextField'
 import PasswordField from '@/components/input/PasswordField'
 import Pressable from '@/components/Pressable'
 import PressableOpacity from '@/components/PressableOpacity'
+        
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { useMemo } from 'react'
 import { createStyles } from '../styles'

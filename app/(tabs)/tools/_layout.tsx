@@ -12,8 +12,6 @@ export default function ToolLayout() {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
 
-  console.log(pathname)
-
   return (
     <View style={styles.safeAreaContainer}>
       {/* Tools Top Tabs with Icons Only */}
@@ -77,6 +75,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     safeAreaContainer: {
       flex: 1,
       paddingHorizontal: Padding.SMALL,
+      paddingTop: Padding.XLARGE,
     },
     container: {
       flex: 1,
@@ -88,7 +87,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       backgroundColor: theme.subtle1,
       justifyContent: 'center',
       position: 'absolute',
-      top: 15,
+      top: 55,
       alignSelf: 'center',
       zIndex: 10,
     },

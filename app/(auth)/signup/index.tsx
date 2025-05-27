@@ -20,7 +20,7 @@ import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth'
 
 import { useSignupStore } from '@/lib/useSignupStore'
 
-import api, { url } from '@/api/api'
+import api, { url } from '@/services/api/api'
 import axios from 'axios'
 
 import { useThemeStyle } from '@/hooks/useThemeStyle'

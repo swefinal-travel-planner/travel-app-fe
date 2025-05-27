@@ -92,7 +92,7 @@ const TripDetailModifyScreen = () => {
 
           <View style={styles.spotImageContainer}>
             <Image
-              source={item.image || require('@/assets/images/alligator.jpg')}
+              source={item.image ?? require('@/assets/images/alligator.jpg')}
               style={styles.spotImage}
             />
           </View>

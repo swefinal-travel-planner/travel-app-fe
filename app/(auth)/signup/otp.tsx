@@ -4,7 +4,7 @@ import { Keyboard, Text, TouchableWithoutFeedback, View } from 'react-native'
 
 import { useSignupStore } from '@/lib/useSignupStore'
 
-import api, { url } from '@/api/api'
+import api, { url } from '@/services/api/api'
 import axios from 'axios'
 
 import { useThemeStyle } from '@/hooks/useThemeStyle'

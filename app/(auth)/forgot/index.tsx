@@ -6,14 +6,16 @@ import { z } from 'zod'
 
 import { usePwdResetStore } from '@/lib/usePwdResetStore'
 
-import api, { url } from '@/api/api'
+import api, { url } from '@/services/api/api'
 import axios from 'axios'
 
 import CustomTextField from '@/components/input/CustomTextField'
 import Pressable from '@/components/Pressable'
+
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { useMemo } from 'react'
 import { createStyles } from '../styles'
+
 
 interface ForgotFormData {
   email: string

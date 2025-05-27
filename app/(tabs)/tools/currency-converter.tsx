@@ -1,7 +1,7 @@
-import { apiGetCurrencies } from '@/api/tools/APIcurrency'
 import { UniversalPicker } from '@/components/CommonPicker'
 import CurrencySelection from '@/components/CurrencySelection'
 import Currencies from '@/constants/currencies'
+import { apiGetCurrencies } from '@/services/api/tools/ApiCurrency'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
