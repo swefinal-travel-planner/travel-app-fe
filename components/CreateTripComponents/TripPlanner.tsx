@@ -1,39 +1,82 @@
-import Ionicons from '@expo/vector-icons/Ionicons'
+import { TimeSlot, timeSlots, TripItem } from '@/types/Trip/Trip'
 import React, { useState } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import DraggableFlatList, {
   RenderItemParams,
-  ScaleDecorator,
 } from 'react-native-draggable-flatlist'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import { AddItemModal } from './TripPlanner/AddItemModal'
+import { SectionHeader } from './TripPlanner/SectionHeader'
+import { TripItemCard } from './TripPlanner/TripItemCard'
 
-const times = ['morning', 'afternoon', 'evening', 'night'] as const
-type Time = (typeof times)[number]
-
-interface TripItem {
-  type: 'item'
-  item_id: string
-  time_in_date: Time
-}
-
-interface SectionHeader {
+export type SectionHeader = {
   type: 'header'
-  time: Time
+  time: TimeSlot
 }
 
-type ListItem = TripItem | SectionHeader
+export type TypedTripItem = TripItem & { type: 'item' }
 
-const initialData: TripItem[] = [
-  { type: 'item', item_id: '1', time_in_date: 'morning' },
-  { type: 'item', item_id: '2', time_in_date: 'afternoon' },
-  { type: 'item', item_id: '4', time_in_date: 'night' },
-  { type: 'item', item_id: '5', time_in_date: 'evening' },
-  { type: 'item', item_id: '6', time_in_date: 'evening' },
+export type Item = TypedTripItem | SectionHeader
+
+export interface AddItemModalProps {
+  visible: boolean
+  selectedTime: TimeSlot | null
+  onClose: () => void
+  onConfirm: () => void
+}
+
+export interface SectionHeaderProps {
+  time: TimeSlot
+  onAddItem: (time: TimeSlot) => void
+}
+
+export interface TripItemCardProps {
+  item: TypedTripItem
+  drag: () => void
+  isActive: boolean
+}
+
+const initialData: TypedTripItem[] = [
+  {
+    type: 'item',
+    order_in_date: 1,
+    item_id: '1',
+    name: 'ITEM 1',
+    time_in_date: 'morning',
+  },
+  {
+    type: 'item',
+    order_in_date: 2,
+    item_id: '2',
+    name: 'ITEM 2',
+    time_in_date: 'afternoon',
+  },
+  {
+    type: 'item',
+    order_in_date: 3,
+    item_id: '4',
+    name: 'ITEM 3',
+    time_in_date: 'evening',
+  },
+  {
+    type: 'item',
+    order_in_date: 4,
+    item_id: '5',
+    name: 'ITEM 4',
+    time_in_date: 'evening',
+  },
+  {
+    type: 'item',
+    order_in_date: 5,
+    item_id: '6',
+    name: 'ITEM 5',
+    time_in_date: 'evening',
+  },
 ]
 
-function buildList(data: TripItem[]): ListItem[] {
-  const list: ListItem[] = []
-  for (const time of times) {
+function buildList(data: TypedTripItem[]): Item[] {
+  const list: Item[] = []
+  for (const time of timeSlots) {
     list.push({ type: 'header', time })
     const items = data.filter((item) => item.time_in_date === time)
     list.push(...items)
@@ -43,135 +86,104 @@ function buildList(data: TripItem[]): ListItem[] {
 
 export default function TripPlanner() {
   const [data, setData] = useState(() => buildList(initialData))
+  const [modalVisible, setModalVisible] = useState(false)
+  const [selectedTime, setSelectedTime] = useState<TimeSlot | null>(null)
 
-  const onDragEnd = ({ data: newData }: { data: ListItem[] }) => {
-    const updatedData: TripItem[] = []
-    let currentTime: Time | null = null
+  // Log every time the data changes
+  React.useEffect(() => {
+    console.log('Data changed:', data)
+  }, [data])
+
+  const onDragEnd = ({ data: newData }: { data: Item[] }) => {
+    const updatedTripItems: TypedTripItem[] = []
+    let currentTime: TimeSlot | null = null
+    let globalOrder = 1
 
     for (const item of newData) {
       if (item.type === 'header') {
         currentTime = item.time
       } else if (item.type === 'item' && currentTime) {
-        updatedData.push({
+        updatedTripItems.push({
           ...item,
           time_in_date: currentTime,
+          order_in_date: globalOrder++,
         })
       }
     }
 
-    setData(buildList(updatedData))
+    setData(buildList(updatedTripItems))
   }
 
-  const renderItem = ({ item, drag, isActive }: RenderItemParams<ListItem>) => {
-    if (item.type === 'header') {
-      return (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{item.time.toUpperCase()}</Text>
-        </View>
-      )
+  const handleAddItem = (time: TimeSlot) => {
+    setSelectedTime(time)
+    setModalVisible(true)
+  }
+
+  const handleConfirmAdd = () => {
+    if (!selectedTime) return
+
+    const newItem: TypedTripItem = {
+      name: `New TypedTripItem ${Date.now().toString()}`,
+      type: 'item',
+      item_id: Date.now().toString(),
+      time_in_date: selectedTime,
+      order_in_date:
+        data.filter((item): item is TypedTripItem => item.type === 'item')
+          .length + 1,
     }
 
-    return (
-      <ScaleDecorator>
-        <TouchableOpacity
-          activeOpacity={1}
-          onLongPress={drag}
-          disabled={isActive}
-          style={[
-            styles.spotCard,
-            { backgroundColor: isActive ? '#f0f0f0' : '#FFFFFF' },
-          ]}
-        >
-          <View style={styles.dragHandle}>
-            <Ionicons name="menu-outline" size={24} color="#666" />
-          </View>
+    const updatedItems = [
+      ...data.filter((item): item is TypedTripItem => item.type === 'item'),
+      newItem,
+    ]
 
-          <View style={styles.spotImageContainer}>
-            <Image
-              source={require('@/assets/images/alligator.jpg')}
-              style={styles.spotImage}
-            />
-          </View>
+    setData(buildList(updatedItems))
+    setModalVisible(false)
+    setSelectedTime(null)
+  }
 
-          <View style={styles.spotDetails}>
-            <Text style={styles.spotName}>{item.item_id}</Text>
-            <View style={styles.spotLocationContainer}>
-              <Ionicons name="location" size={14} color="#888" />
-            </View>
-          </View>
-        </TouchableOpacity>
-      </ScaleDecorator>
-    )
+  const renderItem = ({ item, drag, isActive }: RenderItemParams<Item>) => {
+    if (item.type === 'header') {
+      return <SectionHeader time={item.time} onAddItem={handleAddItem} />
+    }
+
+    return <TripItemCard item={item} drag={drag} isActive={isActive} />
   }
 
   return (
-    <GestureHandlerRootView style={styles.container}>
-      <DraggableFlatList
-        data={data}
-        keyExtractor={(item, index) =>
-          item.type === 'header' ? `header-${item.time}` : item.item_id
-        }
-        onDragEnd={onDragEnd}
-        renderItem={renderItem}
-      />
-    </GestureHandlerRootView>
+    <View style={styles.wrapper}>
+      <View>
+        <AddItemModal
+          visible={modalVisible}
+          selectedTime={selectedTime}
+          onClose={() => setModalVisible(false)}
+          onConfirm={handleConfirmAdd}
+        />
+      </View>
+      <GestureHandlerRootView style={styles.container}>
+        <DraggableFlatList
+          data={data}
+          keyExtractor={(item) =>
+            item.type === 'header' ? `header-${item.time}` : item.item_id
+          }
+          onDragEnd={onDragEnd}
+          renderItem={renderItem}
+        />
+      </GestureHandlerRootView>
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
+  wrapper: {
     flex: 1,
-    padding: 10,
-  },
-  section: {
-    paddingVertical: 8,
-    backgroundColor: '#f3f3f3',
-  },
-  sectionTitle: {
-    fontWeight: 'bold',
-    fontSize: 16,
-    marginBottom: 5,
-    color: '#333',
-  },
-  spotCard: {
-    flexDirection: 'row',
-    borderRadius: 12,
-    marginBottom: 12,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#E5DACB',
-    alignItems: 'center',
-  },
-  dragHandle: {
-    marginHorizontal: 8,
-  },
-  spotImageContainer: {
-    width: 100,
-    height: 80,
-    padding: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  spotImage: {
     width: '100%',
     height: '100%',
-    borderColor: '#D3B7A8',
-    borderWidth: 2,
-    borderRadius: 8,
   },
-  spotDetails: {
+  container: {
     flex: 1,
-    padding: 12,
-    justifyContent: 'center',
-  },
-  spotName: {
-    fontSize: 15,
-    fontWeight: '500',
-    marginBottom: 6,
-    color: '#563D30',
-  },
-  spotLocationContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#fff',
   },
 })

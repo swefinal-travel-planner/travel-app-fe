@@ -15,8 +15,6 @@ export default function ManualTripCreate({
 }: Readonly<ManualTripCreateProps>) {
   const setManualTrip = useManualTripStore((state) => state.setManualTrip)
   const trip = useManualTripStore((state) => state.trip)
-  const [selectedSlot, setSelectedSlot] = useState('Morning')
-
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
 
   useEffect(() => {
@@ -28,7 +26,7 @@ export default function ManualTripCreate({
   const theme = useThemeStyle()
 
   return (
-    <View style={[styles.container, { backgroundColor: 'red' }]}>
+    <View style={[styles.container]}>
       {selectedDate && (
         <HorizontalDatePicker
           trip={trip}
@@ -43,7 +41,7 @@ export default function ManualTripCreate({
         label="Next"
         color={theme.white}
         backgroundColor={theme.primary}
-        style={{ width: '100%', paddingVertical: 15 }}
+        style={{ width: '100%', paddingVertical: 15, marginTop: 15 }}
       ></Button>
     </View>
   )
@@ -55,7 +53,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     width: '100%',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingHorizontal: 15,
+    paddingBottom: 15,
   },
 })
