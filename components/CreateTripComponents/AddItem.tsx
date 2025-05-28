@@ -7,8 +7,7 @@ import {
   StyleSheet,
 } from 'react-native'
 import { useManualTripStore } from '@/store/manualTripStore'
-import { TripItem } from '@/types/Trip/TripItem'
-import { Trip } from '@/types/Trip/Trip'
+import { Trip, TripItem } from '@/types/Trip/Trip'
 
 const categories = ['Garden', 'Shop', 'Museum', 'Park'] as const
 type Category = (typeof categories)[number]
@@ -49,7 +48,7 @@ export default function AddItemComponent({
 }: Readonly<AddItemProps>) {
   const [selectedCategory, setSelectedCategory] = useState<Category>('Garden')
 
-  const manualTrip = useManualTripStore((state) => state.manualTrip)
+  const manualTrip = useManualTripStore((state) => state.trip)
   const setManualTrip = useManualTripStore((state) => state.setManualTrip)
 
   const filteredItems = useMemo(
