@@ -57,7 +57,7 @@ export default function ChooseLocation({
         color={theme.white}
         backgroundColor={theme.primary}
         style={{ width: '100%', paddingVertical: 15 }}
-        disabled={!selectedValue}
+        // disabled={!selectedValue} TODO: enable later
       ></Button>
     </View>
   )

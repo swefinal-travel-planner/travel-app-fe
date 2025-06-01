@@ -12,20 +12,20 @@ export type Trip = {
 
 export type TripDate = {
   date: Date
-  timeInDate: TimeInDate
 }
 
-export type TimeSlot = 'morning' | 'midday' | 'afternoon' | 'evening'
+export const timeSlots = ['morning', 'afternoon', 'evening'] as const
 
-export type TimeInDate = {
-  time: TimeSlot
-  items: TripItem[]
-}
+export type TimeSlot = (typeof timeSlots)[number]
 
-export interface TripItem {
-  id: string
+export type TripItem = {
+  item_id: string
   name: string
-  category: string
-  location: string
+  category?: string
+  location?: string
   address?: string
+  time_in_date: TimeSlot
+  order_in_date?: number
 }
+
+export type PartialTripItem = Partial<TripItem>

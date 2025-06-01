@@ -27,6 +27,8 @@ export default function TripLength({
   }
 
   const handleNext = () => {
+    nextFn() // TODO: remove this line when the next step is implemented
+
     if (!startDate || !endDate) {
       setErrorMessage('Please select a start and end date.')
       return
@@ -83,7 +85,7 @@ export default function TripLength({
         backgroundColor={theme.primary}
         style={{ width: '100%', paddingVertical: 15 }}
         size="large"
-        disabled={!startDate || !endDate || !!errorMessage}
+        // disabled={!startDate || !endDate || !!errorMessage} TODO : enable later
       />
     </View>
   )
