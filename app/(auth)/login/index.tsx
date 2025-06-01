@@ -27,8 +27,9 @@ import CustomTextField from '@/components/input/CustomTextField'
 import PasswordField from '@/components/input/PasswordField'
 import Pressable from '@/components/Pressable'
 import PressableOpacity from '@/components/PressableOpacity'
-        
+
 import { useThemeStyle } from '@/hooks/useThemeStyle'
+import updateNotifToken from '@/utils/updateNotifToken'
 import { useMemo } from 'react'
 import { createStyles } from '../styles'
 
@@ -101,6 +102,8 @@ export default function Login() {
           response.data.data.name
         )
 
+        await updateNotifToken()
+
         router.replace('/(tabs)')
       } else {
         console.error('Google sign-in cancelled or ID token missing')
@@ -143,6 +146,8 @@ export default function Login() {
         response.data.data.email,
         response.data.data.name
       )
+
+      await updateNotifToken()
 
       router.replace('/(tabs)')
     } catch (error) {

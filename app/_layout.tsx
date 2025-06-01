@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import Constants from 'expo-constants'
 import * as Notifications from 'expo-notifications'
 import { Stack } from 'expo-router'
+import * as SecureStore from 'expo-secure-store'
 import * as SplashScreen from 'expo-splash-screen'
 import { StatusBar } from 'expo-status-bar'
 import React, { useEffect, useRef, useState } from 'react'
@@ -69,18 +70,28 @@ async function registerForPushNotificationsAsync() {
       })
     ).data
 
-    console.log(pushTokenString)
-
     return pushTokenString
   } catch (e: unknown) {
     handleRegistrationError(`${e}`)
   }
 }
 
+const updateUserPushToken = async (token: string) => {
+  if (!token) {
+    return
+  }
+
+  try {
+    await SecureStore.setItemAsync('expoPushToken', token)
+
+    console.log('Push token stored successfully:', token)
+  } catch (error) {
+    console.error('Error storing push token:', error)
+  }
+}
+
 export default function RootLayout() {
   const [queryClient] = useState(() => new QueryClient())
-
-  const [expoPushToken, setExpoPushToken] = useState('')
 
   // TODO: might need to set this in store to update the Inbox screen
   const [notification, setNotification] = useState<
@@ -102,8 +113,8 @@ export default function RootLayout() {
 
   useEffect(() => {
     registerForPushNotificationsAsync()
-      .then((token) => setExpoPushToken(token ?? ''))
-      .catch((error: any) => setExpoPushToken(`${error}`))
+      .then((token) => updateUserPushToken(token ?? ''))
+      .catch((error: any) => console.log(`${error}`))
 
     notificationListener.current =
       Notifications.addNotificationReceivedListener((notification) => {
