@@ -1,3 +1,4 @@
+import { FontFamily } from '@/constants/font'
 import { colorPalettes } from '@/styles/Itheme'
 import { StyleSheet } from 'react-native'
 
@@ -22,7 +23,7 @@ export const createStyles = (theme: typeof colorPalettes.light) =>
     title: {
       color: '#3F6453',
       fontSize: 28,
-      fontFamily: 'PlusJakartaSans_700Bold',
+      fontFamily: FontFamily.BOLD,
       marginBottom: 12,
     },
     subtitle: {

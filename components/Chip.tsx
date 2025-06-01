@@ -1,19 +1,22 @@
 import { useMemo, useState } from 'react'
 import { StyleSheet, Text } from 'react-native'
 
+import { FontFamily, FontSize } from '@/constants/font'
+import { Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { colorPalettes } from '@/styles/Itheme'
 import PressableOpacity from './PressableOpacity'
 
 interface ChipProps {
   value: string
+  size: 'small' | 'large'
   onSelect?: (value: string) => void
   onDeselect?: (value: string) => void
 }
 
-const Chip: React.FC<ChipProps> = ({ value, onSelect, onDeselect }) => {
+const Chip: React.FC<ChipProps> = ({ value, size, onSelect, onDeselect }) => {
   const theme = useThemeStyle()
-  const styles = useMemo(() => createStyles(theme), [theme])
+  const styles = useMemo(() => createStyles(theme, size), [theme])
 
   const [selected, setSelected] = useState(false)
 
@@ -38,27 +41,25 @@ const Chip: React.FC<ChipProps> = ({ value, onSelect, onDeselect }) => {
 
 export default Chip
 
-const createStyles = (theme: typeof colorPalettes.light) =>
+const createStyles = (theme: typeof colorPalettes.light, size: string) =>
   StyleSheet.create({
     wrapper: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      borderRadius: 100,
-      paddingHorizontal: 16,
-      paddingVertical: 8,
+      borderRadius: Radius.FULL,
+      paddingHorizontal: size === 'large' ? 16 : 12,
+      paddingVertical: size === 'large' ? 8 : 4,
       margin: 4,
     },
     baseBg: {
-      backgroundColor: '#EEF8EF',
-      borderWidth: 1,
-      borderColor: '#3F6453',
+      backgroundColor: theme.background,
     },
-    selectedBg: { backgroundColor: '#3F6453' },
+    selectedBg: { backgroundColor: theme.primary },
     value: {
-      fontSize: 16,
-      fontFamily: 'PlusJakartaSans_400Regular',
+      fontSize: size === 'large' ? FontSize.LG : FontSize.MD,
+      fontFamily: FontFamily.REGULAR,
     },
-    baseText: { color: '#3F6453' },
-    selectedText: { color: '#FFFFFF' },
+    baseText: { color: theme.primary },
+    selectedText: { color: theme.white },
   })

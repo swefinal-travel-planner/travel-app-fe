@@ -78,6 +78,7 @@ export default function SignUpAllergies() {
             )
             .map((item) => (
               <Chip
+                size="large"
                 key={item.id}
                 value={item.value}
                 onSelect={handleSelect}
