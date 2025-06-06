@@ -115,7 +115,6 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       color: theme.primary,
       fontFamily: FontFamily.BOLD,
       fontSize: FontSize.MD,
-      clip: 'ellipsis',
       marginTop: 2,
       marginBottom: 4,
     },
