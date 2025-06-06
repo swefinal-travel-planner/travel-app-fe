@@ -48,7 +48,8 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor: '#eef8ef',
+      backgroundColor: theme.white,
+      paddingVertical: 40,
     },
     container: {
       flex: 1,
