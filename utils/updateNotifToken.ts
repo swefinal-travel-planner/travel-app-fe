@@ -16,6 +16,7 @@ export default async function updateNotifToken(): Promise<void> {
 
       if (!projectId) {
         console.error('From updateNotifToken: project ID not found')
+        return
       }
 
       token = (
