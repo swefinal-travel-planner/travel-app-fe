@@ -1,6 +1,7 @@
+import { usePlaces } from '@/hooks/usePlaces'
 import { TimeSlot, timeSlots, TripItem } from '@/types/Trip/Trip'
 import React, { useState } from 'react'
-import { StyleSheet, View } from 'react-native'
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
 import DraggableFlatList, {
   RenderItemParams,
 } from 'react-native-draggable-flatlist'
@@ -89,10 +90,43 @@ export default function TripPlanner() {
   const [modalVisible, setModalVisible] = useState(false)
   const [selectedTime, setSelectedTime] = useState<TimeSlot | null>(null)
 
+  const {
+    data: places,
+    isLoading,
+    error,
+  } = usePlaces({
+    limit: 10, // Adjust limit as needed
+    location: 'Ho Chi Minh',
+    language: 'en',
+  })
+
+  // Log places when they change
+  React.useEffect(() => {
+    if (places) {
+      console.log('Places loaded:', places)
+    }
+  }, [places])
+
   // Log every time the data changes
   React.useEffect(() => {
     console.log('Data changed:', data)
   }, [data])
+
+  if (isLoading) {
+    return (
+      <View style={[styles.container, styles.centerContent]}>
+        <ActivityIndicator size="large" />
+      </View>
+    )
+  }
+
+  if (error) {
+    return (
+      <View style={[styles.container, styles.centerContent]}>
+        <Text>Error loading places: {error.message}</Text>
+      </View>
+    )
+  }
 
   const onDragEnd = ({ data: newData }: { data: Item[] }) => {
     const updatedTripItems: TypedTripItem[] = []
@@ -185,5 +219,9 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     backgroundColor: '#fff',
+  },
+  centerContent: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 })

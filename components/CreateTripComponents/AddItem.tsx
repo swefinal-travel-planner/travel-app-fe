@@ -14,19 +14,29 @@ type Category = (typeof categories)[number]
 
 const allItems: TripItem[] = [
   {
-    id: '1',
+    item_id: '1',
     name: 'Botanical Garden',
     category: 'Garden',
     location: 'District 1',
   },
-  { id: '2', name: 'Vincom Mall', category: 'Shop', location: 'District 3' },
   {
-    id: '3',
+    item_id: '2',
+    name: 'Vincom Mall',
+    category: 'Shop',
+    location: 'District 3',
+  },
+  {
+    item_id: '3',
     name: 'War Remnants Museum',
     category: 'Museum',
     location: 'District 1',
   },
-  { id: '4', name: 'Central Park', category: 'Park', location: 'District 2' },
+  {
+    item_id: '4',
+    name: 'Central Park',
+    category: 'Park',
+    location: 'District 2',
+  },
   // add more
 ]
 
