@@ -145,7 +145,6 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       color: theme.text,
       fontSize: FontSize.MD,
       fontFamily: FontFamily.REGULAR,
-      clip: 'ellipsis',
     },
     subText: {
       color: theme.text,
