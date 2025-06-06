@@ -50,7 +50,7 @@ const createStyles = (theme: typeof colorPalettes.light, size: string) =>
       borderRadius: Radius.FULL,
       paddingHorizontal: size === 'large' ? 16 : 12,
       paddingVertical: size === 'large' ? 8 : 4,
-      margin: 4,
+      marginRight: size === 'large' ? 12 : 8,
     },
     baseBg: {
       backgroundColor: theme.background,

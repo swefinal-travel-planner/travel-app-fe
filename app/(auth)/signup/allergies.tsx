@@ -70,7 +70,12 @@ export default function SignUpAllergies() {
         />
 
         <View
-          style={{ flexDirection: 'row', flexWrap: 'wrap', marginVertical: 12 }}
+          style={{
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            marginVertical: 12,
+            rowGap: 12,
+          }}
         >
           {data
             .filter((item) =>

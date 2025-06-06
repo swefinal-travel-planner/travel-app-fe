@@ -22,23 +22,26 @@ export default function Inbox() {
     inbox as Notification[]
   )
 
-  const categories: (NotificationCategory | 'all')[] = [
-    'all',
-    'friend',
-    'location',
-    'trip',
-    'reminder',
+  const categories: NotificationCategory[] = [
+    'friends',
+    'locations',
+    'trips',
+    'reminders',
     'weather',
   ]
 
-  const [activeCategory, setActiveCategory] = useState<
-    NotificationCategory | 'all'
-  >('all')
+  const [activeCategories, setActiveCategories] = useState<
+    NotificationCategory[]
+  >([])
 
   const filteredNotifications =
-    activeCategory === 'all'
+    activeCategories.length === 0
       ? notifications
-      : notifications.filter((n) => n.category === activeCategory)
+      : notifications.filter((n) =>
+          activeCategories.includes(
+            n.category.toLowerCase() as NotificationCategory
+          )
+        )
 
   const removeNotification = (id: number) => {
     setNotifications(notifications.filter((notif) => notif.id !== id))
@@ -52,21 +55,25 @@ export default function Inbox() {
     )
   }
 
+  // useEffect(() => {
+  //   console.log('Active categories changed:', activeCategories)
+  // }, [activeCategories])
+
   return (
     <View style={styles.container}>
       <View style={styles.filters}>
+        <Text style={styles.filtersTitle}>Filter:</Text>
+
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {categories.map((cat) => (
             <Chip
               key={cat}
-              value={
-                cat === 'all'
-                  ? 'All'
-                  : cat.charAt(0).toUpperCase() + cat.slice(1)
-              }
+              value={cat.charAt(0).toUpperCase() + cat.slice(1)}
               size="small"
-              onSelect={() => setActiveCategory(cat)}
-              onDeselect={() => setActiveCategory('all')}
+              onSelect={() => setActiveCategories([...activeCategories, cat])}
+              onDeselect={() =>
+                setActiveCategories(activeCategories.filter((c) => c !== cat))
+              }
             />
           ))}
         </ScrollView>
@@ -98,9 +105,17 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     container: {
       paddingTop: 40,
       flexDirection: 'column',
+      height: '100%',
       backgroundColor: theme.white,
     },
+    filtersTitle: {
+      fontFamily: FontFamily.BOLD,
+      fontSize: FontSize.LG,
+      color: theme.primary,
+      marginRight: 10,
+    },
     filters: {
+      flexDirection: 'row',
       marginVertical: 20,
       paddingHorizontal: 20,
     },
