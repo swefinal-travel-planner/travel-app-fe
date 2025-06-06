@@ -1,8 +1,9 @@
 import { FontFamily, FontSize } from '@/constants/font'
 import { Location } from '@/constants/location'
+import { Radius } from '@/constants/theme'
 import { colorPalettes } from '@/styles/Itheme'
 import { Camera, MapView } from '@rnmapbox/maps'
-import React from 'react'
+import React, { useMemo } from 'react'
 import { StyleSheet } from 'react-native'
 import { Button, Picker, Text, View } from 'react-native-ui-lib'
 
@@ -15,6 +16,8 @@ export default function ChooseLocation({
   theme,
   nextFn,
 }: Readonly<ChooseLocationProps>) {
+  const styles = useMemo(() => createStyles(theme), [theme])
+
   const [selectedValue, setSelectedValue] = React.useState<string>('')
   return (
     <View style={[styles.container, { backgroundColor: theme.white }]}>
@@ -29,6 +32,7 @@ export default function ChooseLocation({
         }}
         onChange={(item) => setSelectedValue(item?.toString() ?? '')}
         topBarProps={{ title: 'Destinations' }}
+        style={styles.picker}
       >
         {Location.map((location) => {
           return (
@@ -42,7 +46,11 @@ export default function ChooseLocation({
         })}
       </Picker>
       <View style={styles.mapContainer}>
-        <MapView style={{ flex: 1 }} logoEnabled={false}>
+        <MapView
+          style={{ flex: 1 }}
+          logoEnabled={true}
+          scaleBarPosition={{ top: 8, left: 16 }}
+        >
           <Camera
             centerCoordinate={
               Location.find((loc) => loc.key == selectedValue)?.coordinates
@@ -63,23 +71,36 @@ export default function ChooseLocation({
   )
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: 'column',
-    width: '100%',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    paddingTop: '30%',
-  },
-  mapContainer: {
-    width: '100%',
-    height: '70%',
-  },
-  text: {
-    fontFamily: FontFamily.REGULAR,
-    fontSize: FontSize.XXXL,
-  },
-})
+const createStyles = (theme: typeof colorPalettes.light) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      flexDirection: 'column',
+      width: '100%',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: 24,
+      paddingVertical: 40,
+    },
+    mapContainer: {
+      width: '100%',
+      height: '65%',
+      borderRadius: Radius.ROUNDED,
+      overflow: 'hidden',
+    },
+    text: {
+      fontFamily: FontFamily.BOLD,
+      fontSize: FontSize.XXXL,
+      textAlign: 'center',
+    },
+    picker: {
+      fontFamily: FontFamily.REGULAR,
+      fontSize: FontSize.LG,
+      backgroundColor: theme.background,
+      minWidth: '100%',
+      height: 48,
+      borderRadius: Radius.FULL,
+      padding: 12,
+      color: theme.primary,
+    },
+  })

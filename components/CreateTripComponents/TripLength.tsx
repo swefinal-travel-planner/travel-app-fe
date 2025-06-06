@@ -60,15 +60,20 @@ export default function TripLength({
         <Text style={[styles.textField, { color: theme.primary }]}>
           Select a date range
         </Text>
+
         <DateRangeField
           startDate={startDate}
           endDate={endDate}
           setStartDate={setStartDate}
           setEndDate={setEndDate}
         />
-        <Text style={[styles.textField, { color: theme.primary }]}>
-          Number of days:{' '}
-          {startDate && endDate ? getDayDiff(startDate, endDate) : '--'}
+
+        <Text
+          style={[styles.textField, { color: theme.primary, marginTop: 40 }]}
+        >
+          {startDate && endDate
+            ? `Number of days: ${getDayDiff(startDate, endDate)}`
+            : ''}
         </Text>
 
         {errorMessage && (
@@ -98,19 +103,20 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingBottom: 20,
-    paddingTop: '30%',
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
+    paddingVertical: 40,
   },
   textFieldContainer: {
     width: '100%',
     flexDirection: 'column',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    gap: 20,
+    alignItems: 'center',
+    gap: 12,
   },
   textQuestion: {
-    fontFamily: FontFamily.REGULAR,
+    display: 'flex',
+    textAlign: 'center',
+    fontFamily: FontFamily.BOLD,
     fontSize: FontSize.XXXL,
   },
   textField: {
@@ -120,5 +126,13 @@ const styles = StyleSheet.create({
   errorText: {
     fontFamily: FontFamily.REGULAR,
     fontSize: FontSize.XL,
+  },
+  dateField: {
+    width: '100%',
+    height: 48,
+    borderRadius: 24,
+    padding: 12,
+    backgroundColor: colorPalettes.light.background,
+    color: colorPalettes.light.primary,
   },
 })

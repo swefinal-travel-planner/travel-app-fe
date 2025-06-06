@@ -1,13 +1,15 @@
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { colorPalettes } from '@/styles/Itheme'
 import Ionicons from '@expo/vector-icons/Ionicons'
-import { Tabs } from 'expo-router'
+import { Tabs, usePathname } from 'expo-router'
 import { useMemo } from 'react'
 import { Platform, Pressable, StyleSheet } from 'react-native'
 
 export default function TabLayout() {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
+
+  const pathname = usePathname()
 
   return (
     <Tabs
@@ -16,7 +18,9 @@ export default function TabLayout() {
         tabBarActiveTintColor: theme.primary,
         tabBarInactiveTintColor: theme.disabled,
         tabBarHideOnKeyboard: true,
-        tabBarStyle: styles.tabBarStyle,
+        tabBarStyle: pathname.includes('/my-trips/create')
+          ? styles.hidden
+          : styles.tabBarStyle,
         tabBarLabelStyle: {
           marginTop: 2,
           fontFamily: 'PlusJakartaSans_400Regular',
@@ -121,5 +125,8 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       height: Platform.OS === 'ios' ? 90 : 80,
       borderColor: theme.disabled,
       backgroundColor: theme.white,
+    },
+    hidden: {
+      display: 'none',
     },
   })
