@@ -2,11 +2,11 @@ import { Image, StyleSheet, Text, View } from 'react-native'
 
 import Ionicons from '@expo/vector-icons/Ionicons'
 
+import { FontFamily, FontSize } from '@/constants/font'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { colorPalettes } from '@/styles/Itheme'
 import { useMemo } from 'react'
-import Pressable from './Pressable'
-import PressableOpacity from './PressableOpacity'
+import PressableOpacity from '../PressableOpacity'
 
 interface SpotCardProps {
   spotName: string
@@ -40,7 +40,7 @@ const CarouselSpotCard: React.FC<SpotCardProps> = ({
             <Ionicons
               name="location-outline"
               size={16}
-              color="#A68372"
+              color={theme.text}
               style={{ marginRight: 4 }}
             />
 
@@ -53,8 +53,6 @@ const CarouselSpotCard: React.FC<SpotCardProps> = ({
             </Text>
           </View>
         </View>
-
-        <Pressable title={'Check in'} onPress={onCheckIn} />
       </View>
     </PressableOpacity>
   )
@@ -102,17 +100,17 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       width: '100%',
     },
     name: {
-      color: '#563D30',
-      fontFamily: 'PlusJakartaSans_400Regular',
-      fontSize: 16,
+      color: theme.primary,
+      fontFamily: FontFamily.BOLD,
+      fontSize: FontSize.MD,
       width: '100%',
       marginTop: 2,
+      marginBottom: 4,
     },
     location: {
-      color: '#A68372',
-      fontFamily: 'PlusJakartaSans_400Regular',
-      fontSize: 12,
+      color: theme.text,
+      fontFamily: FontFamily.REGULAR,
+      fontSize: FontSize.SM,
       flex: 1,
-      marginTop: 4,
     },
   })

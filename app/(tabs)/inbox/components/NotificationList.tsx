@@ -1,12 +1,21 @@
-import React from "react";
-import { Notification } from "@/lib/types/Notification";
-import { Pressable, ScrollView } from "react-native";
-import { View, Text, Drawer, Colors, Avatar } from "react-native-ui-lib";
+import { useMemo } from 'react'
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Avatar, Colors, Drawer } from 'react-native-ui-lib'
+
+import { useThemeStyle } from '@/hooks/useThemeStyle'
+
+import { Notification } from '@/lib/types/Notification'
+
+import { colorPalettes } from '@/styles/Itheme'
+
+import { FontFamily, FontSize } from '@/constants/font'
+import { Radius } from '@/constants/theme'
+import { formatDateTime } from '@/utils/Datetime'
 
 interface NotificationListProps {
-  notificationList: Notification[];
-  removeNotification: (id: number) => void;
-  markAsRead: (id: number) => void;
+  notificationList: Notification[]
+  removeNotification: (id: number) => void
+  markAsRead: (id: number) => void
 }
 
 function NotificationList({
@@ -14,15 +23,23 @@ function NotificationList({
   removeNotification,
   markAsRead,
 }: NotificationListProps) {
+  const theme = useThemeStyle()
+  const styles = useMemo(() => createStyles(theme), [theme])
+
   return (
-    <ScrollView>
+    <ScrollView
+      contentContainerStyle={{
+        paddingBottom: 80,
+        paddingHorizontal: 24,
+      }}
+    >
       {notificationList.map((notif) => (
         <Drawer
-          key={`${notif.id}-${notif.unread ? "unread" : "read"}`}
+          key={`${notif.id}-${notif.unread ? 'unread' : 'read'}`}
           leftItem={
-            notif.type === "actionable"
+            notif.type === 'actionable'
               ? {
-                  text: notif.unread ? "Accept" : "Accepted",
+                  text: notif.unread ? 'Accept' : 'Accepted',
                   background: notif.unread ? Colors.green30 : Colors.grey50,
                   onPress: notif.unread ? () => markAsRead(notif.id) : () => {},
                 }
@@ -30,15 +47,14 @@ function NotificationList({
           }
           rightItems={[
             {
-              text: "Delete",
+              text: 'Delete',
               background: Colors.red30,
               onPress: () => removeNotification(notif.id),
             },
           ]}
           style={{
-            borderRadius: 10,
-            borderColor: notif.unread ? "#D3B7A8" : Colors.grey50,
-            borderWidth: 2,
+            borderRadius: Radius.ROUNDED,
+            backgroundColor: notif.unread ? theme.secondary : Colors.grey80,
             marginBottom: 10,
           }}
           disableHaptic
@@ -49,50 +65,40 @@ function NotificationList({
         >
           <Pressable
             onPress={
-              notif.type === "navigable"
+              notif.type === 'navigable'
                 ? () => markAsRead(notif.id)
                 : undefined
             }
           >
-            <View row paddingH-15 paddingV-20 backgroundColor="white">
-              <View
-                center
-                style={{
-                  borderWidth: 2,
-                  width: 50,
-                  height: 50,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  borderColor: notif.unread ? "#D3B7A8" : Colors.grey50,
-                  borderRadius: 50,
-                }}
-              >
-                <Avatar source={notif.senderAvatar} size={40} />
-              </View>
-              <View marginL-10 flex>
+            <View
+              style={
+                notif.unread
+                  ? styles.unreadNotifContainer
+                  : styles.notifContainer
+              }
+            >
+              <Avatar source={notif.senderAvatar} size={40} />
+
+              <View style={styles.view3}>
                 {notif.unread ? (
                   <View>
-                    <View row centerV spread>
-                      <Text text70BO>{notif.title}</Text>
-                      <Text text90>
+                    <View style={styles.view4}>
+                      <Text style={styles.notifTitle}>{notif.title}</Text>
+                      <Text style={styles.subText}>
                         {formatDateTime(notif.date, notif.time)}
                       </Text>
                     </View>
-                    <Text text80>{notif.message}</Text>
+                    <Text style={styles.text}>{notif.message}</Text>
                   </View>
                 ) : (
                   <View>
-                    <View row centerV spread>
-                      <Text text70BO color={Colors.grey50}>
-                        {notif.title}
-                      </Text>
-                      <Text text90 color={Colors.grey50}>
+                    <View style={styles.view4}>
+                      <Text style={styles.notifTitleDim}>{notif.title}</Text>
+                      <Text style={styles.subTextDim}>
                         {formatDateTime(notif.date, notif.time)}
                       </Text>
                     </View>
-                    <Text text80 color={Colors.grey50}>
-                      {notif.message}
-                    </Text>
+                    <Text style={styles.textDim}>{notif.message}</Text>
                   </View>
                 )}
               </View>
@@ -101,39 +107,64 @@ function NotificationList({
         </Drawer>
       ))}
     </ScrollView>
-  );
+  )
 }
 
-function formatDateTime(date: string, time: string): string {
-  const now = new Date();
-  const notifDateTime = new Date(`${date}T${time}`);
+export default NotificationList
 
-  const isSameDay =
-    now.getFullYear() === notifDateTime.getFullYear() &&
-    now.getMonth() === notifDateTime.getMonth() &&
-    now.getDate() === notifDateTime.getDate();
-
-  if (isSameDay) {
-    return notifDateTime.toTimeString().slice(0, 5);
-  } else {
-    const monthNames = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-    const month = monthNames[notifDateTime.getMonth()];
-    const day = String(notifDateTime.getDate()).padStart(2, "0");
-    return `${day} ${month}`;
-  }
-}
-
-export default NotificationList;
+const createStyles = (theme: typeof colorPalettes.light) =>
+  StyleSheet.create({
+    notifContainer: {
+      flexDirection: 'row',
+      paddingHorizontal: 15,
+      paddingVertical: 20,
+      backgroundColor: Colors.grey80,
+    },
+    unreadNotifContainer: {
+      flexDirection: 'row',
+      paddingHorizontal: 15,
+      paddingVertical: 20,
+      backgroundColor: theme.secondary,
+    },
+    view3: {
+      marginLeft: 10,
+      flex: 1,
+    },
+    view4: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      width: '100%',
+    },
+    notifTitle: {
+      color: theme.primary,
+      fontSize: FontSize.LG,
+      fontFamily: FontFamily.BOLD,
+    },
+    text: {
+      color: theme.text,
+      fontSize: FontSize.MD,
+      fontFamily: FontFamily.REGULAR,
+    },
+    subText: {
+      color: theme.text,
+      fontSize: FontSize.SM,
+      fontFamily: FontFamily.ITALIC,
+    },
+    notifTitleDim: {
+      color: theme.dimText,
+      fontSize: FontSize.LG,
+      fontFamily: FontFamily.BOLD,
+    },
+    textDim: {
+      color: theme.dimText,
+      fontSize: FontSize.MD,
+      fontFamily: FontFamily.REGULAR,
+      clip: 'ellipsis',
+    },
+    subTextDim: {
+      color: theme.dimText,
+      fontSize: FontSize.SM,
+      fontFamily: FontFamily.ITALIC,
+    },
+  })

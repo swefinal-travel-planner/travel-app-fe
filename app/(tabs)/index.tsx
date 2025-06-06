@@ -8,10 +8,12 @@ import {
   View,
 } from 'react-native'
 
-import CarouselSpotCard from '@/components/CarouselSpotCard'
 import Pressable from '@/components/Pressable'
-import SpotCard from '@/components/SpotCard'
+import CarouselSpotCard from '@/components/SpotCards/CarouselSpotCard'
+import SpotCard from '@/components/SpotCards/SpotCard'
 
+import { FontFamily, FontSize } from '@/constants/font'
+import { Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { colorPalettes } from '@/styles/Itheme'
 import { useMemo } from 'react'
@@ -68,7 +70,7 @@ const Index = () => {
         <View style={styles.topCenter}>
           <Text style={styles.hugeText}>Welcome back, bro!</Text>
 
-          <Link href="/signup" style={styles.mainButton}>
+          <Link href="/signup/allergies" style={styles.mainButton}>
             Go to Signup screen
           </Link>
 
@@ -87,7 +89,7 @@ const Index = () => {
                 }}
                 containerMarginHorizontal={0}
                 pageControlPosition={Carousel.pageControlPositions.UNDER}
-                pageControlProps={{ color: '#A68372' }}
+                pageControlProps={{ color: theme.primary }}
               >
                 {data.map((item, index) => (
                   <CarouselSpotCard key={index} {...item} />
@@ -156,8 +158,8 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       paddingHorizontal: 24,
     },
     mainButton: {
-      fontSize: 20,
-      fontFamily: 'PlusJakartaSans_400Regular',
+      fontSize: FontSize.XXL,
+      fontFamily: FontFamily.REGULAR,
       textDecorationLine: 'underline',
       color: theme.text,
     },
@@ -180,21 +182,20 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       paddingHorizontal: 40,
     },
     subText: {
-      fontSize: 16,
-      marginBottom: 4,
+      fontSize: FontSize.LG,
       color: theme.text,
-      fontFamily: 'PlusJakartaSans_400Regular',
+      fontFamily: FontFamily.REGULAR,
     },
     mainText: {
-      fontSize: 20,
       color: theme.primary,
-      fontFamily: 'PlusJakartaSans_400Regular',
+      fontFamily: FontFamily.BOLD,
+      fontSize: FontSize.XXL,
       marginBottom: 12,
     },
     hugeText: {
-      fontSize: 28,
+      fontSize: FontSize.XXXL,
       color: theme.primary,
-      fontFamily: 'PlusJakartaSans_400Regular',
+      fontFamily: FontFamily.BOLD,
     },
     topCenter: {
       width: '100%',
@@ -203,7 +204,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     },
     currentTrip: {
       width: '100%',
-      borderRadius: 12,
+      borderRadius: Radius.ROUNDED,
       marginVertical: 24,
       padding: 20,
       alignItems: 'center',
