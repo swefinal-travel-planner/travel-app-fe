@@ -1,5 +1,10 @@
+import { Friend } from '@/lib/types/Profile'
+import { useThemeStore } from '@/store/themeStore'
 import Ionicons from '@expo/vector-icons/Ionicons'
+import { useQuery } from '@tanstack/react-query'
 import * as ImagePicker from 'expo-image-picker'
+import { useRouter } from 'expo-router'
+import * as SecureStore from 'expo-secure-store'
 import { StatusBar } from 'expo-status-bar'
 import React, { useEffect, useState } from 'react'
 import {
@@ -7,6 +12,7 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
+  Switch,
   TouchableOpacity,
   View,
 } from 'react-native'
@@ -15,11 +21,6 @@ import { PaperProvider } from 'react-native-paper'
 import { ActionSheet, Button, Card, Image, Text } from 'react-native-ui-lib'
 import EditProfileModal from './components/EditProfileModal'
 import FriendListModal from './components/FriendListModal'
-//import { useThemeStore } from "@/store/useThemeStore";
-import { Friend } from '@/lib/types/Profile'
-import { useQuery } from '@tanstack/react-query'
-import { useRouter } from 'expo-router'
-import * as SecureStore from 'expo-secure-store'
 
 interface SettingSection {
   title: string
@@ -51,7 +52,7 @@ const ProfileScreen = () => {
     { title: 'Delete account', icon: 'trash-outline' },
     { title: 'Log out', icon: 'log-out-outline' },
   ]
-  //const { setTheme } = useThemeStore()
+  const { setTheme } = useThemeStore()
   //const { setLanguage } = useThemeStore()
   const [modalVisible, setModalVisible] = useState<boolean>(false)
   const [showActionSheet, setShowActionSheet] = useState<boolean>(false)
@@ -64,6 +65,7 @@ const ProfileScreen = () => {
   const [profilePic, setProfilePic] = useState(
     require('@/assets/images/alligator.jpg')
   )
+  const [isDarkTheme, setIsDarkTheme] = useState(false)
 
   useEffect(() => {
     const getUserInfo = async () => {
@@ -287,29 +289,41 @@ const ProfileScreen = () => {
             </Text>
           </View>
           <Card style={styles.sectionContainer}>
-            {dangerSection.map((item, index) => (
-              <TouchableOpacity
-                key={index}
-                onPress={() => {
-                  //setTheme('dark')
-                  //setLanguage('vi')
-                }}
-              >
-                <View style={styles.sectionItemContainer}>
+            {dangerSection.map((item, index) =>
+              item.title === 'Change theme' ? (
+                <View key={index} style={styles.sectionItemContainer}>
                   <View style={styles.sectionItem}>
                     <View style={styles.iconContainer}>
                       <Ionicons name={item.icon} size={20} color="white" />
                     </View>
                     <Text>{item.title}</Text>
                   </View>
-                  <Ionicons
-                    name="chevron-forward-outline"
-                    size={20}
-                    color="black"
+                  <Switch
+                    value={isDarkTheme}
+                    onValueChange={(value) => {
+                      setIsDarkTheme(value)
+                      setTheme(value ? 'dark' : 'light')
+                    }}
                   />
                 </View>
-              </TouchableOpacity>
-            ))}
+              ) : (
+                <TouchableOpacity key={index} onPress={() => {}}>
+                  <View style={styles.sectionItemContainer}>
+                    <View style={styles.sectionItem}>
+                      <View style={styles.iconContainer}>
+                        <Ionicons name={item.icon} size={20} color="white" />
+                      </View>
+                      <Text>{item.title}</Text>
+                    </View>
+                    <Ionicons
+                      name="chevron-forward-outline"
+                      size={20}
+                      color="black"
+                    />
+                  </View>
+                </TouchableOpacity>
+              )
+            )}
           </Card>
         </ScrollView>
 
