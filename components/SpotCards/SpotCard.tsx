@@ -122,6 +122,6 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       color: theme.text,
       fontFamily: FontFamily.REGULAR,
       fontSize: FontSize.SM,
-      clip: 'ellipsis',
+      
     },
   })
