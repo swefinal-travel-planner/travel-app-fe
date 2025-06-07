@@ -12,8 +12,8 @@ export const colorPalettes = {
     white: '#ffffff',
   },
   dark: {
-    primary: '#1A434E',
-    secondary: '#F3E6FF',
+    primary: '#1EE',
+    secondary: '#F6FF',
     accent: '#FFE1B8',
     error: '#D73C62',
     disabled: '#ABBBBF',

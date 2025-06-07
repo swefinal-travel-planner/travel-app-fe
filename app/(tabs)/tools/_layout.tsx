@@ -65,7 +65,7 @@ function TabButton({
       onPress={onPress}
       style={[active ? styles.activeTab : styles.tabButton]}
     >
-      <Ionicons name={icon} size={IconSize.MD} color={theme.normal} />
+      <Ionicons name={icon} size={IconSize.MD} color={theme.text} />
     </TouchableOpacity>
   )
 }
@@ -84,7 +84,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       flexDirection: 'row',
       padding: Padding.SMALL,
       borderRadius: Radius.FULL,
-      backgroundColor: theme.subtle1,
+      backgroundColor: theme.secondary,
       justifyContent: 'center',
       position: 'absolute',
       top: 55,
