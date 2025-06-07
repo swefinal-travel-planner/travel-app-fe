@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { StyleSheet, Text } from 'react-native'
+import { StyleProp, StyleSheet, Text, ViewStyle } from 'react-native'
 
 import { FontFamily, FontSize } from '@/constants/font'
 import { Radius } from '@/constants/theme'
@@ -10,28 +10,52 @@ import PressableOpacity from './PressableOpacity'
 interface ChipProps {
   value: string
   size: 'small' | 'large'
+  isSelected?: boolean
   onSelect?: (value: string) => void
   onDeselect?: (value: string) => void
+  style?: StyleProp<ViewStyle>
 }
 
-const Chip: React.FC<ChipProps> = ({ value, size, onSelect, onDeselect }) => {
+const Chip: React.FC<ChipProps> = ({
+  value,
+  size,
+  isSelected = false,
+  onSelect,
+  onDeselect,
+  style,
+}) => {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme, size), [theme])
 
-  const [selected, setSelected] = useState(false)
+  const [internalSelected, setInternalSelected] = useState(isSelected)
+
+  // Use either controlled or uncontrolled selected state
+  const selected = isSelected !== undefined ? isSelected : internalSelected
 
   return (
     <PressableOpacity
-      style={[styles.wrapper, selected ? styles.selectedBg : styles.baseBg]}
+      style={[
+        styles.wrapper,
+        selected
+          ? { backgroundColor: theme.primary }
+          : { backgroundColor: theme.background },
+        style,
+      ]}
       onPress={() => {
         const newSelected = !selected
-        setSelected(newSelected)
+        // Only update internal state if not controlled externally
+        if (isSelected === undefined) {
+          setInternalSelected(newSelected)
+        }
         if (newSelected && onSelect) onSelect(value)
         if (!newSelected && onDeselect) onDeselect(value)
       }}
     >
       <Text
-        style={[styles.value, selected ? styles.selectedText : styles.baseText]}
+        style={[
+          styles.value,
+          selected ? { color: theme.white } : { color: theme.primary },
+        ]}
       >
         {value}
       </Text>
@@ -52,14 +76,9 @@ const createStyles = (theme: typeof colorPalettes.light, size: string) =>
       paddingVertical: size === 'large' ? 8 : 4,
       marginRight: size === 'large' ? 12 : 8,
     },
-    baseBg: {
-      backgroundColor: theme.background,
-    },
-    selectedBg: { backgroundColor: theme.primary },
     value: {
       fontSize: size === 'large' ? FontSize.LG : FontSize.MD,
       fontFamily: FontFamily.REGULAR,
+      textAlign: 'center',
     },
-    baseText: { color: theme.primary },
-    selectedText: { color: theme.white },
   })

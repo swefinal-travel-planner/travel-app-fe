@@ -1,23 +1,26 @@
 import { FontFamily, FontSize } from '@/constants/font'
-import spotTypeData from '@/lib/mock_data/spotTypes'
+import foodSpotTypeData from '@/lib/mock_data/foodSpotTypes'
 import { colorPalettes } from '@/styles/Itheme'
 import React, { useEffect, useState } from 'react'
 import { StyleSheet } from 'react-native'
 import { Button, Text, View } from 'react-native-ui-lib'
 import CollapsibleSectionList from '../CollapsibleSectionList'
 
-type SpotTypeProps = {
+type FoodSpotTypeProps = {
   theme: typeof colorPalettes.light
   nextFn: () => void
 }
 
-export default function SpotType({ theme, nextFn }: Readonly<SpotTypeProps>) {
-  const [spotTypes, setSpotTypes] = useState<string[]>([])
+export default function FoodSpotType({
+  theme,
+  nextFn,
+}: Readonly<FoodSpotTypeProps>) {
+  const [foodSpotTypes, setFoodSpotTypes] = useState<string[]>([])
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const handleNext = () => {
-    if (spotTypes.length === 0) {
-      setErrorMessage('Please select at least one category of spots to visit.')
+    if (foodSpotTypes.length === 0) {
+      setErrorMessage('Please select at least one category of culinary spot.')
       return
     }
 
@@ -26,15 +29,15 @@ export default function SpotType({ theme, nextFn }: Readonly<SpotTypeProps>) {
   }
 
   useEffect(() => {
-    if (spotTypes.length > 0) {
+    if (foodSpotTypes.length > 0) {
       setErrorMessage(null)
     }
-  }, [spotTypes])
+  }, [foodSpotTypes])
 
   return (
     <View style={styles.container}>
       <Text style={[styles.textQuestion, { color: theme.primary }]}>
-        What type of spots do you want to visit?
+        What type of culinary spots do you want to visit?
       </Text>
 
       <Text style={[styles.subTextQuestion, { color: theme.text }]}>
@@ -43,18 +46,18 @@ export default function SpotType({ theme, nextFn }: Readonly<SpotTypeProps>) {
 
       <View style={styles.textFieldContainer}>
         <CollapsibleSectionList
-          data={spotTypeData}
-          selectedValues={spotTypes}
-          onValueChange={setSpotTypes}
+          data={foodSpotTypeData}
+          selectedValues={foodSpotTypes}
+          onValueChange={setFoodSpotTypes}
         />
 
         <Text
           style={[styles.textField, { color: theme.primary, marginTop: 40 }]}
         >
-          {spotTypes.length === 1
+          {foodSpotTypes.length === 1
             ? 'Selected 1 category'
-            : spotTypes.length > 1
-              ? `Selected ${spotTypes.length} categories`
+            : foodSpotTypes.length > 1
+              ? `Selected ${foodSpotTypes.length} categories`
               : ''}
         </Text>
 
@@ -72,7 +75,7 @@ export default function SpotType({ theme, nextFn }: Readonly<SpotTypeProps>) {
         backgroundColor={theme.primary}
         style={{ width: '100%', paddingVertical: 15 }}
         size="large"
-        // disabled={spotTypes.length === 0} TODO : enable later
+        // disabled={foodSpotTypes.length === 0} TODO : enable later
       />
     </View>
   )

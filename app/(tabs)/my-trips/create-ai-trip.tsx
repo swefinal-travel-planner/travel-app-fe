@@ -24,6 +24,7 @@ export default function AiCreateTripScreen() {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1)
     }
+
     if (currentStep === 0) {
       router.back()
     }
