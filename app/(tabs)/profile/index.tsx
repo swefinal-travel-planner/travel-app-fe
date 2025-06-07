@@ -1,27 +1,26 @@
+import { Friend } from '@/lib/types/Profile'
+import { useThemeStore } from '@/store/themeStore'
+import Ionicons from '@expo/vector-icons/Ionicons'
+import { useQuery } from '@tanstack/react-query'
+import * as ImagePicker from 'expo-image-picker'
+import { useRouter } from 'expo-router'
+import * as SecureStore from 'expo-secure-store'
+import { StatusBar } from 'expo-status-bar'
 import React, { useEffect, useState } from 'react'
 import {
+  Dimensions,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  TouchableOpacity,
   View,
-  Text,
-  Card,
-  Colors,
-  ActionSheet,
-  Button,
-  Image,
-} from 'react-native-ui-lib'
-import { TouchableOpacity, ScrollView, Platform } from 'react-native'
+} from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
-import { StatusBar } from 'expo-status-bar'
-import Ionicons from '@expo/vector-icons/Ionicons'
-import * as ImagePicker from 'expo-image-picker'
+import { PaperProvider } from 'react-native-paper'
+import { ActionSheet, Button, Card, Image, Text } from 'react-native-ui-lib'
 import EditProfileModal from './components/EditProfileModal'
 import FriendListModal from './components/FriendListModal'
-import { PaperProvider } from 'react-native-paper'
-import { useNavigation } from '@react-navigation/native'
-import { Dimensions } from 'react-native'
-//import { useThemeStore } from "@/store/useThemeStore";
-import { useQuery } from '@tanstack/react-query'
-import * as SecureStore from 'expo-secure-store'
-import { Friend } from '@/lib/types/Profile'
 
 interface SettingSection {
   title: string
@@ -38,7 +37,7 @@ interface SettingSection {
 const url = process.env.EXPO_PUBLIC_API_URL
 
 const ProfileScreen = () => {
-  const navigation = useNavigation()
+  const router = useRouter()
   const generalSection: SettingSection[] = [
     {
       title: 'Edit profile picture',
@@ -53,7 +52,7 @@ const ProfileScreen = () => {
     { title: 'Delete account', icon: 'trash-outline' },
     { title: 'Log out', icon: 'log-out-outline' },
   ]
-  //const { setTheme } = useThemeStore()
+  const { setTheme } = useThemeStore()
   //const { setLanguage } = useThemeStore()
   const [modalVisible, setModalVisible] = useState<boolean>(false)
   const [showActionSheet, setShowActionSheet] = useState<boolean>(false)
@@ -66,6 +65,7 @@ const ProfileScreen = () => {
   const [profilePic, setProfilePic] = useState(
     require('@/assets/images/alligator.jpg')
   )
+  const [isDarkTheme, setIsDarkTheme] = useState(false)
 
   useEffect(() => {
     const getUserInfo = async () => {
@@ -173,79 +173,36 @@ const ProfileScreen = () => {
 
   return (
     <PaperProvider>
-      <GestureHandlerRootView style={{ flex: 1, backgroundColor: '#EEF8EF' }}>
-        <ScrollView
-          contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 30 }}
-        >
+      <GestureHandlerRootView style={styles.container}>
+        <ScrollView contentContainerStyle={styles.scrollViewContent}>
           {/* Avatar and Personal Information */}
-          <View center>
-            <View center marginB-60 style={{ position: 'relative' }}>
-              <Image
-                source={profilePic}
-                style={{
-                  width: Dimensions.get('window').width - 30,
-                  height: Dimensions.get('window').width - 30,
-                  borderRadius: 20,
-                  borderWidth: 4,
-                  borderColor: '#3F6453',
-                  resizeMode: 'cover',
-                }}
-              />
-              <View
-                style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  alignItems: 'center',
-                  transform: [{ translateY: 40 }],
-                  backgroundColor: '#3F6453',
-                  paddingVertical: 10,
-                  paddingHorizontal: 20,
-                  marginHorizontal: 20,
-                  borderRadius: 10,
-                }}
-              >
-                <Text text50 marginT-10 color="white">
-                  {name}
-                </Text>
-                <View
-                  row
-                  style={{ alignItems: 'baseline', justifyContent: 'center' }}
-                >
-                  {/* <Text text70 color="white">
-                    {" "}
-                    {phone}{" "}
-                  </Text> */}
-                  {/* <Text color="white"> - </Text> */}
-                  <Text text70 color="white">
-                    {' '}
-                    {email}{' '}
-                  </Text>
-                </View>
-              </View>
+          <View style={styles.avatarContainer}>
+            <Image source={profilePic} style={styles.profileImage} />
+            <View style={styles.userInfoContainer}>
+              <Text text50 marginT-10 color="white">
+                {name}
+              </Text>
+              <Text text70 color="white">
+                {email}
+              </Text>
+              <Text text70 color="white">
+                {phone}
+              </Text>
             </View>
           </View>
 
-          <View
-            marginT-10
-            marginB-25
-            paddingV-10
-            row
-            backgroundColor="white"
-            style={{ borderWidth: 1, borderRadius: 10, overflow: 'hidden' }}
-          >
-            <View flex center padding-10 style={{ borderRightWidth: 1 }}>
+          {/* Statistics */}
+          <View style={styles.statsContainer}>
+            <View style={styles.statsItem}>
               <Text text70>Number of Trips</Text>
               <Text text50BO>70</Text>
               <Button
                 label="Go to My trips"
                 backgroundColor="#3F6453"
-                onPress={() => navigation.navigate('my-trips/index')}
+                onPress={() => router.push('/my-trips')}
               />
             </View>
-
-            <View flex center padding-10>
+            <View style={styles.statsItem}>
               <Text text70>Completed Trips</Text>
               <Text text50BO>50</Text>
               <Button label="View Trip history" backgroundColor="#3F6453" />
@@ -253,32 +210,25 @@ const ProfileScreen = () => {
           </View>
 
           {/* Friendlist */}
-          <View row centerV gap-5 marginB-10>
+          <View style={styles.sectionHeader}>
             <Ionicons name="person-add" size={25} color="black" />
             <Text>Friend</Text>
           </View>
           <Card
-            marginB-25
-            padding-15
-            borderRadius={10}
-            style={{
-              backgroundColor:
-                isError || isLoading ? Colors.grey60 : Colors.white,
-            }}
+            style={[
+              styles.sectionContainer,
+              {
+                backgroundColor: isError || isLoading ? '#E8ECF0' : 'white',
+              },
+            ]}
           >
             <TouchableOpacity
               onPress={openFriendListModal}
               disabled={isLoading || isError}
             >
-              <View row spread paddingV-10 centerV>
-                <View row center gap-10>
-                  <View
-                    style={{ backgroundColor: '#3F6453' }}
-                    br100
-                    width={36}
-                    height={36}
-                    center
-                  >
+              <View style={styles.sectionItemContainer}>
+                <View style={styles.sectionItem}>
+                  <View style={styles.iconContainer}>
                     <Ionicons name="people" size={20} color="white" />
                   </View>
                   {isLoading ? (
@@ -300,16 +250,11 @@ const ProfileScreen = () => {
           </Card>
 
           {/* Personal Information */}
-          <View row centerV gap-5 marginB-10>
+          <View style={styles.sectionHeader}>
             <Ionicons name="settings" size={25} color="black" />
             <Text text70>General</Text>
           </View>
-          <Card
-            padding-15
-            marginB-25
-            borderRadius={10}
-            style={{ backgroundColor: Colors.white }}
-          >
+          <Card style={styles.sectionContainer}>
             {generalSection.map((item, index) => (
               <TouchableOpacity
                 key={index}
@@ -319,15 +264,9 @@ const ProfileScreen = () => {
                     : () => openModal(item.title)
                 }
               >
-                <View row spread paddingV-10 centerV>
-                  <View row center gap-10>
-                    <View
-                      style={{ backgroundColor: '#3F6453' }}
-                      br100
-                      width={36}
-                      height={36}
-                      center
-                    >
+                <View style={styles.sectionItemContainer}>
+                  <View style={styles.sectionItem}>
+                    <View style={styles.iconContainer}>
                       <Ionicons name={item.icon} size={20} color="white" />
                     </View>
                     <Text>{item.title}</Text>
@@ -343,47 +282,48 @@ const ProfileScreen = () => {
           </Card>
 
           {/* Danger Zone */}
-          <View row centerV marginB-10 gap-5>
+          <View style={styles.sectionHeader}>
             <Ionicons name="alert-circle-outline" size={25} color="red" />
-            <Text text70 color={Colors.red30}>
+            <Text text70 color="red">
               Danger Zone
             </Text>
           </View>
-          <Card
-            padding-15
-            marginB-25
-            borderRadius={10}
-            style={{ backgroundColor: Colors.white }}
-          >
-            {dangerSection.map((item, index) => (
-              <TouchableOpacity
-                key={index}
-                onPress={() => {
-                  //setTheme('dark')
-                  //setLanguage('vi')
-                }}
-              >
-                <View row spread paddingV-10 centerV>
-                  <View row center gap-10>
-                    <View
-                      style={{ backgroundColor: '#3F6453' }}
-                      br100
-                      width={36}
-                      height={36}
-                      center
-                    >
+          <Card style={styles.sectionContainer}>
+            {dangerSection.map((item, index) =>
+              item.title === 'Change theme' ? (
+                <View key={index} style={styles.sectionItemContainer}>
+                  <View style={styles.sectionItem}>
+                    <View style={styles.iconContainer}>
                       <Ionicons name={item.icon} size={20} color="white" />
                     </View>
                     <Text>{item.title}</Text>
                   </View>
-                  <Ionicons
-                    name="chevron-forward-outline"
-                    size={20}
-                    color="black"
+                  <Switch
+                    value={isDarkTheme}
+                    onValueChange={(value) => {
+                      setIsDarkTheme(value)
+                      setTheme(value ? 'dark' : 'light')
+                    }}
                   />
                 </View>
-              </TouchableOpacity>
-            ))}
+              ) : (
+                <TouchableOpacity key={index} onPress={() => {}}>
+                  <View style={styles.sectionItemContainer}>
+                    <View style={styles.sectionItem}>
+                      <View style={styles.iconContainer}>
+                        <Ionicons name={item.icon} size={20} color="white" />
+                      </View>
+                      <Text>{item.title}</Text>
+                    </View>
+                    <Ionicons
+                      name="chevron-forward-outline"
+                      size={20}
+                      color="black"
+                    />
+                  </View>
+                </TouchableOpacity>
+              )
+            )}
           </Card>
         </ScrollView>
 
@@ -429,4 +369,93 @@ const ProfileScreen = () => {
     </PaperProvider>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'white',
+  },
+  scrollViewContent: {
+    paddingTop: 30,
+    paddingHorizontal: 22,
+  },
+  avatarContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 60,
+    position: 'relative',
+  },
+  profileImage: {
+    width: Dimensions.get('window').width - 50,
+    height: Dimensions.get('window').width - 50,
+    borderRadius: 20,
+    borderWidth: 4,
+    borderColor: '#3F6453',
+    resizeMode: 'cover',
+  },
+  userInfoContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    transform: [{ translateY: 40 }],
+    backgroundColor: '#3F6453',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    marginHorizontal: 20,
+    borderRadius: 10,
+  },
+  statsContainer: {
+    borderWidth: 2,
+    borderColor: '#E5DACB',
+    borderRadius: 10,
+    marginTop: 20,
+    marginBottom: 25,
+    paddingVertical: 10,
+    flexDirection: 'row',
+  },
+  statsItem: {
+    borderRightWidth: 2,
+    borderRightColor: '#E5DACB',
+    flex: 1,
+    justifyContent: 'center',
+    alignContent: 'center',
+    alignItems: 'center',
+    padding: 10,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+    gap: 5,
+  },
+  sectionContainer: {
+    borderWidth: 2,
+    borderRadius: 10,
+    borderColor: '#E5DACB',
+    padding: 15,
+    marginBottom: 25,
+  },
+  sectionItemContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
+  sectionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  iconContainer: {
+    backgroundColor: '#3F6453',
+    borderRadius: 18,
+    width: 36,
+    height: 36,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+})
+
 export default ProfileScreen
