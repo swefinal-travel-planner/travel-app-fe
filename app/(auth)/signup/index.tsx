@@ -100,11 +100,11 @@ export default function SignUp() {
         const idToken = await user.getIdToken()
 
         const payload = {
-          displayName: user.displayName || '',
-          email: user.email || '',
+          displayName: user.displayName ?? '',
+          email: user.email ?? '',
           password: 'googlelogin', // placeholder since password is not applicable for Google login
-          phoneNumber: user.phoneNumber || '',
-          photoURL: user.photoURL || '',
+          phoneNumber: user.phoneNumber ?? '',
+          photoURL: user.photoURL ?? '',
           id_token: idToken,
         }
 

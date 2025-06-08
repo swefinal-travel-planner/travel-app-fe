@@ -1,4 +1,4 @@
-import { Place } from '@/features/trips/domain/models/Place'
+import { Place } from '@/features/place/domain/models/Place'
 import { TimeSlot, timeSlots, TripItem } from '@/types/Trip/Trip'
 import React, { useState } from 'react'
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
@@ -8,8 +8,8 @@ import DraggableFlatList, {
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { SectionHeader } from '../../../../components/CreateTripComponents/TripPlanner/SectionHeader'
 import { TripItemCard } from '../../../../components/CreateTripComponents/TripPlanner/TripItemCard'
-import { AddItemModal } from './AddItemModal'
-import { usePlaces } from '../state/usePlaces'
+import { usePlaces } from '../../../place/presentation/state/usePlaces'
+import { AddPlaceModal } from '@/features/place/presentation/components/AddPlaceComponent'
 
 export type SectionHeader = {
   type: 'header'
@@ -22,13 +22,6 @@ export type TypedTripItem = TripItem & {
 }
 
 export type Item = TypedTripItem | SectionHeader
-
-export interface AddItemModalProps {
-  visible: boolean
-  selectedTime: TimeSlot | null
-  onClose: () => void
-  onConfirm: (place: Place) => void
-}
 
 export interface SectionHeaderProps {
   time: TimeSlot
@@ -94,22 +87,11 @@ export default function TripPlanner() {
   const [modalVisible, setModalVisible] = useState(false)
   const [selectedTime, setSelectedTime] = useState<TimeSlot | null>(null)
 
-  const {
-    data: places,
-    isLoading,
-    error,
-  } = usePlaces({
+  const { isLoading, error } = usePlaces({
     limit: 10,
     location: 'Ho Chi Minh',
     language: 'en',
   })
-
-  // Log places when they change
-  React.useEffect(() => {
-    if (places) {
-      console.log('Places loaded:', places)
-    }
-  }, [places])
 
   // Log every time the data changes
   React.useEffect(() => {
@@ -161,9 +143,9 @@ export default function TripPlanner() {
     if (!selectedTime) return
 
     const newItem: TypedTripItem = {
-      name: place._source.en_name,
+      name: place.en_name,
       type: 'item',
-      item_id: place._id,
+      item_id: place.id,
       time_in_date: selectedTime,
       order_in_date:
         data.filter((item): item is TypedTripItem => item.type === 'item')
@@ -192,7 +174,7 @@ export default function TripPlanner() {
   return (
     <View style={styles.wrapper}>
       <View>
-        <AddItemModal
+        <AddPlaceModal
           visible={modalVisible}
           selectedTime={selectedTime}
           onClose={() => setModalVisible(false)}
