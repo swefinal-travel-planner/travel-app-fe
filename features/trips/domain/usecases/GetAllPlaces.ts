@@ -1,5 +1,8 @@
 import { Place } from '../models/Place'
-import { PlaceRepository } from '../repositories/PlaceRepository'
+import {
+  GetPlacesParams,
+  PlaceRepository,
+} from '../repositories/IPlaceRepository'
 
 export class GetAllPlaces {
   private readonly placeRepository: PlaceRepository
@@ -8,7 +11,7 @@ export class GetAllPlaces {
     this.placeRepository = placeRepository
   }
 
-  async execute(): Promise<Place[]> {
-    return this.placeRepository.getPlaces()
+  async execute(params: GetPlacesParams): Promise<Place[]> {
+    return this.placeRepository.getPlaces(params)
   }
 }

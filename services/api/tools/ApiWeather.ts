@@ -1,6 +1,6 @@
-import { QueryFunctionContext } from '@tanstack/react-query'
-import api from '../api'
 import { WeatherResponse } from '@/types/Weather/WeatherResponse'
+import { QueryFunctionContext } from '@tanstack/react-query'
+import beApi from '../../../lib/beApi'
 
 const url = process.env.EXPO_PUBLIC_WEATHER_API_URL
 const key = process.env.EXPO_PUBLIC_WEATHER_API_KEY
@@ -16,7 +16,7 @@ export const ApiGetWeather = async ({
   ]
 
   try {
-    const response = await api.get(
+    const response = await beApi.get(
       `${url}?key=${key}&q=${city}&days=${numberOfDays}&aqi=${aqi}`
     )
 
