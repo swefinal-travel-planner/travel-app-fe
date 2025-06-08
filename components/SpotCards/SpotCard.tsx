@@ -8,6 +8,7 @@ import { colorPalettes } from '@/constants/Itheme'
 import { Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 
+import { useRouter } from 'expo-router'
 import PressableOpacity from '../PressableOpacity'
 
 interface SpotCardProps {
@@ -27,9 +28,10 @@ const SpotCard: React.FC<SpotCardProps> = ({
   const styles = useMemo(() => createStyles(theme), [theme])
 
   const [saved, setSaved] = useState(isSaved)
+  const router = useRouter()
 
   return (
-    <PressableOpacity style={styles.wrapper}>
+    <View style={styles.wrapper}>
       <View style={styles.imageContainer}>
         <Image source={{ uri: spotImage }} style={styles.image} />
 
@@ -63,7 +65,7 @@ const SpotCard: React.FC<SpotCardProps> = ({
           </Text>
         </View>
       </View>
-    </PressableOpacity>
+    </View>
   )
 }
 
