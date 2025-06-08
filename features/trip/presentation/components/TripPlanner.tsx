@@ -1,15 +1,18 @@
 import { Place } from '@/features/place/domain/models/Place'
-import { TimeSlot, timeSlots, TripItem } from '@/types/Trip/Trip'
+import { AddPlaceModal } from '@/features/place/presentation/components/AddPlaceComponent'
+import {
+  TimeSlot,
+  timeSlots,
+  TripItem,
+} from '@/features/trip/domain/models/Trip'
 import React, { useState } from 'react'
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import DraggableFlatList, {
   RenderItemParams,
 } from 'react-native-draggable-flatlist'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
-import { SectionHeader } from '../../../../components/CreateTripComponents/TripPlanner/SectionHeader'
-import { TripItemCard } from '../../../../components/CreateTripComponents/TripPlanner/TripItemCard'
-import { usePlaces } from '../../../place/presentation/state/usePlaces'
-import { AddPlaceModal } from '@/features/place/presentation/components/AddPlaceComponent'
+import { SectionHeader } from './SectionHeader'
+import { TripItemCard } from './TripItemCard'
 
 export type SectionHeader = {
   type: 'header'
@@ -34,43 +37,9 @@ export interface TripItemCardProps {
   isActive: boolean
 }
 
-const initialData: TypedTripItem[] = [
-  {
-    type: 'item',
-    order_in_date: 1,
-    item_id: '1',
-    name: 'ITEM 1',
-    time_in_date: 'morning',
-  },
-  {
-    type: 'item',
-    order_in_date: 2,
-    item_id: '2',
-    name: 'ITEM 2',
-    time_in_date: 'afternoon',
-  },
-  {
-    type: 'item',
-    order_in_date: 3,
-    item_id: '4',
-    name: 'ITEM 3',
-    time_in_date: 'evening',
-  },
-  {
-    type: 'item',
-    order_in_date: 4,
-    item_id: '5',
-    name: 'ITEM 4',
-    time_in_date: 'evening',
-  },
-  {
-    type: 'item',
-    order_in_date: 5,
-    item_id: '6',
-    name: 'ITEM 5',
-    time_in_date: 'evening',
-  },
-]
+export interface TripPlannerProps {
+  onTripItemsChange?: (items: TypedTripItem[]) => void
+}
 
 function buildList(data: TypedTripItem[]): Item[] {
   const list: Item[] = []
@@ -82,37 +51,17 @@ function buildList(data: TypedTripItem[]): Item[] {
   return list
 }
 
-export default function TripPlanner() {
-  const [data, setData] = useState(() => buildList(initialData))
+export default function TripPlanner({
+  onTripItemsChange,
+}: Readonly<TripPlannerProps>) {
+  const [data, setData] = useState(() => buildList([]))
   const [modalVisible, setModalVisible] = useState(false)
   const [selectedTime, setSelectedTime] = useState<TimeSlot | null>(null)
-
-  const { isLoading, error } = usePlaces({
-    limit: 10,
-    location: 'Ho Chi Minh',
-    language: 'en',
-  })
 
   // Log every time the data changes
   React.useEffect(() => {
     console.log('Data changed:', data)
   }, [data])
-
-  if (isLoading) {
-    return (
-      <View style={[styles.container, styles.centerContent]}>
-        <ActivityIndicator size="large" />
-      </View>
-    )
-  }
-
-  if (error) {
-    return (
-      <View style={[styles.container, styles.centerContent]}>
-        <Text>Error loading places: {error.message}</Text>
-      </View>
-    )
-  }
 
   const onDragEnd = ({ data: newData }: { data: Item[] }) => {
     const updatedTripItems: TypedTripItem[] = []
@@ -132,6 +81,7 @@ export default function TripPlanner() {
     }
 
     setData(buildList(updatedTripItems))
+    onTripItemsChange?.(updatedTripItems)
   }
 
   const handleAddItem = (time: TimeSlot) => {
@@ -139,26 +89,28 @@ export default function TripPlanner() {
     setModalVisible(true)
   }
 
-  const handleConfirmAdd = (place: Place) => {
+  const handleConfirmAdd = (places: Place[]) => {
     if (!selectedTime) return
 
-    const newItem: TypedTripItem = {
+    const existingItems = data.filter(
+      (item): item is TypedTripItem => item.type === 'item'
+    )
+    const orderNumbers = existingItems.map((item) => item.order_in_date ?? 0)
+    const currentMaxOrder =
+      orderNumbers.length > 0 ? Math.max(...orderNumbers) : 0
+
+    const newItems: TypedTripItem[] = places.map((place, index) => ({
       name: place.en_name,
       type: 'item',
       item_id: place.id,
       time_in_date: selectedTime,
-      order_in_date:
-        data.filter((item): item is TypedTripItem => item.type === 'item')
-          .length + 1,
+      order_in_date: currentMaxOrder + index + 1,
       place: place,
-    }
+    }))
 
-    const updatedItems = [
-      ...data.filter((item): item is TypedTripItem => item.type === 'item'),
-      newItem,
-    ]
-
+    const updatedItems = [...existingItems, ...newItems]
     setData(buildList(updatedItems))
+    onTripItemsChange?.(updatedItems)
     setModalVisible(false)
     setSelectedTime(null)
   }

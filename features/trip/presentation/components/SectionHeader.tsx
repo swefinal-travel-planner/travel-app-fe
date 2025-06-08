@@ -1,7 +1,7 @@
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6'
 import React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { SectionHeaderProps } from '../../../features/trip/presentation/components/TripPlanner'
+import { SectionHeaderProps } from './TripPlanner'
 
 export const SectionHeader: React.FC<SectionHeaderProps> = ({
   time,
@@ -27,7 +27,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: '#f3f3f3',
   },
   sectionTitle: {
     fontWeight: 'bold',

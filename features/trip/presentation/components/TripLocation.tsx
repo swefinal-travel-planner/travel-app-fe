@@ -7,15 +7,15 @@ import React, { useMemo } from 'react'
 import { StyleSheet } from 'react-native'
 import { Button, Picker, Text, View } from 'react-native-ui-lib'
 
-type ChooseLocationProps = {
+type TripLocationProps = {
   theme: typeof colorPalettes.light
   nextFn: () => void
 }
 
-export default function ChooseLocation({
+export default function TripLocation({
   theme,
   nextFn,
-}: Readonly<ChooseLocationProps>) {
+}: Readonly<TripLocationProps>) {
   const styles = useMemo(() => createStyles(theme), [theme])
 
   const [selectedValue, setSelectedValue] = React.useState<string>('')

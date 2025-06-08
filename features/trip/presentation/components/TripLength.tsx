@@ -1,10 +1,10 @@
 import { FontFamily, FontSize } from '@/constants/font'
-import { useManualTripStore } from '@/store/manualTripStore'
+import { useManualTripStore } from '@/features/trip/presentation/state/useManualTrip'
 import { colorPalettes } from '@/styles/Itheme'
 import React, { useState } from 'react'
 import { StyleSheet } from 'react-native'
 import { Button, Text, View } from 'react-native-ui-lib'
-import DateRangeField from '../Pickers/DateRangeField'
+import DateRangeField from '../../../../components/Pickers/DateRangeField'
 
 type TripLengthProps = {
   theme: typeof colorPalettes.light

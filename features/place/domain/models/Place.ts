@@ -8,4 +8,5 @@ export type Place = {
   vi_name: string
   vi_properties: string[]
   vi_type: string
+  order_in_date?: string
 }
