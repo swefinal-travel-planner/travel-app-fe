@@ -20,7 +20,7 @@ import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth'
 
 import saveLoginInfo from '@/utils/saveLoginInfo'
 
-import api, { url } from '@/services/api/api'
+import beApi, { BE_URL } from '@/lib/beApi'
 import axios from 'axios'
 
 import CustomTextField from '@/components/input/CustomTextField'
@@ -92,7 +92,10 @@ export default function Login() {
           id_token: idToken,
         }
 
-        const response = await api.post(`${url}/auth/google-login`, payload)
+        const response = await beApi.post(
+          `${BE_URL}/auth/google-login`,
+          payload
+        )
 
         await saveLoginInfo(
           response.data.data.userId,
@@ -137,7 +140,7 @@ export default function Login() {
         password: data.password || '',
       }
 
-      const response = await api.post(`${url}/auth/login`, payload)
+      const response = await beApi.post(`${BE_URL}/auth/login`, payload)
 
       await saveLoginInfo(
         response.data.data.userId,

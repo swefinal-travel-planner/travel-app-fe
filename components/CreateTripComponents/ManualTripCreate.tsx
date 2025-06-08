@@ -3,8 +3,8 @@ import { useManualTripStore } from '@/store/manualTripStore'
 import React, { useEffect, useState } from 'react'
 import { StyleSheet } from 'react-native'
 import { Button, View } from 'react-native-ui-lib'
+import TripPlanner from '../../features/trips/presentation/components/TripPlanner'
 import HorizontalDatePicker from './HorizontalDatePicker'
-import TripPlanner from './TripPlanner'
 
 type ManualTripCreateProps = {
   nextFn: () => void

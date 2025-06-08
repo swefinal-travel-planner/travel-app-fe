@@ -6,7 +6,7 @@ import { z } from 'zod'
 
 import { usePwdResetStore } from '@/lib/usePwdResetStore'
 
-import api, { url } from '@/services/api/api'
+import beApi, { BE_URL } from '@/lib/beApi'
 import axios from 'axios'
 
 import PasswordField from '@/components/input/PasswordField'
@@ -62,7 +62,7 @@ export default function ResetPassword() {
         password: data.password || '',
       }
 
-      await api.post(`${url}/auth/reset-password`, payload)
+      await beApi.post(`${BE_URL}/auth/reset-password`, payload)
 
       clearRequest() // clear the request in the store
 

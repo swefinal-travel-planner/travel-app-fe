@@ -1,4 +1,4 @@
-import { usePlaces } from '@/hooks/usePlaces'
+import { Place } from '@/features/trips/domain/models/Place'
 import { TimeSlot, timeSlots, TripItem } from '@/types/Trip/Trip'
 import React, { useState } from 'react'
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
@@ -6,16 +6,20 @@ import DraggableFlatList, {
   RenderItemParams,
 } from 'react-native-draggable-flatlist'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
-import { AddItemModal } from './TripPlanner/AddItemModal'
-import { SectionHeader } from './TripPlanner/SectionHeader'
-import { TripItemCard } from './TripPlanner/TripItemCard'
+import { SectionHeader } from '../../../../components/CreateTripComponents/TripPlanner/SectionHeader'
+import { TripItemCard } from '../../../../components/CreateTripComponents/TripPlanner/TripItemCard'
+import { AddItemModal } from './AddItemModal'
+import { usePlaces } from '../state/usePlaces'
 
 export type SectionHeader = {
   type: 'header'
   time: TimeSlot
 }
 
-export type TypedTripItem = TripItem & { type: 'item' }
+export type TypedTripItem = TripItem & {
+  type: 'item'
+  place?: Place
+}
 
 export type Item = TypedTripItem | SectionHeader
 
@@ -23,7 +27,7 @@ export interface AddItemModalProps {
   visible: boolean
   selectedTime: TimeSlot | null
   onClose: () => void
-  onConfirm: () => void
+  onConfirm: (place: Place) => void
 }
 
 export interface SectionHeaderProps {
@@ -95,7 +99,7 @@ export default function TripPlanner() {
     isLoading,
     error,
   } = usePlaces({
-    limit: 10, // Adjust limit as needed
+    limit: 10,
     location: 'Ho Chi Minh',
     language: 'en',
   })
@@ -153,17 +157,18 @@ export default function TripPlanner() {
     setModalVisible(true)
   }
 
-  const handleConfirmAdd = () => {
+  const handleConfirmAdd = (place: Place) => {
     if (!selectedTime) return
 
     const newItem: TypedTripItem = {
-      name: `New TypedTripItem ${Date.now().toString()}`,
+      name: place._source.en_name,
       type: 'item',
-      item_id: Date.now().toString(),
+      item_id: place._id,
       time_in_date: selectedTime,
       order_in_date:
         data.filter((item): item is TypedTripItem => item.type === 'item')
           .length + 1,
+      place: place,
     }
 
     const updatedItems = [
