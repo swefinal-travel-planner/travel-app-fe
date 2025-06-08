@@ -1,6 +1,6 @@
-import { Place } from '@/features/trips/domain/models/Place'
-import { GetPlacesParams } from '../../domain/repositories/IPlaceRepository'
+import { Place } from '@/features/place/domain/models/Place'
 import coreApi, { ENDPOINTS } from '../../../../lib/coreApi'
+import { GetPlacesParams } from '../../../place/domain/repositories/IPlaceRepository'
 
 export class PlaceApi {
   static async getPlaces(params: GetPlacesParams): Promise<Place[]> {

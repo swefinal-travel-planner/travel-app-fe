@@ -2,7 +2,7 @@ import Ionicons from '@expo/vector-icons/Ionicons'
 import React from 'react'
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { ScaleDecorator } from 'react-native-draggable-flatlist'
-import { TripItemCardProps } from '../../../features/trips/presentation/components/TripPlanner'
+import { TripItemCardProps } from '../../../features/trip/presentation/components/TripPlanner'
 
 export const TripItemCard: React.FC<TripItemCardProps> = ({
   item,

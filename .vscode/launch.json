@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "d:/GRADUATION PROJECT/travel-app-fe/features/trips",
-      "program": "d:/GRADUATION PROJECT/travel-app-fe/features/trips/build/Debug/outDebug",
+      "cwd": "d:/GRADUATION PROJECT/travel-app-fe/features/places",
+      "program": "d:/GRADUATION PROJECT/travel-app-fe/features/places/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
