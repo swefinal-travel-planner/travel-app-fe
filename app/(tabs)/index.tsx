@@ -1,12 +1,21 @@
-import { Link } from 'expo-router'
+import { Link, useRouter } from 'expo-router'
 import {
   Dimensions,
   FlatList,
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native'
+
+interface SpotData {
+  id: string
+  spotName: string
+  spotLocation: string
+  spotImage: string
+  isSaved: boolean
+}
 
 import Pressable from '@/components/Pressable'
 import CarouselSpotCard from '@/components/SpotCards/CarouselSpotCard'
@@ -21,6 +30,7 @@ import { Carousel } from 'react-native-ui-lib'
 
 const data = [
   {
+    id: '1',
     spotName: 'War Remnants Museum',
     spotLocation: '28 Võ Văn Tần, Phường Võ Thị Sáu, Quận 3, Hồ Chí Minh',
     spotImage:
@@ -28,6 +38,7 @@ const data = [
     isSaved: false,
   },
   {
+    id: '2',
     spotName: 'Le Quy Don High School',
     spotLocation: '110 Nguyễn Thị Minh Khai, Phường 6, Quận 3, Hồ Chí Minh',
     spotImage:
@@ -35,6 +46,7 @@ const data = [
     isSaved: false,
   },
   {
+    id: '3',
     spotName: 'Co.opmart Nguyễn Đình Chiểu',
     spotLocation: '168 Nguyễn Đình Chiểu, Phường 6, Quận 3, Hồ Chí Minh',
     spotImage:
@@ -42,6 +54,7 @@ const data = [
     isSaved: false,
   },
   {
+    id: '4',
     spotName: 'HCMC Cultural Palace for Labors',
     spotLocation:
       '55B Nguyễn Thị Minh Khai, Phường Bến Thành, Quận 1, Hồ Chí Minh',
@@ -60,6 +73,18 @@ const cardWidth = screenWidth - 120 // account for margins and padding
 const Index = () => {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
+  const router = useRouter()
+
+  const handlePress = (item: SpotData) => {
+    router.push({
+      pathname: `/places/${item.id}`,
+      params: {
+        spotName: item.spotName,
+        spotLocation: item.spotLocation,
+        spotImage: item.spotImage,
+      },
+    })
+  }
 
   return (
     <ScrollView
@@ -122,7 +147,11 @@ const Index = () => {
           style={[styles.list, { marginBottom: 28 }]}
           contentContainerStyle={styles.listContent}
           data={data}
-          renderItem={({ item }) => <SpotCard {...item} />}
+          renderItem={({ item }) => (
+            <TouchableOpacity onPress={() => handlePress(item)}>
+              <SpotCard {...item} />
+            </TouchableOpacity>
+          )}
           keyExtractor={(item) => item.spotName}
           ItemSeparatorComponent={() => <View style={{ width: 16 }} />}
           showsHorizontalScrollIndicator={false}
@@ -137,7 +166,11 @@ const Index = () => {
           style={styles.list}
           contentContainerStyle={styles.listContent}
           data={data}
-          renderItem={({ item }) => <SpotCard {...item} />}
+          renderItem={({ item }) => (
+            <TouchableOpacity onPress={() => handlePress(item)}>
+              <SpotCard {...item} />
+            </TouchableOpacity>
+          )}
           keyExtractor={(item) => item.spotName}
           ItemSeparatorComponent={() => <View style={{ width: 16 }} />}
           showsHorizontalScrollIndicator={false}
