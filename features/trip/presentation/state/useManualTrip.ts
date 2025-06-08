@@ -1,4 +1,4 @@
-import { Trip, TripItem } from '@/types/Trip/Trip'
+import { Trip, TripItem } from '@/features/trip/domain/models/Trip'
 import { create } from 'zustand'
 
 // Trip state management using Zustand
@@ -28,7 +28,9 @@ export const useManualTripStore = create<ManualTripState>((set) => ({
     set((state) => {
       const currentItems = state.trip.items ?? []
       const updatedItems = currentItems.map((item) =>
-        item.id === updatedItem.id ? { ...item, ...updatedItem } : item
+        item.item_id === updatedItem.item_id
+          ? { ...item, ...updatedItem }
+          : item
       )
 
       return {
@@ -42,7 +44,7 @@ export const useManualTripStore = create<ManualTripState>((set) => ({
   deleteTripItem: (itemId) =>
     set((state) => {
       const updatedItems = state.trip.items?.filter(
-        (item) => item.id !== itemId
+        (item) => item.item_id !== itemId
       )
       return {
         trip: {

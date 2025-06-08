@@ -1,9 +1,10 @@
 import { Radius } from '@/constants/theme'
 import { Place } from '@/features/place/domain/models/Place'
-import { TimeSlot } from '@/types/Trip/Trip'
+import { TimeSlot } from '@/features/trip/domain/models/Trip'
 import Ionicons from '@expo/vector-icons/Ionicons'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
+  ActivityIndicator,
   FlatList,
   Image,
   Modal,
@@ -12,13 +13,13 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
-import { usePlaces } from '../../../place/presentation/state/usePlaces'
+import { usePlaces } from '../state/usePlaces'
 
 export interface AddPlaceModalProps {
   visible: boolean
   selectedTime: TimeSlot | null
   onClose: () => void
-  onConfirm: (place: Place) => void
+  onConfirm: (places: Place[]) => void
 }
 
 export const AddPlaceModal: React.FC<AddPlaceModalProps> = ({
@@ -28,9 +29,47 @@ export const AddPlaceModal: React.FC<AddPlaceModalProps> = ({
   onConfirm,
 }) => {
   const [isFilterVisible, setIsFilterVisible] = useState(false)
+  const [selectedPlaces, setSelectedPlaces] = useState<Place[]>([])
+  const [shouldFetchPlaces, setShouldFetchPlaces] = useState(false)
 
-  const handleAddPlace = (place: Place) => {
-    onConfirm(place)
+  useEffect(() => {
+    if (visible) {
+      setShouldFetchPlaces(true)
+    } else {
+      // Reset selected places when modal closes
+      setSelectedPlaces([])
+      setShouldFetchPlaces(false)
+    }
+  }, [visible])
+
+  const {
+    data: places,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    error,
+  } = usePlaces({
+    limit: 20,
+    location: 'Ho Chi Minh',
+    language: 'en',
+    enabled: shouldFetchPlaces,
+  })
+
+  const handleTogglePlace = (place: Place) => {
+    setSelectedPlaces((current) => {
+      const isSelected = current.some((p) => p.id === place.id)
+      if (isSelected) {
+        return current.filter((p) => p.id !== place.id)
+      } else {
+        return [...current, place]
+      }
+    })
+  }
+
+  const handleDone = () => {
+    onConfirm(selectedPlaces)
+    setSelectedPlaces([])
     onClose()
   }
 
@@ -38,34 +77,83 @@ export const AddPlaceModal: React.FC<AddPlaceModalProps> = ({
     setIsFilterVisible(!isFilterVisible)
   }
 
-  const { data: places } = usePlaces({
-    limit: 20,
-    location: 'Ho Chi Minh',
-    language: 'en',
-  })
+  const handleLoadMore = () => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage()
+    }
+  }
 
-  const renderPlace = ({ item }: { item: Place }) => (
-    <View style={styles.placeContainer}>
-      <View style={styles.imageContainer}>
-        <Image
-          source={require('@/assets/images/alligator.jpg')}
-          style={styles.placeImage}
-        />
+  const renderFooter = () => {
+    if (!isFetchingNextPage) return null
+    return (
+      <View style={styles.loadingFooter}>
+        <Text>Loading more places...</Text>
       </View>
-      <View style={styles.contentContainer}>
-        <View style={styles.placeInfo}>
-          <Text style={styles.placeName}>{item.en_name}</Text>
-          <Text style={styles.placeType}>{item.en_type}</Text>
+    )
+  }
+
+  const renderContent = () => {
+    if (isLoading) {
+      return (
+        <View style={styles.centerContent}>
+          <ActivityIndicator size="large" />
         </View>
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => handleAddPlace(item)}
-        >
-          <Text style={styles.addButtonText}>Add</Text>
-        </TouchableOpacity>
+      )
+    }
+
+    if (error) {
+      return (
+        <View style={styles.centerContent}>
+          <Text style={styles.errorText}>
+            Error loading places: {error.message}
+          </Text>
+        </View>
+      )
+    }
+
+    return (
+      <FlatList
+        data={places}
+        renderItem={renderPlace}
+        keyExtractor={(item) => item.id}
+        style={styles.placesList}
+        contentContainerStyle={styles.placesListContent}
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.4}
+        ListFooterComponent={renderFooter}
+      />
+    )
+  }
+
+  const renderPlace = ({ item }: { item: Place }) => {
+    const isSelected = selectedPlaces.some((p) => p.id === item.id)
+    return (
+      <View
+        style={[styles.placeContainer, isSelected && styles.selectedContainer]}
+      >
+        <View style={styles.imageContainer}>
+          <Image
+            source={require('@/assets/images/alligator.jpg')}
+            style={styles.placeImage}
+          />
+        </View>
+        <View style={styles.contentContainer}>
+          <View style={styles.placeInfo}>
+            <Text style={styles.placeName}>{item.en_name}</Text>
+            <Text style={styles.placeType}>{item.en_type}</Text>
+          </View>
+          <TouchableOpacity
+            style={[styles.addButton, isSelected && styles.selectedButton]}
+            onPress={() => handleTogglePlace(item)}
+          >
+            <Text style={styles.addButtonText}>
+              {isSelected ? 'Selected' : 'Select'}
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
-  )
+    )
+  }
 
   return (
     <Modal
@@ -79,7 +167,7 @@ export const AddPlaceModal: React.FC<AddPlaceModalProps> = ({
           <View style={styles.header}>
             <View style={styles.titleContainer}>
               <Text style={styles.modalTitle}>
-                Add new place to {selectedTime}
+                Add places to {selectedTime}
               </Text>
               <TouchableOpacity
                 style={styles.filterButton}
@@ -95,20 +183,29 @@ export const AddPlaceModal: React.FC<AddPlaceModalProps> = ({
             )}
           </View>
 
-          <FlatList
-            data={places}
-            renderItem={renderPlace}
-            keyExtractor={(item) => item.id}
-            style={styles.placesList}
-            contentContainerStyle={styles.placesListContent}
-          />
+          {renderContent()}
 
-          <TouchableOpacity
-            style={[styles.modalButton, styles.cancelButton]}
-            onPress={onClose}
-          >
-            <Text style={styles.buttonText}>Cancel</Text>
-          </TouchableOpacity>
+          <View style={styles.bottomButtons}>
+            <TouchableOpacity
+              style={[styles.modalButton, styles.cancelButton]}
+              onPress={onClose}
+            >
+              <Text style={[styles.buttonText, styles.cancelText]}>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.modalButton,
+                styles.doneButton,
+                selectedPlaces.length === 0 && styles.disabledButton,
+              ]}
+              onPress={handleDone}
+              disabled={selectedPlaces.length === 0}
+            >
+              <Text style={[styles.buttonText, styles.doneText]}>
+                Done ({selectedPlaces.length})
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </Modal>
@@ -206,19 +303,42 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
   },
+  selectedContainer: {
+    borderColor: '#563D30',
+    borderWidth: 2,
+  },
+  selectedButton: {
+    backgroundColor: '#808080',
+  },
+  bottomButtons: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 10,
+  },
   modalButton: {
+    flex: 1,
     padding: 15,
     borderRadius: Radius.FULL,
     alignItems: 'center',
-    marginTop: 10,
   },
   cancelButton: {
-    backgroundColor: 'red',
-    borderRadius: Radius.FULL,
+    backgroundColor: '#f5f5f5',
+  },
+  doneButton: {
+    backgroundColor: '#563D30',
+  },
+  disabledButton: {
+    backgroundColor: '#cccccc',
   },
   buttonText: {
     fontSize: 16,
+    fontWeight: '500',
+  },
+  cancelText: {
     color: '#333',
+  },
+  doneText: {
+    color: 'white',
   },
   centerContent: {
     flex: 1,
@@ -228,5 +348,9 @@ const styles = StyleSheet.create({
   errorText: {
     color: 'red',
     textAlign: 'center',
+  },
+  loadingFooter: {
+    padding: 10,
+    alignItems: 'center',
   },
 })
