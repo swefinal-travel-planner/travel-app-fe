@@ -92,6 +92,8 @@ const updateUserPushToken = async (token: string) => {
 
 export default function RootLayout() {
   const [queryClient] = useState(() => new QueryClient())
+  const [isReady, setIsReady] = useState(false)
+  const [isHealthy, setIsHealthy] = useState(false)
 
   // TODO: might need to set this in store to update the Inbox screen
   const [notification, setNotification] = useState<

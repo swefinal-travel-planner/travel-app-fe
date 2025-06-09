@@ -2,7 +2,7 @@ import Constants from 'expo-constants'
 import * as Notifications from 'expo-notifications'
 import * as SecureStore from 'expo-secure-store'
 
-import api, { url } from '@/services/api/api'
+import beApi, { BE_URL } from '@/lib/beApi'
 import axios from 'axios'
 
 export default async function updateNotifToken(): Promise<void> {
@@ -32,7 +32,7 @@ export default async function updateNotifToken(): Promise<void> {
       notificationToken: token,
     }
 
-    await api.put(`${url}/users/notification-token`, payload)
+    await beApi.put(`${BE_URL}/users/notification-token`, payload)
   } catch (error) {
     if (axios.isAxiosError(error)) {
       // handle errors coming from the API call

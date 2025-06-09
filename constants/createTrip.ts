@@ -1,11 +1,11 @@
-import ChooseLocation from '@/components/CreateTripComponents/ChooseLocation'
 import FoodSpotType from '@/components/CreateTripComponents/FoodSpotType'
-import ManualTripCreate from '@/components/CreateTripComponents/ManualTripCreate'
 import MedicalReqs from '@/components/CreateTripComponents/MedicalReq'
 import OtherReqs from '@/components/CreateTripComponents/OtherReq'
 import SpotNumber from '@/components/CreateTripComponents/SpotNumber'
 import SpotType from '@/components/CreateTripComponents/SpotType'
-import TripLength from '@/components/CreateTripComponents/TripLength'
+import ManualTripCreate from '@/features/trip/presentation/components/ManualTripCreate'
+import TripLength from '@/features/trip/presentation/components/TripLength'
+import ChooseLocation from '@/features/trip/presentation/components/TripLocation'
 
 export const createManualTripSteps = [
   ChooseLocation,

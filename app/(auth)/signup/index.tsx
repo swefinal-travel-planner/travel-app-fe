@@ -20,7 +20,7 @@ import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth'
 
 import { useSignupStore } from '@/lib/useSignupStore'
 
-import api, { url } from '@/services/api/api'
+import beApi, { BE_URL } from '@/lib/beApi'
 import axios from 'axios'
 
 import { useThemeStyle } from '@/hooks/useThemeStyle'
@@ -100,15 +100,18 @@ export default function SignUp() {
         const idToken = await user.getIdToken()
 
         const payload = {
-          displayName: user.displayName || '',
-          email: user.email || '',
+          displayName: user.displayName ?? '',
+          email: user.email ?? '',
           password: 'googlelogin', // placeholder since password is not applicable for Google login
-          phoneNumber: user.phoneNumber || '',
-          photoURL: user.photoURL || '',
+          phoneNumber: user.phoneNumber ?? '',
+          photoURL: user.photoURL ?? '',
           id_token: idToken,
         }
 
-        const response = await api.post(`${url}/auth/google-login`, payload)
+        const response = await beApi.post(
+          `${BE_URL}/auth/google-login`,
+          payload
+        )
 
         await saveLoginInfo(
           response.data.data.userId,
@@ -155,7 +158,9 @@ export default function SignUp() {
       // set the signup request in the store
       setRequest({ ...payload })
 
-      await api.post(`${url}/auth/register/send-otp`, { email: payload.email })
+      await beApi.post(`${BE_URL}/auth/register/send-otp`, {
+        email: payload.email,
+      })
 
       router.push('/signup/otp')
     } catch (error) {
