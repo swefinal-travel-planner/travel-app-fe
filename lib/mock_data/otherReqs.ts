@@ -10,7 +10,7 @@ export default [
     ],
   },
   {
-    title: 'Family accomodations',
+    title: 'Family accommodations',
     data: [
       '👶 Allows children',
       '🏰 Kids’ play area / ball pit',
