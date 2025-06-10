@@ -20,7 +20,7 @@ export default [
     ],
   },
   {
-    title: 'Pet accomodations',
+    title: 'Pet accommodations',
     data: ['🐾 Pets allowed', '🐕 Dedicated pet areas'],
   },
   {
