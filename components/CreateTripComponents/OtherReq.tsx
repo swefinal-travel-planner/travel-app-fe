@@ -1,40 +1,27 @@
 import { FontFamily, FontSize } from '@/constants/font'
-import spotTypeData from '@/lib/mock_data/spotTypes'
+import otherReqData from '@/lib/mock_data/otherReqs'
 import { colorPalettes } from '@/styles/Itheme'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { StyleSheet } from 'react-native'
 import { Button, Text, View } from 'react-native-ui-lib'
 import CollapsibleSectionList from '../CollapsibleSectionList'
 
-type SpotTypeProps = {
+type OtherReqProps = {
   theme: typeof colorPalettes.light
   nextFn: () => void
 }
 
-export default function SpotType({ theme, nextFn }: Readonly<SpotTypeProps>) {
-  const [spotTypes, setSpotTypes] = useState<string[]>([])
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+export default function OtherReq({ theme, nextFn }: Readonly<OtherReqProps>) {
+  const [otherReqs, setOtherReqs] = useState<string[]>([])
 
   const handleNext = () => {
-    if (spotTypes.length === 0) {
-      setErrorMessage('Please select at least one category of spots to visit.')
-      return
-    }
-
-    setErrorMessage(null)
     nextFn()
   }
-
-  useEffect(() => {
-    if (spotTypes.length > 0) {
-      setErrorMessage(null)
-    }
-  }, [spotTypes])
 
   return (
     <View style={styles.container}>
       <Text style={[styles.textQuestion, { color: theme.primary }]}>
-        What type of spots do you want to visit?
+        Finally, do you have any other requirements or preferences?
       </Text>
 
       <Text style={[styles.subTextQuestion, { color: theme.text }]}>
@@ -43,26 +30,20 @@ export default function SpotType({ theme, nextFn }: Readonly<SpotTypeProps>) {
 
       <View style={styles.textFieldContainer}>
         <CollapsibleSectionList
-          data={spotTypeData}
-          selectedValues={spotTypes}
-          onValueChange={setSpotTypes}
+          data={otherReqData}
+          selectedValues={otherReqs}
+          onValueChange={setOtherReqs}
         />
 
         <Text
           style={[styles.textField, { color: theme.primary, marginTop: 40 }]}
         >
-          {spotTypes.length === 1
+          {otherReqs.length === 1
             ? 'Selected 1 category'
-            : spotTypes.length > 1
-              ? `Selected ${spotTypes.length} categories`
+            : otherReqs.length > 1
+              ? `Selected ${otherReqs.length} categories`
               : ''}
         </Text>
-
-        {errorMessage && (
-          <Text style={[styles.errorText, { color: theme.error ?? 'red' }]}>
-            {errorMessage}
-          </Text>
-        )}
       </View>
 
       <Button
@@ -72,7 +53,6 @@ export default function SpotType({ theme, nextFn }: Readonly<SpotTypeProps>) {
         backgroundColor={theme.primary}
         style={{ width: '100%', paddingVertical: 15 }}
         size="large"
-        // disabled={spotTypes.length === 0} TODO : enable later
       />
     </View>
   )

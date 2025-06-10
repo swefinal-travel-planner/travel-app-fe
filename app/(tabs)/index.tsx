@@ -70,8 +70,8 @@ const Index = () => {
         <View style={styles.topCenter}>
           <Text style={styles.hugeText}>Welcome back, bro!</Text>
 
-          <Link href="/signup/allergies" style={styles.mainButton}>
-            Go to Signup screen
+          <Link href="/my-trips/create-ai-trip" style={styles.mainButton}>
+            Plan a trip with AI
           </Link>
 
           {hasTrip ? (

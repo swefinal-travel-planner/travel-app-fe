@@ -1,3 +1,6 @@
+import FoodSpotType from '@/components/CreateTripComponents/FoodSpotType'
+import MedicalReqs from '@/components/CreateTripComponents/MedicalReq'
+import OtherReqs from '@/components/CreateTripComponents/OtherReq'
 import SpotNumber from '@/components/CreateTripComponents/SpotNumber'
 import SpotType from '@/components/CreateTripComponents/SpotType'
 import ManualTripCreate from '@/features/trip/presentation/components/ManualTripCreate'
@@ -20,6 +23,9 @@ export const createAiTripSteps = [
   TripLength,
   SpotNumber,
   SpotType,
+  FoodSpotType,
+  MedicalReqs,
+  OtherReqs,
 ]
 
 export const MAX_TRIP_LENGTH = 7
