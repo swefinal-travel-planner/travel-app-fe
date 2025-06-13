@@ -1,3 +1,4 @@
+import { getCoreAccessToken } from '@/lib/coreApi'
 import { GoogleSignin } from '@react-native-google-signin/google-signin'
 import Mapbox from '@rnmapbox/maps'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -117,6 +118,10 @@ export default function RootLayout() {
     registerForPushNotificationsAsync()
       .then((token) => updateUserPushToken(token ?? ''))
       .catch((error: any) => console.log(`${error}`))
+
+    getCoreAccessToken().catch((error) => {
+      console.error('Failed to initialize API:', error)
+    })
 
     notificationListener.current =
       Notifications.addNotificationReceivedListener((notification) => {

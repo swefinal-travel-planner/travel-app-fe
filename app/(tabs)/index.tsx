@@ -74,6 +74,10 @@ const Index = () => {
             Plan a trip with AI
           </Link>
 
+          <Link href="/login" style={styles.mainButton}>
+            Log in
+          </Link>
+
           {hasTrip ? (
             <View style={styles.currentTrip}>
               <Text style={styles.subText}>This morning's plan</Text>

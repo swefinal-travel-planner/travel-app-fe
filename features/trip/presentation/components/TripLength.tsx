@@ -27,7 +27,7 @@ export default function TripLength({
   }
 
   const handleNext = () => {
-    nextFn() // TODO: remove this line when the next step is implemented
+    nextFn()
 
     if (!startDate || !endDate) {
       setErrorMessage('Please select a start and end date.')
@@ -43,7 +43,7 @@ export default function TripLength({
 
     setManualTrip({
       startDate: new Date(startDate),
-      numberOfDays: days,
+      days: days,
     })
 
     setErrorMessage(null)
@@ -90,7 +90,7 @@ export default function TripLength({
         backgroundColor={theme.primary}
         style={{ width: '100%', paddingVertical: 15 }}
         size="large"
-        // disabled={!startDate || !endDate || !!errorMessage} TODO : enable later
+        disabled={!startDate || !endDate || !!errorMessage}
       />
     </View>
   )

@@ -1,15 +1,53 @@
 import { FontFamily, FontSize } from '@/constants/font'
+import { useManualTripStore } from '@/features/trip/presentation/state/useManualTrip'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { colorPalettes } from '@/styles/Itheme'
-import { useRouter } from 'expo-router'
+import { useFocusEffect } from '@react-navigation/native'
+import { useNavigation, useRouter } from 'expo-router'
 import React, { useMemo } from 'react'
-import { StyleSheet, Text } from 'react-native'
+import { Alert, StyleSheet, Text } from 'react-native'
 import { Button, View } from 'react-native-ui-lib'
 
 export default function WelcomeCreateScreen() {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
   const router = useRouter()
+  const navigation = useNavigation()
+  const resetManualTrip = useManualTripStore((state) => state.resetManualTrip)
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const handleBackPress = (e: any) => {
+        // Prevent default navigation
+        e.preventDefault()
+
+        Alert.alert(
+          'Discard Changes',
+          'Are you sure you want to go back? All trip data will be cleared.',
+          [
+            {
+              text: 'Cancel',
+              style: 'cancel',
+            },
+            {
+              text: 'Yes, go back',
+              style: 'destructive',
+              onPress: () => {
+                resetManualTrip()
+                navigation.dispatch(e.data.action)
+              },
+            },
+          ]
+        )
+      }
+
+      navigation.addListener('beforeRemove', handleBackPress)
+
+      return () => {
+        navigation.removeListener('beforeRemove', handleBackPress)
+      }
+    }, [navigation, resetManualTrip])
+  )
 
   return (
     <View style={[styles.container, { backgroundColor: theme.white }]}>

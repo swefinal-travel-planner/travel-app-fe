@@ -3,20 +3,21 @@ export type TimeSlot = (typeof timeSlots)[number]
 
 export type TripItem = {
   item_id: string
-  name: string
+  title: string
   category?: string
   location?: string
   address?: string
-  time_in_date: TimeSlot
-  order_in_date?: number
-  place_id?: string | null
+  tripDay?: number // Represents the day of the trip, starting from 1
+  timeInDate: TimeSlot
+  orderInDay: number
+  placeID?: string | null
 }
 
 export type Trip = {
-  id?: string
-  name: string
+  id?: number
+  title: string
   startDate: Date
-  numberOfDays: number
+  days: number
   location: string
   description?: string
   imageUrl?: string
@@ -24,13 +25,10 @@ export type Trip = {
 }
 
 export interface CreateTripDTO {
-  name: string
-  startDate: Date
-  numberOfDays: number
-  location: string
-  description?: string
-  imageUrl?: string
-  items: TripItem[]
+  city?: string
+  days?: number
+  startDate?: Date
+  title?: string
 }
 
 export type TripDate = {
