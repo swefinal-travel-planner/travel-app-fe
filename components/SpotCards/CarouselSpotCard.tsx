@@ -8,17 +8,28 @@ import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { useMemo } from 'react'
 import PressableOpacity from '../PressableOpacity'
 
+interface Location {
+  long: number
+  lat: number
+}
+
 interface SpotCardProps {
-  spotName: string
-  spotLocation: string
-  spotImage: string
+  id: string
+  location: Location
+  name: string
+  properties: string[]
+  type: string[]
+  image: string
   onCheckIn?: () => void
 }
 
 const CarouselSpotCard: React.FC<SpotCardProps> = ({
-  spotName,
-  spotLocation,
-  spotImage,
+  id,
+  location,
+  name,
+  properties,
+  type,
+  image,
   onCheckIn,
 }) => {
   const theme = useThemeStyle()
@@ -27,13 +38,13 @@ const CarouselSpotCard: React.FC<SpotCardProps> = ({
   return (
     <PressableOpacity style={styles.wrapper}>
       <View style={styles.imageContainer}>
-        <Image source={{ uri: spotImage }} style={styles.image} />
+        <Image source={{ uri: image }} style={styles.image} />
       </View>
 
       <View style={styles.infoContainer}>
         <View style={styles.spotInfo}>
           <Text style={styles.name} numberOfLines={1} ellipsizeMode="tail">
-            {spotName}
+            {name}
           </Text>
 
           <View style={styles.locationContainer}>
@@ -49,7 +60,7 @@ const CarouselSpotCard: React.FC<SpotCardProps> = ({
               numberOfLines={1}
               ellipsizeMode="tail"
             >
-              {spotLocation}
+              {location.long.toFixed(6)}, {location.lat.toFixed(6)}
             </Text>
           </View>
         </View>

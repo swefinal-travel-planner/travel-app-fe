@@ -10,18 +10,28 @@ import { useThemeStyle } from '@/hooks/useThemeStyle'
 
 import { useRouter } from 'expo-router'
 import PressableOpacity from '../PressableOpacity'
+interface Location {
+  long: number
+  lat: number
+}
 
 interface SpotCardProps {
-  spotName: string
-  spotLocation: string
-  spotImage: string
+  id: string
+  location: Location
+  name: string
+  properties: string[]
+  type: string[]
+  image: string
   isSaved: boolean
 }
 
 const SpotCard: React.FC<SpotCardProps> = ({
-  spotName,
-  spotLocation,
-  spotImage,
+  id,
+  location,
+  name,
+  properties,
+  type,
+  image,
   isSaved,
 }) => {
   const theme = useThemeStyle()
@@ -33,7 +43,7 @@ const SpotCard: React.FC<SpotCardProps> = ({
   return (
     <View style={styles.wrapper}>
       <View style={styles.imageContainer}>
-        <Image source={{ uri: spotImage }} style={styles.image} />
+        <Image source={{ uri: image }} style={styles.image} />
 
         <PressableOpacity
           style={styles.overlay}
@@ -49,7 +59,7 @@ const SpotCard: React.FC<SpotCardProps> = ({
 
       <View style={styles.spotInfo}>
         <Text style={styles.name} numberOfLines={1}>
-          {spotName}
+          {name}
         </Text>
 
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -61,7 +71,7 @@ const SpotCard: React.FC<SpotCardProps> = ({
           />
 
           <Text style={styles.location} numberOfLines={1}>
-            {spotLocation}
+            {location.long}, {location.lat}
           </Text>
         </View>
       </View>
