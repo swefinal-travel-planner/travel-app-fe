@@ -1,12 +1,12 @@
 export type Place = {
-  en_name: string
-  en_properties: string[]
-  en_type: string
   id: string
-  lat: number
-  long: number
-  vi_name: string
-  vi_properties: string[]
-  vi_type: string
-  order_in_date?: string
+  address: string
+  images: string[]
+  location: {
+    lat: number
+    long: number
+  }
+  name: string
+  properties: string[]
+  type: string
 }

@@ -36,6 +36,9 @@ export const ENDPOINTS = {
     BASE: createEndpoint('/places'),
     BY_ID: (id: string) => createEndpoint(`/places/${id}`),
   },
+  LABELS: {
+    BASE: createEndpoint('/labels'),
+  },
 } as const
 
 // Token refresh state

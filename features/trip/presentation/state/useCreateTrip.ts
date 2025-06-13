@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { TripRepositoryImpl } from '../../data/repositories/TripRepositoryImpl'
-import { CreateTripDTO, Trip } from '../../domain/models/Trip'
+import { CreateTripDTO } from '../../domain/models/Trip'
 import { CreateManualTripUseCase } from '../../domain/usecases/CreateManualTrip'
 
 export const useCreateTrip = () => {
@@ -11,7 +11,7 @@ export const useCreateTrip = () => {
     new TripRepositoryImpl()
   )
 
-  const createTrip = async (trip: CreateTripDTO): Promise<Trip | null> => {
+  const createTrip = async (trip: CreateTripDTO): Promise<number | null> => {
     setIsLoading(true)
     setError(null)
     try {
