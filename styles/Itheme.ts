@@ -1,11 +1,11 @@
 export const colorPalettes = {
   light: {
     primary: '#1A434E',
-    secondary: '#F3E6FF',
+    secondary: '#DCF4F5',
     accent: '#FFE1B8',
     error: '#D73C62',
     disabled: '#ABBBBF',
-    background: '#F0FCFF',
+    background: '#F2F2F2',
     text: '#4C585B',
     dimText: '#808E91',
     black: '#000000',
@@ -13,11 +13,11 @@ export const colorPalettes = {
   },
   dark: {
     primary: '#1EE',
-    secondary: '#F6FF',
+    secondary: '#DCF4F5',
     accent: '#FFE1B8',
     error: '#D73C62',
     disabled: '#ABBBBF',
-    background: '#F0FCFF',
+    background: '#F2F2F2',
     text: '#1D292C',
     dimText: '#808E91',
     black: '#000000',
