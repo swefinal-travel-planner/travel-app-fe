@@ -55,7 +55,7 @@ export default function TripLength({
   }
 
   const handleNext = () => {
-    nextFn() // TODO: remove this line when the next step is implemented
+    nextFn()
 
     if (!startDate || !endDate) {
       setErrorMessage('Please select a start and end date.')
@@ -71,7 +71,7 @@ export default function TripLength({
 
     setManualTrip({
       startDate: new Date(startDate),
-      numberOfDays: days,
+      days: days,
     })
 
     setTripLength(startDate, days)

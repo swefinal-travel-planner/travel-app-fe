@@ -4,8 +4,9 @@ import { StyleSheet, Text } from 'react-native'
 import { Button, View } from 'react-native-ui-lib'
 import { CreateTripDTO } from '../../domain/models/Trip'
 import { useCreateTrip } from '../state/useCreateTrip'
-import TripPlanner, { TypedTripItem } from './TripPlanner'
 import { useManualTripStore } from '../state/useManualTrip'
+import { useUpdateTripItem } from '../state/useUpdateTripItem'
+import DayPlanner from './DayPlanner'
 import HorizontalDatePicker from './HorizontalDatePicker'
 
 type ManualTripCreateProps = {
@@ -15,16 +16,23 @@ type ManualTripCreateProps = {
 export default function ManualTripCreate({
   nextFn,
 }: Readonly<ManualTripCreateProps>) {
-  const { createTrip, isLoading, error } = useCreateTrip()
-  const { trip, setManualTrip } = useManualTripStore()
+  const {
+    createTrip,
+    isLoading: isCreating,
+    error: createError,
+  } = useCreateTrip()
+  const {
+    updateTripItem,
+    isLoading: isUpdating,
+    error: updateError,
+  } = useUpdateTripItem()
+
+  const { trip, setManualTrip, getItemsForDate, log } = useManualTripStore()
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
-  const [tripItems, setTripItems] = useState<TypedTripItem[]>([])
 
   useEffect(() => {
-    if (trip.startDate && selectedDate === null) {
-      setSelectedDate(new Date(trip.startDate))
-    }
-  }, [trip.startDate, selectedDate])
+    setSelectedDate(trip.startDate ? new Date(trip.startDate) : null)
+  }, [trip.startDate])
 
   const theme = useThemeStyle()
 
@@ -34,34 +42,31 @@ export default function ManualTripCreate({
       return
     }
 
-    // Convert TypedTripItems to TripItems
-    const items = tripItems.map(({ type, place, ...item }) => ({
-      ...item,
-      place_id: place?.id || null,
-    }))
+    // Get all items for the selected date
+    const items = getItemsForDate(selectedDate)
 
     const createTripDTO: CreateTripDTO = {
-      name: trip.name || 'Untitled Trip',
+      city: 'Ho Chi Minh City', // Default city, can be changed later
+      title: trip.title ?? 'Untitled Trip',
       startDate: selectedDate,
-      numberOfDays: trip.numberOfDays || 1,
-      location: trip.location || 'Unknown',
-      description: trip.description,
-      imageUrl: trip.imageUrl,
-      items,
+      days: trip.days ?? 1,
     }
 
-    const createdTrip = await createTrip(createTripDTO)
-    if (createdTrip) {
-      setManualTrip(createdTrip)
-      nextFn()
+    // const createdTripId = await createTrip(createTripDTO)
+    const createdTripId = 4 // Mocked ID for demonstration purposes
+
+    if (createdTripId) {
+      log() // Log the current state for debugging
+
+      nextFn() // Proceed to the next step
     }
   }
 
-  if (error) {
+  if (createError) {
     // Handle error state
     return (
       <View style={[styles.container, styles.centerContent]}>
-        <Text>Error: {error.message}</Text>
+        <Text>Error: {createError.message}</Text>
       </View>
     )
   }
@@ -76,11 +81,11 @@ export default function ManualTripCreate({
           theme={theme}
         />
       )}
-      <TripPlanner onTripItemsChange={setTripItems} />
+      {selectedDate && <DayPlanner selectedDate={selectedDate} />}
       <Button
         onPress={handleNext}
-        label={isLoading ? 'Creating...' : 'Next'}
-        disabled={isLoading}
+        label={isCreating ? 'Creating...' : 'Next'}
+        disabled={isCreating}
         color={theme.white}
         backgroundColor={theme.primary}
         style={{ width: '100%', paddingVertical: 15, marginTop: 15 }}

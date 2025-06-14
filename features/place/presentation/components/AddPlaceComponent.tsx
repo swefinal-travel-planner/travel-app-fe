@@ -14,6 +14,7 @@ import {
   View,
 } from 'react-native'
 import { usePlaces } from '../state/usePlaces'
+import { LabelFilterModal } from './LabelFilterModal'
 
 export interface AddPlaceModalProps {
   visible: boolean
@@ -28,9 +29,10 @@ export const AddPlaceModal: React.FC<AddPlaceModalProps> = ({
   onClose,
   onConfirm,
 }) => {
-  const [isFilterVisible, setIsFilterVisible] = useState(false)
+  const [isFilterModalVisible, setIsFilterModalVisible] = useState(false)
   const [selectedPlaces, setSelectedPlaces] = useState<Place[]>([])
   const [shouldFetchPlaces, setShouldFetchPlaces] = useState(false)
+  const [selectedLabels, setSelectedLabels] = useState<string[]>([])
 
   useEffect(() => {
     if (visible) {
@@ -39,6 +41,7 @@ export const AddPlaceModal: React.FC<AddPlaceModalProps> = ({
       // Reset selected places when modal closes
       setSelectedPlaces([])
       setShouldFetchPlaces(false)
+      setSelectedLabels([])
     }
   }, [visible])
 
@@ -54,6 +57,7 @@ export const AddPlaceModal: React.FC<AddPlaceModalProps> = ({
     location: 'Ho Chi Minh',
     language: 'en',
     enabled: shouldFetchPlaces,
+    filter: selectedLabels.length > 0 ? selectedLabels.join(',') : undefined,
   })
 
   const handleTogglePlace = (place: Place) => {
@@ -74,7 +78,11 @@ export const AddPlaceModal: React.FC<AddPlaceModalProps> = ({
   }
 
   const handleFilterPress = () => {
-    setIsFilterVisible(!isFilterVisible)
+    setIsFilterModalVisible(true)
+  }
+
+  const handleLabelSelect = (labels: string[]) => {
+    setSelectedLabels(labels)
   }
 
   const handleLoadMore = () => {
@@ -133,14 +141,17 @@ export const AddPlaceModal: React.FC<AddPlaceModalProps> = ({
       >
         <View style={styles.imageContainer}>
           <Image
-            source={require('@/assets/images/alligator.jpg')}
+            source={{
+              uri:
+                'https://drive.google.com/uc?export=view&id=' + item.images[2],
+            }}
             style={styles.placeImage}
           />
         </View>
         <View style={styles.contentContainer}>
           <View style={styles.placeInfo}>
-            <Text style={styles.placeName}>{item.en_name}</Text>
-            <Text style={styles.placeType}>{item.en_type}</Text>
+            <Text style={styles.placeName}>{item.name}</Text>
+            <Text style={styles.placeType}>{item.type}</Text>
           </View>
           <TouchableOpacity
             style={[styles.addButton, isSelected && styles.selectedButton]}
@@ -176,11 +187,6 @@ export const AddPlaceModal: React.FC<AddPlaceModalProps> = ({
                 <Ionicons name="filter-outline" size={24} color="#563D30" />
               </TouchableOpacity>
             </View>
-            {isFilterVisible && (
-              <View style={styles.filterContainer}>
-                <Text>Filter options will go here</Text>
-              </View>
-            )}
           </View>
 
           {renderContent()}
@@ -208,6 +214,13 @@ export const AddPlaceModal: React.FC<AddPlaceModalProps> = ({
           </View>
         </View>
       </View>
+
+      <LabelFilterModal
+        visible={isFilterModalVisible}
+        onClose={() => setIsFilterModalVisible(false)}
+        onApply={handleLabelSelect}
+        initialSelectedLabels={selectedLabels}
+      />
     </Modal>
   )
 }
