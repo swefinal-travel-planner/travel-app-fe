@@ -111,7 +111,6 @@ const Index = () => {
         `${EXPO_PUBLIC_CORE_API_URL}/places/get_random_places?${query}`
       )
       const data = await response.json()
-      console.log('Fetched cool spots:', data.data[0])
       setCoolSpots(data.data)
     } catch (error) {
       console.error('Error fetching cool spots:', error)
@@ -120,27 +119,6 @@ const Index = () => {
 
   useEffect(() => {
     getCoolSpots()
-  }, [])
-
-  const getTypes = async () => {
-    try {
-      const language = 'en' // hoặc 'vi'
-      const query = new URLSearchParams({
-        language,
-      }).toString()
-
-      const response = await fetch(
-        `${EXPO_PUBLIC_CORE_API_URL}/labels?${query}`
-      )
-      const data = await response.json()
-      console.log('Fetched types:', data)
-    } catch (error) {
-      console.error('Error fetching cool spots:', error)
-    }
-  }
-
-  useEffect(() => {
-    getTypes()
   }, [])
 
   const handlePress = (item: SpotData) => {
