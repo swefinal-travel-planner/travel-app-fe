@@ -145,8 +145,9 @@ const Index = () => {
 
   const handlePress = (item: SpotData) => {
     router.push({
-      pathname: `/places/${item.id}`,
+      pathname: '/places/[id]',
       params: {
+        id: item.id,
         name: item.name,
         long: item.location.long.toString(),
         lat: item.location.lat.toString(),
