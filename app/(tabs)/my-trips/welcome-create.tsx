@@ -68,7 +68,7 @@ export default function WelcomeCreateScreen() {
       />
 
       <Pressable
-        onPress={() => router.push('/(tabs)/my-trips/create-ai-trip')}
+        onPress={() => router.push('/(tabs)/my-trips/create-manual-trip')}
         title="Plan a trip manually"
         style={{
           color: theme.text,

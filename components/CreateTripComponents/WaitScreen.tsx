@@ -9,19 +9,11 @@ import Pressable from '../Pressable'
 
 type WaitScreenProps = {
   theme: typeof colorPalettes.light
-  nextFn: () => void
 }
 
-export default function WaitScreen({
-  theme,
-  nextFn,
-}: Readonly<WaitScreenProps>) {
+export default function WaitScreen({ theme }: Readonly<WaitScreenProps>) {
   const router = useRouter()
   const animation = useRef<LottieView>(null)
-
-  const handleNext = () => {
-    nextFn()
-  }
 
   useEffect(() => {
     animation.current?.play()
