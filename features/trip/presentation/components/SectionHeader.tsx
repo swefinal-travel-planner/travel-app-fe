@@ -1,7 +1,12 @@
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6'
 import React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { SectionHeaderProps } from './TripPlanner'
+import { TimeSlot } from '../../domain/models/Trip'
+
+type SectionHeaderProps = {
+  time: TimeSlot
+  onAddItem: (time: TimeSlot) => void
+}
 
 export const SectionHeader: React.FC<SectionHeaderProps> = ({
   time,

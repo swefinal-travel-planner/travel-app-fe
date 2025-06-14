@@ -5,12 +5,13 @@ import {
   timeSlots,
   TripItem,
 } from '@/features/trip/domain/models/Trip'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import DraggableFlatList, {
   RenderItemParams,
 } from 'react-native-draggable-flatlist'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import { useManualTripStore } from '../state/useManualTrip'
 import { SectionHeader } from './SectionHeader'
 import { TripItemCard } from './TripItemCard'
 
@@ -24,44 +25,42 @@ export type TypedTripItem = TripItem & {
   place?: Place
 }
 
-export type Item = TypedTripItem | SectionHeader
+type Item = SectionHeader | TypedTripItem
 
-export interface SectionHeaderProps {
-  time: TimeSlot
-  onAddItem: (time: TimeSlot) => void
-}
-
-export interface TripItemCardProps {
-  item: TypedTripItem
-  drag: () => void
-  isActive: boolean
-}
-
-export interface TripPlannerProps {
-  onTripItemsChange?: (items: TypedTripItem[]) => void
+export interface DayPlannerProps {
+  selectedDate: Date
 }
 
 function buildList(data: TypedTripItem[]): Item[] {
   const list: Item[] = []
   for (const time of timeSlots) {
     list.push({ type: 'header', time })
-    const items = data.filter((item) => item.time_in_date === time)
+    const items = data.filter((item) => item.timeInDate === time)
     list.push(...items)
   }
   return list
 }
 
-export default function TripPlanner({
-  onTripItemsChange,
-}: Readonly<TripPlannerProps>) {
-  const [data, setData] = useState(() => buildList([]))
+export default function DayPlanner({
+  selectedDate,
+}: Readonly<DayPlannerProps>) {
+  const [data, setData] = useState<Item[]>([])
   const [modalVisible, setModalVisible] = useState(false)
   const [selectedTime, setSelectedTime] = useState<TimeSlot | null>(null)
 
-  // Log every time the data changes
-  React.useEffect(() => {
-    console.log('Data changed:', data)
-  }, [data])
+  const { getItemsForDate, addTripItems, updateTripItem, deleteTripItem } =
+    useManualTripStore()
+
+  // Update data when selected date changes
+  useEffect(() => {
+    const items = getItemsForDate(selectedDate)
+    // Convert TripItem[] to TypedTripItem[]
+    const typedItems: TypedTripItem[] = items.map((item) => ({
+      ...item,
+      type: 'item',
+    }))
+    setData(buildList(typedItems))
+  }, [selectedDate, getItemsForDate])
 
   const onDragEnd = ({ data: newData }: { data: Item[] }) => {
     const updatedTripItems: TypedTripItem[] = []
@@ -74,14 +73,14 @@ export default function TripPlanner({
       } else if (item.type === 'item' && currentTime) {
         updatedTripItems.push({
           ...item,
-          time_in_date: currentTime,
-          order_in_date: globalOrder++,
+          timeInDate: currentTime,
+          orderInDay: globalOrder++,
         })
       }
     }
 
     setData(buildList(updatedTripItems))
-    onTripItemsChange?.(updatedTripItems)
+    addTripItems(updatedTripItems, selectedDate)
   }
 
   const handleAddItem = (time: TimeSlot) => {
@@ -95,22 +94,23 @@ export default function TripPlanner({
     const existingItems = data.filter(
       (item): item is TypedTripItem => item.type === 'item'
     )
-    const orderNumbers = existingItems.map((item) => item.order_in_date ?? 0)
+    const orderNumbers = existingItems.map((item) => item.orderInDay ?? 0)
     const currentMaxOrder =
       orderNumbers.length > 0 ? Math.max(...orderNumbers) : 0
 
     const newItems: TypedTripItem[] = places.map((place, index) => ({
-      name: place.en_name,
+      name: place.name,
       type: 'item',
+      title: place.name,
       item_id: place.id,
-      time_in_date: selectedTime,
-      order_in_date: currentMaxOrder + index + 1,
+      timeInDate: selectedTime,
+      orderInDay: currentMaxOrder + index + 1,
       place: place,
     }))
 
     const updatedItems = [...existingItems, ...newItems]
     setData(buildList(updatedItems))
-    onTripItemsChange?.(updatedItems)
+    addTripItems(updatedItems, selectedDate)
     setModalVisible(false)
     setSelectedTime(null)
   }

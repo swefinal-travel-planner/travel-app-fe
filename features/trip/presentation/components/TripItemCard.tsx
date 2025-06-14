@@ -2,7 +2,13 @@ import Ionicons from '@expo/vector-icons/Ionicons'
 import React from 'react'
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { ScaleDecorator } from 'react-native-draggable-flatlist'
-import { TripItemCardProps } from './TripPlanner'
+import { TypedTripItem } from './DayPlanner'
+
+export type TripItemCardProps = {
+  item: TypedTripItem
+  drag: () => void
+  isActive: boolean
+}
 
 export const TripItemCard: React.FC<TripItemCardProps> = ({
   item,
@@ -26,16 +32,18 @@ export const TripItemCard: React.FC<TripItemCardProps> = ({
 
         <View style={styles.spotImageContainer}>
           <Image
-            source={require('@/assets/images/alligator.jpg')}
+            source={{
+              uri: `https://drive.usercontent.google.com/download?id=1vsS3c_2bTBy3FDII3zyC047A-M6cDxnq&export=view&authuser=0`,
+            }}
             style={styles.spotImage}
           />
         </View>
 
         <View style={styles.spotDetails}>
-          <Text style={styles.spotName}>{item.name}</Text>
+          <Text style={styles.spotName}>{item.place?.name}</Text>
           <View style={styles.spotLocationContainer}>
             <Ionicons name="location" size={14} color="#888" />
-            <Text>{item.time_in_date}</Text>
+            <Text>{item.place?.address ?? 'No address available'}</Text>
           </View>
         </View>
       </TouchableOpacity>

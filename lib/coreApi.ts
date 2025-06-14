@@ -3,20 +3,31 @@ import { AxiosError, InternalAxiosRequestConfig } from 'axios'
 import { getItemAsync, setItemAsync } from 'expo-secure-store'
 import createAxiosInstance from './axios'
 
-// Extended type for request config with _retry property
+// Types
 interface ExtendedAxiosRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean
 }
 
-export const CORE_URL = process.env.EXPO_PUBLIC_CORE_API_URL ?? EMPTY_STRING
+interface QueueItem {
+  resolve: (value?: unknown) => void
+  reject: (reason?: unknown) => void
+}
 
-// Core API for all requests
+interface TokenResponse {
+  token: string
+}
+
+// Constants
+const TOKEN_STORAGE_KEY = 'coreAccessToken'
+export const CORE_URL = process.env.EXPO_PUBLIC_CORE_API_URL ?? EMPTY_STRING
+const SECRET_KEY = process.env.EXPO_PUBLIC_CORE_SECRET_TOKEN
+
+// API instance
 const coreApi = createAxiosInstance(CORE_URL)
 
-// Function to create endpoint URL
-export const createEndpoint = (path: string) => `${CORE_URL}${path}`
+// Endpoint utilities
+const createEndpoint = (path: string) => `${CORE_URL}${path}`
 
-// Endpoints
 export const ENDPOINTS = {
   AUTH: {
     TOKEN: createEndpoint('/auth/generate_token'),
@@ -25,108 +36,124 @@ export const ENDPOINTS = {
     BASE: createEndpoint('/places'),
     BY_ID: (id: string) => createEndpoint(`/places/${id}`),
   },
+  LABELS: {
+    BASE: createEndpoint('/labels'),
+  },
 } as const
 
-// Flag to prevent multiple refresh token requests
+// Token refresh state
 let isRefreshing = false
-// Store pending requests
-let failedQueue: any[] = []
+let failedQueue: QueueItem[] = []
 
-const processQueue = (error: any = null) => {
-  failedQueue.forEach((prom) => {
+const processQueue = (error: Error | null = null) => {
+  failedQueue.forEach(({ resolve, reject }) => {
     if (error) {
-      prom.reject(error)
+      reject(error)
     } else {
-      prom.resolve()
+      resolve()
     }
   })
   failedQueue = []
 }
 
-// Function to refresh token
-const refreshToken = async () => {
+/**
+ * Gets a valid token, either from storage or by requesting a new one
+ * @param forceRefresh If true, will always request a new token
+ * @returns The token string
+ */
+export const getCoreAccessToken = async (
+  forceRefresh = false
+): Promise<string> => {
+  if (!SECRET_KEY) {
+    throw new Error('Secret token not found in environment variables')
+  }
+
   try {
-    const secretKey = process.env.EXPO_PUBLIC_CORE_SECRET_TOKEN
-    if (!secretKey) {
-      throw new Error('Secret token not found in environment variables')
+    // Try to get existing token if not forcing refresh
+    if (!forceRefresh) {
+      const existingToken = await getItemAsync(TOKEN_STORAGE_KEY)
+      if (existingToken) {
+        return existingToken
+      }
     }
 
-    const response = await coreApi.post(ENDPOINTS.AUTH.TOKEN, {
-      secret_key: secretKey,
+    // Get new token
+    const { data } = await coreApi.post<TokenResponse>(ENDPOINTS.AUTH.TOKEN, {
+      secret_key: SECRET_KEY,
     })
 
-    const token = response.data.token
-
-    if (typeof token !== 'string') {
-      throw new Error('Access token must be a string')
+    if (typeof data.token !== 'string') {
+      throw new Error('Invalid token received from server')
     }
 
-    await setItemAsync('coreAccessToken', token)
-    return token
+    // Store and setup new token
+    await setItemAsync(TOKEN_STORAGE_KEY, data.token)
+    coreApi.defaults.headers.common['Authorization'] = `Bearer ${data.token}`
+
+    return data.token
   } catch (error) {
-    await setItemAsync('coreAccessToken', '') // Clear token on error
-    console.error('Token refresh error:', error)
-    throw error
+    await setItemAsync(TOKEN_STORAGE_KEY, '')
+    throw error instanceof Error ? error : new Error('Failed to get token')
   }
 }
 
-// Add authentication and token refresh interceptor
+// Request interceptor
 coreApi.interceptors.request.use(
   async (config) => {
-    const coreAccessToken = await getItemAsync('coreAccessToken')
-    if (coreAccessToken && typeof coreAccessToken === 'string') {
-      config.headers.Authorization = `Bearer ${coreAccessToken}`
+    const token = await getItemAsync(TOKEN_STORAGE_KEY)
+    if (token && typeof token === 'string') {
+      config.headers.Authorization = `Bearer ${token}`
     }
     return config
   },
-  (error) => {
-    return Promise.reject(
-      error instanceof Error ? error : new Error(String(error))
-    )
-  }
+  (error) =>
+    Promise.reject(error instanceof Error ? error : new Error(String(error)))
 )
 
-// Add token refresh interceptor
+// Response interceptor
 coreApi.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const originalRequest = error.config as ExtendedAxiosRequestConfig
 
-    // Handle 401 error
     if (
-      error.response?.status === 401 &&
-      originalRequest &&
-      !originalRequest._retry
+      error.response?.status !== 401 ||
+      !originalRequest ||
+      originalRequest._retry
     ) {
-      if (isRefreshing) {
-        return new Promise((resolve, reject) => {
+      return Promise.reject(error)
+    }
+
+    if (isRefreshing) {
+      try {
+        await new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject })
         })
-          .then(() => coreApi(originalRequest))
-          .catch(() => Promise.reject(new Error('Failed to refresh token')))
-      }
-
-      originalRequest._retry = true
-      isRefreshing = true
-
-      try {
-        const newToken = await refreshToken()
-        processQueue()
-
-        if (originalRequest.headers) {
-          originalRequest.headers.Authorization = `Bearer ${newToken}`
-        }
-
         return coreApi(originalRequest)
-      } catch (refreshError) {
-        processQueue(refreshError)
+      } catch {
         return Promise.reject(new Error('Failed to refresh token'))
-      } finally {
-        isRefreshing = false
       }
     }
 
-    return Promise.reject(error)
+    originalRequest._retry = true
+    isRefreshing = true
+
+    try {
+      const newToken = await getCoreAccessToken(true)
+      processQueue()
+
+      if (originalRequest.headers) {
+        originalRequest.headers.Authorization = `Bearer ${newToken}`
+      }
+
+      return coreApi(originalRequest)
+    } catch (refreshError) {
+      console.error('Failed to refresh token:', refreshError)
+      processQueue(new Error('Failed to refresh token'))
+      return Promise.reject(new Error('Failed to get new token'))
+    } finally {
+      isRefreshing = false
+    }
   }
 )
 
