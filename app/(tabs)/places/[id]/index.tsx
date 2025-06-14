@@ -2,18 +2,14 @@ import LocationDetail from '@/components/LocationDetail'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 
 const PlaceDetailScreen = () => {
-  const { spotName, spotLocation, spotImage } = useLocalSearchParams()
+  const { name, long, lat, image, properties, types } = useLocalSearchParams()
   const router = useRouter()
 
   return (
     <LocationDetail
-      title={spotName as string}
-      introduction="Turtle Lake is a popular spot in HCMC..."
-      activities={[
-        { name: 'Catch turtle', iconName: 'paw-outline' },
-        { name: 'Take photo', iconName: 'camera-outline' },
-        { name: 'Eat snacks', iconName: 'fast-food-outline' },
-      ]}
+      title={name as string}
+      properties={properties as string}
+      types={types as string}
       onBack={() => router.back()}
     />
   )

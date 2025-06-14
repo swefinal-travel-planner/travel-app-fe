@@ -1,5 +1,6 @@
-import { Ionicons } from '@expo/vector-icons' // Assuming you use Expo for icons
+import { Ionicons } from '@expo/vector-icons'
 import {
+  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -7,20 +8,24 @@ import {
   View,
 } from 'react-native'
 
+import { getGroupIconsFromTypes } from '@/utils/TypeBadges'
+
 type LocationDetailProps = {
   title: string
-  introduction: string
-  activities: { name: string; iconName?: string }[]
+  properties: string
+  types: string
   images?: string[]
   onBack?: () => void
 }
 
 const LocationDetail = ({
   title,
-  introduction,
-  activities,
+  properties,
+  types,
   onBack,
 }: LocationDetailProps) => {
+  const groupIcons = getGroupIconsFromTypes(types)
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -45,20 +50,18 @@ const LocationDetail = ({
 
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.subtitle}>Introduction</Text>
-        <Text style={styles.description}>{introduction}</Text>
+        <Text style={styles.description}>{properties}</Text>
 
-        <Text style={styles.activityTitle}>Activity</Text>
+        <Text style={styles.activityTitle}>Badges</Text>
         <View style={styles.activityGrid}>
-          {activities.map((activity, index) => (
+          {groupIcons.map((icon, index) => (
             <View style={styles.activityItem} key={index}>
-              <View style={styles.activityPlaceholder}>
-                <Ionicons
-                  name={activity.iconName || 'image-outline'}
-                  size={30}
-                  color="#A79F93"
-                />
+              <View style={styles.activityBox}>
+                <View style={styles.iconWrapper}>
+                  <Image source={icon.iconSource} style={styles.iconImage} />
+                </View>
+                <Text style={styles.activityText}>{icon.label}</Text>
               </View>
-              <Text style={styles.activityText}>{activity.name}</Text>
             </View>
           ))}
         </View>
@@ -133,31 +136,39 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'flex-start',
-    gap: 15,
+    gap: 12,
   },
   activityItem: {
-    width: '30%',
-    backgroundColor: '#EBE2D9',
-    borderRadius: 8,
-    padding: 10,
+    width: 100,
     alignItems: 'center',
-    marginBottom: 10,
   },
-  activityPlaceholder: {
-    width: '100%',
-    height: 80,
-    backgroundColor: '#DCDCDC',
-    borderRadius: 8,
+  activityBox: {
+    width: 100,
+    height: 100,
+    backgroundColor: '#EBE2D9',
+    borderRadius: 12,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    padding: 10,
+  },
+  iconWrapper: {
+    width: '60%',
+    height: '60%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 6,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 5,
+    marginBottom: 6,
+  },
+  iconImage: {
+    width: 36,
+    height: 36,
+    resizeMode: 'contain',
   },
   activityText: {
     fontSize: 14,
-    color: '#333333',
-    marginTop: 5,
     textAlign: 'center',
+    fontWeight: '500',
   },
 })
-
 export default LocationDetail
