@@ -1,10 +1,13 @@
 import { FontFamily, FontSize } from '@/constants/font'
 import medicalReqData from '@/lib/mock_data/medicalReqs'
+import { useAiTripStore } from '@/store/useAiTripStore'
 import { colorPalettes } from '@/styles/Itheme'
-import React, { useState } from 'react'
+import { formatAttribute } from '@/utils/tripAttributes'
+import React, { useEffect, useState } from 'react'
 import { StyleSheet } from 'react-native'
-import { Button, Text, View } from 'react-native-ui-lib'
+import { Text, View } from 'react-native-ui-lib'
 import CollapsibleSectionList from '../CollapsibleSectionList'
+import Pressable from '../Pressable'
 
 type MedicalReqProps = {
   theme: typeof colorPalettes.light
@@ -15,16 +18,37 @@ export default function MedicalReq({
   theme,
   nextFn,
 }: Readonly<MedicalReqProps>) {
-  const [medicalReqs, setMedicalReqs] = useState<string[]>([])
+  const request = useAiTripStore((state) => state.request)
+
+  const [medicalReqs, setMedicalReqs] = useState<string[]>(
+    request?.enMedicalConditions
+      ? request.enMedicalConditions.filter((req) => req !== 'none')
+      : []
+  )
+
+  const setMedicalConditions = useAiTripStore(
+    (state) => state.setMedicalConditions
+  )
 
   const handleNext = () => {
     nextFn()
   }
 
+  useEffect(() => {
+    setMedicalConditions(
+      medicalReqs.map((req) => formatAttribute(req)),
+      ['không']
+    )
+
+    if (medicalReqs.length === 0) {
+      setMedicalConditions(['none'], ['none'])
+    }
+  }, [medicalReqs])
+
   return (
     <View style={styles.container}>
       <Text style={[styles.textQuestion, { color: theme.primary }]}>
-        Do you have any medical requirements or dietary restrictions?
+        Do you have any medical or dietary requirements?
       </Text>
 
       <Text style={[styles.subTextQuestion, { color: theme.text }]}>
@@ -37,25 +61,25 @@ export default function MedicalReq({
           selectedValues={medicalReqs}
           onValueChange={setMedicalReqs}
         />
+      </View>
 
-        <Text
-          style={[styles.textField, { color: theme.primary, marginTop: 40 }]}
-        >
-          {medicalReqs.length === 1
+      {medicalReqs.length > 0 && (
+        <Text style={[styles.textField, { color: theme.primary }]}>
+          {medicalReqs.length === 1 && medicalReqs[0] !== 'none'
             ? 'Selected 1 category'
             : medicalReqs.length > 1
               ? `Selected ${medicalReqs.length} categories`
               : ''}
         </Text>
-      </View>
+      )}
 
-      <Button
+      <Pressable
         onPress={handleNext}
-        label="Next"
-        color={theme.white}
-        backgroundColor={theme.primary}
-        style={{ width: '100%', paddingVertical: 15 }}
-        size="large"
+        title="Next"
+        style={{
+          color: theme.white,
+          backgroundColor: theme.primary,
+        }}
       />
     </View>
   )
@@ -74,9 +98,8 @@ const styles = StyleSheet.create({
   textFieldContainer: {
     width: '100%',
     flexDirection: 'column',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: 12,
     height: '60%',
   },
   textQuestion: {
@@ -94,19 +117,6 @@ const styles = StyleSheet.create({
   textField: {
     textAlign: 'center',
     fontFamily: FontFamily.REGULAR,
-    fontSize: FontSize.XL,
-  },
-  errorText: {
-    textAlign: 'center',
-    fontFamily: FontFamily.REGULAR,
-    fontSize: FontSize.LG,
-  },
-  dateField: {
-    width: '100%',
-    height: 48,
-    borderRadius: 24,
-    padding: 12,
-    backgroundColor: colorPalettes.light.background,
-    color: colorPalettes.light.primary,
+    fontSize: FontSize.MD,
   },
 })

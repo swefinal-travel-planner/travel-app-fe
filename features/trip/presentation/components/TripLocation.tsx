@@ -1,11 +1,13 @@
+import Pressable from '@/components/Pressable'
 import { FontFamily, FontSize } from '@/constants/font'
 import { Location } from '@/constants/location'
 import { Radius } from '@/constants/theme'
+import { useAiTripStore } from '@/store/useAiTripStore'
 import { colorPalettes } from '@/styles/Itheme'
 import { Camera, MapView } from '@rnmapbox/maps'
 import React, { useMemo } from 'react'
 import { StyleSheet } from 'react-native'
-import { Button, Picker, Text, View } from 'react-native-ui-lib'
+import { Picker, Text, View } from 'react-native-ui-lib'
 
 type TripLocationProps = {
   theme: typeof colorPalettes.light
@@ -17,8 +19,13 @@ export default function TripLocation({
   nextFn,
 }: Readonly<TripLocationProps>) {
   const styles = useMemo(() => createStyles(theme), [theme])
+  const setCity = useAiTripStore((state) => state.setCity)
+  const request = useAiTripStore((state) => state.request)
 
-  const [selectedValue, setSelectedValue] = React.useState<string>('')
+  const [selectedValue, setSelectedValue] = React.useState<string>(
+    Location.find((loc) => loc.label === request?.city)?.key ?? ''
+  )
+
   return (
     <View style={[styles.container, { backgroundColor: theme.white }]}>
       <Text style={[styles.text, { color: theme.primary }]}>
@@ -30,7 +37,9 @@ export default function TripLocation({
         getLabel={(item) => {
           return Location.find((loc) => loc.key === item)?.label ?? ''
         }}
-        onChange={(item) => setSelectedValue(item?.toString() ?? '')}
+        onChange={(item) => {
+          setSelectedValue(item?.toString() ?? '')
+        }}
         topBarProps={{ title: 'Destinations' }}
         style={styles.picker}
       >
@@ -40,7 +49,10 @@ export default function TripLocation({
               key={location.key}
               value={location.key}
               label={location.label}
-              onPress={() => setSelectedValue(location.key)}
+              onPress={() => {
+                setSelectedValue(location.key)
+                setCity(location.label)
+              }}
             />
           )
         })}
@@ -59,14 +71,15 @@ export default function TripLocation({
           />
         </MapView>
       </View>
-      <Button
+      <Pressable
         onPress={nextFn}
-        label="Next"
-        color={theme.white}
-        backgroundColor={theme.primary}
-        style={{ width: '100%', paddingVertical: 15 }}
+        title="Next"
+        style={{
+          color: theme.white,
+          backgroundColor: theme.primary,
+        }}
         // disabled={!selectedValue} TODO: enable later
-      ></Button>
+      />
     </View>
   )
 }

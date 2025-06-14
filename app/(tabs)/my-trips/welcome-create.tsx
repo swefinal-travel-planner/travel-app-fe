@@ -1,43 +1,52 @@
+import Pressable from '@/components/Pressable'
 import { FontFamily, FontSize } from '@/constants/font'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { colorPalettes } from '@/styles/Itheme'
 import { useRouter } from 'expo-router'
 import React, { useMemo } from 'react'
-import { StyleSheet, Text } from 'react-native'
-import { Button, View } from 'react-native-ui-lib'
+import { StyleSheet } from 'react-native'
+import { Text, View } from 'react-native-ui-lib'
 
 export default function WelcomeCreateScreen() {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
+
   const router = useRouter()
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.white }]}>
-      <View>
-        <Text style={styles.text}>
-          Let's create an
-          <Text style={styles.italicText}> AI planning trip </Text>
-          together!
-        </Text>
-      </View>
-      <View style={{ width: '80%', gap: 10 }}>
-        <Button
-          backgroundColor={theme.primary}
-          onPress={() => router.push('/(tabs)/my-trips/create-ai-trip')}
-        >
-          <Text style={[styles.buttonText, { color: theme.white }]}>
-            Start creating an AI trip
-          </Text>
-        </Button>
-        <Button
-          backgroundColor={theme.secondary}
-          onPress={() => router.push('/(tabs)/my-trips/create-manual-trip')}
-        >
-          <Text style={[styles.buttonText, { color: theme.black }]}>
-            Create a trip manually
-          </Text>
-        </Button>
-      </View>
+    <View style={styles.container}>
+      <Text style={[styles.textQuestion, { color: theme.primary }]}>
+        Let our AI help you plan your next trip!
+      </Text>
+
+      <View style={styles.textFieldContainer}></View>
+
+      <Pressable
+        onPress={() => router.push('/(tabs)/my-trips/create-ai-trip')}
+        title="Start"
+        style={{
+          color: theme.white,
+          backgroundColor: theme.primary,
+        }}
+      />
+
+      <Pressable
+        onPress={() => router.push('/(tabs)/my-trips/create-ai-trip')}
+        title="Plan a trip manually"
+        style={{
+          color: theme.text,
+          backgroundColor: theme.secondary,
+        }}
+      />
+
+      <Pressable
+        onPress={() => router.push('/(tabs)/my-trips')}
+        title="Cancel"
+        style={{
+          color: theme.text,
+          backgroundColor: theme.background,
+        }}
+      />
     </View>
   )
 }
@@ -46,25 +55,55 @@ const createStyles = (theme: typeof colorPalettes.light) =>
   StyleSheet.create({
     container: {
       flex: 1,
+      width: '100%',
       flexDirection: 'column',
       justifyContent: 'space-between',
       alignItems: 'center',
-      paddingBottom: 20,
-      paddingTop: 90,
+      paddingHorizontal: 24,
+      paddingVertical: 120,
+      backgroundColor: theme.white,
     },
-    text: {
-      fontFamily: FontFamily.REGULAR,
-      fontSize: FontSize.XXXL,
+    textFieldContainer: {
+      width: '100%',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      height: '60%',
+    },
+    textQuestion: {
+      display: 'flex',
       textAlign: 'center',
-      paddingHorizontal: 20,
-    },
-    italicText: {
       fontFamily: FontFamily.BOLD,
       fontSize: FontSize.XXXL,
     },
-    buttonText: {
+    subTextQuestion: {
+      display: 'flex',
+      textAlign: 'center',
       fontFamily: FontFamily.REGULAR,
-      fontSize: 16,
-      color: theme.white,
+      fontSize: FontSize.MD,
+    },
+    textField: {
+      textAlign: 'center',
+      fontFamily: FontFamily.REGULAR,
+      fontSize: FontSize.XL,
+    },
+    errorText: {
+      textAlign: 'center',
+      fontFamily: FontFamily.REGULAR,
+      fontSize: FontSize.LG,
+    },
+    button: {
+      width: '100%',
+      paddingVertical: 15,
+      fontFamily: FontFamily.BOLD,
+      fontSize: FontSize.XL,
+    },
+    dateField: {
+      width: '100%',
+      height: 48,
+      borderRadius: 24,
+      padding: 12,
+      backgroundColor: colorPalettes.light.background,
+      color: colorPalettes.light.primary,
     },
   })

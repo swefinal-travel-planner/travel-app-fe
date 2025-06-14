@@ -1,10 +1,13 @@
 import { FontFamily, FontSize } from '@/constants/font'
 import foodSpotTypeData from '@/lib/mock_data/foodSpotTypes'
+import { useAiTripStore } from '@/store/useAiTripStore'
 import { colorPalettes } from '@/styles/Itheme'
+import { formatAttribute } from '@/utils/tripAttributes'
 import React, { useEffect, useState } from 'react'
 import { StyleSheet } from 'react-native'
-import { Button, Text, View } from 'react-native-ui-lib'
+import { Text, View } from 'react-native-ui-lib'
 import CollapsibleSectionList from '../CollapsibleSectionList'
+import Pressable from '../Pressable'
 
 type FoodSpotTypeProps = {
   theme: typeof colorPalettes.light
@@ -15,23 +18,18 @@ export default function FoodSpotType({
   theme,
   nextFn,
 }: Readonly<FoodSpotTypeProps>) {
-  const [foodSpotTypes, setFoodSpotTypes] = useState<string[]>([])
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const setFoodAttributes = useAiTripStore((state) => state.setFoodAttributes)
+  const request = useAiTripStore((state) => state.request)
 
-  const handleNext = () => {
-    if (foodSpotTypes.length === 0) {
-      setErrorMessage('Please select at least one category of culinary spot.')
-      return
-    }
-
-    setErrorMessage(null)
-    nextFn()
-  }
+  const [foodSpotTypes, setFoodSpotTypes] = useState<string[]>(
+    request?.enFoodAttributes ?? []
+  )
 
   useEffect(() => {
-    if (foodSpotTypes.length > 0) {
-      setErrorMessage(null)
-    }
+    setFoodAttributes(
+      foodSpotTypes.map((type) => formatAttribute(type)),
+      []
+    )
   }, [foodSpotTypes])
 
   return (
@@ -44,38 +42,36 @@ export default function FoodSpotType({
         Scroll to see all categories, and tap to expand each category.
       </Text>
 
+      <Text style={[styles.subTextQuestion, { color: theme.text }]}>
+        Select at least one category to continue.
+      </Text>
+
       <View style={styles.textFieldContainer}>
         <CollapsibleSectionList
           data={foodSpotTypeData}
           selectedValues={foodSpotTypes}
           onValueChange={setFoodSpotTypes}
         />
+      </View>
 
-        <Text
-          style={[styles.textField, { color: theme.primary, marginTop: 40 }]}
-        >
+      {foodSpotTypes.length > 0 && (
+        <Text style={[styles.textField, { color: theme.primary }]}>
           {foodSpotTypes.length === 1
             ? 'Selected 1 category'
             : foodSpotTypes.length > 1
               ? `Selected ${foodSpotTypes.length} categories`
               : ''}
         </Text>
+      )}
 
-        {errorMessage && (
-          <Text style={[styles.errorText, { color: theme.error ?? 'red' }]}>
-            {errorMessage}
-          </Text>
-        )}
-      </View>
-
-      <Button
-        onPress={handleNext}
-        label="Next"
-        color={theme.white}
-        backgroundColor={theme.primary}
-        style={{ width: '100%', paddingVertical: 15 }}
-        size="large"
-        // disabled={foodSpotTypes.length === 0} TODO : enable later
+      <Pressable
+        onPress={nextFn}
+        title="Next"
+        style={{
+          color: theme.white,
+          backgroundColor: theme.primary,
+        }}
+        disabled={foodSpotTypes.length === 0}
       />
     </View>
   )
@@ -94,9 +90,8 @@ const styles = StyleSheet.create({
   textFieldContainer: {
     width: '100%',
     flexDirection: 'column',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: 12,
     height: '60%',
   },
   textQuestion: {
@@ -114,19 +109,6 @@ const styles = StyleSheet.create({
   textField: {
     textAlign: 'center',
     fontFamily: FontFamily.REGULAR,
-    fontSize: FontSize.XL,
-  },
-  errorText: {
-    textAlign: 'center',
-    fontFamily: FontFamily.REGULAR,
-    fontSize: FontSize.LG,
-  },
-  dateField: {
-    width: '100%',
-    height: 48,
-    borderRadius: 24,
-    padding: 12,
-    backgroundColor: colorPalettes.light.background,
-    color: colorPalettes.light.primary,
+    fontSize: FontSize.MD,
   },
 })

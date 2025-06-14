@@ -32,7 +32,7 @@ const Pressable: React.FC<PressableProps> = ({
     <PressableOpacity
       onPress={onPress}
       disabled={disabled}
-      style={[styles.wrapper, style]}
+      style={[styles.wrapper, disabled ? styles.disabled : style]}
     >
       <Text style={[styles.title, style && { color: style.color }]}>
         {title}
@@ -52,6 +52,9 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       borderRadius: 100,
       paddingHorizontal: 16,
       paddingVertical: 16,
+    },
+    disabled: {
+      backgroundColor: theme.disabled,
     },
     title: {
       fontSize: 14,

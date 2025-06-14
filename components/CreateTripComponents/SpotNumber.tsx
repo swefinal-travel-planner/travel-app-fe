@@ -1,9 +1,11 @@
 import { FontFamily, FontSize } from '@/constants/font'
+import { useAiTripStore } from '@/store/useAiTripStore'
 import { colorPalettes } from '@/styles/Itheme'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { StyleSheet } from 'react-native'
-import { Button, Text, View } from 'react-native-ui-lib'
+import { Text, View } from 'react-native-ui-lib'
 import NumStepper from '../NumStepper'
+import Pressable from '../Pressable'
 
 type SpotNumberProps = {
   theme: typeof colorPalettes.light
@@ -14,7 +16,12 @@ export default function SpotNumber({
   theme,
   nextFn,
 }: Readonly<SpotNumberProps>) {
-  const [numberOfSpots, setNumberOfSpots] = useState<number>(5)
+  const setLocsPerDay = useAiTripStore((state) => state.setLocsPerDay)
+  const request = useAiTripStore((state) => state.request)
+
+  const [numberOfSpots, setNumberOfSpots] = useState<number>(
+    request?.locationsPerDay ?? 5
+  )
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const handleNext = () => {
@@ -27,6 +34,15 @@ export default function SpotNumber({
     nextFn()
   }
 
+  useEffect(() => {
+    if (numberOfSpots >= 5 && numberOfSpots <= 9) {
+      setLocsPerDay(numberOfSpots)
+      setErrorMessage(null)
+    } else {
+      setErrorMessage('Please select a number between 5 and 9.')
+    }
+  }, [numberOfSpots])
+
   return (
     <View style={styles.container}>
       <Text style={[styles.textQuestion, { color: theme.primary }]}>
@@ -37,7 +53,10 @@ export default function SpotNumber({
         <NumStepper
           size="large"
           value={numberOfSpots}
-          onValueChange={setNumberOfSpots}
+          onValueChange={(value: number) => {
+            setNumberOfSpots(value)
+            setLocsPerDay(value)
+          }}
           minValue={5}
           maxValue={9}
         />
@@ -49,13 +68,13 @@ export default function SpotNumber({
         )}
       </View>
 
-      <Button
+      <Pressable
         onPress={handleNext}
-        label="Next"
-        color={theme.white}
-        backgroundColor={theme.primary}
-        style={{ width: '100%', paddingVertical: 15 }}
-        size="large"
+        title="Next"
+        style={{
+          color: theme.white,
+          backgroundColor: theme.primary,
+        }}
         // disabled={numberOfSpots === 0} TODO : enable later
       />
     </View>

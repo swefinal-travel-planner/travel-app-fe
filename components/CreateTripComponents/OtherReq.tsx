@@ -1,10 +1,13 @@
 import { FontFamily, FontSize } from '@/constants/font'
 import otherReqData from '@/lib/mock_data/otherReqs'
+import { useAiTripStore } from '@/store/useAiTripStore'
 import { colorPalettes } from '@/styles/Itheme'
-import React, { useState } from 'react'
+import { formatAttribute } from '@/utils/tripAttributes'
+import React, { useEffect, useState } from 'react'
 import { StyleSheet } from 'react-native'
-import { Button, Text, View } from 'react-native-ui-lib'
+import { Text, View } from 'react-native-ui-lib'
 import CollapsibleSectionList from '../CollapsibleSectionList'
+import Pressable from '../Pressable'
 
 type OtherReqProps = {
   theme: typeof colorPalettes.light
@@ -12,11 +15,32 @@ type OtherReqProps = {
 }
 
 export default function OtherReq({ theme, nextFn }: Readonly<OtherReqProps>) {
-  const [otherReqs, setOtherReqs] = useState<string[]>([])
+  const request = useAiTripStore((state) => state.request)
+
+  const [otherReqs, setOtherReqs] = useState<string[]>(
+    request?.enSpecialRequirements
+      ? request.enSpecialRequirements.filter((req) => req !== 'none')
+      : []
+  )
+
+  const setSpecialRequirements = useAiTripStore(
+    (state) => state.setSpecialRequirements
+  )
 
   const handleNext = () => {
     nextFn()
   }
+
+  useEffect(() => {
+    setSpecialRequirements(
+      otherReqs.map((req) => formatAttribute(req)),
+      ['không']
+    )
+
+    if (otherReqs.length === 0) {
+      setSpecialRequirements(['none'], ['none'])
+    }
+  }, [otherReqs])
 
   return (
     <View style={styles.container}>
@@ -34,25 +58,25 @@ export default function OtherReq({ theme, nextFn }: Readonly<OtherReqProps>) {
           selectedValues={otherReqs}
           onValueChange={setOtherReqs}
         />
+      </View>
 
-        <Text
-          style={[styles.textField, { color: theme.primary, marginTop: 40 }]}
-        >
+      {otherReqs.length > 0 && (
+        <Text style={[styles.textField, { color: theme.primary }]}>
           {otherReqs.length === 1
             ? 'Selected 1 category'
             : otherReqs.length > 1
               ? `Selected ${otherReqs.length} categories`
               : ''}
         </Text>
-      </View>
+      )}
 
-      <Button
+      <Pressable
         onPress={handleNext}
-        label="Next"
-        color={theme.white}
-        backgroundColor={theme.primary}
-        style={{ width: '100%', paddingVertical: 15 }}
-        size="large"
+        title="Next"
+        style={{
+          color: theme.white,
+          backgroundColor: theme.primary,
+        }}
       />
     </View>
   )
@@ -71,9 +95,8 @@ const styles = StyleSheet.create({
   textFieldContainer: {
     width: '100%',
     flexDirection: 'column',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: 12,
     height: '60%',
   },
   textQuestion: {
@@ -91,19 +114,6 @@ const styles = StyleSheet.create({
   textField: {
     textAlign: 'center',
     fontFamily: FontFamily.REGULAR,
-    fontSize: FontSize.XL,
-  },
-  errorText: {
-    textAlign: 'center',
-    fontFamily: FontFamily.REGULAR,
-    fontSize: FontSize.LG,
-  },
-  dateField: {
-    width: '100%',
-    height: 48,
-    borderRadius: 24,
-    padding: 12,
-    backgroundColor: colorPalettes.light.background,
-    color: colorPalettes.light.primary,
+    fontSize: FontSize.MD,
   },
 })
