@@ -18,7 +18,7 @@ import {
 } from '@react-native-google-signin/google-signin'
 import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth'
 
-import { useSignupStore } from '@/lib/useSignupStore'
+import { useSignupStore } from '@/store/useSignupStore'
 
 import beApi, { BE_URL } from '@/lib/beApi'
 import axios from 'axios'
