@@ -1,4 +1,6 @@
+import { Radius, Size, SpacingScale } from '@/constants/theme'
 import { Ionicons } from '@expo/vector-icons'
+import { useMemo } from 'react'
 import {
   Image,
   ScrollView,
@@ -7,6 +9,10 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
+
+import { useThemeStyle } from '@/hooks/useThemeStyle'
+
+import { colorPalettes } from '@/styles/Itheme'
 
 import { getGroupIconsFromTypes } from '@/utils/TypeBadges'
 
@@ -25,6 +31,8 @@ const LocationDetail = ({
   onBack,
 }: LocationDetailProps) => {
   const groupIcons = getGroupIconsFromTypes(types)
+  const theme = useThemeStyle()
+  const styles = useMemo(() => createStyles(theme), [theme])
 
   return (
     <View style={styles.container}>
@@ -70,105 +78,106 @@ const LocationDetail = ({
   )
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F7F7F7',
-  },
-  header: {
-    paddingTop: 50,
-    paddingHorizontal: 20,
-    backgroundColor: '#F7F7F7',
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  scrollContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-  },
-  imageCarousel: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#EBE2D9',
-    borderRadius: 8,
-    height: 200,
-    marginBottom: 20,
-    paddingHorizontal: 15,
-  },
-  carouselArrow: {
-    padding: 10,
-  },
-  placeholderImage: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#5C6F5A',
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#5C6F5A',
-    marginBottom: 10,
-  },
-  description: {
-    fontSize: 16,
-    color: '#333333',
-    lineHeight: 24,
-    marginBottom: 20,
-  },
-  activityTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#5C6F5A',
-    marginBottom: 15,
-  },
-  activityGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'flex-start',
-    gap: 12,
-  },
-  activityItem: {
-    width: 100,
-    alignItems: 'center',
-  },
-  activityBox: {
-    width: 100,
-    height: 100,
-    backgroundColor: '#EBE2D9',
-    borderRadius: 12,
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    padding: 10,
-  },
-  iconWrapper: {
-    width: '60%',
-    height: '60%',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 6,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 6,
-  },
-  iconImage: {
-    width: 36,
-    height: 36,
-    resizeMode: 'contain',
-  },
-  activityText: {
-    fontSize: 14,
-    textAlign: 'center',
-    fontWeight: '500',
-  },
-})
+const createStyles = (theme: typeof colorPalettes.light) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.white,
+    },
+    header: {
+      paddingTop: SpacingScale.GIGANTIC,
+      paddingHorizontal: SpacingScale.XXLARGE,
+      backgroundColor: theme.white,
+    },
+    backButton: {
+      width: 40,
+      height: 40,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    scrollContent: {
+      paddingHorizontal: SpacingScale.XXLARGE,
+      paddingBottom: SpacingScale.XXLARGE,
+    },
+    imageCarousel: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      backgroundColor: theme.brown,
+      borderRadius: Radius.NORMAL,
+      height: 200,
+      marginBottom: SpacingScale.XXLARGE,
+      paddingHorizontal: SpacingScale.XLARGE,
+    },
+    carouselArrow: {
+      padding: SpacingScale.MEDIUM,
+    },
+    placeholderImage: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    title: {
+      fontSize: Size.XS,
+      fontWeight: 'bold',
+      color: theme.green,
+      marginBottom: SpacingScale.MEDIUM,
+    },
+    subtitle: {
+      fontSize: Size.MEDIUM,
+      fontWeight: '600',
+      color: theme.dimText,
+      marginBottom: SpacingScale.MEDIUM,
+    },
+    description: {
+      fontSize: Size.NORMAL,
+      color: theme.black,
+      lineHeight: 24,
+      marginBottom: SpacingScale.XXLARGE,
+    },
+    activityTitle: {
+      fontSize: Size.MEDIUM,
+      fontWeight: '600',
+      color: theme.green,
+      marginBottom: SpacingScale.XLARGE,
+    },
+    activityGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'flex-start',
+      gap: 12,
+    },
+    activityItem: {
+      width: 100,
+      alignItems: 'center',
+    },
+    activityBox: {
+      width: 100,
+      height: 100,
+      backgroundColor: theme.brown,
+      borderRadius: Radius.MEDIUM,
+      justifyContent: 'flex-start',
+      alignItems: 'center',
+      padding: SpacingScale.MEDIUM,
+    },
+    iconWrapper: {
+      width: '60%',
+      height: '60%',
+      backgroundColor: theme.white,
+      borderRadius: Radius.NORMAL,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: SpacingScale.NORMAL,
+    },
+    iconImage: {
+      width: 36,
+      height: 36,
+      resizeMode: 'contain',
+    },
+    activityText: {
+      fontSize: Size.SMALL,
+      textAlign: 'center',
+      fontWeight: '500',
+    },
+  })
 export default LocationDetail

@@ -10,6 +10,8 @@ export const colorPalettes = {
     dimText: '#808E91',
     black: '#000000',
     white: '#ffffff',
+    brown: '#EBE2D9',
+    green: '#5C6F5A',
   },
   dark: {
     primary: '#1A434E',
