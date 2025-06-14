@@ -312,7 +312,10 @@ const ProfileScreen = () => {
                   />
                 </View>
               ) : (
-                <TouchableOpacity key={index} onPress={item.onPress}>
+                <TouchableOpacity
+                  key={index}
+                  onPress={item.onPress ?? (() => {})}
+                >
                   <View style={styles.sectionItemContainer}>
                     <View style={styles.sectionItem}>
                       <View style={styles.iconContainer}>

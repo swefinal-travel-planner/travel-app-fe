@@ -1,4 +1,4 @@
-import { FontFamily, FontSize } from '@/constants/font'
+import { FontFamily } from '@/constants/font'
 import { Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { colorPalettes } from '@/styles/Itheme'
@@ -117,10 +117,6 @@ const DateRangeField = ({
               markingType={'period'}
               markedDates={getMarkedDates()}
               onDayPress={onDayPress}
-              style={{
-                fontFamily: FontFamily.REGULAR,
-                fontSize: FontSize.MD,
-              }}
             />
 
             <View style={styles.buttons}>

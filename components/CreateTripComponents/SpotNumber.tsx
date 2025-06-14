@@ -22,25 +22,9 @@ export default function SpotNumber({
   const [numberOfSpots, setNumberOfSpots] = useState<number>(
     request?.locationsPerDay ?? 5
   )
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
-
-  const handleNext = () => {
-    if (numberOfSpots === null || numberOfSpots < 1) {
-      setErrorMessage('Please enter a valid number of spots.')
-      return
-    }
-
-    setErrorMessage(null)
-    nextFn()
-  }
 
   useEffect(() => {
-    if (numberOfSpots >= 5 && numberOfSpots <= 9) {
-      setLocsPerDay(numberOfSpots)
-      setErrorMessage(null)
-    } else {
-      setErrorMessage('Please select a number between 5 and 9.')
-    }
+    setLocsPerDay(numberOfSpots)
   }, [numberOfSpots])
 
   return (
@@ -53,23 +37,14 @@ export default function SpotNumber({
         <NumStepper
           size="large"
           value={numberOfSpots}
-          onValueChange={(value: number) => {
-            setNumberOfSpots(value)
-            setLocsPerDay(value)
-          }}
+          onValueChange={setNumberOfSpots}
           minValue={5}
           maxValue={9}
         />
-
-        {errorMessage && (
-          <Text style={[styles.errorText, { color: theme.error ?? 'red' }]}>
-            {errorMessage}
-          </Text>
-        )}
       </View>
 
       <Pressable
-        onPress={handleNext}
+        onPress={nextFn}
         title="Next"
         style={{
           color: theme.white,
