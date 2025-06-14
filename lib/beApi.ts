@@ -17,7 +17,7 @@ beApi.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(
-      error instanceof Error ? error : new Error(String(error))
+      error instanceof Error ? error : new Error(String(error.response))
     )
   }
 )
@@ -38,8 +38,8 @@ beApi.interceptors.response.use(
       console.log('Received 204 No Content - treating as success')
       return Promise.resolve({ status: 204, data: null })
     }
-    console.error('Response Error:', error)
-    return Promise.reject(new Error(error.message))
+    console.error('Response Error:', error.response)
+    return Promise.reject(new Error(error.response))
   }
 )
 
