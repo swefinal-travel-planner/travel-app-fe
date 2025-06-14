@@ -32,6 +32,7 @@ interface SettingSection {
     | 'trash-outline'
     | 'log-out-outline'
     | 'color-palette-outline'
+  onPress?: () => void
 }
 
 const url = process.env.EXPO_PUBLIC_API_URL
@@ -50,7 +51,11 @@ const ProfileScreen = () => {
   const dangerSection: SettingSection[] = [
     { title: 'Change theme', icon: 'color-palette-outline' },
     { title: 'Delete account', icon: 'trash-outline' },
-    { title: 'Log out', icon: 'log-out-outline' },
+    {
+      title: 'Log out',
+      icon: 'log-out-outline',
+      onPress: () => router.push('/login'),
+    },
   ]
   const { setTheme } = useThemeStore()
   //const { setLanguage } = useThemeStore()
@@ -307,7 +312,7 @@ const ProfileScreen = () => {
                   />
                 </View>
               ) : (
-                <TouchableOpacity key={index} onPress={() => {}}>
+                <TouchableOpacity key={index} onPress={item.onPress}>
                   <View style={styles.sectionItemContainer}>
                     <View style={styles.sectionItem}>
                       <View style={styles.iconContainer}>
