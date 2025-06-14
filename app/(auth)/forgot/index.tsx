@@ -4,7 +4,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { Keyboard, Text, TouchableWithoutFeedback, View } from 'react-native'
 import { z } from 'zod'
 
-import { usePwdResetStore } from '@/lib/usePwdResetStore'
+import { usePwdResetStore } from '@/store/usePwdResetStore'
 
 import beApi, { BE_URL } from '@/lib/beApi'
 import axios from 'axios'

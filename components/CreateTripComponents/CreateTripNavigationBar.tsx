@@ -13,6 +13,7 @@ type CreateTripNavigationBarProps = {
   type: string
   theme: typeof colorPalettes.light
   currentStep: number
+  isLastStep?: boolean
   goback: () => void
 }
 
@@ -20,6 +21,7 @@ export default function CreateTripNavigationBar({
   theme,
   goback,
   currentStep,
+  isLastStep = false,
   type,
 }: Readonly<CreateTripNavigationBarProps>) {
   const numberOfSteps =
@@ -29,18 +31,21 @@ export default function CreateTripNavigationBar({
 
   return (
     <View style={styles.createTripNavigationBar}>
-      <Button
-        backgroundColor="transparent"
-        style={styles.button}
-        round={true}
-        onPress={goback}
-        fullWidth={true}
-        avoidInnerPaddings={true}
-      >
-        <Ionicons name="arrow-back" size={20} color={theme.primary} />
-      </Button>
+      {!isLastStep && (
+        <Button
+          backgroundColor="transparent"
+          style={styles.button}
+          round={true}
+          onPress={goback}
+          fullWidth={true}
+          avoidInnerPaddings={true}
+        >
+          <Ionicons name="arrow-back" size={20} color={theme.primary} />
+        </Button>
+      )}
+
       <ProgressBar
-        progress={(currentStep / numberOfSteps) * 100}
+        progress={(currentStep / (numberOfSteps - 1)) * 100}
         progressColor={theme.primary}
         style={[styles.progressBar, { backgroundColor: theme.secondary }]}
       />
@@ -52,9 +57,7 @@ const styles = StyleSheet.create({
   createTripNavigationBar: {
     width: '100%',
     height: 'auto',
-    gap: 10,
-    paddingRight: 20,
-    paddingLeft: 10,
+    paddingHorizontal: 24,
     paddingVertical: 5,
     backgroundColor: '#ffffff',
     flexDirection: 'row',
@@ -66,6 +69,7 @@ const styles = StyleSheet.create({
     width: 'auto',
     justifyContent: 'center',
     alignItems: 'center',
+    marginRight: 10,
   },
   progressBar: {
     flex: 1,

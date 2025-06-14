@@ -1,9 +1,11 @@
 import { FontFamily, FontSize } from '@/constants/font'
+import { useAiTripStore } from '@/store/useAiTripStore'
 import { colorPalettes } from '@/styles/Itheme'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { StyleSheet } from 'react-native'
-import { Button, Text, View } from 'react-native-ui-lib'
+import { Text, View } from 'react-native-ui-lib'
 import NumStepper from '../NumStepper'
+import Pressable from '../Pressable'
 
 type SpotNumberProps = {
   theme: typeof colorPalettes.light
@@ -14,18 +16,16 @@ export default function SpotNumber({
   theme,
   nextFn,
 }: Readonly<SpotNumberProps>) {
-  const [numberOfSpots, setNumberOfSpots] = useState<number>(5)
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const setLocsPerDay = useAiTripStore((state) => state.setLocsPerDay)
+  const request = useAiTripStore((state) => state.request)
 
-  const handleNext = () => {
-    if (numberOfSpots === null || numberOfSpots < 1) {
-      setErrorMessage('Please enter a valid number of spots.')
-      return
-    }
+  const [numberOfSpots, setNumberOfSpots] = useState<number>(
+    request?.locationsPerDay ?? 5
+  )
 
-    setErrorMessage(null)
-    nextFn()
-  }
+  useEffect(() => {
+    setLocsPerDay(numberOfSpots)
+  }, [numberOfSpots])
 
   return (
     <View style={styles.container}>
@@ -41,21 +41,15 @@ export default function SpotNumber({
           minValue={5}
           maxValue={9}
         />
-
-        {errorMessage && (
-          <Text style={[styles.errorText, { color: theme.error ?? 'red' }]}>
-            {errorMessage}
-          </Text>
-        )}
       </View>
 
-      <Button
-        onPress={handleNext}
-        label="Next"
-        color={theme.white}
-        backgroundColor={theme.primary}
-        style={{ width: '100%', paddingVertical: 15 }}
-        size="large"
+      <Pressable
+        onPress={nextFn}
+        title="Next"
+        style={{
+          color: theme.white,
+          backgroundColor: theme.primary,
+        }}
         // disabled={numberOfSpots === 0} TODO : enable later
       />
     </View>

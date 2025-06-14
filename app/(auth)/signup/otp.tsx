@@ -2,7 +2,7 @@ import { useRouter } from 'expo-router'
 import React, { useEffect, useMemo, useState } from 'react'
 import { Keyboard, Text, TouchableWithoutFeedback, View } from 'react-native'
 
-import { useSignupStore } from '@/lib/useSignupStore'
+import { useSignupStore } from '@/store/useSignupStore'
 
 import beApi, { BE_URL } from '@/lib/beApi'
 import axios from 'axios'

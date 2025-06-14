@@ -4,15 +4,9 @@ import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { colorPalettes } from '@/styles/Itheme'
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5'
 import React, { useMemo, useState } from 'react'
-import {
-  Modal,
-  Pressable,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native'
+import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Calendar, DateData } from 'react-native-calendars'
+import Pressable from '../Pressable'
 
 type DateRangeFieldProps = {
   startDate: string | null
@@ -113,7 +107,7 @@ const DateRangeField = ({
             ? `From: ${startDate} - To: ${endDate}`
             : 'Select date range'}
         </Text>
-        <FontAwesome5 name="calendar-alt" size={24} color="black" />
+        <FontAwesome5 name="calendar-alt" size={24} color={theme.primary} />
       </TouchableOpacity>
 
       <Modal visible={modalVisible} transparent animationType="slide">
@@ -127,18 +121,17 @@ const DateRangeField = ({
 
             <View style={styles.buttons}>
               <Pressable
-                onPress={() => setModalVisible(false)}
-                style={styles.btn}
-              >
-                <Text style={styles.cancelText}>Cancel</Text>
-              </Pressable>
-              <Pressable
                 onPress={handleConfirm}
-                style={[styles.btn, { backgroundColor: '#70d7c7' }]}
+                title="Confirm"
+                style={{ color: theme.white, backgroundColor: theme.primary }}
                 disabled={!tempStart || !tempEnd}
-              >
-                <Text style={styles.confirmText}>Confirm</Text>
-              </Pressable>
+              />
+
+              <Pressable
+                onPress={() => setModalVisible(false)}
+                title="Cancel"
+                style={{ color: theme.text, backgroundColor: theme.secondary }}
+              />
             </View>
           </View>
         </View>
@@ -154,16 +147,15 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      borderWidth: 1,
-      borderColor: '#ccc',
       borderRadius: Radius.FULL,
       paddingVertical: 12,
       paddingHorizontal: 20,
-      backgroundColor: '#f9f9f9',
+      backgroundColor: theme.background,
     },
     icon: {
       fontSize: 18,
       marginRight: 8,
+      color: theme.primary,
     },
     fieldText: {
       color: '#333',
@@ -178,26 +170,17 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     },
     modalContent: {
       backgroundColor: 'white',
-      borderRadius: 10,
       overflow: 'hidden',
+      borderRadius: 32,
+      paddingHorizontal: 12,
+      paddingVertical: 20,
     },
     buttons: {
-      flexDirection: 'row',
-      justifyContent: 'flex-end',
-      padding: 10,
-    },
-    btn: {
-      paddingVertical: 10,
-      paddingHorizontal: 15,
-      borderRadius: 6,
-      marginLeft: 10,
-    },
-    cancelText: {
-      color: '#555',
-    },
-    confirmText: {
-      color: 'white',
-      fontWeight: 'bold',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+      marginHorizontal: 16,
+      marginVertical: 20,
+      gap: 12,
     },
   })
 

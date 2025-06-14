@@ -18,9 +18,11 @@ export default function TabLayout() {
         tabBarActiveTintColor: theme.primary,
         tabBarInactiveTintColor: theme.disabled,
         tabBarHideOnKeyboard: true,
-        tabBarStyle: pathname.includes('/my-trips/create')
-          ? styles.hidden
-          : styles.tabBarStyle,
+        tabBarStyle:
+          pathname.includes('/my-trips/create') ||
+          pathname.includes('/my-trips/welcome')
+            ? styles.hidden
+            : styles.tabBarStyle,
         tabBarLabelStyle: {
           marginTop: 2,
           fontFamily: 'PlusJakartaSans_400Regular',

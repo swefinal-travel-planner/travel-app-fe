@@ -2,6 +2,7 @@ import { FontFamily, FontSize } from '@/constants/font'
 import { Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { colorPalettes } from '@/styles/Itheme'
+import { formatAttribute } from '@/utils/tripAttributes'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Animated,
@@ -46,7 +47,9 @@ const CollapsibleSectionList: React.FC<ListProps> = ({
     const section = data.find((section) => section.title === title)
     if (!section) return 0
 
-    return section.data.filter((item) => selectedValues.includes(item)).length
+    return section.data.filter((item) =>
+      selectedValues.includes(formatAttribute(item))
+    ).length
   }
 
   const handleToggle = (title: string) => {
@@ -82,14 +85,16 @@ const CollapsibleSectionList: React.FC<ListProps> = ({
   // Handle chip selection/deselection
   const handleSelect = (value: string) => {
     if (onValueChange) {
-      const newValues = [...selectedValues, value]
+      const newValues = [...selectedValues, formatAttribute(value)]
       onValueChange(newValues)
     }
   }
 
   const handleDeselect = (value: string) => {
     if (onValueChange) {
-      const newValues = selectedValues.filter((v) => v !== value)
+      const newValues = selectedValues.filter(
+        (v) => v !== formatAttribute(value)
+      )
       onValueChange(newValues)
     }
   }
@@ -103,7 +108,7 @@ const CollapsibleSectionList: React.FC<ListProps> = ({
       keyExtractor={(item, index) => item + index}
       renderItem={({ section: { title }, item, index }) => {
         const animValue = animationValues.get(title) || new Animated.Value(0)
-        const isSelected = selectedValues.includes(item)
+        const isSelected = selectedValues.includes(formatAttribute(item))
 
         return (
           <Animated.View
@@ -152,6 +157,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
   StyleSheet.create({
     container: {
       width: '100%',
+      flex: 1,
     },
     scrollContent: {
       width: '100%',
