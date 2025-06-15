@@ -1,7 +1,7 @@
 import { FontFamily, FontSize } from '@/constants/font'
+import { colorPalettes } from '@/constants/Itheme'
 import otherReqData from '@/lib/mock_data/otherReqs'
 import { useAiTripStore } from '@/store/useAiTripStore'
-import { colorPalettes } from '@/styles/Itheme'
 import { formatAttribute } from '@/utils/tripAttributes'
 import React, { useEffect, useState } from 'react'
 import { StyleSheet } from 'react-native'

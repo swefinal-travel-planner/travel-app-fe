@@ -3,7 +3,7 @@ import {
   createManualTripSteps,
   TRIP_TYPES,
 } from '@/constants/createTrip'
-import { colorPalettes } from '@/styles/Itheme'
+import { colorPalettes } from '@/constants/Itheme'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import React from 'react'
 import { StyleSheet, View } from 'react-native'

@@ -1,7 +1,7 @@
 import { FontFamily, FontSize } from '@/constants/font'
+import { colorPalettes } from '@/constants/Itheme'
 import { Radius } from '@/constants/theme'
 import { Trip } from '@/features/trip/domain/models/Trip'
-import { colorPalettes } from '@/styles/Itheme'
 import React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 

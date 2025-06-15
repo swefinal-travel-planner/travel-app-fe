@@ -1,4 +1,3 @@
-import { Link } from 'expo-router'
 import {
   Dimensions,
   FlatList,
@@ -13,9 +12,9 @@ import CarouselSpotCard from '@/components/SpotCards/CarouselSpotCard'
 import SpotCard from '@/components/SpotCards/SpotCard'
 
 import { FontFamily, FontSize } from '@/constants/font'
+import { colorPalettes } from '@/constants/Itheme'
 import { Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
-import { colorPalettes } from '@/styles/Itheme'
 import { useMemo } from 'react'
 import { Carousel } from 'react-native-ui-lib'
 

@@ -1,5 +1,5 @@
 import { FontFamily, FontSize } from '@/constants/font'
-import { colorPalettes } from '@/styles/Itheme'
+import { colorPalettes } from '@/constants/Itheme'
 import { useRouter } from 'expo-router'
 import LottieView from 'lottie-react-native'
 import React, { useEffect, useRef } from 'react'

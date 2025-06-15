@@ -1,6 +1,6 @@
 import { FontFamily, FontSize } from '@/constants/font'
+import { colorPalettes } from '@/constants/Itheme'
 import { useAiTripStore } from '@/store/useAiTripStore'
-import { colorPalettes } from '@/styles/Itheme'
 import React, { useEffect, useState } from 'react'
 import { StyleSheet } from 'react-native'
 import { Text, View } from 'react-native-ui-lib'

@@ -6,7 +6,7 @@ import { useThemeStyle } from '@/hooks/useThemeStyle'
 
 import { Notification } from '@/lib/types/Notification'
 
-import { colorPalettes } from '@/styles/Itheme'
+import { colorPalettes } from '@/constants/Itheme'
 
 import { FontFamily, FontSize } from '@/constants/font'
 import { Radius } from '@/constants/theme'

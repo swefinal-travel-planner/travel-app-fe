@@ -1,7 +1,7 @@
+import { colorPalettes } from '@/constants/Itheme'
 import { Padding, Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { ApiTranslate } from '@/services/api/tools/ApiTranslate'
-import { colorPalettes } from '@/styles/Itheme'
 import React, { useMemo, useState } from 'react'
 import { Button, StyleSheet, Text, TextInput, View } from 'react-native'
 import { Picker } from 'react-native-ui-lib'

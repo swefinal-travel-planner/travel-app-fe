@@ -4,9 +4,9 @@ import { Image, StyleSheet, Text, View } from 'react-native'
 import Ionicons from '@expo/vector-icons/Ionicons'
 
 import { FontFamily, FontSize } from '@/constants/font'
+import { colorPalettes } from '@/constants/Itheme'
 import { Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
-import { colorPalettes } from '@/styles/Itheme'
 
 import PressableOpacity from '../PressableOpacity'
 
@@ -122,6 +122,5 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       color: theme.text,
       fontFamily: FontFamily.REGULAR,
       fontSize: FontSize.SM,
-      
     },
   })

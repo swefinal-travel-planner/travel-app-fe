@@ -1,8 +1,8 @@
+import { colorPalettes, Theme, ThemeName } from '@/constants/Itheme'
 import i18n from '@/i18n'
-import { colorPalettes, Theme, ThemeName } from '@/styles/Itheme'
-import { persist, createJSONStorage } from 'zustand/middleware'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { create } from 'zustand'
+import { createJSONStorage, persist } from 'zustand/middleware'
 
 type Language = 'en' | 'vi'
 

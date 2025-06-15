@@ -2,9 +2,9 @@ import { useMemo, useState } from 'react'
 import { StyleProp, StyleSheet, Text, ViewStyle } from 'react-native'
 
 import { FontFamily, FontSize } from '@/constants/font'
+import { colorPalettes } from '@/constants/Itheme'
 import { Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
-import { colorPalettes } from '@/styles/Itheme'
 import PressableOpacity from './PressableOpacity'
 
 interface ChipProps {
