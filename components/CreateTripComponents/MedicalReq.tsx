@@ -37,11 +37,11 @@ export default function MedicalReq({
   useEffect(() => {
     setMedicalConditions(
       medicalReqs.map((req) => formatAttribute(req)),
-      ['không']
+      []
     )
 
     if (medicalReqs.length === 0) {
-      setMedicalConditions(['none'], ['none'])
+      setMedicalConditions(['none'], ['không'])
     }
   }, [medicalReqs])
 

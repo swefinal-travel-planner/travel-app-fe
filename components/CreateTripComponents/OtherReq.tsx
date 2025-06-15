@@ -34,11 +34,11 @@ export default function OtherReq({ theme, nextFn }: Readonly<OtherReqProps>) {
   useEffect(() => {
     setSpecialRequirements(
       otherReqs.map((req) => formatAttribute(req)),
-      ['không']
+      []
     )
 
     if (otherReqs.length === 0) {
-      setSpecialRequirements(['none'], ['none'])
+      setSpecialRequirements(['none'], ['không'])
     }
   }, [otherReqs])
 
