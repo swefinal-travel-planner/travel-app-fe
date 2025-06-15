@@ -48,8 +48,7 @@ export default function DayPlanner({
   const [modalVisible, setModalVisible] = useState(false)
   const [selectedTime, setSelectedTime] = useState<TimeSlot | null>(null)
 
-  const { getItemsForDate, addTripItems, updateTripItem, deleteTripItem } =
-    useManualTripStore()
+  const { getItemsForDate, addTripItems } = useManualTripStore()
 
   // Update data when selected date changes
   useEffect(() => {
@@ -105,6 +104,7 @@ export default function DayPlanner({
       item_id: place.id,
       timeInDate: selectedTime,
       orderInDay: currentMaxOrder + index + 1,
+      placeID: place.id,
       place: place,
     }))
 
