@@ -3,6 +3,10 @@ import React, { useEffect, useState } from 'react'
 import { StyleSheet, Text } from 'react-native'
 import { Button, View } from 'react-native-ui-lib'
 import { CreateTripDTO } from '../../domain/models/Trip'
+import {
+  convertManualTripToDTO,
+  ensureAllDatesIncluded,
+} from '../../utils/TripUtils'
 import { useCreateTrip } from '../state/useCreateTrip'
 import { useManualTripStore } from '../state/useManualTrip'
 import { useUpdateTripItem } from '../state/useUpdateTripItem'
@@ -22,7 +26,7 @@ export default function ManualTripCreate({
     error: createError,
   } = useCreateTrip()
   const {
-    updateTripItem,
+    updateTripItems,
     isLoading: isUpdating,
     error: updateError,
   } = useUpdateTripItem()
@@ -52,11 +56,18 @@ export default function ManualTripCreate({
       days: trip.days ?? 1,
     }
 
-    // const createdTripId = await createTrip(createTripDTO)
-    const createdTripId = 4 // Mocked ID for demonstration purposes
+    const createdTripId = await createTrip(createTripDTO)
 
     if (createdTripId) {
-      log() // Log the current state for debugging
+      const { trip, itemsByDate } = useManualTripStore.getState()
+
+      // First ensure all dates are included
+      const completeItemsByDate = ensureAllDatesIncluded(trip, itemsByDate)
+
+      // Then convert to DTO format for API calls
+      const tripItems = convertManualTripToDTO(trip, completeItemsByDate)
+
+      updateTripItems(createdTripId, tripItems)
 
       nextFn() // Proceed to the next step
     }

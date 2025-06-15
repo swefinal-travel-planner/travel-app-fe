@@ -11,7 +11,7 @@ export const useUpdateTripItem = () => {
     new TripRepositoryImpl()
   )
 
-  const updateTripItem = async (
+  const updateTripItems = async (
     tripId: number,
     tripItems: UpdateTripItemDTO[]
   ): Promise<void> => {
@@ -29,7 +29,7 @@ export const useUpdateTripItem = () => {
   }
 
   return {
-    updateTripItem,
+    updateTripItems,
     isLoading,
     error,
   }

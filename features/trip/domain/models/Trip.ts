@@ -10,7 +10,7 @@ export type TripItem = {
   tripDay?: number // Represents the day of the trip, starting from 1
   timeInDate: TimeSlot
   orderInDay: number
-  placeID?: string | null
+  placeID: string
 }
 
 export type Trip = {

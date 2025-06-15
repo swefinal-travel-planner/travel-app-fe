@@ -45,15 +45,12 @@ export const useManualTripStore = create<ManualTripState>((set, get) => ({
   addTripItems: (items: TripItem[], date: Date) =>
     set((state) => {
       const dateStr = date.toDateString()
-      const currentItemsByDate = state.itemsByDate[dateStr] || {}
       const newItemsByDate: { [key in TimeSlot]?: TripItem[] } = {}
 
       // Group items by time slot
       items.forEach((item) => {
         const timeSlot = item.timeInDate
-        if (!newItemsByDate[timeSlot]) {
-          newItemsByDate[timeSlot] = []
-        }
+        newItemsByDate[timeSlot] ??= []
         // Only add the item if it's not already in the array
         if (
           !newItemsByDate[timeSlot]?.some(
