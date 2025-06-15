@@ -5,7 +5,7 @@ import { AiTripRequest, useAiTripStore } from '@/store/useAiTripStore'
 import { colorPalettes } from '@/styles/Itheme'
 import SegmentedControl from '@react-native-segmented-control/segmented-control'
 import axios from 'axios'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import Pressable from '../Pressable'
 
@@ -39,14 +39,24 @@ export default function LocPreference({
 
   const submitTrip = async (payload: AiTripRequest) => {
     try {
+      setLocPreference(
+        preference === 0
+          ? 'proximity'
+          : preference === 1
+            ? 'balanced'
+            : 'relevance'
+      )
+
       payload = {
         ...payload,
         startDate: new Date(payload.startDate).toISOString(),
       }
+
       setTripCreated(false)
+
       console.log(payload)
 
-      const response = await beApi.post(`${BE_URL}/trips/ai`, payload)
+      await beApi.post(`${BE_URL}/trips/ai`, payload)
 
       nextFn()
     } catch (error) {
@@ -58,6 +68,16 @@ export default function LocPreference({
       }
     }
   }
+
+  useEffect(() => {
+    setLocPreference(
+      preference === 0
+        ? 'proximity'
+        : preference === 1
+          ? 'balanced'
+          : 'relevance'
+    )
+  }, [preference])
 
   return (
     <View style={styles.container}>
@@ -91,13 +111,6 @@ export default function LocPreference({
           }}
           onChange={(event) => {
             setPreference(event.nativeEvent.selectedSegmentIndex)
-            setLocPreference(
-              event.nativeEvent.selectedSegmentIndex === 0
-                ? 'proximity'
-                : event.nativeEvent.selectedSegmentIndex === 1
-                  ? 'balanced'
-                  : 'relevance'
-            )
           }}
         />
       </View>
