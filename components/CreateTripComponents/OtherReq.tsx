@@ -38,7 +38,7 @@ export default function OtherReq({ theme, nextFn }: Readonly<OtherReqProps>) {
     )
 
     if (otherReqs.length === 0) {
-      setSpecialRequirements(['none'], ['không'])
+      setSpecialRequirements(['none'], [])
     }
   }, [otherReqs])
 

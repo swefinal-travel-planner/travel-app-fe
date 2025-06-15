@@ -41,7 +41,7 @@ export default function MedicalReq({
     )
 
     if (medicalReqs.length === 0) {
-      setMedicalConditions(['none'], ['không'])
+      setMedicalConditions(['none'], [])
     }
   }, [medicalReqs])
 
