@@ -1,5 +1,5 @@
+import { colorPalettes } from '@/constants/Itheme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
-import { colorPalettes } from '@/styles/Itheme'
 import AntDesign from '@expo/vector-icons/AntDesign'
 import { Fragment, ReactNode, useEffect, useMemo, useState } from 'react'
 import {

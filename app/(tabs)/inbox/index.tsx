@@ -7,7 +7,7 @@ import { useThemeStyle } from '@/hooks/useThemeStyle'
 
 import { Notification, NotificationCategory } from '@/lib/types/Notification'
 
-import { colorPalettes } from '@/styles/Itheme'
+import { colorPalettes } from '@/constants/Itheme'
 
 import Chip from '@/components/Chip'
 import { FontFamily, FontSize } from '@/constants/font'

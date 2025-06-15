@@ -1,7 +1,7 @@
 import { FontFamily, FontSize } from '@/constants/font'
+import { colorPalettes } from '@/constants/Itheme'
 import { Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
-import { colorPalettes } from '@/styles/Itheme'
 import { formatAttribute } from '@/utils/tripAttributes'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {

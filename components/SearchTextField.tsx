@@ -1,5 +1,5 @@
+import { colorPalettes } from '@/constants/Itheme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
-import { colorPalettes } from '@/styles/Itheme'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import React, { useMemo } from 'react'
 import { StyleSheet, Text, TextInput, View } from 'react-native'

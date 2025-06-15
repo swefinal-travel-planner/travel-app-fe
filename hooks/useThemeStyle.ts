@@ -1,5 +1,5 @@
+import { colorPalettes } from '@/constants/Itheme'
 import { useThemeStore } from '@/store/themeStore'
-import { colorPalettes } from '@/styles/Itheme'
 import { useMemo } from 'react'
 
 export const useThemeStyle = () => {

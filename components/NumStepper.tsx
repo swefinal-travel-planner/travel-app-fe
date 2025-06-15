@@ -3,8 +3,8 @@ import { StyleSheet, Text, View } from 'react-native'
 
 import Ionicons from '@expo/vector-icons/Ionicons'
 
+import { colorPalettes } from '@/constants/Itheme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
-import { colorPalettes } from '@/styles/Itheme'
 
 import { FontFamily, FontSize } from '@/constants/font'
 import { Radius } from '@/constants/theme'

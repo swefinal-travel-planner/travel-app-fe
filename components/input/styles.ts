@@ -1,4 +1,4 @@
-import { colorPalettes } from '@/styles/Itheme'
+import { colorPalettes } from '@/constants/Itheme'
 import { StyleSheet } from 'react-native'
 
 export const createStyles = (theme: typeof colorPalettes.light) =>

@@ -1,6 +1,6 @@
+import { colorPalettes } from '@/constants/Itheme'
 import { IconSize, Padding, Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
-import { colorPalettes } from '@/styles/Itheme'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { Stack, usePathname, useRouter } from 'expo-router'
 import { useMemo } from 'react'
