@@ -54,3 +54,6 @@ travel-app-229d7-firebase-adminsdk-fbsvc-893e2354e5.json
 
 # App
 app.json
+
+# Test 
+coverage/**
