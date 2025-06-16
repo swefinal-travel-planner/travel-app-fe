@@ -2,6 +2,7 @@ export const Radius = {
   NONE: 0,
   SMALL: 4,
   NORMAL: 8,
+  MEDIUM: 12,
   ROUNDED: 16,
   FULL: 9999,
 }
@@ -13,6 +14,10 @@ export const Border = {
 }
 
 export const Size = {
+  TINY: 8,
+  SMALL: 12,
+  NORMAL: 16,
+  MEDIUM: 20,
   XS: 24,
   SM: 32,
   MD: 48,
@@ -39,6 +44,7 @@ export const SpacingScale = {
   XXLARGE: 20,
   HUGE: 24,
   MASSIVE: 32,
+  GIGANTIC: 48,
   TOOL_SPACING: 70,
 }
 
