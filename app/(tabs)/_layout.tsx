@@ -1,5 +1,5 @@
+import { colorPalettes } from '@/constants/Itheme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
-import { colorPalettes } from '@/styles/Itheme'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { Tabs, usePathname } from 'expo-router'
 import { useMemo } from 'react'
@@ -18,9 +18,11 @@ export default function TabLayout() {
         tabBarActiveTintColor: theme.primary,
         tabBarInactiveTintColor: theme.disabled,
         tabBarHideOnKeyboard: true,
-        tabBarStyle: pathname.includes('/my-trips/create')
-          ? styles.hidden
-          : styles.tabBarStyle,
+        tabBarStyle:
+          pathname.includes('/my-trips/create') ||
+          pathname.includes('/my-trips/welcome')
+            ? styles.hidden
+            : styles.tabBarStyle,
         tabBarLabelStyle: {
           marginTop: 2,
           fontFamily: 'PlusJakartaSans_400Regular',

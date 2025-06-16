@@ -1,9 +1,10 @@
 import CreateTripNavigationBar from '@/components/CreateTripComponents/CreateTripNavigationBar'
 import { createAiTripSteps, TRIP_TYPES } from '@/constants/createTrip'
+import { colorPalettes } from '@/constants/Itheme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
-import { colorPalettes } from '@/styles/Itheme'
+import { useAiTripStore } from '@/store/useAiTripStore'
 import { useRouter } from 'expo-router'
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { StyleSheet } from 'react-native'
 import { View } from 'react-native-ui-lib'
 
@@ -13,6 +14,8 @@ export default function AiCreateTripScreen() {
   const [currentStep, setCurrentStep] = useState(0)
   const StepComponent = createAiTripSteps[currentStep]
   const router = useRouter()
+  const request = useAiTripStore((state) => state.request)
+  const clearRequest = useAiTripStore((state) => state.clearRequest)
 
   const goNext = () => {
     if (currentStep < createAiTripSteps.length - 1) {
@@ -24,10 +27,19 @@ export default function AiCreateTripScreen() {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1)
     }
+
     if (currentStep === 0) {
       router.back()
     }
   }
+
+  // useEffect(() => {
+  //   clearRequest()
+  // }, [])
+
+  useEffect(() => {
+    console.log(request)
+  }, [currentStep, router])
 
   return (
     <View style={styles.safeAreaContainer}>
@@ -36,6 +48,7 @@ export default function AiCreateTripScreen() {
         theme={theme}
         goback={goBack}
         currentStep={currentStep}
+        isLastStep={currentStep === createAiTripSteps.length - 1}
       />
       <StepComponent theme={theme} nextFn={goNext} />
     </View>

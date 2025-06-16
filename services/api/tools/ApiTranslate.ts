@@ -1,5 +1,5 @@
 import { TranslateResponse } from '@/types/Translate/TranslateResponse'
-import api from '../api'
+import beApi from '../../../lib/beApi'
 
 const url = process.env.EXPO_PUBLIC_TRANSLATE_API_URL ?? ''
 const key = process.env.EXPO_PUBLIC_TRANSLATE_API_KEY
@@ -10,7 +10,7 @@ export async function ApiTranslate(
   targetLanguage: string
 ): Promise<string> {
   try {
-    const response = await api.post(
+    const response = await beApi.post(
       url,
       {
         prompt: `Translate the following ${sourceLanguage} text into ${targetLanguage}.`,

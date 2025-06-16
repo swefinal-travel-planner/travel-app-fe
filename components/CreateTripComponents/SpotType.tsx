@@ -1,6 +1,13 @@
-import { colorPalettes } from '@/styles/Itheme'
-import React from 'react'
-import { Button, View, Text } from 'react-native-ui-lib'
+import { FontFamily, FontSize } from '@/constants/font'
+import { colorPalettes } from '@/constants/Itheme'
+import spotTypeData from '@/lib/mock_data/spotTypes'
+import { useAiTripStore } from '@/store/useAiTripStore'
+import { formatAttribute } from '@/utils/tripAttributes'
+import React, { useEffect, useState } from 'react'
+import { StyleSheet } from 'react-native'
+import { Text, View } from 'react-native-ui-lib'
+import CollapsibleSectionList from '../CollapsibleSectionList'
+import Pressable from '../Pressable'
 
 type SpotTypeProps = {
   theme: typeof colorPalettes.light
@@ -8,19 +15,97 @@ type SpotTypeProps = {
 }
 
 export default function SpotType({ theme, nextFn }: Readonly<SpotTypeProps>) {
+  const setLocAttributes = useAiTripStore((state) => state.setLocAttributes)
+  const request = useAiTripStore((state) => state.request)
+
+  const [spotTypes, setSpotTypes] = useState<string[]>(
+    request?.enLocationAttributes ?? []
+  )
+
+  useEffect(() => {
+    setLocAttributes(
+      spotTypes.map((type) => formatAttribute(type)),
+      []
+    )
+  }, [spotTypes])
+
   return (
-    <View
-      style={{
-        width: '100%',
-        height: '100%',
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'yellow',
-      }}
-    >
-      <Text>Spot Type</Text>
-      <Button onPress={nextFn} label="Next" color={theme.primary}></Button>
+    <View style={styles.container}>
+      <Text style={[styles.textQuestion, { color: theme.primary }]}>
+        What type of spots do you want to visit?
+      </Text>
+
+      <Text style={[styles.subTextQuestion, { color: theme.text }]}>
+        Scroll to see all categories, and tap to expand each category.
+      </Text>
+
+      <Text style={[styles.subTextQuestion, { color: theme.text }]}>
+        Select at least one category to continue.
+      </Text>
+
+      <View style={styles.textFieldContainer}>
+        <CollapsibleSectionList
+          data={spotTypeData}
+          selectedValues={spotTypes}
+          onValueChange={setSpotTypes}
+        />
+      </View>
+
+      {spotTypes.length > 0 && (
+        <Text style={[styles.textField, { color: theme.primary }]}>
+          {spotTypes.length === 1
+            ? 'Selected 1 category'
+            : spotTypes.length > 1
+              ? `Selected ${spotTypes.length} categories`
+              : ''}
+        </Text>
+      )}
+
+      <Pressable
+        onPress={nextFn}
+        title="Next"
+        style={{
+          color: theme.white,
+          backgroundColor: theme.primary,
+        }}
+        disabled={spotTypes.length === 0}
+      />
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    width: '100%',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingVertical: 40,
+  },
+  textFieldContainer: {
+    width: '100%',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '60%',
+  },
+  textQuestion: {
+    display: 'flex',
+    textAlign: 'center',
+    fontFamily: FontFamily.BOLD,
+    fontSize: FontSize.XXXL,
+  },
+  subTextQuestion: {
+    display: 'flex',
+    textAlign: 'center',
+    fontFamily: FontFamily.REGULAR,
+    fontSize: FontSize.MD,
+  },
+  textField: {
+    textAlign: 'center',
+    fontFamily: FontFamily.REGULAR,
+    fontSize: FontSize.MD,
+  },
+})

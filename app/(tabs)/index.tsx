@@ -30,9 +30,9 @@ import SpotCard from '@/components/SpotCards/SpotCard'
 
 import CarouselSpotCard from '@/components/SpotCards/CarouselSpotCard'
 import { FontFamily, FontSize } from '@/constants/font'
+import { colorPalettes } from '@/constants/Itheme'
 import { Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
-import { colorPalettes } from '@/styles/Itheme'
 import { useMemo } from 'react'
 import { Carousel } from 'react-native-ui-lib'
 
@@ -143,10 +143,6 @@ const Index = () => {
       <View style={styles.container}>
         <View style={styles.topCenter}>
           <Text style={styles.hugeText}>Welcome back, bro!</Text>
-
-          <Link href="/signup/allergies" style={styles.mainButton}>
-            Go to Signup screen
-          </Link>
 
           {hasTrip ? (
             <View style={styles.currentTrip}>

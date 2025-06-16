@@ -2,9 +2,9 @@ import { useRouter } from 'expo-router'
 import React, { useEffect, useMemo, useState } from 'react'
 import { Keyboard, Text, TouchableWithoutFeedback, View } from 'react-native'
 
-import { usePwdResetStore } from '@/lib/usePwdResetStore'
+import { usePwdResetStore } from '@/store/usePwdResetStore'
 
-import api, { url } from '@/services/api/api'
+import beApi, { BE_URL } from '@/lib/beApi'
 import axios from 'axios'
 
 import OtpField from '@/components/input/OtpField'
@@ -31,7 +31,7 @@ export default function ForgotPasswordOtp() {
       setOtp(otp) // set the OTP in the store
 
       // verify the OTP
-      await api.post(`${url}/auth/reset-password/verify-otp`, {
+      await beApi.post(`${BE_URL}/auth/reset-password/verify-otp`, {
         email: email,
         otp: otp,
       })

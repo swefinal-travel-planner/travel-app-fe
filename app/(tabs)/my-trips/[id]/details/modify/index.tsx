@@ -1,5 +1,5 @@
+import { colorPalettes } from '@/constants/Itheme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
-import { colorPalettes } from '@/styles/Itheme'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import React, { useEffect, useMemo, useState } from 'react'

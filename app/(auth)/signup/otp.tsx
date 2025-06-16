@@ -2,9 +2,9 @@ import { useRouter } from 'expo-router'
 import React, { useEffect, useMemo, useState } from 'react'
 import { Keyboard, Text, TouchableWithoutFeedback, View } from 'react-native'
 
-import { useSignupStore } from '@/lib/useSignupStore'
+import { useSignupStore } from '@/store/useSignupStore'
 
-import api, { url } from '@/services/api/api'
+import beApi, { BE_URL } from '@/lib/beApi'
 import axios from 'axios'
 
 import { useThemeStyle } from '@/hooks/useThemeStyle'
@@ -29,14 +29,14 @@ export default function SignUpOtp() {
   const onOtpFilled = async (otp: string) => {
     try {
       // verify the OTP
-      const response = await api.post(`${url}/auth/register/verify-otp`, {
+      const response = await beApi.post(`${BE_URL}/auth/register/verify-otp`, {
         email: request?.email,
         otp: otp,
       })
 
       // if the OTP is verified successfully, call the register API
       if (response.status === 204 || response.status === 200) {
-        await api.post(`${url}/auth/register`, { ...request, otp: otp })
+        await beApi.post(`${BE_URL}/auth/register`, { ...request, otp: otp })
         clearRequest()
         router.replace('/signup/allergies')
       } else {

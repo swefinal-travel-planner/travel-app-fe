@@ -1,6 +1,6 @@
+import { colorPalettes } from '@/constants/Itheme'
 import { IconSize, Padding, Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
-import { colorPalettes } from '@/styles/Itheme'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { Stack, usePathname, useRouter } from 'expo-router'
 import { useMemo } from 'react'
@@ -65,7 +65,7 @@ function TabButton({
       onPress={onPress}
       style={[active ? styles.activeTab : styles.tabButton]}
     >
-      <Ionicons name={icon} size={IconSize.MD} color={theme.normal} />
+      <Ionicons name={icon} size={IconSize.MD} color={theme.text} />
     </TouchableOpacity>
   )
 }
@@ -84,7 +84,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       flexDirection: 'row',
       padding: Padding.SMALL,
       borderRadius: Radius.FULL,
-      backgroundColor: theme.subtle1,
+      backgroundColor: theme.secondary,
       justifyContent: 'center',
       position: 'absolute',
       top: 55,

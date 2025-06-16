@@ -4,9 +4,9 @@ import { Controller, useForm } from 'react-hook-form'
 import { Keyboard, Text, TouchableWithoutFeedback, View } from 'react-native'
 import { z } from 'zod'
 
-import { usePwdResetStore } from '@/lib/usePwdResetStore'
+import { usePwdResetStore } from '@/store/usePwdResetStore'
 
-import api, { url } from '@/services/api/api'
+import beApi, { BE_URL } from '@/lib/beApi'
 import axios from 'axios'
 
 import CustomTextField from '@/components/input/CustomTextField'
@@ -15,7 +15,6 @@ import Pressable from '@/components/Pressable'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { useMemo } from 'react'
 import { createStyles } from '../styles'
-
 
 interface ForgotFormData {
   email: string
@@ -49,7 +48,7 @@ export default function ForgotPassword() {
       // set the email in the store
       setEmail(data.email)
 
-      await api.post(`${url}/auth/reset-password/send-otp`, {
+      await beApi.post(`${BE_URL}/auth/reset-password/send-otp`, {
         email: data.email,
       })
 

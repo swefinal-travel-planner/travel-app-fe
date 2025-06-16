@@ -1,7 +1,7 @@
 import CreateTripNavigationBar from '@/components/CreateTripComponents/CreateTripNavigationBar'
 import { createManualTripSteps, TRIP_TYPES } from '@/constants/createTrip'
+import { colorPalettes } from '@/constants/Itheme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
-import { colorPalettes } from '@/styles/Itheme'
 import { useRouter } from 'expo-router'
 import React, { useEffect, useMemo, useState } from 'react'
 import { StyleSheet } from 'react-native'

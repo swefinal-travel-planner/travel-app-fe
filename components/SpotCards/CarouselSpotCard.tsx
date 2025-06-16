@@ -3,8 +3,8 @@ import { Image, StyleSheet, Text, View } from 'react-native'
 import Ionicons from '@expo/vector-icons/Ionicons'
 
 import { FontFamily, FontSize } from '@/constants/font'
+import { colorPalettes } from '@/constants/Itheme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
-import { colorPalettes } from '@/styles/Itheme'
 import { useMemo } from 'react'
 import PressableOpacity from '../PressableOpacity'
 

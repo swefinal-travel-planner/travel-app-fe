@@ -1,11 +1,11 @@
-import { Trip } from '@/types/Trip/Trip'
-import { Text, StyleSheet } from 'react-native'
-import React, { useMemo } from 'react'
-import { View } from 'react-native-ui-lib'
-import { useThemeStyle } from '@/hooks/useThemeStyle'
-import { colorPalettes } from '@/styles/Itheme'
+import { colorPalettes } from '@/constants/Itheme'
 import { Padding, Radius } from '@/constants/theme'
+import { Trip } from '@/features/trip/domain/models/Trip'
+import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { Image } from 'expo-image'
+import React, { useMemo } from 'react'
+import { StyleSheet, Text } from 'react-native'
+import { View } from 'react-native-ui-lib'
 
 const blurhash = 'this-is-a-blurhash'
 

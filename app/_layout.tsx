@@ -1,3 +1,4 @@
+import { getCoreAccessToken } from '@/lib/coreApi'
 import { GoogleSignin } from '@react-native-google-signin/google-signin'
 import Mapbox from '@rnmapbox/maps'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -92,6 +93,8 @@ const updateUserPushToken = async (token: string) => {
 
 export default function RootLayout() {
   const [queryClient] = useState(() => new QueryClient())
+  const [isReady, setIsReady] = useState(false)
+  const [isHealthy, setIsHealthy] = useState(false)
 
   // TODO: might need to set this in store to update the Inbox screen
   const [notification, setNotification] = useState<
@@ -115,6 +118,10 @@ export default function RootLayout() {
     registerForPushNotificationsAsync()
       .then((token) => updateUserPushToken(token ?? ''))
       .catch((error: any) => console.log(`${error}`))
+
+    getCoreAccessToken().catch((error) => {
+      console.error('Failed to initialize API:', error)
+    })
 
     notificationListener.current =
       Notifications.addNotificationReceivedListener((notification) => {
