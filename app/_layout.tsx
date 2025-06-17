@@ -8,148 +8,151 @@ import { Stack } from 'expo-router'
 import * as SecureStore from 'expo-secure-store'
 import * as SplashScreen from 'expo-splash-screen'
 import { StatusBar } from 'expo-status-bar'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Platform } from 'react-native'
 
-// prevent the splash screen from hiding before the font finishes loading
-SplashScreen.preventAutoHideAsync()
+// Types
+interface NotificationState {
+  notification: Notifications.Notification | undefined
+  isReady: boolean
+  isHealthy: boolean
+}
 
-Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN ?? '')
+// Constants
+const GOOGLE_WEB_CLIENT_ID = '490333496504-qe9p6s4an7ub4ros021q2p6kda9hakhm.apps.googleusercontent.com'
+const MAPBOX_TOKEN = process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN ?? ''
 
-// configure notification handler
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-})
+// Configuration
+const configureNotifications = () => {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+    }),
+  })
+}
 
-function handleRegistrationError(errorMessage: string) {
-  alert(errorMessage)
+const configureGoogleSignIn = () => {
+  GoogleSignin.configure({
+    webClientId: GOOGLE_WEB_CLIENT_ID,
+    scopes: ['https://www.googleapis.com/auth/drive.readonly'],
+  })
+}
+
+const configureMapbox = () => {
+  Mapbox.setAccessToken(MAPBOX_TOKEN)
+}
+
+// Utility functions
+const handleRegistrationError = (errorMessage: string): never => {
+  console.error(errorMessage)
   throw new Error(errorMessage)
 }
 
-async function registerForPushNotificationsAsync() {
-  if (Platform.OS === 'android') {
-    Notifications.setNotificationChannelAsync('default', {
-      name: 'default',
-      importance: Notifications.AndroidImportance.MAX,
-      vibrationPattern: [0, 250, 250, 250],
-      lightColor: '#FF231F7C',
-    })
-  }
-
-  const { status: existingStatus } = await Notifications.getPermissionsAsync()
-
-  let finalStatus = existingStatus
-
-  if (existingStatus !== 'granted') {
-    const { status } = await Notifications.requestPermissionsAsync()
-    finalStatus = status
-  }
-
-  if (finalStatus !== 'granted') {
-    handleRegistrationError(
-      'Permission not granted to get push token for push notification!'
-    )
-    return
-  }
-
-  const projectId =
-    Constants?.expoConfig?.extra?.eas?.projectId ??
-    Constants?.easConfig?.projectId
-
-  if (!projectId) {
-    handleRegistrationError('Project ID not found')
-  }
-
-  try {
-    const pushTokenString = (
-      await Notifications.getExpoPushTokenAsync({
-        projectId,
-      })
-    ).data
-
-    return pushTokenString
-  } catch (e: unknown) {
-    handleRegistrationError(`${e}`)
-  }
-}
-
-const updateUserPushToken = async (token: string) => {
-  if (!token) {
-    return
-  }
+const updateUserPushToken = async (token: string): Promise<void> => {
+  if (!token) return
 
   try {
     await SecureStore.setItemAsync('expoPushToken', token)
-
-    console.log('Push token stored successfully:', token)
   } catch (error) {
     console.error('Error storing push token:', error)
   }
 }
 
+const registerForPushNotificationsAsync = async (): Promise<string | undefined> => {
+  try {
+    if (Platform.OS === 'android') {
+      await Notifications.setNotificationChannelAsync('default', {
+        name: 'default',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
+      })
+    }
+
+    const { status: existingStatus } = await Notifications.getPermissionsAsync()
+    const finalStatus =
+      existingStatus === 'granted' ? existingStatus : (await Notifications.requestPermissionsAsync()).status
+
+    if (finalStatus !== 'granted') {
+      handleRegistrationError('Permission not granted for push notifications')
+    }
+
+    const projectId = Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId
+    if (!projectId) {
+      handleRegistrationError('Project ID not found')
+    }
+
+    const { data: pushTokenString } = await Notifications.getExpoPushTokenAsync({ projectId })
+    return pushTokenString
+  } catch (error) {
+    console.error('Push notification registration error:', error)
+    return undefined
+  }
+}
+
+// Main Component
 export default function RootLayout() {
   const [queryClient] = useState(() => new QueryClient())
-  const [isReady, setIsReady] = useState(false)
-  const [isHealthy, setIsHealthy] = useState(false)
+  const [state, setState] = useState<NotificationState>({
+    notification: undefined,
+    isReady: false,
+    isHealthy: false,
+  })
 
-  // TODO: might need to set this in store to update the Inbox screen
-  const [notification, setNotification] = useState<
-    Notifications.Notification | undefined
-  >(undefined)
   const notificationListener = useRef<Notifications.EventSubscription>()
   const responseListener = useRef<Notifications.EventSubscription>()
 
-  useEffect(() => {
-    SplashScreen.hideAsync()
+  const initializeApp = useCallback(async () => {
+    try {
+      await SplashScreen.preventAutoHideAsync()
+      configureMapbox()
+      configureNotifications()
+      configureGoogleSignIn()
 
-    // configure Google sign-in
-    GoogleSignin.configure({
-      webClientId:
-        '490333496504-qe9p6s4an7ub4ros021q2p6kda9hakhm.apps.googleusercontent.com', // client ID of type WEB for your server. Required to get the `idToken` on the user object, and for offline access.
-      scopes: ['https://www.googleapis.com/auth/drive.readonly'], // what API you want to access on behalf of the user, default is email and profile
-    })
-  }, [])
+      const token = await registerForPushNotificationsAsync()
+      if (token) {
+        await updateUserPushToken(token)
+      }
 
-  useEffect(() => {
-    registerForPushNotificationsAsync()
-      .then((token) => updateUserPushToken(token ?? ''))
-      .catch((error: any) => console.log(`${error}`))
-
-    getCoreAccessToken().catch((error) => {
-      console.error('Failed to initialize API:', error)
-    })
-
-    notificationListener.current =
-      Notifications.addNotificationReceivedListener((notification) => {
-        setNotification(notification)
-      })
-
-    responseListener.current =
-      Notifications.addNotificationResponseReceivedListener((response) => {
-        console.log(response)
-      })
-
-    return () => {
-      notificationListener.current &&
-        Notifications.removeNotificationSubscription(
-          notificationListener.current
-        )
-
-      responseListener.current &&
-        Notifications.removeNotificationSubscription(responseListener.current)
+      await getCoreAccessToken()
+      setState((prev) => ({ ...prev, isReady: true, isHealthy: true }))
+    } catch (error) {
+      console.error('App initialization error:', error)
+      setState((prev) => ({ ...prev, isReady: true, isHealthy: false }))
+    } finally {
+      await SplashScreen.hideAsync()
     }
   }, [])
+
+  useEffect(() => {
+    initializeApp()
+
+    notificationListener.current = Notifications.addNotificationReceivedListener((notification) =>
+      setState((prev) => ({ ...prev, notification }))
+    )
+
+    responseListener.current = Notifications.addNotificationResponseReceivedListener((response) =>
+      console.log('Notification response:', response)
+    )
+
+    return () => {
+      notificationListener.current?.remove()
+      responseListener.current?.remove()
+    }
+  }, [initializeApp])
+
+  if (!state.isReady) {
+    return null
+  }
 
   return (
     <>
       <StatusBar style="auto" />
       <QueryClientProvider client={queryClient}>
         <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="(auth)/login/index" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />
         </Stack>
       </QueryClientProvider>
