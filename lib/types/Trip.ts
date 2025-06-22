@@ -49,7 +49,7 @@ export interface Trip {
   startDate: string
   status: 'not_started' | 'in_progress' | 'completed' | 'cancelled'
   title: string
-  id: number
+  id: string
   image: string
   pinned: boolean
 }
