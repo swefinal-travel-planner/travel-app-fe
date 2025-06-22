@@ -5,7 +5,8 @@ import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { Trip } from '@/lib/types/Trip'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useRouter } from 'expo-router'
-import React, { useMemo, useState } from 'react'
+import * as SecureStore from 'expo-secure-store'
+import React, { useEffect, useMemo, useState } from 'react'
 import {
   Button,
   FlatList,
@@ -14,6 +15,8 @@ import {
   TextInput,
   View,
 } from 'react-native'
+
+const url = process.env.EXPO_PUBLIC_BE_API_URL
 
 const sampleTrips: Trip[] = [
   {
@@ -114,6 +117,29 @@ export default function MyTrips() {
     trip.title.toLowerCase().includes(search.toLowerCase())
   )
 
+  const getAllTrips = async () => {
+    try {
+      const accessToken = await SecureStore.getItemAsync('accessToken')
+      const response = await fetch(`${url}/trips`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      if (!response.ok) {
+        throw new Error('Failed to fetch trips')
+      }
+      const data = await response.json()
+      console.log('Fetched trips:', data.data)
+      setTrips(data.data)
+    } catch (error) {
+      console.error('Error fetching trips:', error)
+    }
+  }
+
+  useEffect(() => {
+    getAllTrips()
+  }, [])
+
   return (
     <View style={styles.container}>
       {/* Thanh tìm kiếm */}
@@ -151,7 +177,7 @@ export default function MyTrips() {
               tripName={item.title}
               tripImage={item.image}
               days={item.days}
-              num_members={item.num_members}
+              num_members={item.numMembers}
               budget={item.budget}
               isPinned={item.pinned}
               onPress={() =>

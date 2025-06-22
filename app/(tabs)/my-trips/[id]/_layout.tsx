@@ -1,7 +1,6 @@
-import { Trip } from '@/lib/types/Trip'
 import Ionicons from '@expo/vector-icons/Ionicons'
-import { Tabs, useLocalSearchParams, useRouter, useSegments } from 'expo-router'
-import React, { useEffect, useState } from 'react'
+import { Tabs, useRouter, useSegments } from 'expo-router'
+import React from 'react'
 import {
   Dimensions,
   StyleSheet,
@@ -10,51 +9,15 @@ import {
   View,
 } from 'react-native'
 
-const sampleTrips: Trip[] = [
-  {
-    id: '1',
-    image:
-      'https://lh3.googleusercontent.com/p/AF1QipPwjfXoTp4uuEBODAptmwg054U6pzYeLUhS9W-o=s1360-w1360-h1020',
-    title: 'Hà Giang Loop Adventure',
-    city: 'Hà Giang',
-    start_date: '2025-05-10',
-    days: 4,
-    budget: 500,
-    num_members: 5,
-    location_attributes: ['mountains', 'viewpoints'],
-    food_attributes: ['local', 'street food'],
-    special_requirements: ['helmet', 'raincoat'],
-    medical_conditions: [],
-    status: 'not_started',
-    pinned: true,
-  },
-  // ...thêm các chuyến đi khác nếu cần
-]
-
 // Lấy chiều rộng màn hình để tính toán kích thước tab
 const SCREEN_WIDTH = Dimensions.get('window').width
 const TAB_WIDTH = SCREEN_WIDTH / 3 // Chia cho 3 tab
 
 export default function TripDetailLayout() {
-  const { id } = useLocalSearchParams()
   const router = useRouter()
-  const [trip, setTrip] = useState<Trip | null>(null)
   const segments = useSegments()
 
   const isModifyScreen = segments.includes('modify')
-
-  useEffect(() => {
-    const foundTrip = sampleTrips.find((trip) => trip.id === id)
-    setTrip(foundTrip || null)
-  }, [id])
-
-  if (!trip) {
-    return (
-      <View style={styles.loadingContainer}>
-        <Text>Đang tải...</Text>
-      </View>
-    )
-  }
 
   // Component tùy chỉnh cho tab label
   const CustomTabLabel = ({
