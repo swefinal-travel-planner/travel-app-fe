@@ -9,7 +9,6 @@ import { Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 
 import { useRouter } from 'expo-router'
-import PressableOpacity from '../PressableOpacity'
 interface Location {
   long: number
   lat: number
@@ -25,15 +24,7 @@ interface SpotCardProps {
   isSaved: boolean
 }
 
-const SpotCard: React.FC<SpotCardProps> = ({
-  id,
-  location,
-  name,
-  properties,
-  type,
-  image,
-  isSaved,
-}) => {
+const SpotCard: React.FC<SpotCardProps> = ({ id, location, name, properties, type, image, isSaved }) => {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
 
@@ -45,7 +36,7 @@ const SpotCard: React.FC<SpotCardProps> = ({
       <View style={styles.imageContainer}>
         <Image source={{ uri: image }} style={styles.image} />
 
-        <PressableOpacity
+        {/* <PressableOpacity
           style={styles.overlay}
           onPress={() => setSaved(!saved)}
         >
@@ -54,7 +45,7 @@ const SpotCard: React.FC<SpotCardProps> = ({
             size={20}
             color="white"
           />
-        </PressableOpacity>
+        </PressableOpacity> */}
       </View>
 
       <View style={styles.spotInfo}>
@@ -63,12 +54,7 @@ const SpotCard: React.FC<SpotCardProps> = ({
         </Text>
 
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Ionicons
-            name="location-outline"
-            size={16}
-            color={theme.text}
-            style={{ marginRight: 4 }}
-          />
+          <Ionicons name="location-outline" size={16} color={theme.text} style={{ marginRight: 4 }} />
 
           <Text style={styles.location} numberOfLines={1}>
             {location.long}, {location.lat}

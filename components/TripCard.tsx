@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
 
-import Ionicons from '@expo/vector-icons/Ionicons'
-
+import { FontFamily } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
+import { Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import PressableOpacity from './PressableOpacity'
 
@@ -38,16 +38,9 @@ const TripCard: React.FC<TripCardProps> = ({
       <View style={styles.imageContainer}>
         <Image source={{ uri: tripImage }} style={styles.image} />
 
-        <PressableOpacity
-          style={styles.overlay}
-          onPress={() => setPinned(!pinned)}
-        >
-          <Ionicons
-            name={pinned ? 'pin' : 'pin-outline'}
-            size={20}
-            color="white"
-          />
-        </PressableOpacity>
+        {/* <PressableOpacity style={styles.overlay} onPress={() => setPinned(!pinned)}>
+          <Ionicons name={pinned ? 'pin' : 'pin-outline'} size={20} color="white" />
+        </PressableOpacity> */}
       </View>
 
       <View style={styles.spotInfo}>
@@ -57,7 +50,7 @@ const TripCard: React.FC<TripCardProps> = ({
 
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <Text style={styles.location} numberOfLines={1}>
-            {days} days | {num_members} members | ${budget}
+            {days} days · {num_members} members
           </Text>
         </View>
       </View>
@@ -74,10 +67,9 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       height: 206,
       alignItems: 'center',
       justifyContent: 'flex-start',
-      borderRadius: 12,
+      borderRadius: Radius.ROUNDED,
       padding: 16,
-      borderWidth: 1,
-      borderColor: '#A68372',
+      backgroundColor: theme.secondary,
     },
     imageContainer: {
       width: '100%',
@@ -88,8 +80,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     image: {
       width: '100%',
       height: '100%',
-      borderRadius: 8,
-      borderColor: '#A68372',
+      borderRadius: Radius.ROUNDED,
     },
     overlay: {
       position: 'absolute',
@@ -98,7 +89,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       color: '#fff',
       backgroundColor: 'rgba(0, 0, 0, 0.5)',
       padding: 6,
-      borderRadius: 4,
+      borderRadius: Radius.NORMAL,
       alignItems: 'center',
       justifyContent: 'center',
     },
@@ -110,15 +101,15 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       marginBottom: 8,
     },
     name: {
-      color: '#563D30',
-      fontFamily: 'PlusJakartaSans_400Regular',
+      color: theme.primary,
+      fontFamily: FontFamily.BOLD,
       fontSize: 16,
       clip: 'ellipsis',
       marginTop: 2,
     },
     location: {
-      color: '#A68372',
-      fontFamily: 'PlusJakartaSans_400Regular',
+      color: theme.text,
+      fontFamily: FontFamily.REGULAR,
       fontSize: 12,
       clip: 'ellipsis',
       marginTop: 4,
