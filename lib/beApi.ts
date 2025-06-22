@@ -82,9 +82,7 @@ beApi.interceptors.response.use(
         // Call refresh endpoint
         const refreshResponse = await beApi.post('/auth/refresh', { refreshToken })
 
-        console.log(refreshResponse.data)
-
-        const { accessToken: newAccessToken } = refreshResponse.data.data
+        const newAccessToken = refreshResponse.data.data
 
         // Save new tokens
         await setItemAsync('accessToken', newAccessToken)
