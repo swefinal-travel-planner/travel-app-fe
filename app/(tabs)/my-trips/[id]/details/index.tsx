@@ -1,8 +1,10 @@
 import { colorPalettes } from '@/constants/Itheme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
+import { Trip, TripItem } from '@/lib/types/Trip'
 import Ionicons from '@expo/vector-icons/Ionicons'
-import { useRouter } from 'expo-router'
-import React, { useMemo, useState } from 'react'
+import { useLocalSearchParams, useRouter } from 'expo-router'
+import * as SecureStore from 'expo-secure-store'
+import React, { useEffect, useMemo, useState } from 'react'
 import {
   Image,
   SafeAreaView,
@@ -14,78 +16,123 @@ import {
   View,
 } from 'react-native'
 
+const url = process.env.EXPO_PUBLIC_BE_API_URL
+
 const TripDetailViewScreen = () => {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
-
-  // Dữ liệu mẫu cho chuyến đi
-  const tripData = {
-    tripId: '1',
-    destination: 'Ho Chi Minh City',
-    dateRange: '11/11/2024 - 15/11/2024',
-    totalCost: '7000 USD',
-    exchangeRate: {
-      from: '1 USD',
-      to: '25,105 VND',
-    },
-    outlets: 'A, C',
-    timezone: 'UTC+7',
-    days: [
-      {
-        day: 1,
-        date: '11/11/2024',
-        spots: [
-          {
-            id: '1',
-            name: 'Nhà thờ Đức Bà',
-            address: 'Quận 1, Thành phố Hồ Chí Minh',
-            timeSlot: '9:00 - 11:00',
-            image: require('@/assets/images/alligator.jpg'),
-          },
-          {
-            id: '2',
-            name: 'Bến Nhà Rồng',
-            address: 'Quận 4, Thành phố Hồ Chí Minh',
-            image: require('@/assets/images/alligator.jpg'),
-          },
-          {
-            id: '3',
-            name: 'Phố đi bộ Nguyễn Huệ',
-            address: 'Quận 1, Thành phố Hồ Chí Minh',
-            image: require('@/assets/images/alligator.jpg'),
-          },
-          {
-            id: '4',
-            name: 'Chợ Bến Thành',
-            address: 'Quận 1, Thành phố Hồ Chí Minh',
-            image: require('@/assets/images/alligator.jpg'),
-          },
-          {
-            id: '5',
-            name: 'Bảo tàng Chứng tích Chiến tranh',
-            address: 'Quận 3, Thành phố Hồ Chí Minh',
-            image: require('@/assets/images/alligator.jpg'),
-          },
-        ],
-      },
-    ],
-  }
+  const [trip, setTrip] = useState<Trip>()
+  const [tripItems, setTripItems] = useState<TripItem[]>([])
+  const [groupedItems, setGroupedItems] = useState<
+    { day: number; date: string; spots: any[] }[]
+  >([])
 
   const [activeDay, setActiveDay] = useState(0)
   const router = useRouter()
 
   const handleEditTrip = () => {
     router.push({
-      pathname: `my-trips/${tripData.tripId}/details/modify`,
+      pathname: `my-trips/${trip?.id}/details/modify`,
       params: {
-        tripData: JSON.stringify(tripData.days[activeDay].spots),
-        tripDate: tripData.days[activeDay].date,
-        tripDay: tripData.days[activeDay].day,
+        tripData: JSON.stringify(groupedItems[activeDay]?.spots ?? []),
+        tripDate: groupedItems[activeDay]?.date ?? '',
+        tripDay: groupedItems[activeDay]?.day ?? 1,
       },
     })
   }
 
   const [activeTab, setActiveTab] = useState('Details')
+
+  const { id } = useLocalSearchParams()
+
+  console.log('Trip ID:', id)
+
+  const getTripDetail = async () => {
+    try {
+      const accessToken = await SecureStore.getItemAsync('accessToken')
+      const response = await fetch(`${url}/trips/${id}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      if (!response.ok) {
+        throw new Error('Failed to fetch trips')
+      }
+      const data = await response.json()
+      console.log('Get trip by ID:', data.data)
+      setTrip(data.data)
+    } catch (error) {
+      console.error('Error fetching trip detail by ID:', error)
+    }
+  }
+
+  const getTripItems = async () => {
+    if (!trip?.startDate) {
+      console.warn('Trip startDate is undefined — skipping item grouping.')
+      return
+    }
+    try {
+      const accessToken = await SecureStore.getItemAsync('accessToken')
+      const response = await fetch(`${url}/trips/${id}/trip-items`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch trip items')
+      }
+
+      const data = await response.json()
+      const items: TripItem[] = data.data
+      setTripItems(items)
+
+      // Nhóm items theo ngày
+      const start = trip?.startDate ? new Date(trip.startDate) : new Date()
+
+      const grouped: { [day: number]: TripItem[] } = {}
+      items.forEach((item) => {
+        if (!grouped[item.tripDay]) grouped[item.tripDay] = []
+        grouped[item.tripDay].push(item)
+      })
+
+      const groupedList = Object.entries(grouped)
+        .map(([dayStr, items]) => {
+          const day = parseInt(dayStr)
+          const currentDate = new Date(start)
+          currentDate.setDate(start.getDate() + day - 1)
+
+          return {
+            day,
+            date: formatDate(currentDate),
+            spots: items
+              .sort((a, b) => a.orderInDay - b.orderInDay)
+              .map((spot) => ({
+                id: spot.placeID,
+                name: spot.placeInfo?.name ?? 'Unknown',
+                address: spot.placeInfo?.address ?? 'Unknown address',
+                image: { uri: spot.placeInfo?.image?.[0] ?? '' },
+                timeSlot: spot.timeInDate,
+              })),
+          }
+        })
+        .sort((a, b) => a.day - b.day)
+
+      setGroupedItems(groupedList)
+    } catch (error) {
+      console.error('Error fetching trip items:', error)
+    }
+  }
+
+  useEffect(() => {
+    getTripDetail()
+  }, [id])
+
+  useEffect(() => {
+    if (trip) {
+      getTripItems()
+    }
+  }, [trip])
 
   // Chuyển ngày
   const goToPreviousDay = () => {
@@ -93,11 +140,21 @@ const TripDetailViewScreen = () => {
       setActiveDay(activeDay - 1)
     }
   }
-
   const goToNextDay = () => {
-    if (activeDay < tripData.days.length - 1) {
+    if (activeDay < tripItems.length - 1) {
       setActiveDay(activeDay + 1)
     }
+  }
+
+  if (!trip) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <StatusBar barStyle="dark-content" />
+        <View style={styles.content}>
+          <Text>Loading trip details...</Text>
+        </View>
+      </SafeAreaView>
+    )
   }
 
   return (
@@ -107,27 +164,26 @@ const TripDetailViewScreen = () => {
       <ScrollView style={styles.content}>
         {/* Trip Info Card */}
         <View style={styles.tripCard}>
-          <Text style={styles.destinationText}>{tripData.destination}</Text>
+          <Text style={styles.destinationText}>{trip.title}</Text>
           <Text style={styles.dateAndCostText}>
-            {tripData.dateRange} · {tripData.totalCost}
+            {formatDate(new Date(trip.startDate))} -{' '}
+            {calculateEndDate(trip.startDate, trip.days)}
           </Text>
 
           <View style={styles.tripInfoRow}>
             <View style={styles.tripInfoItem}>
-              <Text style={styles.tripInfoLabel}>
-                {tripData.exchangeRate.from}
-              </Text>
+              <Text style={styles.tripInfoLabel}>Budget</Text>
               <Text style={styles.tripInfoValue}>
-                {tripData.exchangeRate.to}
+                {trip.budget.toLocaleString('vi-VN')}
               </Text>
             </View>
             <View style={styles.tripInfoItem}>
-              <Text style={styles.tripInfoLabel}>Outlets</Text>
-              <Text style={styles.tripInfoValue}>{tripData.outlets}</Text>
+              <Text style={styles.tripInfoLabel}>Members</Text>
+              <Text style={styles.tripInfoValue}>{trip.numMembers}</Text>
             </View>
             <View style={styles.tripInfoItem}>
-              <Text style={styles.tripInfoLabel}>Timezone</Text>
-              <Text style={styles.tripInfoValue}>{tripData.timezone}</Text>
+              <Text style={styles.tripInfoLabel}>Status</Text>
+              <Text style={styles.tripInfoValue}></Text>
             </View>
           </View>
         </View>
@@ -137,45 +193,57 @@ const TripDetailViewScreen = () => {
           <TouchableOpacity
             onPress={goToPreviousDay}
             style={styles.dayNavigationButton}
+            disabled={activeDay === 0}
           >
-            <Ionicons name="chevron-back" size={20} color="#000" />
+            <Ionicons
+              name="chevron-back"
+              size={20}
+              color={activeDay === 0 ? '#ccc' : '#000'}
+            />
           </TouchableOpacity>
 
-          <Text style={styles.dayText}>
-            Day {tripData.days[activeDay].day} ({tripData.days[activeDay].date})
-          </Text>
+          {groupedItems[activeDay] && (
+            <Text style={styles.dayText}>
+              Day {groupedItems[activeDay].day} ({groupedItems[activeDay].date})
+            </Text>
+          )}
 
           <TouchableOpacity
             onPress={goToNextDay}
             style={styles.dayNavigationButton}
+            disabled={activeDay === groupedItems.length - 1}
           >
-            <Ionicons name="chevron-forward" size={20} color="#000" />
+            <Ionicons
+              name="chevron-forward"
+              size={20}
+              color={activeDay === groupedItems.length - 1 ? '#ccc' : '#000'}
+            />
           </TouchableOpacity>
         </View>
 
         <Text style={styles.mapInstructionText}>
-          Tap a spot to view it on the map
+          Tap a spot to view its detail
         </Text>
 
         {/* Spots List */}
-        {tripData.days[activeDay].spots.map((spot) => (
-          <View key={spot.id} style={styles.spotCard}>
-            <View style={styles.spotImageContainer}>
-              <Image
-                source={require('@/assets/images/alligator.jpg')}
-                style={styles.spotImage}
-                defaultSource={require('@/assets/images/alligator.jpg')}
-              />
-            </View>
-            <View style={styles.spotDetails}>
-              <Text style={styles.spotName}>{spot.name}</Text>
-              <View style={styles.spotLocationContainer}>
-                <Ionicons name="location" size={14} color="#888" />
-                <Text style={styles.spotAddress}>{spot.address}</Text>
+        {groupedItems[activeDay] && (
+          <>
+            {groupedItems[activeDay].spots.map((spot) => (
+              <View key={spot.id} style={styles.spotCard}>
+                <View style={styles.spotImageContainer}>
+                  <Image source={spot.image} style={styles.spotImage} />
+                </View>
+                <View style={styles.spotDetails}>
+                  <Text style={styles.spotName}>{spot.name}</Text>
+                  <View style={styles.spotLocationContainer}>
+                    <Ionicons name="location" size={14} color="#888" />
+                    <Text style={styles.spotAddress}>{spot.address}</Text>
+                  </View>
+                </View>
               </View>
-            </View>
-          </View>
-        ))}
+            ))}
+          </>
+        )}
       </ScrollView>
 
       {/* Edit Button */}
@@ -320,3 +388,17 @@ const createStyles = (theme: typeof colorPalettes.light) =>
   })
 
 export default TripDetailViewScreen
+
+const formatDate = (date: Date) => {
+  const day = date.getDate().toString().padStart(2, '0')
+  const month = (date.getMonth() + 1).toString().padStart(2, '0')
+  const year = date.getFullYear()
+  return `${day}/${month}/${year}`
+}
+
+const calculateEndDate = (startDate: string, days: number) => {
+  const start = new Date(startDate)
+  const end = new Date(start)
+  end.setDate(start.getDate() + days - 1)
+  return formatDate(end)
+}
