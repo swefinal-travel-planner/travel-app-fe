@@ -2,135 +2,28 @@ import CreateTripButton from '@/components/Buttons/CreateTripButton'
 import TripCard from '@/components/TripCard'
 import { colorPalettes } from '@/constants/Itheme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
+import beApi from '@/lib/beApi'
 import { Trip } from '@/lib/types/Trip'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useRouter } from 'expo-router'
-import * as SecureStore from 'expo-secure-store'
 import React, { useEffect, useMemo, useState } from 'react'
-import {
-  Button,
-  FlatList,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native'
+import { Button, FlatList, StyleSheet, Text, TextInput, View } from 'react-native'
 
 const url = process.env.EXPO_PUBLIC_BE_API_URL
 
-const sampleTrips: Trip[] = [
-  {
-    id: '1',
-    image:
-      'https://lh3.googleusercontent.com/p/AF1QipPwjfXoTp4uuEBODAptmwg054U6pzYeLUhS9W-o=s1360-w1360-h1020',
-    title: 'Hà Giang Loop Adventure',
-    city: 'Hà Giang',
-    start_date: '2025-05-10',
-    days: 4,
-    budget: 500,
-    num_members: 5,
-    location_attributes: ['mountains', 'viewpoints'],
-    food_attributes: ['local', 'street food'],
-    special_requirements: ['helmet', 'raincoat'],
-    medical_conditions: [],
-    status: 'not_started',
-    pinned: true,
-  },
-  {
-    id: '2',
-    image:
-      'https://lh3.googleusercontent.com/p/AF1QipPwjfXoTp4uuEBODAptmwg054U6pzYeLUhS9W-o=s1360-w1360-h1020',
-    title: 'Đà Lạt Chill Trip',
-    city: 'Đà Lạt',
-    start_date: '2025-06-01',
-    days: 3,
-    budget: 300,
-    num_members: 3,
-    location_attributes: ['lake', 'market'],
-    food_attributes: ['vegetarian', 'coffee'],
-    special_requirements: ['jacket'],
-    medical_conditions: ['asthma'],
-    status: 'in_progress',
-    pinned: false,
-  },
-  {
-    id: '3',
-    image:
-      'https://lh3.googleusercontent.com/p/AF1QipPwjfXoTp4uuEBODAptmwg054U6pzYeLUhS9W-o=s1360-w1360-h1020',
-    title: 'Nha Trang Beach Break',
-    city: 'Nha Trang',
-    start_date: '2025-07-15',
-    days: 5,
-    budget: 700,
-    num_members: 4,
-    location_attributes: ['beach', 'resort'],
-    food_attributes: ['seafood'],
-    special_requirements: [],
-    medical_conditions: [],
-    status: 'completed',
-    pinned: true,
-  },
-  {
-    id: '4',
-    image:
-      'https://lh3.googleusercontent.com/p/AF1QipPwjfXoTp4uuEBODAptmwg054U6pzYeLUhS9W-o=s1360-w1360-h1020',
-    title: 'Nha Trang Beach Break',
-    city: 'Nha Trang',
-    start_date: '2025-07-15',
-    days: 5,
-    budget: 700,
-    num_members: 4,
-    location_attributes: ['beach', 'resort'],
-    food_attributes: ['seafood'],
-    special_requirements: [],
-    medical_conditions: [],
-    status: 'completed',
-    pinned: true,
-  },
-  {
-    id: '5',
-    image:
-      'https://lh3.googleusercontent.com/p/AF1QipPwjfXoTp4uuEBODAptmwg054U6pzYeLUhS9W-o=s1360-w1360-h1020',
-    title: 'Nha Trang Beach Break',
-    city: 'Nha Trang',
-    start_date: '2025-07-15',
-    days: 5,
-    budget: 700,
-    num_members: 4,
-    location_attributes: ['beach', 'resort'],
-    food_attributes: ['seafood'],
-    special_requirements: [],
-    medical_conditions: [],
-    status: 'completed',
-    pinned: true,
-  },
-]
-
 export default function MyTrips() {
-  const [trips, setTrips] = useState<Trip[]>(sampleTrips)
+  const [trips, setTrips] = useState<Trip[]>([])
   const [search, setSearch] = useState('')
   const router = useRouter()
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
-
-  const filteredTrips = trips.filter((trip) =>
-    trip.title.toLowerCase().includes(search.toLowerCase())
-  )
+  const [filteredTrips, setFilteredTrips] = useState<Trip[]>(trips)
 
   const getAllTrips = async () => {
     try {
-      const accessToken = await SecureStore.getItemAsync('accessToken')
-      const response = await fetch(`${url}/trips`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      })
-      if (!response.ok) {
-        throw new Error('Failed to fetch trips')
-      }
-      const data = await response.json()
-      console.log('Fetched trips:', data.data)
-      setTrips(data.data)
+      const response = await beApi.get('/trips')
+      setTrips(response.data.data)
+      setFilteredTrips(response.data.data)
     } catch (error) {
       console.error('Error fetching trips:', error)
     }
@@ -144,12 +37,7 @@ export default function MyTrips() {
     <View style={styles.container}>
       {/* Thanh tìm kiếm */}
       <View style={styles.searchContainer}>
-        <Ionicons
-          name="search"
-          size={18}
-          color="#A68372"
-          style={{ marginRight: 8 }}
-        />
+        <Ionicons name="search" size={18} color="#A68372" style={{ marginRight: 8 }} />
         <TextInput
           style={styles.searchInput}
           placeholder="Search for your trips..."
@@ -180,9 +68,7 @@ export default function MyTrips() {
               num_members={item.numMembers}
               budget={item.budget}
               isPinned={item.pinned}
-              onPress={() =>
-                router.push(`/my-trips/${item.id}/details` as const)
-              }
+              onPress={() => router.push(`/my-trips/${item.id}/details` as const)}
             />
           )}
           keyExtractor={(item) => item.id}
@@ -192,10 +78,7 @@ export default function MyTrips() {
         />
       )}
       {/* Nút tạo chuyến đi */}
-      <CreateTripButton
-        onPress={() => router.push('/my-trips/welcome-create')}
-        color={colorPalettes.light.primary}
-      />
+      <CreateTripButton onPress={() => router.push('/my-trips/welcome-create')} color={colorPalettes.light.primary} />
     </View>
   )
 }

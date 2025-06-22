@@ -7,20 +7,13 @@ import { useRouter } from 'expo-router'
 import * as SecureStore from 'expo-secure-store'
 import { StatusBar } from 'expo-status-bar'
 import React, { useEffect, useState } from 'react'
-import {
-  Dimensions,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Switch,
-  TouchableOpacity,
-  View,
-} from 'react-native'
+import { Dimensions, Platform, ScrollView, StyleSheet, Switch, TouchableOpacity, View } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { PaperProvider } from 'react-native-paper'
 import { ActionSheet, Button, Card, Image, Text } from 'react-native-ui-lib'
 import EditProfileModal from './components/EditProfileModal'
 import FriendListModal from './components/FriendListModal'
+import { clearLoginInfo } from '@/utils/clearLoginInfo'
 
 interface SettingSection {
   title: string
@@ -54,22 +47,22 @@ const ProfileScreen = () => {
     {
       title: 'Log out',
       icon: 'log-out-outline',
-      onPress: () => router.push('/login'),
+      onPress: () => {
+        router.push('/login')
+        clearLoginInfo()
+      },
     },
   ]
   const { setTheme } = useThemeStore()
   //const { setLanguage } = useThemeStore()
   const [modalVisible, setModalVisible] = useState<boolean>(false)
   const [showActionSheet, setShowActionSheet] = useState<boolean>(false)
-  const [friendListModalVisible, setFriendListModalVisible] =
-    useState<boolean>(false)
+  const [friendListModalVisible, setFriendListModalVisible] = useState<boolean>(false)
   const [name, setName] = useState<string>('Đặng Nhật Beo')
   const [email, setEmail] = useState<string>('csb@gmail.com')
   const [phone, setPhone] = useState<string>('4060001290')
   const [selectedField, setSelectedField] = useState<string>('Edit name')
-  const [profilePic, setProfilePic] = useState(
-    require('@/assets/images/alligator.jpg')
-  )
+  const [profilePic, setProfilePic] = useState(require('@/assets/images/alligator.jpg'))
   const [isDarkTheme, setIsDarkTheme] = useState(false)
 
   useEffect(() => {
@@ -151,11 +144,7 @@ const ProfileScreen = () => {
   }
 
   const handleSave = (value: string, field: string) => {
-    field.includes('name')
-      ? setName(value)
-      : field.includes('phone')
-        ? setPhone(value)
-        : setEmail(value)
+    field.includes('name') ? setName(value) : field.includes('phone') ? setPhone(value) : setEmail(value)
     closeModal()
   }
 
@@ -201,11 +190,7 @@ const ProfileScreen = () => {
             <View style={styles.statsItem}>
               <Text text70>Number of Trips</Text>
               <Text text50BO>70</Text>
-              <Button
-                label="Go to My trips"
-                backgroundColor="#3F6453"
-                onPress={() => router.push('/my-trips')}
-              />
+              <Button label="Go to My trips" backgroundColor="#3F6453" onPress={() => router.push('/my-trips')} />
             </View>
             <View style={styles.statsItem}>
               <Text text70>Completed Trips</Text>
@@ -227,10 +212,7 @@ const ProfileScreen = () => {
               },
             ]}
           >
-            <TouchableOpacity
-              onPress={openFriendListModal}
-              disabled={isLoading || isError}
-            >
+            <TouchableOpacity onPress={openFriendListModal} disabled={isLoading || isError}>
               <View style={styles.sectionItemContainer}>
                 <View style={styles.sectionItem}>
                   <View style={styles.iconContainer}>
@@ -245,11 +227,7 @@ const ProfileScreen = () => {
                   )}
                 </View>
 
-                <Ionicons
-                  name="chevron-forward-outline"
-                  size={20}
-                  color="black"
-                />
+                <Ionicons name="chevron-forward-outline" size={20} color="black" />
               </View>
             </TouchableOpacity>
           </Card>
@@ -263,11 +241,7 @@ const ProfileScreen = () => {
             {generalSection.map((item, index) => (
               <TouchableOpacity
                 key={index}
-                onPress={
-                  item.title.includes('picture')
-                    ? openActionSheet
-                    : () => openModal(item.title)
-                }
+                onPress={item.title.includes('picture') ? openActionSheet : () => openModal(item.title)}
               >
                 <View style={styles.sectionItemContainer}>
                   <View style={styles.sectionItem}>
@@ -276,11 +250,7 @@ const ProfileScreen = () => {
                     </View>
                     <Text>{item.title}</Text>
                   </View>
-                  <Ionicons
-                    name="chevron-forward-outline"
-                    size={20}
-                    color="black"
-                  />
+                  <Ionicons name="chevron-forward-outline" size={20} color="black" />
                 </View>
               </TouchableOpacity>
             ))}
@@ -312,10 +282,7 @@ const ProfileScreen = () => {
                   />
                 </View>
               ) : (
-                <TouchableOpacity
-                  key={index}
-                  onPress={item.onPress ?? (() => {})}
-                >
+                <TouchableOpacity key={index} onPress={item.onPress ?? (() => {})}>
                   <View style={styles.sectionItemContainer}>
                     <View style={styles.sectionItem}>
                       <View style={styles.iconContainer}>
@@ -323,11 +290,7 @@ const ProfileScreen = () => {
                       </View>
                       <Text>{item.title}</Text>
                     </View>
-                    <Ionicons
-                      name="chevron-forward-outline"
-                      size={20}
-                      color="black"
-                    />
+                    <Ionicons name="chevron-forward-outline" size={20} color="black" />
                   </View>
                 </TouchableOpacity>
               )
@@ -337,13 +300,7 @@ const ProfileScreen = () => {
 
         {/* Popup modal */}
         <EditProfileModal
-          value={
-            selectedField === 'Edit name'
-              ? name
-              : selectedField === 'Edit phone number'
-                ? phone
-                : email
-          }
+          value={selectedField === 'Edit name' ? name : selectedField === 'Edit phone number' ? phone : email}
           visible={modalVisible}
           field={selectedField}
           onSave={handleSave}
