@@ -68,6 +68,7 @@ export default function MyTrips() {
           ItemSeparatorComponent={() => <View style={{ height: 24 }} />}
         />
       )}
+
       {/* Nút tạo chuyến đi */}
       <CreateTripButton onPress={() => router.push('/my-trips/welcome-create')} color={colorPalettes.light.primary} />
     </View>
