@@ -9,7 +9,6 @@ import { Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 
 import { useRouter } from 'expo-router'
-import PressableOpacity from '../PressableOpacity'
 interface Location {
   long: number
   lat: number
@@ -37,9 +36,16 @@ const SpotCard: React.FC<SpotCardProps> = ({ id, location, name, properties, typ
       <View style={styles.imageContainer}>
         <Image source={{ uri: image }} defaultSource={require('@/assets/images/alligator.jpg')} style={styles.image} />
 
-        <PressableOpacity style={styles.overlay} onPress={() => setSaved(!saved)}>
-          <Ionicons name={saved ? 'bookmark' : 'bookmark-outline'} size={20} color="white" />
-        </PressableOpacity>
+        {/* <PressableOpacity
+          style={styles.overlay}
+          onPress={() => setSaved(!saved)}
+        >
+          <Ionicons
+            name={saved ? 'bookmark' : 'bookmark-outline'}
+            size={20}
+            color="white"
+          />
+        </PressableOpacity> */}
       </View>
 
       <View style={styles.spotInfo}>

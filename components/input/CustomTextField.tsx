@@ -35,14 +35,11 @@ const CustomTextField: React.FC<TextFieldProps> = ({
 
   return (
     <View style={styles.wrapper}>
-      {leftIcon && (
-        <Ionicons name={leftIcon as any} style={styles.leftIcon} size={24} />
-      )}
+      {leftIcon && <Ionicons name={leftIcon as any} style={styles.leftIcon} size={24} />}
       <TextInput
         numberOfLines={1}
         style={styles.input}
         placeholder={placeholder || ''}
-        placeholderTextColor="#3F6453"
         onChangeText={(value) => {
           if (onChange) onChange(value)
         }}
@@ -52,9 +49,7 @@ const CustomTextField: React.FC<TextFieldProps> = ({
         underlineColorAndroid="transparent"
         autoComplete={type ? (type as any) : 'none'}
       />
-      {rightIcon && (
-        <Ionicons name={rightIcon as any} style={styles.rightIcon} size={24} />
-      )}
+      {rightIcon && <Ionicons name={rightIcon as any} style={styles.rightIcon} size={24} />}
       {error && <Text style={styles.errorText}>{error}</Text>}
     </View>
   )
