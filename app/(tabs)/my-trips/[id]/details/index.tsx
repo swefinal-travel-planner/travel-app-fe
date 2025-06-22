@@ -1,20 +1,14 @@
+import Pressable from '@/components/Pressable'
+import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
+import { Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { Trip, TripItem } from '@/lib/types/Trip'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import * as SecureStore from 'expo-secure-store'
 import React, { useEffect, useMemo, useState } from 'react'
-import {
-  Image,
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native'
+import { Image, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 const url = process.env.EXPO_PUBLIC_BE_API_URL
 
@@ -23,9 +17,7 @@ const TripDetailViewScreen = () => {
   const styles = useMemo(() => createStyles(theme), [theme])
   const [trip, setTrip] = useState<Trip>()
   const [tripItems, setTripItems] = useState<TripItem[]>([])
-  const [groupedItems, setGroupedItems] = useState<
-    { day: number; date: string; spots: any[] }[]
-  >([])
+  const [groupedItems, setGroupedItems] = useState<{ day: number; date: string; spots: any[] }[]>([])
 
   const [activeDay, setActiveDay] = useState(0)
   const router = useRouter()
@@ -166,16 +158,13 @@ const TripDetailViewScreen = () => {
         <View style={styles.tripCard}>
           <Text style={styles.destinationText}>{trip.title}</Text>
           <Text style={styles.dateAndCostText}>
-            {formatDate(new Date(trip.startDate))} -{' '}
-            {calculateEndDate(trip.startDate, trip.days)}
+            {formatDate(new Date(trip.startDate))} - {calculateEndDate(trip.startDate, trip.days)}
           </Text>
 
           <View style={styles.tripInfoRow}>
             <View style={styles.tripInfoItem}>
               <Text style={styles.tripInfoLabel}>Budget</Text>
-              <Text style={styles.tripInfoValue}>
-                {trip.budget.toLocaleString('vi-VN')}
-              </Text>
+              <Text style={styles.tripInfoValue}>{trip.budget.toLocaleString('vi-VN')}</Text>
             </View>
             <View style={styles.tripInfoItem}>
               <Text style={styles.tripInfoLabel}>Members</Text>
@@ -190,16 +179,8 @@ const TripDetailViewScreen = () => {
 
         {/* Day Navigation */}
         <View style={styles.dayNavigationContainer}>
-          <TouchableOpacity
-            onPress={goToPreviousDay}
-            style={styles.dayNavigationButton}
-            disabled={activeDay === 0}
-          >
-            <Ionicons
-              name="chevron-back"
-              size={20}
-              color={activeDay === 0 ? '#ccc' : '#000'}
-            />
+          <TouchableOpacity onPress={goToPreviousDay} style={styles.dayNavigationButton} disabled={activeDay === 0}>
+            <Ionicons name="chevron-back" size={20} color={activeDay === 0 ? theme.disabled : theme.text} />
           </TouchableOpacity>
 
           {groupedItems[activeDay] && (
@@ -216,14 +197,12 @@ const TripDetailViewScreen = () => {
             <Ionicons
               name="chevron-forward"
               size={20}
-              color={activeDay === groupedItems.length - 1 ? '#ccc' : '#000'}
+              color={activeDay === groupedItems.length - 1 ? theme.disabled : theme.text}
             />
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.mapInstructionText}>
-          Tap a spot to view its detail
-        </Text>
+        <Text style={styles.mapInstructionText}>Tap a spot to view its details</Text>
 
         {/* Spots List */}
         {groupedItems[activeDay] && (
@@ -236,7 +215,7 @@ const TripDetailViewScreen = () => {
                 <View style={styles.spotDetails}>
                   <Text style={styles.spotName}>{spot.name}</Text>
                   <View style={styles.spotLocationContainer}>
-                    <Ionicons name="location" size={14} color="#888" />
+                    <Ionicons name="location-outline" size={14} color={theme.text} />
                     <Text style={styles.spotAddress}>{spot.address}</Text>
                   </View>
                 </View>
@@ -248,9 +227,11 @@ const TripDetailViewScreen = () => {
 
       {/* Edit Button */}
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.editButton} onPress={handleEditTrip}>
-          <Text style={styles.editButtonText}>Edit</Text>
-        </TouchableOpacity>
+        <Pressable
+          title="Edit"
+          style={{ color: theme.white, backgroundColor: theme.primary }}
+          onPress={handleEditTrip}
+        ></Pressable>
       </View>
     </SafeAreaView>
   )
@@ -261,30 +242,31 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     container: {
       flex: 1,
       backgroundColor: '#FFFFFF',
-      paddingHorizontal: 22,
     },
     content: {
       flex: 1,
       marginTop: 16,
     },
     tripCard: {
-      backgroundColor: '#fff',
-      borderRadius: 8,
+      backgroundColor: theme.secondary,
+      borderRadius: Radius.ROUNDED,
       padding: 16,
       marginBottom: 20,
-      borderWidth: 2,
-      borderColor: '#E5DACB',
+      marginHorizontal: 24,
     },
     destinationText: {
-      fontSize: 30,
+      fontSize: FontSize.XXXL,
       textAlign: 'center',
-      color: '#563D30',
+      color: theme.primary,
       marginBottom: 4,
+      fontFamily: FontFamily.BOLD,
     },
     dateAndCostText: {
-      fontSize: 14,
       textAlign: 'center',
       marginBottom: 12,
+      fontSize: FontSize.MD,
+      color: theme.primary,
+      fontFamily: FontFamily.REGULAR,
     },
     tripInfoRow: {
       flexDirection: 'row',
@@ -296,45 +278,48 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       flex: 1,
     },
     tripInfoLabel: {
-      fontSize: 12,
-      color: '#888',
+      fontSize: FontSize.SM,
+      fontFamily: FontFamily.REGULAR,
+      color: theme.text,
       marginBottom: 2,
     },
     tripInfoValue: {
-      fontSize: 14,
-      color: '#333',
+      fontSize: FontSize.MD,
+      fontFamily: FontFamily.BOLD,
+      color: theme.primary,
     },
     dayNavigationContainer: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
       marginBottom: 8,
+      marginHorizontal: 24,
     },
     dayNavigationButton: {
-      padding: 8,
+      // padding: 8,
     },
     dayText: {
       flex: 1,
       textAlign: 'center',
-      fontSize: 20,
-      fontWeight: '500',
-      paddingHorizontal: 16,
-      color: '#563D30',
+      fontSize: FontSize.XXL,
+      color: theme.primary,
+      fontFamily: FontFamily.BOLD,
+      marginTop: -4,
     },
     mapInstructionText: {
-      fontSize: 14,
-      color: '#563D30',
+      fontSize: FontSize.SM,
+      color: theme.text,
       textAlign: 'center',
-      marginBottom: 16,
+      marginBottom: 28,
+      fontFamily: FontFamily.REGULAR,
     },
     spotCard: {
       flexDirection: 'row',
-      backgroundColor: '#fff',
-      borderRadius: 12,
+      borderRadius: Radius.ROUNDED,
       marginBottom: 12,
       overflow: 'hidden',
-      borderWidth: 1,
-      borderColor: '#E5DACB',
+      backgroundColor: theme.secondary,
+      marginHorizontal: 24,
     },
     spotImageContainer: {
       width: 120,
@@ -346,29 +331,29 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     spotImage: {
       width: '100%',
       height: '100%',
-      borderColor: '#D3B7A8',
-      borderWidth: 2,
-      borderRadius: 8,
+      borderRadius: Radius.NORMAL,
+      backgroundColor: theme.disabled,
     },
     spotDetails: {
       flex: 1,
-      padding: 12,
       justifyContent: 'center',
     },
     spotName: {
-      fontSize: 15,
-      fontWeight: '500',
-      marginBottom: 6,
-      color: '#563D30',
+      fontFamily: FontFamily.BOLD,
+      fontSize: FontSize.MD,
+      marginBottom: 2,
+      color: theme.primary,
+      paddingRight: 8,
     },
     spotLocationContainer: {
       flexDirection: 'row',
       alignItems: 'center',
     },
     spotAddress: {
-      fontSize: 13,
-      color: '#A68372',
-      marginLeft: 4,
+      color: theme.text,
+      marginLeft: 2,
+      fontFamily: FontFamily.REGULAR,
+      fontSize: FontSize.SM,
     },
     buttonContainer: {
       margin: 16,
