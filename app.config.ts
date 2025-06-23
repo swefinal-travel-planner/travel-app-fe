@@ -37,6 +37,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     ],
     '@react-native-google-signin/google-signin',
     'expo-localization',
+    ['expo-image-picker', { photosPermission: 'Allow $(PRODUCT_NAME) to access your photos.' }],
     [
       'expo-secure-store',
       {

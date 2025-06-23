@@ -3,16 +3,9 @@ import { useThemeStyle } from '@/hooks/useThemeStyle'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useRouter } from 'expo-router'
 import React, { useMemo } from 'react'
-import {
-  Image,
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native'
+import * as ImagePicker from 'expo-image-picker'
+import { Image, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { uploadImage2Cloud } from '@/utils/uploadImage2Cloud'
 
 export default function AlbumScreen() {
   const theme = useThemeStyle()
@@ -29,9 +22,22 @@ export default function AlbumScreen() {
     { id: '5', title: 'Catch turtle', imageUrl: null },
   ]
 
-  const handleAddPhoto = () => {
-    // Function to add new photo
-    console.log('Add new photo')
+  const handleAddPhoto = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      quality: 0.5,
+    })
+
+    console.log('ImagePicker result:', result)
+
+    if (!result.canceled && result.assets.length > 0) {
+      const imageUri = result.assets[0].uri
+      const uploadedUrl = await uploadImage2Cloud(imageUri, 'ml_default')
+
+      if (uploadedUrl !== null) {
+        console.log('Image uploaded to:', uploadedUrl)
+      }
+    }
   }
 
   return (
@@ -49,10 +55,7 @@ export default function AlbumScreen() {
                   <Image source={{ uri: item.imageUrl }} style={styles.image} />
                 ) : (
                   <View style={styles.imagePlaceholder}>
-                    <Image
-                      source={require('@/assets/images/alligator.jpg')}
-                      style={styles.placeholderImage}
-                    />
+                    <Image source={require('@/assets/images/alligator.jpg')} style={styles.placeholderImage} />
                   </View>
                 )}
               </TouchableOpacity>
@@ -62,10 +65,7 @@ export default function AlbumScreen() {
 
           {/* Add photo button */}
           <View style={styles.albumItem}>
-            <TouchableOpacity
-              style={[styles.imageContainer, styles.addPhotoButton]}
-              onPress={handleAddPhoto}
-            >
+            <TouchableOpacity style={[styles.imageContainer, styles.addPhotoButton]} onPress={handleAddPhoto}>
               <View style={styles.addPhotoBorder}>
                 <Ionicons name="add" size={24} color="#000" />
               </View>

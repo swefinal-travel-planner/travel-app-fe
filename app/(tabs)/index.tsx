@@ -1,14 +1,6 @@
 import { Link, useRouter } from 'expo-router'
 import { useEffect, useState } from 'react'
-import {
-  Dimensions,
-  FlatList,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native'
+import { Dimensions, FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 interface Location {
   long: number
@@ -107,9 +99,7 @@ const Index = () => {
         language,
       }).toString()
 
-      const response = await fetch(
-        `${EXPO_PUBLIC_CORE_API_URL}/places/get_random_places?${query}`
-      )
+      const response = await fetch(`${EXPO_PUBLIC_CORE_API_URL}/places/get_random_places?${query}`)
       const data = await response.json()
       setCoolSpots(data.data)
     } catch (error) {
@@ -135,11 +125,9 @@ const Index = () => {
       },
     })
   }
+
   return (
-    <ScrollView
-      style={styles.mainContainer}
-      contentContainerStyle={styles.scrollContent}
-    >
+    <ScrollView style={styles.mainContainer} contentContainerStyle={styles.scrollContent}>
       <View style={styles.container}>
         <View style={styles.topCenter}>
           <Text style={styles.hugeText}>Welcome back, bro!</Text>
@@ -166,26 +154,18 @@ const Index = () => {
                 ))}
               </Carousel>
 
-              <Pressable
-                title={'View trip details'}
-                style={styles.button}
-              ></Pressable>
+              <Pressable title={'View trip details'} style={styles.button}></Pressable>
             </View>
           ) : (
             <View style={styles.currentTrip}>
               <Text style={styles.mainText}>Your next great trip awaits!</Text>
 
-              <Pressable
-                title={'Plan a new trip'}
-                style={styles.button}
-              ></Pressable>
+              <Pressable title={'Plan a new trip'} style={styles.button}></Pressable>
             </View>
           )}
         </View>
 
-        <Text style={[styles.mainText, styles.mainText]}>
-          Cool spots near you
-        </Text>
+        <Text style={[styles.mainText, styles.mainText]}>Cool spots near you</Text>
 
         <FlatList
           horizontal={true}
@@ -202,9 +182,7 @@ const Index = () => {
           showsHorizontalScrollIndicator={false}
         />
 
-        <Text style={[styles.mainText, styles.mainText]}>
-          Spots you've visited
-        </Text>
+        <Text style={[styles.mainText, styles.mainText]}>Spots you've visited</Text>
 
         <FlatList
           horizontal={true}
