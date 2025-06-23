@@ -1,3 +1,4 @@
+import { colorPalettes } from '@/constants/Itheme'
 import { Friend } from '@/lib/types/Profile'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -5,27 +6,17 @@ import { useMutation } from '@tanstack/react-query'
 import * as SecureStore from 'expo-secure-store'
 import React, { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import {
-  KeyboardAvoidingView,
-  Platform,
-  Share,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-} from 'react-native'
+import { KeyboardAvoidingView, Platform, Share, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
 import Dialog from 'react-native-dialog'
 import { ScrollView } from 'react-native-gesture-handler'
 import Modal from 'react-native-modal'
 import { Portal } from 'react-native-paper'
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-} from 'react-native-reanimated'
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated'
 import { Avatar, Button, Card, Text, Toast, View } from 'react-native-ui-lib'
 import { z } from 'zod'
 
 interface FriendListModalProps {
+  theme: typeof colorPalettes.light
   visible: boolean
   closeModal: () => void
   friendList: Friend[]
@@ -34,23 +25,16 @@ interface FriendListModalProps {
 const url = process.env.EXPO_PUBLIC_API_URL
 
 const searchSchema = z.object({
-  email: z
-    .string({ required_error: 'Email cannot be empty' })
-    .email({ message: 'Invalid email format' }),
+  email: z.string({ required_error: 'Email cannot be empty' }).email({ message: 'Invalid email format' }),
 })
 
-const FriendListModal: React.FC<FriendListModalProps> = ({
-  visible,
-  closeModal,
-  friendList,
-}) => {
+const FriendListModal = ({ theme, visible, closeModal, friendList }: FriendListModalProps) => {
   const [isSearching, setIsSearching] = useState(false)
   const [visibleFriends, setVisibleFriends] = useState(3)
   const animatedHeight = useSharedValue(225)
   const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null)
   const [isDialogVisible, setIsDialogVisible] = useState(false)
-  const [filteredFriendlist, setFilteredFriendlist] =
-    useState<Friend[]>(friendList)
+  const [filteredFriendlist, setFilteredFriendlist] = useState<Friend[]>(friendList)
 
   const shareText = async () => {
     try {
@@ -79,11 +63,7 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
 
   useEffect(() => {
     animatedHeight.value = withSpring(
-      visibleFriends === 3
-        ? 225
-        : filteredFriendlist.length === 0
-          ? 75
-          : filteredFriendlist.length * 75,
+      visibleFriends === 3 ? 225 : filteredFriendlist.length === 0 ? 75 : filteredFriendlist.length * 75,
       { damping: 100, stiffness: 120 }
     )
   }, [visibleFriends])
@@ -95,9 +75,7 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
 
   const handleDeleteFriend = () => {
     if (selectedFriend) {
-      const updatedList = friendList.filter(
-        (friend) => friend.id !== selectedFriend.id
-      )
+      const updatedList = friendList.filter((friend) => friend.id !== selectedFriend.id)
       setFilteredFriendlist(updatedList)
       setVisibleFriends(Math.min(visibleFriends, updatedList.length))
       setIsDialogVisible(false)
@@ -181,19 +159,11 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
         <Dialog.Container visible={isDialogVisible}>
           <Dialog.Title>Remove Friend</Dialog.Title>
           <Dialog.Description>
-            Are you sure you want to remove{' '}
-            <Text style={styles.boldText}>{selectedFriend?.name}</Text> from
-            your friends list?
+            Are you sure you want to remove <Text style={styles.boldText}>{selectedFriend?.name}</Text> from your
+            friends list?
           </Dialog.Description>
-          <Dialog.Button
-            label="Cancel"
-            onPress={() => setIsDialogVisible(false)}
-          />
-          <Dialog.Button
-            label="Delete"
-            onPress={handleDeleteFriend}
-            color="red"
-          />
+          <Dialog.Button label="Cancel" onPress={() => setIsDialogVisible(false)} />
+          <Dialog.Button label="Delete" onPress={handleDeleteFriend} color="red" />
         </Dialog.Container>
       </Portal>
 
@@ -205,19 +175,14 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
         backdropOpacity={0.5}
         style={styles.modal}
       >
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={styles.keyboardAvoid}
-        >
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.keyboardAvoid}>
           <View style={styles.container}>
             <View style={styles.handleBarContainer}>
               <View style={styles.handleBar} />
             </View>
 
             {!isSearching ? (
-              <Animated.View
-                style={[styles.searchLabelContainer, labelAnimatedStyle]}
-              >
+              <Animated.View style={[styles.searchLabelContainer, labelAnimatedStyle]}>
                 <TouchableOpacity onPress={() => setIsSearching(true)}>
                   <View style={styles.addFriendContainer}>
                     <Ionicons name="search" size={25} />
@@ -229,11 +194,9 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
               </Animated.View>
             ) : (
               <View style={styles.searchInputContainer}>
-                <Animated.View
-                  style={[styles.inputContainer, inputAnimatedStyle]}
-                >
+                <Animated.View style={[styles.inputContainer, inputAnimatedStyle]}>
                   <TouchableOpacity onPress={handleSubmit(onSubmit)}>
-                    <Ionicons name="search" size={25} color="black" />
+                    <Ionicons name="search" size={25} color={theme.black} />
                   </TouchableOpacity>
                   <Controller
                     control={control}
@@ -251,8 +214,8 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
                 </Animated.View>
                 <Button
                   label="Cancel"
-                  backgroundColor="white"
-                  color="black"
+                  backgroundColor={theme.white}
+                  color={theme.black}
                   labelStyle={styles.boldText}
                   br50
                   onPress={() => {
@@ -280,18 +243,11 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
               <View row spread centerV paddingH-20 marginT-10>
                 <View row centerV gap-10>
                   <View style={styles.greenBorder}>
-                    <Avatar
-                      size={40}
-                      source={require('@/assets/images/pig.jpg')}
-                    />
+                    <Avatar size={40} source={require('@/assets/images/pig.jpg')} />
                   </View>
                   <Text text60>{searchFriendMutation.data.username}</Text>
                 </View>
-                <Button
-                  label="Add"
-                  backgroundColor="#3F6453"
-                  onPress={() => addFriendMutation.mutate()}
-                />
+                <Button label="Add" backgroundColor={theme.background} onPress={() => addFriendMutation.mutate()} />
               </View>
             )}
 
@@ -305,62 +261,41 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
 
             <ScrollView style={styles.scrollContainer}>
               <View style={styles.sectionHeader}>
-                <Ionicons name="people" size={25} color="black" />
+                <Ionicons name="people" size={25} color={'black'} />
                 <Text text60>Your friends</Text>
               </View>
 
               <Card style={styles.whiteCard}>
-                <Animated.View
-                  style={[styles.overflowHidden, animatedFriendListStyle]}
-                >
+                <Animated.View style={[styles.overflowHidden, animatedFriendListStyle]}>
                   {filteredFriendlist.length === 0 ? (
                     <View center style={styles.fullHeight}>
-                      <Text text70>
-                        Share your request link to add new friend
-                      </Text>
+                      <Text text70>Share your request link to add new friend</Text>
                     </View>
                   ) : (
-                    filteredFriendlist
-                      .slice(0, visibleFriends)
-                      .map((friend, index) => (
-                        <View key={index} row spread paddingV-10 centerV>
-                          <View row center gap-10>
-                            <View style={styles.greenBorder}>
-                              <Avatar
-                                size={40}
-                                source={require('@/assets/images/pig.jpg')}
-                              />
-                            </View>
-                            <Text text60>{friend.name}</Text>
+                    filteredFriendlist.slice(0, visibleFriends).map((friend, index) => (
+                      <View key={index} row spread paddingV-10 centerV>
+                        <View row center gap-10>
+                          <View style={styles.greenBorder}>
+                            <Avatar size={40} source={require('@/assets/images/pig.jpg')} />
                           </View>
-                          <TouchableOpacity
-                            onPress={() => confirmDeleteFriend(friend)}
-                          >
-                            <Ionicons
-                              name="close-outline"
-                              size={25}
-                              color="black"
-                            />
-                          </TouchableOpacity>
+                          <Text text60>{friend.name}</Text>
                         </View>
-                      ))
+                        <TouchableOpacity onPress={() => confirmDeleteFriend(friend)}>
+                          <Ionicons name="close-outline" size={25} color={theme.black} />
+                        </TouchableOpacity>
+                      </View>
+                    ))
                   )}
                 </Animated.View>
 
                 {filteredFriendlist.length > 3 && (
                   <Button
                     label={visibleFriends === 3 ? 'Show more' : 'Show less'}
-                    backgroundColor={
-                      friendList.length < 4 ? '#E8ECF0' : '#3F6453'
-                    }
+                    backgroundColor={friendList.length < 4 ? theme.background : theme.primary}
                     labelStyle={styles.boldText}
                     style={styles.toggleButton}
                     disabled={friendList.length < 4}
-                    onPress={() =>
-                      setVisibleFriends(
-                        visibleFriends === 3 ? friendList.length : 3
-                      )
-                    }
+                    onPress={() => setVisibleFriends(visibleFriends === 3 ? friendList.length : 3)}
                   />
                 )}
               </Card>
@@ -379,11 +314,7 @@ const FriendListModal: React.FC<FriendListModalProps> = ({
                       </View>
                       <Text>Share your request link</Text>
                     </View>
-                    <Ionicons
-                      name="chevron-forward-outline"
-                      size={20}
-                      color="black"
-                    />
+                    <Ionicons name="chevron-forward-outline" size={20} color="black" />
                   </View>
                 </TouchableOpacity>
               </Card>

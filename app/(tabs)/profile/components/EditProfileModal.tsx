@@ -1,39 +1,22 @@
-import * as SecureStore from 'expo-secure-store'
+import { colorPalettes } from '@/constants/Itheme'
 import React, { useEffect, useState } from 'react'
-import {
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native'
+import { KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Modal from 'react-native-modal'
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-} from 'react-native-reanimated'
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated'
 import { z } from 'zod'
 
 const url = process.env.EXPO_PUBLIC_API_URL
 
 interface EditProfileModalProps {
+  theme: typeof colorPalettes.light
   visible: boolean
   closeModal: () => void
   field: string
   value: string
   onSave: (value: string, field: string) => void
 }
-const EditProfileModal: React.FC<EditProfileModalProps> = ({
-  visible,
-  closeModal,
-  field,
-  value,
-  onSave,
-}) => {
+const EditProfileModal: React.FC<EditProfileModalProps> = ({ theme, visible, closeModal, field, value, onSave }) => {
   const [tempValue, setTempValue] = useState(value)
   const [error, setError] = useState('')
   const translateY = useSharedValue(0)
@@ -83,32 +66,6 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
     transform: [{ translateY: translateY.value }],
   }))
 
-  // Gọi api update
-  const handleSave = async (value: string, field: string) => {
-    try {
-      const accessToken = await SecureStore.getItemAsync('accessToken')
-      const key = mapFieldKey(field)
-
-      const response = await fetch(`${url}/users/me`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({
-          [key]: value,
-        }),
-      })
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-    } catch (error) {
-      console.log('Update profile failed:', error)
-      throw error
-    }
-  }
-
   return (
     <Modal
       isVisible={visible}
@@ -118,10 +75,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
       backdropOpacity={0.5}
       style={styles.modalContainer}
     >
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardAvoiding}
-      >
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.keyboardAvoiding}>
         <GestureDetector gesture={swipeDown}>
           <Animated.View style={[styles.modalContent, animatedStyle]}>
             {/* Thanh vuốt xuống */}
@@ -157,13 +111,8 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
 
             {/* Nút Lưu */}
             <TouchableOpacity
-              style={[
-                styles.saveButton,
-                { backgroundColor: error ? 'gray' : '#3F6453' },
-              ]}
-              onPress={() => {
-                onSave(tempValue, field), handleSave(tempValue, field)
-              }}
+              style={[styles.saveButton, { backgroundColor: error ? 'gray' : theme.primary }]}
+              onPress={() => onSave(tempValue, field)}
               disabled={!!error}
             >
               <Text style={styles.saveText}>Save</Text>

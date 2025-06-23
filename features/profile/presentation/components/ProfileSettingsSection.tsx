@@ -32,7 +32,7 @@ const ProfileSettingsSection = ({
           <View style={styles.sectionItemContainer}>
             <View style={styles.sectionItem}>
               <View style={[styles.iconContainer, { backgroundColor: theme.primary }]}>
-                <Ionicons name={item.icon} size={20} color="white" />
+                <Ionicons name={item.icon} size={20} color={theme.white} />
               </View>
               <Text>{item.title}</Text>
             </View>
