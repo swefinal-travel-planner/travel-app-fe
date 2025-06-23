@@ -30,9 +30,7 @@ const createAxiosInstance = (baseURL: string) => {
     },
     (error) => {
       console.error('Request Error:', JSON.stringify(error, null, INDENT_LEVEL))
-      return Promise.reject(
-        error instanceof Error ? error : new Error(String(error))
-      )
+      return Promise.reject(error instanceof Error ? error : new Error(String(error)))
     }
   )
 
@@ -78,7 +76,9 @@ const createAxiosInstance = (baseURL: string) => {
           INDENT_LEVEL
         )
       )
-      return Promise.reject(error)
+      return Promise.reject(
+        new Error(error.response?.data?.message ?? error.message ?? 'An error occurred while processing the request')
+      )
     }
   )
 
