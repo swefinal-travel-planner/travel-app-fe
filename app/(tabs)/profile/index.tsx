@@ -4,20 +4,20 @@ import ProfileDangerSection from '@/features/profile/presentation/components/Pro
 import ProfileFriendSection from '@/features/profile/presentation/components/ProfileFriendSection'
 import ProfileSettingsSection from '@/features/profile/presentation/components/ProfileSettingsSection'
 import ProfileStats from '@/features/profile/presentation/components/ProfileStats'
+import { useThemeStyle } from '@/hooks/useThemeStyle'
+import beApi from '@/lib/beApi'
 import { Friend } from '@/lib/types/Profile'
 import { useThemeStore } from '@/store/themeStore'
 import { clearLoginInfo } from '@/utils/clearLoginInfo'
 import { useQuery } from '@tanstack/react-query'
 import { useRouter } from 'expo-router'
 import * as SecureStore from 'expo-secure-store'
-import { StatusBar } from 'expo-status-bar'
 import React, { useEffect, useState } from 'react'
-import { Dimensions, ScrollView, StyleSheet } from 'react-native'
+import { ScrollView, StyleSheet } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { PaperProvider } from 'react-native-paper'
 import EditProfileModal from './components/EditProfileModal'
 import FriendListModal from './components/FriendListModal'
-import { useThemeStyle } from '@/hooks/useThemeStyle'
 
 export type SettingSection = {
   title: string
@@ -119,9 +119,37 @@ const ProfileScreen = () => {
     queryFn: fetchFriends,
   })
 
-  const handleSave = (value: string, field: string) => {
-    field.includes('name') ? setName(value) : field.includes('phone') ? setPhone(value) : setEmail(value)
-    closeModal()
+  const mapFieldKey = (field: string) => {
+    switch (field) {
+      case 'Edit name':
+        return 'name'
+      case 'Edit phone number':
+        return 'phoneNumber'
+      case 'Edit email':
+        return 'email'
+      default:
+        return field
+    }
+  }
+
+  const handleSave = async (value: string, field: string) => {
+    try {
+      const key = mapFieldKey(field)
+      const response = await beApi.patch('/users/me', {
+        [key]: value,
+      })
+      if (response.status !== 204) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      // Update local state
+      if (key === 'name') setName(value)
+      else if (key === 'phoneNumber') setPhone(value)
+      else if (key === 'email') setEmail(value)
+      closeModal()
+    } catch (error) {
+      console.log('Update profile failed:', error)
+      throw error
+    }
   }
 
   const openModal = (field: string) => {
@@ -178,6 +206,7 @@ const ProfileScreen = () => {
 
         {/* Popup modal */}
         <EditProfileModal
+          theme={theme}
           value={selectedField === 'Edit name' ? name : selectedField === 'Edit phone number' ? phone : email}
           visible={modalVisible}
           field={selectedField}
@@ -187,6 +216,7 @@ const ProfileScreen = () => {
 
         {/* Friend list modal */}
         <FriendListModal
+          theme={theme}
           visible={friendListModalVisible}
           closeModal={closeFriendListModal}
           friendList={friendList}
@@ -201,7 +231,6 @@ const ProfileScreen = () => {
           }}
         />
       </GestureHandlerRootView>
-      <StatusBar style="dark" />
     </PaperProvider>
   )
 }
