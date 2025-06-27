@@ -1,4 +1,4 @@
-import { Link, useRouter } from 'expo-router'
+import { useRouter } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { Dimensions, FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
@@ -13,8 +13,9 @@ interface SpotData {
   name: string
   properties: string[]
   type: string[]
-  image: string
+  images: string[]
   isSaved: boolean
+  address: string
 }
 
 import Pressable from '@/components/Pressable'
@@ -28,7 +29,7 @@ import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { useMemo } from 'react'
 import { Carousel } from 'react-native-ui-lib'
 
-const hasTrip = true
+const hasTrip = false
 const EXPO_PUBLIC_CORE_API_URL = process.env.EXPO_PUBLIC_CORE_API_URL
 
 // get screen width for responsive sizing
@@ -37,51 +38,22 @@ const cardWidth = screenWidth - 120 // account for margins and padding
 
 const Index = () => {
   const [coolSpots, setCoolSpots] = useState<SpotData[]>([])
+  const [topPicks, setTopPicks] = useState<SpotData[]>([])
   const data: SpotData[] = [
     {
-      id: '1',
+      id: '51a6f6d84c74ac5a40592e1d5958ed882540f00103f901d97455fb000000009203244e68c3a02048c3a174202248c3a06e67204b68c3b46e67204de1baab752048e1baa16d22',
       location: { long: 106.700981, lat: 10.776889 },
       name: 'Ben Thanh Market',
       properties: ['local food', 'souvenir', 'historic'],
       type: ['market', 'cultural'],
-      image: 'https://example.com/images/ben-thanh.jpg',
+      images: [
+        'https://ae01.alicdn.com/kf/Sa0e264bfabba4dfcaaf7ff704b30bc79A.jpg',
+        'https://images-na.ssl-images-amazon.com/images/I/61XFZmy58tL.jpg',
+        'https://ae01.alicdn.com/kf/S474b1e228c524878a5f23ab383a22c63P.jpg',
+      ],
       isSaved: true,
-    },
-    {
-      id: '2',
-      location: { long: 106.703394, lat: 10.775659 },
-      name: 'Notre-Dame Cathedral',
-      properties: ['architecture', 'historic', 'landmark'],
-      type: ['church', 'tourist'],
-      image: 'https://example.com/images/notre-dame.jpg',
-      isSaved: false,
-    },
-    {
-      id: '3',
-      location: { long: 106.695831, lat: 10.762622 },
-      name: 'War Remnants Museum',
-      properties: ['history', 'museum', 'education'],
-      type: ['museum'],
-      image: 'https://example.com/images/war-museum.jpg',
-      isSaved: true,
-    },
-    {
-      id: '4',
-      location: { long: 106.706291, lat: 10.782636 },
-      name: 'Saigon Zoo and Botanical Gardens',
-      properties: ['nature', 'family-friendly', 'animals'],
-      type: ['zoo', 'garden'],
-      image: 'https://example.com/images/zoo-garden.jpg',
-      isSaved: false,
-    },
-    {
-      id: '5',
-      location: { long: 106.711632, lat: 10.762913 },
-      name: 'Landmark 81',
-      properties: ['modern', 'viewpoint', 'shopping'],
-      type: ['skyscraper', 'mall'],
-      image: 'https://example.com/images/landmark81.jpg',
-      isSaved: true,
+      address:
+        'The Flanker Aviation theater, 30, Tran Hung Dao, Quarter 9, Ben Thanh Ward, Ho Chi Minh City, 71010, Vietnam, Vietnam',
     },
   ]
 
@@ -89,9 +61,9 @@ const Index = () => {
   const styles = useMemo(() => createStyles(theme), [theme])
   const router = useRouter()
 
-  const getCoolSpots = async () => {
+  const getSpots = async () => {
     try {
-      const limit = 5
+      const limit = 10
       const language = 'en' // hoặc 'vi'
 
       const query = new URLSearchParams({
@@ -101,14 +73,20 @@ const Index = () => {
 
       const response = await fetch(`${EXPO_PUBLIC_CORE_API_URL}/places/get_random_places?${query}`)
       const data = await response.json()
-      setCoolSpots(data.data)
+
+      const places: SpotData[] = data.data
+      const firstHalf = places.slice(0, 5)
+      const secondHalf = places.slice(5, 10)
+
+      setCoolSpots(firstHalf)
+      setTopPicks(secondHalf)
     } catch (error) {
       console.error('Error fetching cool spots:', error)
     }
   }
 
   useEffect(() => {
-    getCoolSpots()
+    getSpots()
   }, [])
 
   const handlePress = (item: SpotData) => {
@@ -121,7 +99,7 @@ const Index = () => {
         lat: item.location.lat.toString(),
         properties: item.properties.join(','),
         types: item.type,
-        image: item.image,
+        image: item.images[0],
       },
     })
   }
@@ -174,7 +152,15 @@ const Index = () => {
           data={coolSpots}
           renderItem={({ item }) => (
             <TouchableOpacity onPress={() => handlePress(item)}>
-              <SpotCard {...item} />
+              <SpotCard
+                id={item.id}
+                location={item.location}
+                name={item.name}
+                properties={item.properties}
+                type={item.type}
+                image={item.images[0] || ''}
+                isSaved={item.isSaved}
+              />
             </TouchableOpacity>
           )}
           keyExtractor={(item) => item.id}
@@ -182,16 +168,24 @@ const Index = () => {
           showsHorizontalScrollIndicator={false}
         />
 
-        <Text style={[styles.mainText, styles.mainText]}>Spots you've visited</Text>
+        <Text style={[styles.mainText, styles.mainText]}>Top picks for you</Text>
 
         <FlatList
           horizontal={true}
           style={styles.list}
           contentContainerStyle={styles.listContent}
-          data={data}
+          data={topPicks}
           renderItem={({ item }) => (
             <TouchableOpacity onPress={() => handlePress(item)}>
-              <SpotCard {...item} />
+              <SpotCard
+                id={item.id}
+                location={item.location}
+                name={item.name}
+                properties={item.properties}
+                type={item.type}
+                image={item.images[0] || ''}
+                isSaved={item.isSaved}
+              />
             </TouchableOpacity>
           )}
           keyExtractor={(item) => item.id}

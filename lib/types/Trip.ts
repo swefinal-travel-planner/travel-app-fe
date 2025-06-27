@@ -50,6 +50,6 @@ export interface Trip {
   status: 'not_started' | 'in_progress' | 'completed' | 'cancelled'
   title: string
   id: string
-  image: string
+  image: string[]
   pinned: boolean
 }
