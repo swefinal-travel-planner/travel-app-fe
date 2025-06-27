@@ -1,4 +1,4 @@
-import { Image, StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 
 import Ionicons from '@expo/vector-icons/Ionicons'
 
@@ -19,7 +19,8 @@ interface SpotCardProps {
   name: string
   properties: string[]
   type: string[]
-  image: string
+  images: string[]
+  address: string
   onCheckIn?: () => void
 }
 
@@ -29,7 +30,8 @@ const CarouselSpotCard: React.FC<SpotCardProps> = ({
   name,
   properties,
   type,
-  image,
+  images,
+  address,
   onCheckIn,
 }) => {
   const theme = useThemeStyle()
@@ -37,9 +39,9 @@ const CarouselSpotCard: React.FC<SpotCardProps> = ({
 
   return (
     <PressableOpacity style={styles.wrapper}>
-      <View style={styles.imageContainer}>
-        <Image source={{ uri: image }} style={styles.image} />
-      </View>
+      {/* <View style={styles.imageContainer}>
+        <Image source={{ uri: images }} style={styles.image} />
+      </View> */}
 
       <View style={styles.infoContainer}>
         <View style={styles.spotInfo}>
@@ -48,18 +50,9 @@ const CarouselSpotCard: React.FC<SpotCardProps> = ({
           </Text>
 
           <View style={styles.locationContainer}>
-            <Ionicons
-              name="location-outline"
-              size={16}
-              color={theme.text}
-              style={{ marginRight: 4 }}
-            />
+            <Ionicons name="location-outline" size={16} color={theme.text} style={{ marginRight: 4 }} />
 
-            <Text
-              style={styles.location}
-              numberOfLines={1}
-              ellipsizeMode="tail"
-            >
+            <Text style={styles.location} numberOfLines={1} ellipsizeMode="tail">
               {location.long.toFixed(6)}, {location.lat.toFixed(6)}
             </Text>
           </View>
