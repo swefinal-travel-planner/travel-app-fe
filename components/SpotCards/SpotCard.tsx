@@ -9,14 +9,10 @@ import { Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 
 import { useRouter } from 'expo-router'
-interface Location {
-  long: number
-  lat: number
-}
 
 interface SpotCardProps {
   id: string
-  location: Location
+  address: string
   name: string
   properties: string[]
   type: string[]
@@ -24,7 +20,7 @@ interface SpotCardProps {
   isSaved: boolean
 }
 
-const SpotCard: React.FC<SpotCardProps> = ({ id, location, name, properties, type, image, isSaved }) => {
+const SpotCard: React.FC<SpotCardProps> = ({ id, address, name, properties, type, image, isSaved }) => {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
 
@@ -57,7 +53,7 @@ const SpotCard: React.FC<SpotCardProps> = ({ id, location, name, properties, typ
           <Ionicons name="location-outline" size={16} color={theme.text} style={{ marginRight: 4 }} />
 
           <Text style={styles.location} numberOfLines={1}>
-            {location.long}, {location.lat}
+            {address}
           </Text>
         </View>
       </View>

@@ -10,7 +10,7 @@ import PressableOpacity from './PressableOpacity'
 interface TripCardProps {
   tripId: string
   tripName: string
-  tripImage: string
+  tripImage?: string
   days: number
   num_members: number
   budget: number
@@ -35,13 +35,11 @@ const TripCard: React.FC<TripCardProps> = ({
 
   return (
     <PressableOpacity style={styles.wrapper} onPress={onPress}>
-      <View style={styles.imageContainer}>
-        <Image source={{ uri: tripImage }} style={styles.image} />
-
-        {/* <PressableOpacity style={styles.overlay} onPress={() => setPinned(!pinned)}>
-          <Ionicons name={pinned ? 'pin' : 'pin-outline'} size={20} color="white" />
-        </PressableOpacity> */}
-      </View>
+      {tripImage && (
+        <View style={styles.imageContainer}>
+          <Image source={{ uri: tripImage }} style={styles.image} />
+        </View>
+      )}
 
       <View style={styles.spotInfo}>
         <Text style={styles.name} numberOfLines={1}>
@@ -64,7 +62,6 @@ const createStyles = (theme: typeof colorPalettes.light) =>
   StyleSheet.create({
     wrapper: {
       width: 360,
-      height: 206,
       alignItems: 'center',
       justifyContent: 'flex-start',
       borderRadius: Radius.ROUNDED,

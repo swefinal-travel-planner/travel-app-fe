@@ -1,13 +1,14 @@
 import CreateTripButton from '@/components/Buttons/CreateTripButton'
 import CustomTextField from '@/components/input/CustomTextField'
 import TripCard from '@/components/TripCard'
+import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import beApi from '@/lib/beApi'
 import { Trip } from '@/lib/types/Trip'
 import { useRouter } from 'expo-router'
 import React, { useEffect, useMemo, useState } from 'react'
-import { Button, FlatList, StyleSheet, Text, View } from 'react-native'
+import { FlatList, StyleSheet, Text, View } from 'react-native'
 
 const url = process.env.EXPO_PUBLIC_BE_API_URL
 
@@ -29,6 +30,10 @@ export default function MyTrips() {
     }
   }
 
+  const handleCreateTrip = () => {
+    router.push('/my-trips/welcome-create')
+  }
+
   useEffect(() => {
     getAllTrips()
   }, [])
@@ -44,8 +49,7 @@ export default function MyTrips() {
       {/* Danh sách chuyến đi */}
       {filteredTrips.length <= 0 ? (
         <View style={styles.emptyContainer}>
-          <Text style={styles.message}>Bạn chưa có chuyến đi nào.</Text>
-          <Button title="Tạo chuyến đi" />
+          <Text style={styles.message}>Your next great trip awaits!</Text>
         </View>
       ) : (
         <FlatList
@@ -54,7 +58,6 @@ export default function MyTrips() {
             <TripCard
               tripId={item.id}
               tripName={item.title}
-              tripImage={item.image}
               days={item.days}
               num_members={item.numMembers}
               budget={item.budget}
@@ -65,7 +68,7 @@ export default function MyTrips() {
           keyExtractor={(item) => item.id}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.listContent}
-          ItemSeparatorComponent={() => <View style={{ height: 24 }} />}
+          ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
         />
       )}
 
@@ -99,12 +102,19 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       paddingBottom: 32,
     },
     emptyContainer: {
+      height: '100%',
       alignItems: 'center',
       justifyContent: 'center',
-      paddingTop: 40,
     },
     message: {
-      fontSize: 16,
+      fontSize: FontSize.XL,
+      fontFamily: FontFamily.REGULAR,
+      color: theme.text,
       marginBottom: 16,
+    },
+    button: {
+      marginTop: 16,
+      backgroundColor: theme.primary,
+      color: theme.white,
     },
   })

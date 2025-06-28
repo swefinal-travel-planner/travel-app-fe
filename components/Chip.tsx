@@ -16,49 +16,39 @@ interface ChipProps {
   style?: StyleProp<ViewStyle>
 }
 
-const Chip: React.FC<ChipProps> = ({
-  value,
-  size,
-  isSelected = false,
-  onSelect,
-  onDeselect,
-  style,
-}) => {
+const Chip: React.FC<ChipProps> = ({ value, size, isSelected, onSelect, onDeselect, style }) => {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme, size), [theme])
 
-  const [internalSelected, setInternalSelected] = useState(isSelected)
+  const [internalSelected, setInternalSelected] = useState(false)
 
-  // Use either controlled or uncontrolled selected state
+  // Use controlled state if isSelected is provided, otherwise use internal state
   const selected = isSelected !== undefined ? isSelected : internalSelected
 
   return (
     <PressableOpacity
       style={[
         styles.wrapper,
-        selected
-          ? { backgroundColor: theme.primary }
-          : { backgroundColor: theme.background },
+        selected ? { backgroundColor: theme.primary } : { backgroundColor: theme.background },
         style,
       ]}
       onPress={() => {
         const newSelected = !selected
-        // Only update internal state if not controlled externally
+
+        // Only update internal state if component is uncontrolled
         if (isSelected === undefined) {
           setInternalSelected(newSelected)
         }
-        if (newSelected && onSelect) onSelect(value)
-        if (!newSelected && onDeselect) onDeselect(value)
+
+        // Call appropriate callback
+        if (newSelected && onSelect) {
+          onSelect(value)
+        } else if (!newSelected && onDeselect) {
+          onDeselect(value)
+        }
       }}
     >
-      <Text
-        style={[
-          styles.value,
-          selected ? { color: theme.white } : { color: theme.primary },
-        ]}
-      >
-        {value}
-      </Text>
+      <Text style={[styles.value, selected ? { color: theme.white } : { color: theme.primary }]}>{value}</Text>
     </PressableOpacity>
   )
 }

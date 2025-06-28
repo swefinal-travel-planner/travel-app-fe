@@ -1,35 +1,43 @@
 import { Radius, Size, SpacingScale } from '@/constants/theme'
 import { Ionicons } from '@expo/vector-icons'
 import { useMemo } from 'react'
-import {
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native'
+import { Image, Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 
-import { colorPalettes } from '@/styles/Itheme'
+import { colorPalettes } from '@/constants/Itheme'
 
+import { FontFamily, FontSize } from '@/constants/font'
 import { getGroupIconsFromTypes } from '@/utils/TypeBadges'
+import { Carousel } from 'react-native-ui-lib'
+import Pressable from './Pressable'
 
 type LocationDetailProps = {
   title: string
   properties: string
+  lat: string | number
+  lng: string | number
   types: string
   images?: string[]
+  address?: string
   onBack?: () => void
 }
 
-const LocationDetail = ({
-  title,
-  properties,
-  types,
-  onBack,
-}: LocationDetailProps) => {
+type OpenMapArgs = {
+  lat: string | number
+  lng: string | number
+  label: string
+}
+
+const openMap = ({ lat, lng, label }: OpenMapArgs) => {
+  const scheme = `geo:${lat},${lng}?q=${lat},${lng}(${encodeURIComponent(label)})`
+
+  if (scheme) {
+    Linking.openURL(scheme).catch((err) => console.error('Error opening map: ', err))
+  }
+}
+
+const LocationDetail = ({ title, properties, types, images, address, onBack, lat, lng }: LocationDetailProps) => {
   const groupIcons = getGroupIconsFromTypes(types)
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
@@ -38,29 +46,47 @@ const LocationDetail = ({
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={onBack}>
-          <Ionicons name="arrow-back" size={24} color="#5C6F5A" />
+          <Ionicons name="arrow-back" size={24} color={theme.text} />
         </TouchableOpacity>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Image Carousel Placeholder */}
-        <View style={styles.imageCarousel}>
-          <TouchableOpacity style={styles.carouselArrow}>
-            <Ionicons name="arrow-back" size={24} color="#A79F93" />
-          </TouchableOpacity>
-          <View style={styles.placeholderImage}>
-            <Ionicons name="image-outline" size={50} color="#A79F93" />
-          </View>
-          <TouchableOpacity style={styles.carouselArrow}>
-            <Ionicons name="arrow-forward" size={24} color="#A79F93" />
-          </TouchableOpacity>
-        </View>
+        <Carousel
+          pagingEnabled
+          containerPaddingVertical={8}
+          initialPage={0}
+          style={{
+            borderRadius: Radius.ROUNDED,
+          }}
+          loop
+          containerStyle={{
+            marginVertical: SpacingScale.XXLARGE,
+            borderRadius: Radius.ROUNDED,
+            height: 256,
+          }}
+          containerMarginHorizontal={0}
+          pageControlPosition={Carousel.pageControlPositions.UNDER}
+          pageControlProps={{ color: theme.primary }}
+        >
+          {images?.map((item, index) => <Image key={index} style={styles.placeImage} source={{ uri: item }} />) || []}
+        </Carousel>
 
         <Text style={styles.title}>{title}</Text>
-        <Text style={styles.subtitle}>Introduction</Text>
+        <Text style={styles.addressTitle}>{address}</Text>
         <Text style={styles.description}>{properties}</Text>
 
-        <Text style={styles.activityTitle}>Badges</Text>
+        <Pressable
+          title="Show in Maps"
+          style={{
+            backgroundColor: theme.primary,
+            color: theme.white,
+            marginBottom: SpacingScale.HUGE,
+            marginTop: SpacingScale.MEDIUM,
+          }}
+          onPress={() => openMap({ lat, lng, label: title })}
+        />
+
+        <Text style={styles.subtitle}>Activities</Text>
         <View style={styles.activityGrid}>
           {groupIcons.map((icon, index) => (
             <View style={styles.activityItem} key={index}>
@@ -100,46 +126,44 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       paddingBottom: SpacingScale.XXLARGE,
     },
     imageCarousel: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
+      width: '100%',
+      borderRadius: Radius.ROUNDED,
+      marginVertical: 24,
+      padding: 20,
       alignItems: 'center',
-      backgroundColor: theme.brown,
-      borderRadius: Radius.NORMAL,
-      height: 200,
-      marginBottom: SpacingScale.XXLARGE,
-      paddingHorizontal: SpacingScale.XLARGE,
-    },
-    carouselArrow: {
-      padding: SpacingScale.MEDIUM,
-    },
-    placeholderImage: {
-      flex: 1,
       justifyContent: 'center',
-      alignItems: 'center',
+      backgroundColor: theme.secondary,
+    },
+    placeImage: {
+      flex: 1,
+      resizeMode: 'cover',
+      borderRadius: Radius.ROUNDED,
     },
     title: {
+      fontFamily: FontFamily.BOLD,
       fontSize: Size.XS,
-      fontWeight: 'bold',
-      color: theme.green,
-      marginBottom: SpacingScale.MEDIUM,
+      color: theme.primary,
+      marginVertical: SpacingScale.MEDIUM,
     },
     subtitle: {
       fontSize: Size.MEDIUM,
       fontWeight: '600',
       color: theme.dimText,
-      marginBottom: SpacingScale.MEDIUM,
+      marginVertical: SpacingScale.MEDIUM,
+      fontFamily: FontFamily.BOLD,
     },
     description: {
       fontSize: Size.NORMAL,
       color: theme.black,
       lineHeight: 24,
       marginBottom: SpacingScale.XXLARGE,
+      fontFamily: FontFamily.REGULAR,
     },
-    activityTitle: {
-      fontSize: Size.MEDIUM,
-      fontWeight: '600',
-      color: theme.green,
+    addressTitle: {
+      fontSize: FontSize.LG,
+      color: theme.dimText,
       marginBottom: SpacingScale.XLARGE,
+      fontFamily: FontFamily.REGULAR,
     },
     activityGrid: {
       flexDirection: 'row',
@@ -154,7 +178,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     activityBox: {
       width: 100,
       height: 100,
-      backgroundColor: theme.brown,
+      backgroundColor: theme.background,
       borderRadius: Radius.MEDIUM,
       justifyContent: 'flex-start',
       alignItems: 'center',
@@ -162,12 +186,10 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     },
     iconWrapper: {
       width: '60%',
-      height: '60%',
-      backgroundColor: theme.white,
+      height: '55%',
       borderRadius: Radius.NORMAL,
       justifyContent: 'center',
       alignItems: 'center',
-      marginBottom: SpacingScale.NORMAL,
     },
     iconImage: {
       width: 36,
@@ -178,6 +200,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       fontSize: Size.SMALL,
       textAlign: 'center',
       fontWeight: '500',
+      fontFamily: FontFamily.REGULAR,
     },
   })
 export default LocationDetail

@@ -10,21 +10,14 @@ export type TripItemCardProps = {
   isActive: boolean
 }
 
-export const TripItemCard: React.FC<TripItemCardProps> = ({
-  item,
-  drag,
-  isActive,
-}) => {
+export const TripItemCard: React.FC<TripItemCardProps> = ({ item, drag, isActive }) => {
   return (
     <ScaleDecorator>
       <TouchableOpacity
         activeOpacity={1}
         onLongPress={drag}
         disabled={isActive}
-        style={[
-          styles.spotCard,
-          { backgroundColor: isActive ? '#f0f0f0' : 'white' },
-        ]}
+        style={[styles.spotCard, { backgroundColor: isActive ? '#f0f0f0' : 'white' }]}
       >
         <View style={styles.dragHandle}>
           <Ionicons name="menu-outline" size={24} color="#666" />
@@ -43,7 +36,7 @@ export const TripItemCard: React.FC<TripItemCardProps> = ({
           <Text style={styles.spotName}>{item.place?.name}</Text>
           <View style={styles.spotLocationContainer}>
             <Ionicons name="location" size={14} color="#888" />
-            <Text>{item.place?.address ?? 'No address available'}</Text>
+            <Text numberOfLines={1}>{item.place?.address ?? 'No address available'}</Text>
           </View>
         </View>
       </TouchableOpacity>

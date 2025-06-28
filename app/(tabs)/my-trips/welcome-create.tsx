@@ -22,24 +22,20 @@ export default function WelcomeCreateScreen() {
         // Prevent default navigation
         e.preventDefault()
 
-        Alert.alert(
-          'Discard Changes',
-          'Are you sure you want to go back? All trip data will be cleared.',
-          [
-            {
-              text: 'Cancel',
-              style: 'cancel',
+        Alert.alert('Discard Changes', 'Are you sure you want to go back? All trip data will be cleared.', [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
+            text: 'Yes, go back',
+            style: 'destructive',
+            onPress: () => {
+              resetManualTrip()
+              navigation.dispatch(e.data.action)
             },
-            {
-              text: 'Yes, go back',
-              style: 'destructive',
-              onPress: () => {
-                resetManualTrip()
-                navigation.dispatch(e.data.action)
-              },
-            },
-          ]
-        )
+          },
+        ])
       }
 
       navigation.addListener('beforeRemove', handleBackPress)
@@ -52,9 +48,7 @@ export default function WelcomeCreateScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.textQuestion, { color: theme.primary }]}>
-        Let our AI help you plan your next trip!
-      </Text>
+      <Text style={[styles.textQuestion, { color: theme.primary }]}>Let our AI help you plan your next trip!</Text>
 
       <View style={styles.textFieldContainer}></View>
 
@@ -73,15 +67,6 @@ export default function WelcomeCreateScreen() {
         style={{
           color: theme.text,
           backgroundColor: theme.secondary,
-        }}
-      />
-
-      <Pressable
-        onPress={() => router.push('/(tabs)/my-trips')}
-        title="Cancel"
-        style={{
-          color: theme.text,
-          backgroundColor: theme.background,
         }}
       />
     </View>

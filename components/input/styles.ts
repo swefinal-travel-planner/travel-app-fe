@@ -38,7 +38,7 @@ export const createStyles = (theme: typeof colorPalettes.light) =>
       borderColor: theme.primary,
     },
     pinCodeText: {
-      fontFamily: 'PlusJakartaSans_400Regular',
+      fontFamily: FontFamily.BOLD,
       fontSize: 36,
       color: theme.black,
     },
