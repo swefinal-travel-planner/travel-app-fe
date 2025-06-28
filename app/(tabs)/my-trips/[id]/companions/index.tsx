@@ -1,16 +1,11 @@
+import Pressable from '@/components/Pressable'
+import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
+import { Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import React, { useMemo, useState } from 'react'
-import {
-  Image,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native'
+import { Image, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native'
 export default function TripCompanionsScreen() {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
@@ -37,29 +32,23 @@ export default function TripCompanionsScreen() {
           {companions.length > 0 ? (
             companions.map((companion) => (
               <View key={companion.id} style={styles.companionItem}>
-                <Image
-                  source={{ uri: companion.avatar }}
-                  style={styles.image}
-                />
-                <Text style={{ fontSize: 18 }}>{companion.name}</Text>
+                <Image source={{ uri: companion.avatar }} style={styles.image} />
+                <Text style={styles.companionName}>{companion.name}</Text>
               </View>
             ))
           ) : (
-            <Text style={styles.emptyCompanionText}>
-              You're travelling solo.
-            </Text>
+            <Text style={styles.emptyCompanionText}>You're travelling solo.</Text>
           )}
         </ScrollView>
       </View>
 
       {/* Add Companions Button */}
       <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={styles.addButton}
+        <Pressable
+          title="Add companions"
+          style={{ color: theme.white, backgroundColor: theme.primary }}
           onPress={handleAddCompanions}
-        >
-          <Text style={styles.addButtonText}>Add companions</Text>
-        </TouchableOpacity>
+        ></Pressable>
       </View>
     </SafeAreaView>
   )
@@ -70,21 +59,26 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     container: {
       flex: 1,
       backgroundColor: '#FFFFFF',
-      paddingHorizontal: 22,
     },
     content: {
       flexGrow: 0,
       marginTop: 16,
-      borderWidth: 2,
-      borderColor: '#E5DACB',
-      borderRadius: 8,
-      padding: 16,
+      borderRadius: Radius.ROUNDED,
+      paddingVertical: 8,
+      paddingHorizontal: 16,
+      marginHorizontal: 24,
+      backgroundColor: theme.secondary,
     },
     companionItem: {
       flexDirection: 'row',
       alignItems: 'center',
       width: '100%',
       marginVertical: 8,
+    },
+    companionName: {
+      fontFamily: FontFamily.BOLD,
+      fontSize: FontSize.LG,
+      color: theme.primary,
     },
     image: {
       width: 50,
@@ -101,16 +95,5 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     buttonContainer: {
       margin: 16,
       backgroundColor: 'transparent',
-    },
-    addButton: {
-      backgroundColor: '#3F6453',
-      borderRadius: 24,
-      paddingVertical: 16,
-      alignItems: 'center',
-    },
-    addButtonText: {
-      color: '#fff',
-      fontSize: 16,
-      fontWeight: '500',
     },
   })

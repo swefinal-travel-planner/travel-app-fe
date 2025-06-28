@@ -1,11 +1,13 @@
+import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
+import { Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
+import { uploadImage2Cloud } from '@/utils/uploadImage2Cloud'
 import Ionicons from '@expo/vector-icons/Ionicons'
+import * as ImagePicker from 'expo-image-picker'
 import { useRouter } from 'expo-router'
 import React, { useMemo } from 'react'
-import * as ImagePicker from 'expo-image-picker'
 import { Image, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { uploadImage2Cloud } from '@/utils/uploadImage2Cloud'
 
 export default function AlbumScreen() {
   const theme = useThemeStyle()
@@ -67,7 +69,7 @@ export default function AlbumScreen() {
           <View style={styles.albumItem}>
             <TouchableOpacity style={[styles.imageContainer, styles.addPhotoButton]} onPress={handleAddPhoto}>
               <View style={styles.addPhotoBorder}>
-                <Ionicons name="add" size={24} color="#000" />
+                <Ionicons name="add" size={24} color={theme.white} />
               </View>
             </TouchableOpacity>
           </View>
@@ -100,9 +102,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     imageContainer: {
       aspectRatio: 0.75,
       backgroundColor: '#E8DED1',
-      borderRadius: 8,
-      borderWidth: 2,
-      borderColor: '#A68372',
+      borderRadius: Radius.ROUNDED,
     },
     image: {
       width: '100%',
@@ -122,23 +122,19 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     imageTitle: {
       textAlign: 'center',
       marginTop: 8,
-      fontSize: 12,
-      color: '#000000',
+      fontSize: FontSize.MD,
+      fontFamily: FontFamily.REGULAR,
+      color: theme.text,
     },
     addPhotoBorder: {
       alignSelf: 'center',
-      backgroundColor: '#A68372',
-      borderRadius: 30,
+      backgroundColor: theme.primary,
+      borderRadius: Radius.FULL,
       padding: 10,
     },
     addPhotoButton: {
-      backgroundColor: '#E8DED1',
+      backgroundColor: theme.secondary,
       justifyContent: 'center',
       alignItems: 'center',
-    },
-    addButtonText: {
-      fontSize: 28,
-      fontWeight: '300',
-      color: '#8D7B68',
     },
   })

@@ -1,3 +1,4 @@
+import { FontFamily } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import { StyleSheet } from 'react-native'
 
@@ -8,10 +9,9 @@ export const createStyles = (theme: typeof colorPalettes.light) =>
       justifyContent: 'center',
       alignItems: 'center',
       borderRadius: 100,
-      borderWidth: 1,
-      borderColor: '#3F6453',
       paddingHorizontal: 8,
       paddingVertical: 4,
+      backgroundColor: theme.background,
     },
     leftIcon: {
       color: theme.primary,
@@ -28,8 +28,8 @@ export const createStyles = (theme: typeof colorPalettes.light) =>
       paddingRight: 12,
       paddingLeft: 0,
       borderRadius: 100,
-      color: theme.black,
-      fontFamily: 'PlusJakartaSans_400Regular',
+      color: theme.text,
+      fontFamily: FontFamily.REGULAR,
     },
     pinCodeContainer: {
       borderRadius: 0,
