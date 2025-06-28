@@ -24,9 +24,16 @@ const SpotCard: React.FC<SpotCardProps> = ({ name, image, address, isSaved }) =>
       <View style={styles.imageContainer}>
         <Image source={{ uri: image }} defaultSource={require('@/assets/images/alligator.jpg')} style={styles.image} />
 
-        <PressableOpacity style={styles.overlay} onPress={() => setSaved(!saved)}>
-          <Ionicons name={saved ? 'bookmark' : 'bookmark-outline'} size={20} color="white" />
-        </PressableOpacity>
+        {/* <PressableOpacity
+          style={styles.overlay}
+          onPress={() => setSaved(!saved)}
+        >
+          <Ionicons
+            name={saved ? 'bookmark' : 'bookmark-outline'}
+            size={20}
+            color="white"
+          />
+        </PressableOpacity> */}
       </View>
 
       <View style={styles.spotInfo}>
