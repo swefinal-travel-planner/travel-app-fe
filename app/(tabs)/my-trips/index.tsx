@@ -1,13 +1,13 @@
 import CreateTripButton from '@/components/Buttons/CreateTripButton'
+import CustomTextField from '@/components/input/CustomTextField'
 import TripCard from '@/components/TripCard'
 import { colorPalettes } from '@/constants/Itheme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import beApi from '@/lib/beApi'
 import { Trip } from '@/lib/types/Trip'
-import Ionicons from '@expo/vector-icons/Ionicons'
 import { useRouter } from 'expo-router'
 import React, { useEffect, useMemo, useState } from 'react'
-import { Button, FlatList, StyleSheet, Text, TextInput, View } from 'react-native'
+import { Button, FlatList, StyleSheet, Text, View } from 'react-native'
 
 const url = process.env.EXPO_PUBLIC_BE_API_URL
 
@@ -36,16 +36,7 @@ export default function MyTrips() {
   return (
     <View style={styles.container}>
       {/* Thanh tìm kiếm */}
-      <View style={styles.searchContainer}>
-        <Ionicons name="search" size={18} color="#A68372" style={{ marginRight: 8 }} />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search for your trips..."
-          value={search}
-          onChangeText={setSearch}
-          placeholderTextColor="#CDB8A5"
-        />
-      </View>
+      <CustomTextField placeholder="Search for your trips..." value={search} onChange={setSearch} />
 
       {/* Divider */}
       <View style={styles.divider} />
@@ -77,6 +68,7 @@ export default function MyTrips() {
           ItemSeparatorComponent={() => <View style={{ height: 24 }} />}
         />
       )}
+
       {/* Nút tạo chuyến đi */}
       <CreateTripButton onPress={() => router.push('/my-trips/welcome-create')} color={colorPalettes.light.primary} />
     </View>
@@ -90,16 +82,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       paddingTop: 50,
       backgroundColor: theme.white,
       alignItems: 'center',
-    },
-    searchContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: '#FCF4E8',
-      borderRadius: 24,
-      paddingHorizontal: 16,
-      paddingVertical: 10,
-      marginBottom: 16,
-      width: 360,
+      paddingHorizontal: 24,
     },
     searchInput: {
       flex: 1,
@@ -108,7 +91,6 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     },
     divider: {
       height: 1,
-      backgroundColor: '#E5DACB',
       width: '90%',
       alignSelf: 'center',
       marginBottom: 16,
