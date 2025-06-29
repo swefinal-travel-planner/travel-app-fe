@@ -18,6 +18,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { PaperProvider } from 'react-native-paper'
 import EditProfileModal from './components/EditProfileModal'
 import FriendListModal from './components/FriendListModal'
+import { uploadImage2Cloud } from '@/utils/uploadImage2Cloud'
 
 export type SettingSection = {
   title: string
@@ -127,6 +128,8 @@ const ProfileScreen = () => {
         return 'phoneNumber'
       case 'Edit email':
         return 'email'
+      case 'Edit profile picture':
+        return 'photo_url'
       default:
         return field
     }
@@ -226,8 +229,9 @@ const ProfileScreen = () => {
         <ImageActionSheet
           visible={showActionSheet}
           onDismiss={() => setShowActionSheet(false)}
-          onImagePicked={(uri) => {
+          onImagePicked={async (uri) => {
             setProfilePic({ uri })
+            handleSave((await uploadImage2Cloud(uri, 'avatars')) ?? uri, 'Edit profile picture')
           }}
         />
       </GestureHandlerRootView>
