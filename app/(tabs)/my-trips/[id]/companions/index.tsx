@@ -12,7 +12,7 @@ export default function TripCompanionsScreen() {
 
   const router = useRouter()
   const params = useLocalSearchParams()
-  const tripId = params.tripId
+  const tripId = params.id
   const [companions, setCompanions] = useState([
     {
       id: '1',
@@ -22,7 +22,17 @@ export default function TripCompanionsScreen() {
   ])
 
   const handleAddCompanions = () => {
-    //router.push(`/trips/${tripId}/add-companions`);
+    if (!tripId) {
+      console.warn('No trip data available for editing.')
+      return
+    }
+
+    router.push({
+      pathname: `/my-trips/${tripId}/companions/modify`,
+      params: {
+        tripId: tripId,
+      },
+    })
   }
 
   return (
@@ -58,11 +68,11 @@ const createStyles = (theme: typeof colorPalettes.light) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: '#FFFFFF',
+      backgroundColor: theme.white,
     },
     content: {
       flexGrow: 0,
-      marginTop: 16,
+      marginTop: 40,
       borderRadius: Radius.ROUNDED,
       paddingVertical: 8,
       paddingHorizontal: 16,

@@ -83,6 +83,7 @@ export default function TripDetailLayout() {
           options={{
             title: 'Companions',
             tabBarLabel: ({ focused }) => <CustomTabLabel label="Companions" focused={focused} />,
+            href: { pathname: '/my-trips/[id]/companions', params: { id: tripId } },
           }}
         />
         <Tabs.Screen
