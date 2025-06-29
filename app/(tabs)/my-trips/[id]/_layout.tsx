@@ -2,6 +2,7 @@ import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import { Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
+import { useTripId } from '@/hooks/useTripId'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { Tabs, useRouter, useSegments } from 'expo-router'
 import React, { useMemo } from 'react'
@@ -14,6 +15,8 @@ const TAB_WIDTH = SCREEN_WIDTH / 3 // Chia cho 3 tab
 export default function TripDetailLayout() {
   const router = useRouter()
   const segments = useSegments()
+
+  const tripId = useTripId()
 
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
@@ -72,6 +75,7 @@ export default function TripDetailLayout() {
           options={{
             title: 'Details',
             tabBarLabel: ({ focused }) => <CustomTabLabel label="Details" focused={focused} />,
+            href: { pathname: '/my-trips/[id]/details', params: { id: tripId } },
           }}
         />
         <Tabs.Screen
@@ -86,6 +90,7 @@ export default function TripDetailLayout() {
           options={{
             title: 'Album',
             tabBarLabel: ({ focused }) => <CustomTabLabel label="Album" focused={focused} />,
+            href: { pathname: '/my-trips/[id]/album', params: { id: tripId } },
           }}
         />
       </Tabs>

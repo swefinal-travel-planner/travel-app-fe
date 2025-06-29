@@ -50,6 +50,3 @@ export const SpacingScale = {
 
 export const Padding = { ...SpacingScale }
 export const Margin = { ...SpacingScale }
-
-const tam = Padding.TINY
-console.log(' tam', tam)

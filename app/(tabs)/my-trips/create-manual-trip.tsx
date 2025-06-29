@@ -29,18 +29,9 @@ export default function ManualCreateTripScreen() {
     }
   }
 
-  useEffect(() => {
-    console.log('Current Step:', currentStep)
-  }, [currentStep])
-
   return (
     <View style={styles.safeAreaContainer}>
-      <CreateTripNavigationBar
-        type={TRIP_TYPES.MANUAL}
-        theme={theme}
-        goback={goBack}
-        currentStep={currentStep}
-      />
+      <CreateTripNavigationBar type={TRIP_TYPES.MANUAL} theme={theme} goback={goBack} currentStep={currentStep} />
       <StepComponent theme={theme} nextFn={goNext} />
     </View>
   )

@@ -20,7 +20,6 @@ export const uploadImage2Cloud = async (uri: string, uploadPreset: string): Prom
     })
 
     const data = await response.data
-    console.log(data)
     if (data.url) {
       return data.url
     } else {
