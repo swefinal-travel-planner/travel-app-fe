@@ -1,22 +1,7 @@
+import { SpotData } from '@/lib/types/Spots'
 import { useRouter } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { Dimensions, FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-
-interface Location {
-  long: number
-  lat: number
-}
-
-interface SpotData {
-  id: string
-  location: Location
-  name: string
-  properties: string[]
-  type: string[]
-  images: string[]
-  isSaved: boolean
-  address: string
-}
 
 import Pressable from '@/components/Pressable'
 import SpotCard from '@/components/SpotCards/SpotCard'
@@ -78,13 +63,18 @@ const Index = () => {
       params: {
         id: item.id,
         name: item.name,
-        long: item.location.long.toString(),
+        lng: item.location.long.toString(),
         lat: item.location.lat.toString(),
-        properties: item.properties.join(','),
+        properties: item.properties.join(' '),
+        address: item.address,
         types: item.type,
-        image: item.images[0],
+        images: JSON.stringify(item.images),
       },
     })
+  }
+
+  const handleCreateTrip = () => {
+    router.push('/my-trips/welcome-create')
   }
 
   return (
@@ -121,7 +111,7 @@ const Index = () => {
             <View style={styles.currentTrip}>
               <Text style={styles.mainText}>Your next great trip awaits!</Text>
 
-              <Pressable title={'Plan a new trip'} style={styles.button}></Pressable>
+              <Pressable title={'Plan a new trip'} style={styles.button} onPress={handleCreateTrip}></Pressable>
             </View>
           )}
         </View>

@@ -34,13 +34,10 @@ const PasswordField: React.FC<PasswordFieldProps> = ({
 
   return (
     <View style={styles.wrapper}>
-      {leftIcon && (
-        <Ionicons name={leftIcon as any} style={styles.leftIcon} size={24} />
-      )}
+      {leftIcon && <Ionicons name={leftIcon as any} style={styles.leftIcon} size={24} />}
       <TextInput
         style={styles.input}
         placeholder={placeholder ? placeholder : ''}
-        placeholderTextColor="#3F6453"
         underlineColorAndroid="transparent"
         textContentType="password"
         onChangeText={(value) => {
@@ -53,11 +50,7 @@ const PasswordField: React.FC<PasswordFieldProps> = ({
       />
 
       <PressableOpacity onPress={() => setIsVisible(!isVisible)}>
-        <Ionicons
-          name={isVisible ? 'eye-off-outline' : 'eye-outline'}
-          style={styles.rightIcon}
-          size={24}
-        />
+        <Ionicons name={isVisible ? 'eye-off-outline' : 'eye-outline'} style={styles.rightIcon} size={24} />
       </PressableOpacity>
     </View>
   )

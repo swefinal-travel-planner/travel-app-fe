@@ -1,4 +1,5 @@
 import Pressable from '@/components/Pressable'
+import PressableOpacity from '@/components/PressableOpacity'
 import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import { Radius } from '@/constants/theme'
@@ -23,8 +24,13 @@ const TripDetailViewScreen = () => {
   const router = useRouter()
 
   const handleEditTrip = () => {
+    if (!trip || groupedItems.length === 0) {
+      console.warn('No trip data available for editing.')
+      return
+    }
+
     router.push({
-      pathname: `my-trips/${trip?.id}/details/modify`,
+      pathname: `my-trips/${trip.id}/details/modify`,
       params: {
         tripData: JSON.stringify(groupedItems[activeDay]?.spots ?? []),
         tripDate: groupedItems[activeDay]?.date ?? '',
@@ -33,11 +39,27 @@ const TripDetailViewScreen = () => {
     })
   }
 
+  const handleSpotDetail = (id: string) => {
+    let spot = tripItems.find((item) => item.placeID === id)?.placeInfo
+
+    router.push({
+      pathname: '/places/[id]',
+      params: {
+        id: spot?.id ?? '',
+        name: spot?.name,
+        lng: spot?.location.long.toString(),
+        lat: spot?.location.lat.toString(),
+        properties: spot?.properties.join(' '),
+        address: spot?.address,
+        types: spot?.type,
+        images: JSON.stringify(spot?.images),
+      },
+    })
+  }
+
   const [activeTab, setActiveTab] = useState('Details')
 
   const { id } = useLocalSearchParams()
-
-  console.log('Trip ID:', id)
 
   const getTripDetail = async () => {
     try {
@@ -51,7 +73,6 @@ const TripDetailViewScreen = () => {
         throw new Error('Failed to fetch trips')
       }
       const data = await response.json()
-      console.log('Get trip by ID:', data.data)
       setTrip(data.data)
     } catch (error) {
       console.error('Error fetching trip detail by ID:', error)
@@ -103,7 +124,7 @@ const TripDetailViewScreen = () => {
                 id: spot.placeID,
                 name: spot.placeInfo?.name ?? 'Unknown',
                 address: spot.placeInfo?.address ?? 'Unknown address',
-                image: { uri: spot.placeInfo?.image?.[0] ?? '' },
+                image: { uri: spot.placeInfo?.images?.[0] ?? '' },
                 timeSlot: spot.timeInDate,
               })),
           }
@@ -208,18 +229,22 @@ const TripDetailViewScreen = () => {
         {groupedItems[activeDay] && (
           <>
             {groupedItems[activeDay].spots.map((spot) => (
-              <View key={spot.id} style={styles.spotCard}>
-                <View style={styles.spotImageContainer}>
-                  <Image source={spot.image} style={styles.spotImage} />
-                </View>
-                <View style={styles.spotDetails}>
-                  <Text style={styles.spotName}>{spot.name}</Text>
-                  <View style={styles.spotLocationContainer}>
-                    <Ionicons name="location-outline" size={14} color={theme.text} />
-                    <Text style={styles.spotAddress}>{spot.address}</Text>
+              <PressableOpacity key={spot.id} onPress={() => handleSpotDetail(spot.id)}>
+                <View style={styles.spotCard}>
+                  <View style={styles.spotImageContainer}>
+                    <Image source={spot.image} style={styles.spotImage} />
+                  </View>
+                  <View style={styles.spotDetails}>
+                    <Text style={styles.spotName}>{spot.name}</Text>
+                    <View style={styles.spotLocationContainer}>
+                      <Ionicons name="location-outline" size={14} color={theme.text} />
+                      <Text style={styles.spotAddress} numberOfLines={1}>
+                        {spot.address}
+                      </Text>
+                    </View>
                   </View>
                 </View>
-              </View>
+              </PressableOpacity>
             ))}
           </>
         )}
@@ -354,6 +379,9 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       marginLeft: 2,
       fontFamily: FontFamily.REGULAR,
       fontSize: FontSize.SM,
+      flex: 1,
+      flexWrap: 'wrap',
+      marginRight: 8,
     },
     buttonContainer: {
       margin: 16,
