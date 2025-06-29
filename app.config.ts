@@ -9,7 +9,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   scheme: 'myapp',
   userInterfaceStyle: 'automatic',
   newArchEnabled: true,
-  platforms: ['android'],
+  platforms: ['android', 'ios'],
   android: {
     adaptiveIcon: {
       foregroundImage: './assets/icons/adaptive-icon.png',
