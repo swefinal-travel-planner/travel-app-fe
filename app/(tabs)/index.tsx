@@ -24,23 +24,6 @@ const cardWidth = screenWidth - 120 // account for margins and padding
 const Index = () => {
   const [coolSpots, setCoolSpots] = useState<SpotData[]>([])
   const [topPicks, setTopPicks] = useState<SpotData[]>([])
-  const data: SpotData[] = [
-    {
-      id: '51a6f6d84c74ac5a40592e1d5958ed882540f00103f901d97455fb000000009203244e68c3a02048c3a174202248c3a06e67204b68c3b46e67204de1baab752048e1baa16d22',
-      location: { long: 106.700981, lat: 10.776889 },
-      name: 'Ben Thanh Market',
-      properties: ['local food', 'souvenir', 'historic'],
-      type: ['market', 'cultural'],
-      images: [
-        'https://ae01.alicdn.com/kf/Sa0e264bfabba4dfcaaf7ff704b30bc79A.jpg',
-        'https://images-na.ssl-images-amazon.com/images/I/61XFZmy58tL.jpg',
-        'https://ae01.alicdn.com/kf/S474b1e228c524878a5f23ab383a22c63P.jpg',
-      ],
-      isSaved: true,
-      address:
-        'The Flanker Aviation theater, 30, Tran Hung Dao, Quarter 9, Ben Thanh Ward, Ho Chi Minh City, 71010, Vietnam, Vietnam',
-    },
-  ]
 
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
@@ -142,15 +125,7 @@ const Index = () => {
           data={coolSpots}
           renderItem={({ item }) => (
             <TouchableOpacity onPress={() => handlePress(item)}>
-              <SpotCard
-                id={item.id}
-                address={item.address}
-                name={item.name}
-                properties={item.properties}
-                type={item.type}
-                image={item.images[0] || ''}
-                isSaved={item.isSaved}
-              />
+              <SpotCard name={item.name} image={item.images[0] || ''} isSaved={item.isSaved} address={item.address} />
             </TouchableOpacity>
           )}
           keyExtractor={(item) => item.id}
@@ -167,15 +142,7 @@ const Index = () => {
           data={topPicks}
           renderItem={({ item }) => (
             <TouchableOpacity onPress={() => handlePress(item)}>
-              <SpotCard
-                id={item.id}
-                address={item.address}
-                name={item.name}
-                properties={item.properties}
-                type={item.type}
-                image={item.images[0] || ''}
-                isSaved={item.isSaved}
-              />
+              <SpotCard name={item.name} image={item.images[0] || ''} isSaved={item.isSaved} address={item.address} />
             </TouchableOpacity>
           )}
           keyExtractor={(item) => item.id}

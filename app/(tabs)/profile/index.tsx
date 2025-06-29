@@ -18,6 +18,8 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { PaperProvider } from 'react-native-paper'
 import EditProfileModal from './components/EditProfileModal'
 import FriendListModal from './components/FriendListModal'
+import { uploadImage2Cloud } from '@/utils/uploadImage2Cloud'
+import { set } from 'react-hook-form'
 
 export type SettingSection = {
   title: string
@@ -127,6 +129,8 @@ const ProfileScreen = () => {
         return 'phoneNumber'
       case 'Edit email':
         return 'email'
+      case 'Edit profile picture':
+        return 'photo_url'
       default:
         return field
     }
@@ -145,7 +149,8 @@ const ProfileScreen = () => {
       if (key === 'name') setName(value)
       else if (key === 'phoneNumber') setPhone(value)
       else if (key === 'email') setEmail(value)
-      closeModal()
+      else if (key === 'photo_url') setProfilePic({ uri: value })
+      setModalVisible(false)
     } catch (error) {
       console.log('Update profile failed:', error)
       throw error
@@ -155,10 +160,6 @@ const ProfileScreen = () => {
   const openModal = (field: string) => {
     setSelectedField(field)
     setModalVisible(true)
-  }
-
-  const closeModal = () => {
-    setModalVisible(false)
   }
 
   const closeFriendListModal = () => {
@@ -211,7 +212,7 @@ const ProfileScreen = () => {
           visible={modalVisible}
           field={selectedField}
           onSave={handleSave}
-          closeModal={closeModal}
+          closeModal={() => setModalVisible(false)}
         />
 
         {/* Friend list modal */}
@@ -223,11 +224,12 @@ const ProfileScreen = () => {
           //onUpdateFriendList={setFriendList}
         />
 
+        {/* Choose profile picture */}
         <ImageActionSheet
           visible={showActionSheet}
           onDismiss={() => setShowActionSheet(false)}
-          onImagePicked={(uri) => {
-            setProfilePic({ uri })
+          onImagePicked={async (uri) => {
+            handleSave((await uploadImage2Cloud(uri, 'avatars')) ?? uri, 'Edit profile picture')
           }}
         />
       </GestureHandlerRootView>

@@ -9,7 +9,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   scheme: 'myapp',
   userInterfaceStyle: 'automatic',
   newArchEnabled: true,
-  platforms: ['android'],
+  platforms: ['android', 'ios'],
   android: {
     adaptiveIcon: {
       foregroundImage: './assets/icons/adaptive-icon.png',
@@ -65,6 +65,12 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ],
   experiments: {
     typedRoutes: true,
+  },
+  updates: {
+    url: 'https://u.expo.dev/5a3053c6-fc75-46ea-b811-a9eccf5365d3',
+  },
+  runtimeVersion: {
+    policy: 'appVersion',
   },
   extra: {
     router: {

@@ -1,31 +1,23 @@
-import { useMemo, useState } from 'react'
-import { Image, StyleSheet, Text, View } from 'react-native'
-
-import Ionicons from '@expo/vector-icons/Ionicons'
-
 import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import { Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
-
-import { useRouter } from 'expo-router'
+import Ionicons from '@expo/vector-icons/Ionicons'
+import { useMemo, useState } from 'react'
+import { Image, StyleSheet, Text, View } from 'react-native'
+import PressableOpacity from '../PressableOpacity'
 
 interface SpotCardProps {
-  id: string
-  address: string
   name: string
-  properties: string[]
-  type: string[]
   image: string
   isSaved: boolean
+  address: string
 }
 
-const SpotCard: React.FC<SpotCardProps> = ({ id, address, name, properties, type, image, isSaved }) => {
+const SpotCard: React.FC<SpotCardProps> = ({ name, image, address, isSaved }) => {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
-
   const [saved, setSaved] = useState(isSaved)
-  const router = useRouter()
 
   return (
     <View style={styles.wrapper}>

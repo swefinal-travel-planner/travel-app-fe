@@ -1,3 +1,4 @@
+import { ToastProvider } from '@/components/ToastContext'
 import { getCoreAccessToken } from '@/lib/coreApi'
 import { GoogleSignin } from '@react-native-google-signin/google-signin'
 import Mapbox from '@rnmapbox/maps'
@@ -149,13 +150,15 @@ export default function RootLayout() {
 
   return (
     <>
-      <StatusBar style="auto" />
-      <QueryClientProvider client={queryClient}>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(auth)/login/index" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-        </Stack>
-      </QueryClientProvider>
+      <ToastProvider>
+        <StatusBar style="auto" />
+        <QueryClientProvider client={queryClient}>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="(auth)/login/index" options={{ headerShown: false }} />
+            <Stack.Screen name="+not-found" />
+          </Stack>
+        </QueryClientProvider>
+      </ToastProvider>
     </>
   )
 }

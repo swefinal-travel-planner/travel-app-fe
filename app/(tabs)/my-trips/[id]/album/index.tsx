@@ -1,56 +1,44 @@
+import ImageActionSheet from '@/components/ImageActionSheet'
 import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import { Radius } from '@/constants/theme'
+import { useGetTripImages } from '@/features/trip/presentation/state/useGetTripImages'
+import { usePostTripImages } from '@/features/trip/presentation/state/usePostTripImages'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
+import { useTripId } from '@/hooks/useTripId'
 import { uploadImage2Cloud } from '@/utils/uploadImage2Cloud'
 import Ionicons from '@expo/vector-icons/Ionicons'
-import * as ImagePicker from 'expo-image-picker'
 import { useRouter } from 'expo-router'
-import React, { useMemo } from 'react'
-import { Image, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import React, { useMemo, useState } from 'react'
+import { Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 export default function AlbumScreen() {
-  const theme = useThemeStyle()
-  const styles = useMemo(() => createStyles(theme), [theme])
+  const tripId = useTripId()
 
   const router = useRouter()
 
-  // Sample data for the album images
-  const albumItems = [
-    { id: '1', title: 'Catch turtle', imageUrl: null },
-    { id: '2', title: 'Catch turtle', imageUrl: null },
-    { id: '3', title: 'Catch turtle', imageUrl: null },
-    { id: '4', title: 'Catch turtle', imageUrl: null },
-    { id: '5', title: 'Catch turtle', imageUrl: null },
-  ]
-
-  const handleAddPhoto = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      quality: 0.5,
-    })
-
-    console.log('ImagePicker result:', result)
-
-    if (!result.canceled && result.assets.length > 0) {
-      const imageUri = result.assets[0].uri
-      const uploadedUrl = await uploadImage2Cloud(imageUri, 'ml_default')
-
-      if (uploadedUrl !== null) {
-        console.log('Image uploaded to:', uploadedUrl)
-      }
-    }
+  if (!tripId) {
+    console.log(`Invalid tripId: ${tripId}`) // Log an error if tripId is not valid
   }
+
+  const theme = useThemeStyle()
+  const styles = useMemo(() => createStyles(theme), [theme])
+  const [showActionSheet, setShowActionSheet] = useState(false)
+
+  const { tripImages: images, isLoading: getTripImageIsLoading, error: getTripImageError } = useGetTripImages(tripId)
+  const { postTripImage, isLoading, error } = usePostTripImages()
+
+  // log the trip images
+  console.log('object')
+  console.log(images)
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
-
       {/* Album grid */}
       <ScrollView style={styles.scrollView}>
         <View style={styles.albumGrid}>
           {/* Album items */}
-          {albumItems.map((item) => (
+          {images.map((item) => (
             <View key={item.id} style={styles.albumItem}>
               <TouchableOpacity style={styles.imageContainer}>
                 {item.imageUrl ? (
@@ -61,13 +49,16 @@ export default function AlbumScreen() {
                   </View>
                 )}
               </TouchableOpacity>
-              <Text style={styles.imageTitle}>{item.title}</Text>
+              <Text style={styles.imageTitle}>{'Hello'}</Text>
             </View>
           ))}
 
           {/* Add photo button */}
           <View style={styles.albumItem}>
-            <TouchableOpacity style={[styles.imageContainer, styles.addPhotoButton]} onPress={handleAddPhoto}>
+            <TouchableOpacity
+              style={[styles.imageContainer, styles.addPhotoButton]}
+              onPress={() => setShowActionSheet(true)}
+            >
               <View style={styles.addPhotoBorder}>
                 <Ionicons name="add" size={24} color={theme.white} />
               </View>
@@ -75,6 +66,17 @@ export default function AlbumScreen() {
           </View>
         </View>
       </ScrollView>
+
+      <ImageActionSheet
+        visible={showActionSheet}
+        onDismiss={() => setShowActionSheet(false)}
+        onImagePicked={async (uri) => {
+          if (tripId && uri) {
+            await postTripImage(tripId, (await uploadImage2Cloud(uri, 'trip_images')) ?? '')
+            setShowActionSheet(false)
+          }
+        }}
+      />
     </SafeAreaView>
   )
 }
