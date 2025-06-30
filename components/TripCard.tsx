@@ -10,11 +10,12 @@ import PressableOpacity from './PressableOpacity'
 interface TripCardProps {
   tripId: string
   tripName: string
-  tripImage?: string
+  tripImage: string
   days: number
   num_members: number
   budget: number
   isPinned: boolean
+  status?: string
   onPress: () => void
 }
 
@@ -25,6 +26,7 @@ const TripCard: React.FC<TripCardProps> = ({
   days,
   num_members,
   budget,
+  status,
   isPinned,
   onPress,
 }) => {
@@ -34,22 +36,39 @@ const TripCard: React.FC<TripCardProps> = ({
   const [pinned, setPinned] = useState(isPinned)
 
   return (
-    <PressableOpacity style={styles.wrapper} onPress={onPress}>
+    <PressableOpacity
+      style={[
+        styles.wrapper,
+        { backgroundColor: status === 'ai_generating' || status === 'failed' ? theme.disabled : theme.secondary },
+      ]}
+      onPress={onPress}
+      disabled={status === 'ai_generating' || status === 'failed'}
+    >
       {tripImage && (
         <View style={styles.imageContainer}>
           <Image source={{ uri: tripImage }} style={styles.image} />
         </View>
       )}
 
-      <View style={styles.spotInfo}>
+      <View style={[styles.spotInfo]}>
         <Text style={styles.name} numberOfLines={1}>
           {tripName}
         </Text>
 
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <View style={{ flexDirection: 'row', width: '100%', alignItems: 'center', justifyContent: 'space-between' }}>
           <Text style={styles.location} numberOfLines={1}>
             {days} days · {num_members} members
           </Text>
+
+          {status === 'ai_generating' ? (
+            <Text style={[styles.location, { fontFamily: FontFamily.BOLD }]} numberOfLines={1}>
+              Generating...
+            </Text>
+          ) : status === 'failed' ? (
+            <Text style={[styles.location, { fontFamily: FontFamily.BOLD }]} numberOfLines={1}>
+              Failed to generate
+            </Text>
+          ) : null}
         </View>
       </View>
     </PressableOpacity>
