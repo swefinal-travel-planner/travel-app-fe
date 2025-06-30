@@ -64,6 +64,8 @@ const TripDetailViewScreen = () => {
     try {
       const tripData = await beApi.get(`/trips/${id}`)
       setTrip(tripData.data.data)
+      const tripData = await beApi.get(`/trips/${id}`)
+      setTrip(tripData.data.data)
     } catch (error) {
       console.error('Error fetching trip detail by ID:', error)
     }
@@ -75,6 +77,10 @@ const TripDetailViewScreen = () => {
       return
     }
     try {
+      const tripItemData = await beApi.get(`/trips/${id}/trip-items`)
+
+      const items: TripItem[] = tripItemData.data.data
+      console.log(tripItemData.data.data)
       const tripItemData = await beApi.get(`/trips/${id}/trip-items`)
 
       const items: TripItem[] = tripItemData.data.data
@@ -323,6 +329,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       flexDirection: 'row',
       borderRadius: Radius.ROUNDED,
       height: 100,
+      height: 100,
       marginBottom: 12,
       overflow: 'hidden',
       backgroundColor: theme.secondary,
@@ -330,6 +337,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     },
     spotImageContainer: {
       width: 120,
+      height: 'auto',
       height: 'auto',
       padding: 8,
       justifyContent: 'center',
@@ -354,6 +362,8 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     },
     spotLocationContainer: {
       flexDirection: 'row',
+      alignItems: 'baseline',
+      paddingRight: 20,
       alignItems: 'baseline',
       paddingRight: 20,
     },
