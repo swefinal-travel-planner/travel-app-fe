@@ -23,7 +23,7 @@ interface Location {
 interface PlaceInfo {
   address: string
   id: number
-  image: string[]
+  images: string[]
   location: Location
   name: string
   properties: string[]
