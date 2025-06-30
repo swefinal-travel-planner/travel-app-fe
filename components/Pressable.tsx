@@ -7,6 +7,7 @@ import PressableOpacity from './PressableOpacity'
 
 interface PressableProps {
   title: string
+  size?: 'small' | 'large'
   onPress?: () => void
   disabled?: boolean
   style?: ButtonStyleProps
@@ -19,12 +20,7 @@ interface ButtonStyleProps {
 }
 
 // custom button component
-const Pressable: React.FC<PressableProps> = ({
-  title,
-  onPress,
-  disabled,
-  style,
-}) => {
+const Pressable: React.FC<PressableProps> = ({ title, onPress, disabled, style, size }) => {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
 
@@ -32,11 +28,13 @@ const Pressable: React.FC<PressableProps> = ({
     <PressableOpacity
       onPress={onPress}
       disabled={disabled}
-      style={[styles.wrapper, disabled ? styles.disabled : style]}
+      style={[
+        styles.wrapper,
+        disabled ? styles.disabled : style,
+        size === 'small' ? { paddingVertical: 8 } : { paddingVertical: 16 },
+      ]}
     >
-      <Text style={[styles.title, style && { color: style.color }]}>
-        {title}
-      </Text>
+      <Text style={[styles.title, style && { color: style.color }]}>{title}</Text>
     </PressableOpacity>
   )
 }
@@ -51,7 +49,6 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       justifyContent: 'center',
       borderRadius: 100,
       paddingHorizontal: 16,
-      paddingVertical: 16,
     },
     disabled: {
       backgroundColor: theme.disabled,
