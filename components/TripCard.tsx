@@ -31,8 +31,6 @@ const TripCard: React.FC<TripCardProps> = ({
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
 
-  const [pinned, setPinned] = useState(isPinned)
-
   return (
     <PressableOpacity style={styles.wrapper} onPress={onPress}>
       {tripImage && (
