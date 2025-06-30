@@ -4,6 +4,7 @@ import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import { Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
+import beApi from '@/lib/beApi'
 import { Trip, TripItem } from '@/lib/types/Trip'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useLocalSearchParams, useRouter } from 'expo-router'
@@ -57,23 +58,14 @@ const TripDetailViewScreen = () => {
     })
   }
 
-  const [activeTab, setActiveTab] = useState('Details')
-
   const { id } = useLocalSearchParams()
 
   const getTripDetail = async () => {
     try {
-      const accessToken = await SecureStore.getItemAsync('accessToken')
-      const response = await fetch(`${url}/trips/${id}`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      })
-      if (!response.ok) {
-        throw new Error('Failed to fetch trips')
-      }
-      const data = await response.json()
-      setTrip(data.data)
+      const tripData = await beApi.get(`/trips/${id}`)
+      setTrip(tripData.data.data)
+      const tripData = await beApi.get(`/trips/${id}`)
+      setTrip(tripData.data.data)
     } catch (error) {
       console.error('Error fetching trip detail by ID:', error)
     }
@@ -85,19 +77,14 @@ const TripDetailViewScreen = () => {
       return
     }
     try {
-      const accessToken = await SecureStore.getItemAsync('accessToken')
-      const response = await fetch(`${url}/trips/${id}/trip-items`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      })
+      const tripItemData = await beApi.get(`/trips/${id}/trip-items`)
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch trip items')
-      }
+      const items: TripItem[] = tripItemData.data.data
+      console.log(tripItemData.data.data)
+      const tripItemData = await beApi.get(`/trips/${id}/trip-items`)
 
-      const data = await response.json()
-      const items: TripItem[] = data.data
+      const items: TripItem[] = tripItemData.data.data
+      console.log(tripItemData.data.data)
       setTripItems(items)
 
       // Nhóm items theo ngày
@@ -124,7 +111,7 @@ const TripDetailViewScreen = () => {
                 id: spot.placeID,
                 name: spot.placeInfo?.name ?? 'Unknown',
                 address: spot.placeInfo?.address ?? 'Unknown address',
-                image: { uri: spot.placeInfo?.images?.[0] ?? '' },
+                image: { uri: spot.placeInfo?.imagess?.[0] ?? '' },
                 timeSlot: spot.timeInDate,
               })),
           }
@@ -237,7 +224,7 @@ const TripDetailViewScreen = () => {
                   <View style={styles.spotDetails}>
                     <Text style={styles.spotName}>{spot.name}</Text>
                     <View style={styles.spotLocationContainer}>
-                      <Ionicons name="location-outline" size={14} color={theme.text} />
+                      <Ionicons name="location-outline" size={14} color={theme.text} style={{ paddingTop: 5 }} />
                       <Text style={styles.spotAddress} numberOfLines={1}>
                         {spot.address}
                       </Text>
@@ -341,6 +328,8 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     spotCard: {
       flexDirection: 'row',
       borderRadius: Radius.ROUNDED,
+      height: 100,
+      height: 100,
       marginBottom: 12,
       overflow: 'hidden',
       backgroundColor: theme.secondary,
@@ -348,7 +337,8 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     },
     spotImageContainer: {
       width: 120,
-      height: 80,
+      height: 'auto',
+      height: 'auto',
       padding: 8,
       justifyContent: 'center',
       alignItems: 'center',
@@ -372,7 +362,10 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     },
     spotLocationContainer: {
       flexDirection: 'row',
-      alignItems: 'center',
+      alignItems: 'baseline',
+      paddingRight: 20,
+      alignItems: 'baseline',
+      paddingRight: 20,
     },
     spotAddress: {
       color: theme.text,
