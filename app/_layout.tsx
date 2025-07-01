@@ -149,16 +149,14 @@ export default function RootLayout() {
   }
 
   return (
-    <>
-      <ToastProvider>
-        <StatusBar style="auto" />
-        <QueryClientProvider client={queryClient}>
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(auth)/login/index" options={{ headerShown: false }} />
-            <Stack.Screen name="+not-found" />
-          </Stack>
-        </QueryClientProvider>
-      </ToastProvider>
-    </>
+    <ToastProvider>
+      <StatusBar style="auto" />
+      <QueryClientProvider client={queryClient}>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(auth)/login/index" options={{ headerShown: false }} />
+          <Stack.Screen name="+not-found" />
+        </Stack>
+      </QueryClientProvider>
+    </ToastProvider>
   )
 }
