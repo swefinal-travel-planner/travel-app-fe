@@ -1,7 +1,8 @@
 import { getItemAsync, setItemAsync } from 'expo-secure-store'
 import createAxiosInstance from './axios'
+import { EMPTY_STRING } from '@/constants/utilConstants'
 
-export const BE_URL = process.env.EXPO_PUBLIC_BE_API_URL ?? 'http://localhost:3000/beApi/v1'
+export const BE_URL = process.env.EXPO_PUBLIC_BE_API_URL ?? EMPTY_STRING
 
 const beApi = createAxiosInstance(BE_URL)
 

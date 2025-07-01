@@ -1,5 +1,49 @@
+import { checkApiHealth } from '@/common/checkApiHealth'
+import { BE_URL } from '@/lib/beApi'
+import { CORE_URL } from '@/lib/coreApi'
 import { Redirect } from 'expo-router'
+import { useEffect, useState } from 'react'
+import { ActivityIndicator, View } from 'react-native'
 
 export default function Index() {
-  return <Redirect href="/(auth)/login" />
+  const [isLoading, setIsLoading] = useState(true)
+  const [isServerDown, setIsServerDown] = useState(false)
+
+  useEffect(() => {
+    const checkApiHealthStatus = async () => {
+      try {
+        const beApiHealth = await checkApiHealth(BE_URL)
+        const coreApiHealth = await checkApiHealth(CORE_URL)
+
+        if (!beApiHealth || !coreApiHealth) {
+          setIsServerDown(true)
+        } else {
+          // If APIs are healthy, redirect to main app
+          setIsServerDown(false)
+        }
+      } catch (error) {
+        console.error('Error checking API health:', error)
+        setIsServerDown(true)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    checkApiHealthStatus()
+  }, [])
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    )
+  }
+
+  if (isServerDown) {
+    return <Redirect href="/server-down" />
+  }
+
+  // If APIs are healthy, redirect to main app (you can change this to your main route)
+  return <Redirect href="/(tabs)" />
 }
