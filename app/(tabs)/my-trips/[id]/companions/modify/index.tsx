@@ -30,7 +30,7 @@ type User = {
 }
 
 type TripCompanion = {
-  id: string
+  user_id: string
   email: string
   username: string
   status: 'pending' | 'accepted' | 'declined'
@@ -71,9 +71,8 @@ const TripCompanionInviteScreen = () => {
 
   const loadPendingInvites = useCallback(async () => {
     try {
-      const response = await beApi.get(`/trips/${tripId}/invitations`)
-      const pending = response.data.data?.filter((invite: any) => invite.status === 'pending') || []
-      setPendingInvites(pending.map((invite: any) => invite.email))
+      const response = await beApi.get(`/trips/${tripId}/pending-invitations`)
+      setPendingInvites(response.data.data?.map((invite: any) => invite.receiverId) || [])
     } catch (error) {
       console.error('Error loading pending invites:', error)
     }
@@ -100,12 +99,12 @@ const TripCompanionInviteScreen = () => {
           const searchData = await searchResponse.json()
 
           // Filter out existing companions from search results
-          const companionEmails = companions.map((comp: TripCompanion) => comp.email)
+          const companionIds = companions.map((comp: TripCompanion) => comp.user_id)
 
-          if (searchData.data && !companionEmails.includes(searchData.data.email)) {
+          if (searchData.data && !companionIds.includes(searchData.data.id)) {
             const result: SearchResult = {
               ...searchData.data,
-              isInvited: pendingInvites.includes(searchData.data.email),
+              isInvited: pendingInvites.includes(searchData.data.id),
               isCompanion: false,
             }
             setSearchResults([result])

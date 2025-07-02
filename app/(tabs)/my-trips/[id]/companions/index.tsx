@@ -3,8 +3,9 @@ import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import { Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
+import beApi from '@/lib/beApi'
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import React, { useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Image, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native'
 export default function TripCompanionsScreen() {
   const theme = useThemeStyle()
@@ -13,13 +14,7 @@ export default function TripCompanionsScreen() {
   const router = useRouter()
   const params = useLocalSearchParams()
   const tripId = params.id
-  const [companions, setCompanions] = useState([
-    {
-      id: '1',
-      name: 'Đặng Nhật Hòa',
-      avatar: 'https://i.pravatar.cc/150?img=1',
-    },
-  ])
+  const [companions, setCompanions] = useState([] as { user_id: string; name: string; photo_url: string }[])
 
   const handleAddCompanions = () => {
     if (!tripId) {
@@ -35,14 +30,27 @@ export default function TripCompanionsScreen() {
     })
   }
 
+  useEffect(() => {
+    loadCompanions()
+  }, [tripId])
+
+  const loadCompanions = useCallback(async () => {
+    try {
+      const response = await beApi.get(`/trips/${tripId}/members`)
+      setCompanions(response.data.data || [])
+    } catch (error) {
+      console.error('Error loading companions:', error)
+    }
+  }, [tripId])
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={{ flex: 1 }}>
         <ScrollView style={styles.content}>
           {companions.length > 0 ? (
             companions.map((companion) => (
-              <View key={companion.id} style={styles.companionItem}>
-                <Image source={{ uri: companion.avatar }} style={styles.image} />
+              <View key={companion.user_id} style={styles.companionItem}>
+                <Image source={{ uri: companion.photo_url }} style={styles.image} />
                 <Text style={styles.companionName}>{companion.name}</Text>
               </View>
             ))
