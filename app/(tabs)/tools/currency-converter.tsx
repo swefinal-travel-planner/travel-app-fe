@@ -1,18 +1,10 @@
-import { UniversalPicker } from '@/components/CommonPicker'
-import CurrencySelection from '@/components/CurrencySelection'
+import CurrencyPicker from '@/components/CurrencyPicker'
 import Currencies from '@/constants/currencies'
 import { apiGetCurrencies } from '@/services/api/tools/ApiCurrency'
 import Ionicons from '@expo/vector-icons/Ionicons'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-} from 'react-native'
-import { View } from 'react-native-ui-lib'
+import { SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 
 export default function CurrencyConverter() {
   const [amount, setAmount] = useState('')
@@ -20,10 +12,17 @@ export default function CurrencyConverter() {
   const [originalCurrency, setOriginalCurrency] = useState(Currencies[0])
   const [convertedCurrency, setConvertedCurrency] = useState(Currencies[32])
   const [exchangeRate, setExchangeRate] = useState(0)
+  const [isLoading, setIsLoading] = useState(false)
   const { t } = useTranslation()
 
   // Function to handle conversion
-  const handleExchange = async () => {
+  const handleExchange = useCallback(async () => {
+    if (!amount || parseFloat(amount) <= 0) {
+      setConvertedAmount('')
+      return
+    }
+
+    setIsLoading(true)
     try {
       const rate = await apiGetCurrencies(
         originalCurrency.abbreviation.toLowerCase(),
@@ -32,45 +31,42 @@ export default function CurrencyConverter() {
 
       if (rate) {
         setExchangeRate(rate)
-        if (amount) {
-          setConvertedAmount((parseFloat(amount) * exchangeRate).toFixed(2))
-        } else {
-          setConvertedAmount('0')
-        }
+        const converted = (parseFloat(amount) * rate).toFixed(2)
+        setConvertedAmount(converted)
       }
     } catch (error) {
       console.error('Error fetching exchange rate:', error)
+      setConvertedAmount('Error')
+    } finally {
+      setIsLoading(false)
     }
-  }
+  }, [amount, originalCurrency, convertedCurrency])
 
   // Debounce effect: runs only after user stops typing
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (amount) handleExchange()
+      handleExchange()
     }, 600)
 
     return () => clearTimeout(timer)
-  }, [amount, originalCurrency])
+  }, [handleExchange])
 
   // Function to swap currencies
   const swapCurrencies = () => {
+    const temp = originalCurrency
     setOriginalCurrency(convertedCurrency)
-    setConvertedCurrency(originalCurrency)
+    setConvertedCurrency(temp)
     setAmount(convertedAmount)
   }
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.originalCurrencyBox}>
-        <UniversalPicker
-          data={Currencies}
-          keyExtractor={(item) => item.abbreviation}
-          labelExtractor={(item) =>
-            item.abbreviation.toUpperCase() + ' - ' + item.name
-          }
-          iconExtractor={(item) => item.image}
-          initialValue={Currencies[0]}
-          onSelect={(selected) => console.log(selected)}
+        <CurrencyPicker
+          selectedCurrency={originalCurrency}
+          onSelect={setOriginalCurrency}
+          style={styles.pickerStyle}
+          placeholder="Select source currency"
         />
 
         {/* Input Field */}
@@ -89,16 +85,29 @@ export default function CurrencyConverter() {
       </TouchableOpacity>
 
       <View style={styles.convertedCurrencyBox}>
-        <CurrencySelection
-          onSelect={(currency) => setConvertedCurrency(currency)}
-          initial={convertedCurrency}
+        <CurrencyPicker
+          selectedCurrency={convertedCurrency}
+          onSelect={setConvertedCurrency}
+          style={styles.pickerStyle}
+          placeholder="Select target currency"
         />
+
         {/* Result Display */}
         <Text style={styles.resultText}>
-          {convertedAmount
-            ? `${convertedAmount}`
-            : t('currencyConverter.result')}
+          {isLoading
+            ? 'Converting...'
+            : convertedAmount
+              ? `${convertedAmount} ${convertedCurrency.abbreviation.toUpperCase()}`
+              : t('currencyConverter.result')}
         </Text>
+
+        {/* Exchange Rate Display */}
+        {exchangeRate > 0 && !isLoading && (
+          <Text style={styles.rateText}>
+            1 {originalCurrency.abbreviation.toUpperCase()} = {exchangeRate.toFixed(4)}{' '}
+            {convertedCurrency.abbreviation.toUpperCase()}
+          </Text>
+        )}
       </View>
     </SafeAreaView>
   )
@@ -119,11 +128,17 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     backgroundColor: 'white',
     marginBottom: 20,
+    padding: 10,
   },
   convertedCurrencyBox: {
     width: '100%',
     backgroundColor: 'white',
     borderRadius: 20,
+    padding: 10,
+  },
+  pickerStyle: {
+    paddingVertical: 15,
+    paddingHorizontal: 10,
   },
   input: {
     height: 50,
@@ -142,18 +157,18 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginVertical: 10,
   },
+  rateText: {
+    color: '#666',
+    fontSize: 14,
+    textAlign: 'center',
+    marginBottom: 10,
+  },
   swapButton: {
     backgroundColor: '#e5dacb',
     borderRadius: 100,
     padding: 20,
     position: 'absolute',
-    top: 220,
+    top: 242,
     zIndex: 1,
-  },
-  swapText: {
-    fontSize: 24,
-    paddingHorizontal: 8,
-    color: 'white',
-    fontWeight: 'bold',
   },
 })

@@ -118,10 +118,10 @@ export default function RootLayout() {
       }
 
       await getCoreAccessToken()
-      setState((prev) => ({ ...prev, isReady: true, isHealthy: true }))
+      setState((prev: NotificationState) => ({ ...prev, isReady: true, isHealthy: true }))
     } catch (error) {
       console.error('App initialization error:', error)
-      setState((prev) => ({ ...prev, isReady: true, isHealthy: false }))
+      setState((prev: NotificationState) => ({ ...prev, isReady: true, isHealthy: false }))
     } finally {
       await SplashScreen.hideAsync()
     }
@@ -131,7 +131,7 @@ export default function RootLayout() {
     initializeApp()
 
     notificationListener.current = Notifications.addNotificationReceivedListener((notification) =>
-      setState((prev) => ({ ...prev, notification }))
+      setState((prev: NotificationState) => ({ ...prev, notification }))
     )
 
     responseListener.current = Notifications.addNotificationResponseReceivedListener((response) =>

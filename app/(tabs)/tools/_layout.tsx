@@ -18,10 +18,7 @@ export default function ToolLayout() {
       <View style={styles.floatingNavContainer}>
         <TabButton
           icon="cloud"
-          active={
-            pathname.startsWith('/tools/weather') ||
-            pathname.includes('forecast')
-          }
+          active={pathname.startsWith('/tools/weather') || pathname.includes('forecast')}
           onPress={() => router.push('/(tabs)/tools/weather')}
         />
         <TabButton
@@ -61,11 +58,8 @@ function TabButton({
   const styles = useMemo(() => createStyles(theme), [theme])
 
   return (
-    <TouchableOpacity
-      onPress={onPress}
-      style={[active ? styles.activeTab : styles.tabButton]}
-    >
-      <Ionicons name={icon} size={IconSize.MD} color={theme.text} />
+    <TouchableOpacity onPress={onPress} style={[active ? styles.activeTab : styles.tabButton]}>
+      <Ionicons name={icon} size={IconSize.MD} color={theme.primary} />
     </TouchableOpacity>
   )
 }
@@ -82,9 +76,9 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     },
     floatingNavContainer: {
       flexDirection: 'row',
-      padding: Padding.SMALL,
+      padding: Padding.MEDIUM,
       borderRadius: Radius.FULL,
-      backgroundColor: theme.secondary,
+      backgroundColor: theme.green,
       justifyContent: 'center',
       position: 'absolute',
       top: 55,
@@ -98,7 +92,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       backgroundColor: 'transparent',
     },
     activeTab: {
-      backgroundColor: theme.background,
+      backgroundColor: theme.secondary,
       padding: Padding.NORMAL,
       borderRadius: Radius.FULL,
       alignItems: 'center',

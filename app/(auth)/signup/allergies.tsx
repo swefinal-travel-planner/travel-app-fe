@@ -1,16 +1,9 @@
 import { useRouter } from 'expo-router'
 import { useEffect, useMemo, useState } from 'react'
-import {
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-  Text,
-  TouchableWithoutFeedback,
-  View,
-} from 'react-native'
+import { Keyboard, KeyboardAvoidingView, Platform, Text, TouchableWithoutFeedback, View } from 'react-native'
 
 import { useThemeStyle } from '@/hooks/useThemeStyle'
-import { createStyles } from '../styles'
+import { createStyles } from '../../../components/styles'
 
 import Chip from '@/components/Chip'
 import Pressable from '@/components/Pressable'
@@ -54,20 +47,11 @@ export default function SignUpAllergies() {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <KeyboardAvoidingView
-        style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      >
+      <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <Text style={styles.title}>Allergy info</Text>
-        <Text style={styles.subtitle}>
-          Do you have any allergies we should know about?
-        </Text>
+        <Text style={styles.subtitle}>Do you have any allergies we should know about?</Text>
 
-        <CustomTextField
-          placeholder="Type to search"
-          leftIcon="search-outline"
-          onChange={setQuery}
-        />
+        <CustomTextField placeholder="Type to search" leftIcon="search-outline" onChange={setQuery} />
 
         <View
           style={{
@@ -78,17 +62,9 @@ export default function SignUpAllergies() {
           }}
         >
           {data
-            .filter((item) =>
-              item.value.toLowerCase().includes(query.toLowerCase())
-            )
+            .filter((item) => item.value.toLowerCase().includes(query.toLowerCase()))
             .map((item) => (
-              <Chip
-                size="large"
-                key={item.id}
-                value={item.value}
-                onSelect={handleSelect}
-                onDeselect={handleDeselect}
-              />
+              <Chip size="large" key={item.id} value={item.value} onSelect={handleSelect} onDeselect={handleDeselect} />
             ))}
         </View>
 

@@ -8,7 +8,7 @@ import beApi, { BE_URL } from '@/lib/beApi'
 import axios from 'axios'
 
 import { useThemeStyle } from '@/hooks/useThemeStyle'
-import { createStyles } from '../styles'
+import { createStyles } from '../../../components/styles'
 
 import OtpField from '@/components/input/OtpField'
 import Pressable from '@/components/Pressable'
@@ -83,25 +83,15 @@ export default function SignUpOtp() {
       <View style={styles.container}>
         <Text style={styles.title}>Verify signup</Text>
         <Text style={styles.subtitle}>
-          A verification code was sent to your email address. Please check your
-          inbox.
+          A verification code was sent to your email address. Please check your inbox.
         </Text>
 
         <OtpField onChanged={onOtpChanged} onFilled={onOtpFilled} />
 
-        <Pressable
-          title="Verify"
-          disabled={!isFilled}
-          onPress={handlePress}
-          style={styles.primaryButton}
-        />
+        <Pressable title="Verify" disabled={!isFilled} onPress={handlePress} style={styles.primaryButton} />
 
         <Pressable
-          title={
-            resendDisabled
-              ? `Send another code in ${countdown} seconds`
-              : 'Send another code'
-          }
+          title={resendDisabled ? `Send another code in ${countdown} seconds` : 'Send another code'}
           disabled={resendDisabled}
           onPress={() => setResendDisabled(true)}
         />
