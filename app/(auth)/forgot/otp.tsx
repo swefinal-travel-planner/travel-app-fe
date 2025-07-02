@@ -11,7 +11,7 @@ import OtpField from '@/components/input/OtpField'
 import Pressable from '@/components/Pressable'
 
 import { useThemeStyle } from '@/hooks/useThemeStyle'
-import { createStyles } from '../styles'
+import { createStyles } from '../../../components/styles'
 
 export default function ForgotPasswordOtp() {
   const theme = useThemeStyle()
@@ -78,18 +78,13 @@ export default function ForgotPasswordOtp() {
       <View style={styles.container}>
         <Text style={styles.title}>Verify email</Text>
         <Text style={styles.subtitle}>
-          A verification code was sent to your email address. Please check your
-          inbox.
+          A verification code was sent to your email address. Please check your inbox.
         </Text>
 
         <OtpField onChanged={onOtpChanged} onFilled={onOtpFilled} />
 
         <Pressable
-          title={
-            resendDisabled
-              ? `Send another code in ${countdown} seconds`
-              : 'Send another code'
-          }
+          title={resendDisabled ? `Send another code in ${countdown} seconds` : 'Send another code'}
           disabled={resendDisabled}
           onPress={() => setResendDisabled(true)}
           style={{

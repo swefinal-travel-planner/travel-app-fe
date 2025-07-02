@@ -14,7 +14,7 @@ import Pressable from '@/components/Pressable'
 
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { useMemo } from 'react'
-import { createStyles } from '../styles'
+import { createStyles } from '../../../components/styles'
 
 interface ForgotFormData {
   email: string

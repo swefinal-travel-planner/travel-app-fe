@@ -21,7 +21,7 @@ import PressableOpacity from '@/components/PressableOpacity'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import updateNotifToken from '@/utils/updateNotifToken'
 import { useMemo } from 'react'
-import { createStyles } from '../styles'
+import { createStyles } from '../../../components/styles'
 
 interface LoginFormData {
   email: string
