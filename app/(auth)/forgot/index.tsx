@@ -22,9 +22,7 @@ interface ForgotFormData {
 
 // form validation schema
 const schema = z.object({
-  email: z
-    .string({ required_error: 'Please enter your email address' })
-    .email({ message: 'Invalid email address' }),
+  email: z.string({ required_error: 'Please enter your email address' }).email({ message: 'Invalid email address' }),
 })
 
 export default function ForgotPassword() {
@@ -80,13 +78,12 @@ export default function ForgotPassword() {
               onChange={onChange}
               value={value}
               placeholder="Email"
+              autoCapitalize="none"
             />
           )}
         />
 
-        {errors.email?.message && (
-          <Text style={styles.error}>{errors.email.message}</Text>
-        )}
+        {errors.email?.message && <Text style={styles.error}>{errors.email.message}</Text>}
 
         <Pressable
           title="Next"

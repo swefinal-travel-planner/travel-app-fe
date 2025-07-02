@@ -14,6 +14,7 @@ interface TextFieldProps {
   required?: boolean
   type?: string
   value?: string
+  autoCapitalize?: 'none' | 'sentences'
   onChange?: (text: string) => void
   onBlur?: () => void
 }
@@ -29,6 +30,7 @@ const CustomTextField: React.FC<TextFieldProps> = ({
   onChange,
   onBlur,
   value,
+  autoCapitalize = 'sentences',
 }) => {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
@@ -48,6 +50,7 @@ const CustomTextField: React.FC<TextFieldProps> = ({
         }}
         underlineColorAndroid="transparent"
         autoComplete={type ? (type as any) : 'none'}
+        autoCapitalize={autoCapitalize === 'none' ? 'none' : 'sentences'}
       />
       {rightIcon && <Ionicons name={rightIcon as any} style={styles.rightIcon} size={24} />}
       {error && <Text style={styles.errorText}>{error}</Text>}

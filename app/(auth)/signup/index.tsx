@@ -1,21 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link, useRouter } from 'expo-router'
 import { Controller, useForm } from 'react-hook-form'
-import {
-  Image,
-  Keyboard,
-  Text,
-  TouchableWithoutFeedback,
-  View,
-} from 'react-native'
+import { Image, Keyboard, Text, TouchableWithoutFeedback, View } from 'react-native'
 import { z } from 'zod'
 
 import { auth } from '@/firebaseConfig'
-import {
-  GoogleSignin,
-  isErrorWithCode,
-  statusCodes,
-} from '@react-native-google-signin/google-signin'
+import { GoogleSignin, isErrorWithCode, statusCodes } from '@react-native-google-signin/google-signin'
 import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth'
 
 import { useSignupStore } from '@/store/useSignupStore'
@@ -46,9 +36,7 @@ const schema = z
     name: z
       .string({ required_error: 'Please enter your name' })
       .min(2, { message: 'Your name must be at least 2 characters long' }),
-    email: z
-      .string({ required_error: 'Please enter your email address' })
-      .email({ message: 'Invalid email address' }),
+    email: z.string({ required_error: 'Please enter your email address' }).email({ message: 'Invalid email address' }),
     password: z
       .string({ required_error: 'Please enter your password' })
       .min(8, { message: 'Password must have at least 8 characters' }),
@@ -76,10 +64,7 @@ export default function SignUp() {
   })
 
   const errorMessage =
-    errors.name?.message ||
-    errors.email?.message ||
-    errors.password?.message ||
-    errors.repPassword?.message
+    errors.name?.message || errors.email?.message || errors.password?.message || errors.repPassword?.message
 
   const handleGoogleLogin = async () => {
     try {
@@ -87,14 +72,9 @@ export default function SignUp() {
       const userInfo = await GoogleSignin.signIn()
 
       if (userInfo && userInfo.data?.idToken) {
-        const googleCredential = GoogleAuthProvider.credential(
-          userInfo.data.idToken
-        )
+        const googleCredential = GoogleAuthProvider.credential(userInfo.data.idToken)
 
-        const firebaseUserCredential = await signInWithCredential(
-          auth,
-          googleCredential
-        )
+        const firebaseUserCredential = await signInWithCredential(auth, googleCredential)
 
         const user = firebaseUserCredential.user
         const idToken = await user.getIdToken()
@@ -108,10 +88,7 @@ export default function SignUp() {
           id_token: idToken,
         }
 
-        const response = await beApi.post(
-          `${BE_URL}/auth/google-login`,
-          payload
-        )
+        const response = await beApi.post(`${BE_URL}/auth/google-login`, payload)
 
         await saveLoginInfo(
           response.data.data.userId,
@@ -177,9 +154,7 @@ export default function SignUp() {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View style={styles.container}>
         <Text style={styles.title}>Hi!</Text>
-        <Text style={styles.subtitle}>
-          Let us make trip planning fast and easy.
-        </Text>
+        <Text style={styles.subtitle}>Let us make trip planning fast and easy.</Text>
 
         <Controller
           control={control}
@@ -207,6 +182,7 @@ export default function SignUp() {
               onChange={onChange}
               value={value}
               placeholder="Email"
+              autoCapitalize="none"
             />
           )}
         />
@@ -221,6 +197,7 @@ export default function SignUp() {
               onChange={onChange}
               value={value}
               placeholder="Password"
+              autoCapitalize="none"
             />
           )}
         />
@@ -235,28 +212,20 @@ export default function SignUp() {
               onChange={onChange}
               value={value}
               placeholder="Confirm password"
+              autoCapitalize="none"
             />
           )}
         />
 
         {errorMessage && <Text style={styles.error}>{errorMessage}</Text>}
 
-        <Pressable
-          title="Sign up"
-          onPress={handleSubmit(onSubmit)}
-          style={styles.primaryButton}
-        />
+        <Pressable title="Sign up" onPress={handleSubmit(onSubmit)} style={styles.primaryButton} />
 
-        <Text style={[styles.text, { alignSelf: 'center', marginBottom: 8 }]}>
-          or continue with
-        </Text>
+        <Text style={[styles.text, { alignSelf: 'center', marginBottom: 8 }]}>or continue with</Text>
 
         <View style={styles.socials}>
           <PressableOpacity onPress={handleGoogleLogin}>
-            <Image
-              source={require('@/assets/images/google.png')}
-              style={styles.socialIcon}
-            />
+            <Image source={require('@/assets/images/google.png')} style={styles.socialIcon} />
           </PressableOpacity>
         </View>
 

@@ -13,6 +13,7 @@ interface PasswordFieldProps {
   error?: string
   required?: boolean
   value?: string
+  autoCapitalize?: 'none' | 'sentences'
   onChange?: (text: string) => void
   onBlur?: () => void
 }
@@ -25,6 +26,7 @@ const PasswordField: React.FC<PasswordFieldProps> = ({
   required,
   onChange,
   value,
+  autoCapitalize = 'sentences',
   onBlur,
 }) => {
   const theme = useThemeStyle()
@@ -47,6 +49,7 @@ const PasswordField: React.FC<PasswordFieldProps> = ({
           if (onBlur) onBlur()
         }}
         secureTextEntry={!isVisible}
+        autoCapitalize={autoCapitalize === 'none' ? 'none' : 'sentences'}
       />
 
       <PressableOpacity onPress={() => setIsVisible(!isVisible)}>
