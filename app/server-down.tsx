@@ -1,3 +1,5 @@
+import { BE_URL } from '@/lib/beApi'
+import { CORE_URL } from '@/lib/coreApi'
 import React from 'react'
 import { Text, View, StyleSheet } from 'react-native'
 
@@ -9,6 +11,8 @@ export default function ServerDown() {
       <Text style={styles.message}>
         We’re currently unable to reach the server. Please check your internet connection or try again later.
       </Text>
+      <Text style={styles.message}>The backend server is on {BE_URL}</Text>
+      <Text style={styles.message}>The core server is on {CORE_URL}</Text>
     </View>
   )
 }
