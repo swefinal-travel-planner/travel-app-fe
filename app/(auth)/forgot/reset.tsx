@@ -93,6 +93,7 @@ export default function ResetPassword() {
               onChange={onChange}
               value={value}
               placeholder="Password"
+              autoCapitalize="none"
             />
           )}
         />
@@ -107,6 +108,7 @@ export default function ResetPassword() {
               onChange={onChange}
               value={value}
               placeholder="Confirm password"
+              autoCapitalize="none"
             />
           )}
         />

@@ -1,21 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link, useRouter } from 'expo-router'
 import { Controller, useForm } from 'react-hook-form'
-import {
-  Image,
-  Keyboard,
-  Text,
-  TouchableWithoutFeedback,
-  View,
-} from 'react-native'
+import { Image, Keyboard, Text, TouchableWithoutFeedback, View } from 'react-native'
 import { z } from 'zod'
 
 import { auth } from '@/firebaseConfig'
-import {
-  GoogleSignin,
-  isErrorWithCode,
-  statusCodes,
-} from '@react-native-google-signin/google-signin'
+import { GoogleSignin, isErrorWithCode, statusCodes } from '@react-native-google-signin/google-signin'
 import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth'
 
 import saveLoginInfo from '@/utils/saveLoginInfo'
@@ -40,9 +30,7 @@ interface LoginFormData {
 
 // form validation schema
 const schema = z.object({
-  email: z
-    .string({ required_error: 'Please enter your email address' })
-    .email({ message: 'Invalid email address' }),
+  email: z.string({ required_error: 'Please enter your email address' }).email({ message: 'Invalid email address' }),
   password: z
     .string({ required_error: 'Please enter your password' })
     .min(8, { message: 'Password must have at least 8 characters' }),
@@ -71,14 +59,9 @@ export default function Login() {
       const userInfo = await GoogleSignin.signIn()
 
       if (userInfo && userInfo.data?.idToken) {
-        const googleCredential = GoogleAuthProvider.credential(
-          userInfo.data.idToken
-        )
+        const googleCredential = GoogleAuthProvider.credential(userInfo.data.idToken)
 
-        const firebaseUserCredential = await signInWithCredential(
-          auth,
-          googleCredential
-        )
+        const firebaseUserCredential = await signInWithCredential(auth, googleCredential)
 
         const user = firebaseUserCredential.user
         const idToken = await user.getIdToken()
@@ -92,10 +75,7 @@ export default function Login() {
           id_token: idToken,
         }
 
-        const response = await beApi.post(
-          `${BE_URL}/auth/google-login`,
-          payload
-        )
+        const response = await beApi.post(`${BE_URL}/auth/google-login`, payload)
 
         await saveLoginInfo(
           response.data.data.userId,
@@ -167,9 +147,7 @@ export default function Login() {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View style={styles.container}>
         <Text style={styles.title}>Welcome back!</Text>
-        <Text style={styles.subtitle}>
-          Log in to get back to trip planning with us.
-        </Text>
+        <Text style={styles.subtitle}>Log in to get back to trip planning with us.</Text>
 
         <Controller
           control={control}
@@ -182,6 +160,7 @@ export default function Login() {
               onChange={onChange}
               value={value}
               placeholder="Email"
+              autoCapitalize="none"
             />
           )}
         />
@@ -196,36 +175,24 @@ export default function Login() {
               onChange={onChange}
               value={value}
               placeholder="Password"
+              autoCapitalize="none"
             />
           )}
         />
 
-        <Link
-          style={[styles.link, { alignSelf: 'flex-end', marginTop: -8 }]}
-          dismissTo
-          href="/forgot"
-        >
+        <Link style={[styles.link, { alignSelf: 'flex-end', marginTop: -8 }]} dismissTo href="/forgot">
           Forgot password
         </Link>
 
         {errorMessage && <Text style={styles.error}>{errorMessage}</Text>}
 
-        <Pressable
-          title="Log in"
-          onPress={handleSubmit(onSubmit)}
-          style={styles.primaryButton}
-        />
+        <Pressable title="Log in" onPress={handleSubmit(onSubmit)} style={styles.primaryButton} />
 
-        <Text style={[styles.text, { alignSelf: 'center', marginBottom: 8 }]}>
-          or continue with
-        </Text>
+        <Text style={[styles.text, { alignSelf: 'center', marginBottom: 8 }]}>or continue with</Text>
 
         <View style={styles.socials}>
           <PressableOpacity onPress={handleGoogleLogin}>
-            <Image
-              source={require('@/assets/images/google.png')}
-              style={styles.socialIcon}
-            />
+            <Image source={require('@/assets/images/google.png')} style={styles.socialIcon} />
           </PressableOpacity>
         </View>
 
