@@ -2,24 +2,14 @@ import { checkApiHealth } from '@/common/checkApiHealth'
 import { BE_URL } from '@/lib/beApi'
 import { CORE_URL } from '@/lib/coreApi'
 import { Redirect } from 'expo-router'
+import { getItemAsync } from 'expo-secure-store'
 import { useEffect, useState } from 'react'
-import { ActivityIndicator, Text, View } from 'react-native'
+import { ActivityIndicator, View } from 'react-native'
 
 export default function Index() {
   const [isLoading, setIsLoading] = useState(true)
   const [isServerDown, setIsServerDown] = useState(false)
-
-  // If either BE_URL or CORE_URL is not set, show them and do not continue
-  if (!BE_URL || !CORE_URL) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 }}>
-        <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 12 }}>API URLs are not set</Text>
-        <Text style={{ marginBottom: 8 }}>BE_URL: {String(BE_URL)}</Text>
-        <Text style={{ marginBottom: 8 }}>CORE_URL: {String(CORE_URL)}</Text>
-        <Text style={{ color: 'red', marginTop: 16 }}>Please check your environment configuration.</Text>
-      </View>
-    )
-  }
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
 
   useEffect(() => {
     const checkApiHealthStatus = async () => {
@@ -41,6 +31,14 @@ export default function Index() {
       }
     }
 
+    const checkUserLoggedIn = async () => {
+      const accessToken = await getItemAsync('accessToken')
+      const refreshToken = await getItemAsync('refreshToken')
+      if (accessToken && refreshToken) {
+        setIsLoggedIn(true)
+      }
+    }
+    checkUserLoggedIn()
     checkApiHealthStatus()
   }, [])
 
@@ -55,6 +53,11 @@ export default function Index() {
   if (isServerDown) {
     // Show a debug for BE_URL and CORE_URL with UI
     return <Redirect href="/server-down" />
+  }
+
+  if (!isLoggedIn) {
+    // Redirect to login page if not logged in
+    return <Redirect href="/login" />
   }
 
   // If APIs are healthy, redirect to main app (you can change this to your main route)

@@ -53,6 +53,7 @@ beApi.interceptors.response.use(
 
     // Handle 401 Unauthorized and try to refresh token
     if (error.response && error.response.status === 401 && !originalRequest.hasRetry) {
+      console.log('Received 401 Unauthorized - attempting to refresh token')
       originalRequest.hasRetry = true
 
       if (isRefreshing) {
