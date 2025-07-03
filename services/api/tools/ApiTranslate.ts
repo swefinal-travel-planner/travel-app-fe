@@ -1,16 +1,15 @@
 import { TranslateResponse } from '@/types/Translate/TranslateResponse'
 import beApi from '../../../lib/beApi'
+import createAxiosInstance from '@/lib/axios'
 
 const url = process.env.EXPO_PUBLIC_TRANSLATE_API_URL ?? ''
 const key = process.env.EXPO_PUBLIC_TRANSLATE_API_KEY
 
-export async function ApiTranslate(
-  text: string,
-  sourceLanguage: string,
-  targetLanguage: string
-): Promise<string> {
+const api = createAxiosInstance(url)
+
+export async function ApiTranslate(text: string, sourceLanguage: string, targetLanguage: string): Promise<string> {
   try {
-    const response = await beApi.post(
+    const response = await api.post(
       url,
       {
         prompt: `Translate the following ${sourceLanguage} text into ${targetLanguage}.`,

@@ -26,7 +26,7 @@ export const TripItemCard: React.FC<TripItemCardProps> = ({ item, drag, isActive
         <View style={styles.spotImageContainer}>
           <Image
             source={{
-              uri: `https://drive.usercontent.google.com/download?id=1vsS3c_2bTBy3FDII3zyC047A-M6cDxnq&export=view&authuser=0`,
+              uri: item.place?.images[0],
             }}
             style={styles.spotImage}
           />

@@ -56,7 +56,12 @@ const ProfileFriendSection = ({
         </View>
       </TouchableOpacity>
     </Card>
-    <FriendListModal visible={friendListModalVisible} closeModal={closeFriendListModal} friendList={friendList} />
+    <FriendListModal
+      theme={theme}
+      visible={friendListModalVisible}
+      closeModal={closeFriendListModal}
+      friendList={friendList}
+    />
   </>
 )
 

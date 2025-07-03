@@ -69,16 +69,20 @@ const ProfileScreen = () => {
   const [email, setEmail] = useState<string>('')
   const [phone, setPhone] = useState<string>('<phone_number>')
   const [selectedField, setSelectedField] = useState<string>('Edit name')
-  const [profilePic, setProfilePic] = useState(require('@/assets/images/alligator.jpg'))
+  const [profilePic, setProfilePic] = useState(
+    'https://res.cloudinary.com/dt8neu8lq/image/upload/v1751294848/vryqz6ly8amli7stwjik.png'
+  )
   const [isDarkTheme, setIsDarkTheme] = useState(false)
 
   useEffect(() => {
     const getUserInfo = async () => {
       const name = await SecureStore.getItemAsync('name')
       const email = await SecureStore.getItemAsync('email')
-      if (name && email) {
+      const phone = await SecureStore.getItemAsync('phoneNumber')
+      if (name && email && phone) {
         setName(name)
         setEmail(email)
+        setPhone(phone)
       }
     }
     getUserInfo()
@@ -86,20 +90,8 @@ const ProfileScreen = () => {
 
   const fetchFriends = async () => {
     try {
-      const accessToken = await SecureStore.getItemAsync('accessToken')
-      const response = await fetch(`${url}/friends`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-      })
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
-      const data = await response.json()
+      const response = await beApi.get('/friends')
+      const data = response.data
       const friends: Friend[] = (data.data ?? []).map((f: any) => ({
         id: f.id,
         name: f.username,
@@ -130,7 +122,7 @@ const ProfileScreen = () => {
       case 'Edit email':
         return 'email'
       case 'Edit profile picture':
-        return 'photo_url'
+        return 'photoURL'
       default:
         return field
     }
@@ -149,7 +141,8 @@ const ProfileScreen = () => {
       if (key === 'name') setName(value)
       else if (key === 'phoneNumber') setPhone(value)
       else if (key === 'email') setEmail(value)
-      else if (key === 'photo_url') setProfilePic({ uri: value })
+      else if (key === 'photo_url') setProfilePic(value)
+      setProfilePic(value)
       setModalVisible(false)
     } catch (error) {
       console.log('Update profile failed:', error)

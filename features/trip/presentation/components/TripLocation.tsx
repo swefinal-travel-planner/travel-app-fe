@@ -14,10 +14,7 @@ type TripLocationProps = {
   nextFn: () => void
 }
 
-export default function TripLocation({
-  theme,
-  nextFn,
-}: Readonly<TripLocationProps>) {
+export default function TripLocation({ theme, nextFn }: Readonly<TripLocationProps>) {
   const styles = useMemo(() => createStyles(theme), [theme])
   const setCity = useAiTripStore((state) => state.setCity)
   const request = useAiTripStore((state) => state.request)
@@ -28,9 +25,7 @@ export default function TripLocation({
 
   return (
     <View style={[styles.container, { backgroundColor: theme.white }]}>
-      <Text style={[styles.text, { color: theme.primary }]}>
-        Where is your trip located ?
-      </Text>
+      <Text style={[styles.text, { color: theme.primary }]}>Where is your trip located ?</Text>
       <Picker
         placeholder="Select a destination"
         value={selectedValue}
@@ -58,15 +53,9 @@ export default function TripLocation({
         })}
       </Picker>
       <View style={styles.mapContainer}>
-        <MapView
-          style={{ flex: 1 }}
-          logoEnabled={true}
-          scaleBarPosition={{ top: 8, left: 16 }}
-        >
+        <MapView style={{ flex: 1 }} logoEnabled={true} scaleBarPosition={{ top: 8, left: 16 }}>
           <Camera
-            centerCoordinate={
-              Location.find((loc) => loc.key == selectedValue)?.coordinates
-            }
+            centerCoordinate={Location.find((loc) => loc.key == selectedValue)?.coordinates || Location[0].coordinates}
             zoomLevel={11}
           />
         </MapView>

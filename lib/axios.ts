@@ -76,9 +76,8 @@ const createAxiosInstance = (baseURL: string) => {
           INDENT_LEVEL
         )
       )
-      return Promise.reject(
-        new Error(error.response?.data?.message ?? error.message ?? 'An error occurred while processing the request')
-      )
+      // Preserve the original error structure for downstream interceptors
+      return Promise.reject(error)
     }
   )
 

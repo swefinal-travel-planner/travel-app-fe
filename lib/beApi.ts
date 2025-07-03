@@ -1,10 +1,10 @@
+import { EMPTY_STRING } from '@/constants/utilConstants'
 import { getItemAsync, setItemAsync } from 'expo-secure-store'
 import createAxiosInstance from './axios'
-import { EMPTY_STRING } from '@/constants/utilConstants'
 
 export const BE_URL = process.env.EXPO_PUBLIC_BE_API_URL ?? EMPTY_STRING
-
 const beApi = createAxiosInstance(BE_URL)
+const refreshApi = createAxiosInstance(BE_URL)
 
 let isRefreshing = false
 let failedQueue: any[] = []
@@ -21,18 +21,13 @@ const processQueue = (error: any, token: string | null = null) => {
 }
 
 // Add authentication interceptor
-beApi.interceptors.request.use(
-  async (config) => {
-    const accessToken = await getItemAsync('accessToken')
-    if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`
-    }
-    return config
-  },
-  (error) => {
-    return Promise.reject(error instanceof Error ? error : new Error(String(error.response)))
+beApi.interceptors.request.use(async (config) => {
+  const accessToken = await getItemAsync('accessToken')
+  if (accessToken) {
+    config.headers.Authorization = `Bearer ${accessToken}`
   }
-)
+  return config
+})
 
 // Add response interceptor to handle 204 responses and 401 refresh
 beApi.interceptors.response.use(
@@ -45,6 +40,11 @@ beApi.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config
 
+    console.log('Original Request:', originalRequest?.url)
+    console.log('Error Status:', error.response?.status)
+    console.log('Error Message:', error.message)
+    console.log('Full Error Object:', JSON.stringify(error, null, 2))
+
     // If the error has a response and it's a 204, treat it as success
     if (error.response && error.response.status === 204) {
       console.log('Received 204 No Content - treating as success')
@@ -52,9 +52,15 @@ beApi.interceptors.response.use(
     }
 
     // Handle 401 Unauthorized and try to refresh token
-    if (error.response && error.response.status === 401 && !originalRequest.hasRetry) {
+    // Check both error.response.status and error.status for 401
+    const is401Error =
+      (error.response && error.response.status === 401) ||
+      error.status === 401 ||
+      (error.message && error.message.includes('401'))
+
+    if (is401Error && !originalRequest._retry) {
       console.log('Received 401 Unauthorized - attempting to refresh token')
-      originalRequest.hasRetry = true
+      originalRequest._retry = true
 
       if (isRefreshing) {
         // Queue the request until the token is refreshed
@@ -62,7 +68,6 @@ beApi.interceptors.response.use(
           failedQueue.push({ resolve, reject })
         })
           .then((token) => {
-            // token is of type unknown, so we need to check/cast
             if (typeof token !== 'string') {
               return Promise.reject(new Error('Invalid token type'))
             }
@@ -81,12 +86,22 @@ beApi.interceptors.response.use(
           throw new Error('No refresh token available')
         }
 
-        // Call refresh endpoint
-        const refreshResponse = await beApi.post('/auth/refresh', { refreshToken })
+        console.log('Making refresh token request...')
+
+        // Use the separate refreshApi instance to avoid interceptor loops
+        const refreshResponse = await refreshApi.post('/auth/refresh', {
+          refreshToken: refreshToken,
+        })
+
+        console.log('Refresh response received:', refreshResponse.status)
+        console.log('Refresh response data:', refreshResponse.data)
 
         const newAccessToken = refreshResponse.data.data
+        if (!newAccessToken) {
+          throw new Error('No access token received from refresh')
+        }
 
-        // Save new tokens
+        // Save new access token
         await setItemAsync('accessToken', newAccessToken)
 
         processQueue(null, newAccessToken)
@@ -95,16 +110,22 @@ beApi.interceptors.response.use(
         originalRequest.headers.Authorization = 'Bearer ' + newAccessToken
         return beApi(originalRequest)
       } catch (refreshError) {
+        console.error('Refresh token error:', refreshError)
         processQueue(refreshError, null)
-        // Optionally, you can clear tokens here or redirect to login
+
+        // Clear tokens on refresh failure
+        await setItemAsync('accessToken', '')
+        await setItemAsync('refreshToken', '')
+
         return Promise.reject(new Error('Failed to refresh token: ' + refreshError))
       } finally {
         isRefreshing = false
       }
     }
 
-    console.error('Response Error:', error.response)
-    return Promise.reject(new Error(error.response))
+    // For other errors, just reject
+    console.error('Response Error:', error.response?.data || error.message)
+    return Promise.reject(error)
   }
 )
 

@@ -5,7 +5,7 @@ import { Image, Text } from 'react-native-ui-lib'
 
 type ProfileAvatarProps = {
   theme: typeof colorPalettes.light
-  profilePic: any // Replace 'any' with the appropriate type for your image source
+  profilePic: string
   name: string
   email: string
   phone: string
@@ -13,7 +13,7 @@ type ProfileAvatarProps = {
 
 const ProfileAvatar = ({ theme, profilePic, name, email, phone }: ProfileAvatarProps) => (
   <View style={styles.avatarContainer}>
-    <Image source={profilePic} style={[styles.profileImage, { borderColor: theme.primary }]} />
+    <Image source={{ uri: profilePic }} style={[styles.profileImage, { borderColor: theme.primary }]} />
     <View style={[styles.userInfoContainer, { backgroundColor: theme.primary }]}>
       <Text text50 marginT-10 color="white">
         {name}

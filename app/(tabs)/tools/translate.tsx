@@ -280,7 +280,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       backgroundColor: theme.background,
       borderRadius: Radius.NORMAL,
       padding: 16,
-      justifyContent: 'center',
+      justifyContent: 'flex-start',
     },
     outputText: {
       fontSize: FontSize.LG,
