@@ -3,16 +3,7 @@ import { Place } from '@/features/place/domain/models/Place'
 import { TimeSlot } from '@/features/trip/domain/models/Trip'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import React, { useEffect, useState } from 'react'
-import {
-  ActivityIndicator,
-  FlatList,
-  Image,
-  Modal,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native'
+import { ActivityIndicator, FlatList, Image, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { usePlaces } from '../state/usePlaces'
 import { LabelFilterModal } from './LabelFilterModal'
 
@@ -23,12 +14,7 @@ export interface AddPlaceModalProps {
   onConfirm: (places: Place[]) => void
 }
 
-export const AddPlaceModal: React.FC<AddPlaceModalProps> = ({
-  visible,
-  selectedTime,
-  onClose,
-  onConfirm,
-}) => {
+export const AddPlaceModal: React.FC<AddPlaceModalProps> = ({ visible, selectedTime, onClose, onConfirm }) => {
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false)
   const [selectedPlaces, setSelectedPlaces] = useState<Place[]>([])
   const [shouldFetchPlaces, setShouldFetchPlaces] = useState(false)
@@ -112,9 +98,7 @@ export const AddPlaceModal: React.FC<AddPlaceModalProps> = ({
     if (error) {
       return (
         <View style={styles.centerContent}>
-          <Text style={styles.errorText}>
-            Error loading places: {error.message}
-          </Text>
+          <Text style={styles.errorText}>Error loading places: {error.message}</Text>
         </View>
       )
     }
@@ -136,14 +120,11 @@ export const AddPlaceModal: React.FC<AddPlaceModalProps> = ({
   const renderPlace = ({ item }: { item: Place }) => {
     const isSelected = selectedPlaces.some((p) => p.id === item.id)
     return (
-      <View
-        style={[styles.placeContainer, isSelected && styles.selectedContainer]}
-      >
+      <View style={[styles.placeContainer, isSelected && styles.selectedContainer]}>
         <View style={styles.imageContainer}>
           <Image
             source={{
-              uri:
-                'https://drive.google.com/uc?export=view&id=' + item.images[2],
+              uri: item.images[0],
             }}
             style={styles.placeImage}
           />
@@ -157,9 +138,7 @@ export const AddPlaceModal: React.FC<AddPlaceModalProps> = ({
             style={[styles.addButton, isSelected && styles.selectedButton]}
             onPress={() => handleTogglePlace(item)}
           >
-            <Text style={styles.addButtonText}>
-              {isSelected ? 'Selected' : 'Select'}
-            </Text>
+            <Text style={styles.addButtonText}>{isSelected ? 'Selected' : 'Select'}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -167,23 +146,13 @@ export const AddPlaceModal: React.FC<AddPlaceModalProps> = ({
   }
 
   return (
-    <Modal
-      transparent={false}
-      visible={visible}
-      onRequestClose={onClose}
-      animationType="slide"
-    >
+    <Modal transparent={false} visible={visible} onRequestClose={onClose} animationType="slide">
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
           <View style={styles.header}>
             <View style={styles.titleContainer}>
-              <Text style={styles.modalTitle}>
-                Add places to {selectedTime}
-              </Text>
-              <TouchableOpacity
-                style={styles.filterButton}
-                onPress={handleFilterPress}
-              >
+              <Text style={styles.modalTitle}>Add places to {selectedTime}</Text>
+              <TouchableOpacity style={styles.filterButton} onPress={handleFilterPress}>
                 <Ionicons name="filter-outline" size={24} color="#563D30" />
               </TouchableOpacity>
             </View>
@@ -192,24 +161,15 @@ export const AddPlaceModal: React.FC<AddPlaceModalProps> = ({
           {renderContent()}
 
           <View style={styles.bottomButtons}>
-            <TouchableOpacity
-              style={[styles.modalButton, styles.cancelButton]}
-              onPress={onClose}
-            >
+            <TouchableOpacity style={[styles.modalButton, styles.cancelButton]} onPress={onClose}>
               <Text style={[styles.buttonText, styles.cancelText]}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[
-                styles.modalButton,
-                styles.doneButton,
-                selectedPlaces.length === 0 && styles.disabledButton,
-              ]}
+              style={[styles.modalButton, styles.doneButton, selectedPlaces.length === 0 && styles.disabledButton]}
               onPress={handleDone}
               disabled={selectedPlaces.length === 0}
             >
-              <Text style={[styles.buttonText, styles.doneText]}>
-                Done ({selectedPlaces.length})
-              </Text>
+              <Text style={[styles.buttonText, styles.doneText]}>Done ({selectedPlaces.length})</Text>
             </TouchableOpacity>
           </View>
         </View>

@@ -1,4 +1,5 @@
 import { colorPalettes } from '@/constants/Itheme'
+import beApi from '@/lib/beApi'
 import { Friend } from '@/lib/types/Profile'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -35,6 +36,7 @@ const FriendListModal = ({ theme, visible, closeModal, friendList }: FriendListM
   const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null)
   const [isDialogVisible, setIsDialogVisible] = useState(false)
   const [filteredFriendlist, setFilteredFriendlist] = useState<Friend[]>(friendList)
+  const [add, setAdd] = useState(false)
 
   const shareText = async () => {
     try {
@@ -99,15 +101,8 @@ const FriendListModal = ({ theme, visible, closeModal, friendList }: FriendListM
 
   const searchFriendMutation = useMutation({
     mutationFn: async (email: string) => {
-      const token = await SecureStore.getItemAsync('accessToken')
-      const response = await fetch(`${url}/users?userEmail=${email}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      if (!response.ok) {
-        const errorBody = await response.json()
-        throw new Error(errorBody.message || `HTTP Error: ${response.status}`)
-      }
-      const data = await response.json()
+      const response = await beApi.get(`/users?userEmail=${email}`)
+      const data = await response.data
       return data.data
     },
     onError: (err) => console.log('Mutation failed!', err),
@@ -116,14 +111,9 @@ const FriendListModal = ({ theme, visible, closeModal, friendList }: FriendListM
   const addFriendMutation = useMutation({
     mutationFn: async () => {
       const emailValue = watch('email')
-      const token = await SecureStore.getItemAsync('accessToken')
-      const response = await fetch(`${url}/invitation-friends`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ receiverEmail: emailValue }),
-      })
-      if (!response.ok) {
-        const errorBody = await response.json()
+      const response = await beApi.post('/invitation-friends', { receiverEmail: emailValue })
+      if (!response.status.toString().startsWith('2')) {
+        const errorBody = await response.data
         throw new Error(errorBody.message || `HTTP Error: ${response.status}`)
       }
     },
@@ -247,7 +237,15 @@ const FriendListModal = ({ theme, visible, closeModal, friendList }: FriendListM
                   </View>
                   <Text text60>{searchFriendMutation.data.username}</Text>
                 </View>
-                <Button label="Add" backgroundColor={theme.background} onPress={() => addFriendMutation.mutate()} />
+                <Button
+                  label="Add"
+                  backgroundColor={add ? theme.disabled : theme.primary}
+                  onPress={() => {
+                    // addFriendMutation.mutate()
+                    // Immediately set pending state for visual feedback
+                    setAdd(true)
+                  }}
+                />
               </View>
             )}
 

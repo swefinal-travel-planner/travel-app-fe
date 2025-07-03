@@ -82,6 +82,8 @@ export default function Login() {
           response.data.data.accessToken,
           response.data.data.refreshToken,
           response.data.data.email,
+          response.data.data.phoneNumber ?? '',
+          response.data.data.photoURL || '',
           response.data.data.name
         )
 
@@ -126,7 +128,9 @@ export default function Login() {
         response.data.data.userId,
         response.data.data.accessToken,
         response.data.data.refreshToken,
+        response.data.data.phoneNumber || '',
         response.data.data.email,
+        response.data.data.photoURL || '',
         response.data.data.name
       )
 
