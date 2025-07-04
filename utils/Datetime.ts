@@ -15,10 +15,7 @@ export function formatTimeAMPM(datetime: string): string {
   hours = hours % 12 || 12
 
   // Format hours and minutes
-  const formattedHours =
-    minutes === 0
-      ? `${hours}:00`
-      : `${hours}:${minutes.toString().padStart(2, '0')}`
+  const formattedHours = minutes === 0 ? `${hours}:00` : `${hours}:${minutes.toString().padStart(2, '0')}`
 
   return `${formattedHours} ${ampm}`
 }
@@ -29,9 +26,41 @@ export function formatDayInWeek(datetime: string): string {
   return date.toLocaleDateString('en-US', { weekday: 'long' })
 }
 
-export function formatDateTime(date: string, time: string): string {
+// export function formatDateTime(date: string, time: string): string {
+//   const now = new Date()
+//   const notifDateTime = new Date(`${date}T${time}`)
+
+//   const isSameDay =
+//     now.getFullYear() === notifDateTime.getFullYear() &&
+//     now.getMonth() === notifDateTime.getMonth() &&
+//     now.getDate() === notifDateTime.getDate()
+
+//   if (isSameDay) {
+//     return notifDateTime.toTimeString().slice(0, 5)
+//   } else {
+//     const monthNames = [
+//       'Jan',
+//       'Feb',
+//       'Mar',
+//       'Apr',
+//       'May',
+//       'Jun',
+//       'Jul',
+//       'Aug',
+//       'Sep',
+//       'Oct',
+//       'Nov',
+//       'Dec',
+//     ]
+//     const month = monthNames[notifDateTime.getMonth()]
+//     const day = String(notifDateTime.getDate()).padStart(2, '0')
+//     return `${day} ${month}`
+//   }
+// }
+
+export function formatDateTime(dateTime: string): string {
   const now = new Date()
-  const notifDateTime = new Date(`${date}T${time}`)
+  const notifDateTime = new Date(dateTime)
 
   const isSameDay =
     now.getFullYear() === notifDateTime.getFullYear() &&
@@ -39,22 +68,10 @@ export function formatDateTime(date: string, time: string): string {
     now.getDate() === notifDateTime.getDate()
 
   if (isSameDay) {
+    // Lấy giờ và phút theo định dạng HH:mm
     return notifDateTime.toTimeString().slice(0, 5)
   } else {
-    const monthNames = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ]
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
     const month = monthNames[notifDateTime.getMonth()]
     const day = String(notifDateTime.getDate()).padStart(2, '0')
     return `${day} ${month}`
