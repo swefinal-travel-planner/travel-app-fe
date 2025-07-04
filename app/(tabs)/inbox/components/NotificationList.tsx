@@ -13,16 +13,12 @@ import { Radius } from '@/constants/theme'
 import { formatDateTime } from '@/utils/Datetime'
 
 interface NotificationListProps {
-  notificationList: Notification[]
+  notificationList: Notification[] | undefined
   removeNotification: (id: number) => void
   markAsRead: (id: number) => void
 }
 
-function NotificationList({
-  notificationList,
-  removeNotification,
-  markAsRead,
-}: NotificationListProps) {
+function NotificationList({ notificationList, removeNotification, markAsRead }: NotificationListProps) {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
 
@@ -33,15 +29,15 @@ function NotificationList({
         paddingHorizontal: 24,
       }}
     >
-      {notificationList.map((notif) => (
+      {notificationList?.map((notif) => (
         <Drawer
-          key={`${notif.id}-${notif.unread ? 'unread' : 'read'}`}
+          key={`${notif.referenceEntity.id}-${notif.isSeen ? 'unread' : 'read'}`}
           leftItem={
             notif.type === 'actionable'
               ? {
-                  text: notif.unread ? 'Accept' : 'Accepted',
-                  background: notif.unread ? Colors.green30 : Colors.grey50,
-                  onPress: notif.unread ? () => markAsRead(notif.id) : () => {},
+                  text: notif.isSeen ? 'Accept' : 'Accepted',
+                  background: notif.isSeen ? Colors.green30 : Colors.grey50,
+                  onPress: notif.isSeen ? () => markAsRead(notif.referenceEntity.id) : () => {},
                 }
               : undefined
           }
@@ -49,56 +45,40 @@ function NotificationList({
             {
               text: 'Delete',
               background: Colors.red30,
-              onPress: () => removeNotification(notif.id),
+              onPress: () => removeNotification(notif.referenceEntity.id),
             },
           ]}
           style={{
             borderRadius: Radius.ROUNDED,
-            backgroundColor: notif.unread ? theme.secondary : Colors.grey80,
+            backgroundColor: notif.isSeen ? theme.secondary : Colors.grey80,
             marginBottom: 10,
           }}
           disableHaptic
           fullSwipeRight
-          onFullSwipeRight={() => removeNotification(notif.id)}
-          fullSwipeLeft={notif.unread}
-          onFullSwipeLeft={() => markAsRead(notif.id)}
+          onFullSwipeRight={() => removeNotification(notif.referenceEntity.id)}
+          fullSwipeLeft={notif.isSeen}
+          onFullSwipeLeft={() => markAsRead(notif.referenceEntity.id)}
         >
-          <Pressable
-            onPress={
-              notif.type === 'navigable'
-                ? () => markAsRead(notif.id)
-                : undefined
-            }
-          >
-            <View
-              style={
-                notif.unread
-                  ? styles.unreadNotifContainer
-                  : styles.notifContainer
-              }
-            >
-              <Avatar source={notif.senderAvatar} size={40} />
+          <Pressable onPress={notif.type === 'navigable' ? () => markAsRead(notif.referenceEntity.id) : undefined}>
+            <View style={notif.isSeen ? styles.unreadNotifContainer : styles.notifContainer}>
+              <Avatar source={notif.triggerEntity.avatar} size={40} />
 
               <View style={styles.view3}>
-                {notif.unread ? (
+                {notif.isSeen ? (
                   <View>
                     <View style={styles.view4}>
-                      <Text style={styles.notifTitle}>{notif.title}</Text>
-                      <Text style={styles.subText}>
-                        {formatDateTime(notif.date, notif.time)}
-                      </Text>
+                      <Text style={styles.notifTitle}>{notif.triggerEntity.name}</Text>
+                      <Text style={styles.subText}>{formatDateTime(notif.createdAt)}</Text>
                     </View>
-                    <Text style={styles.text}>{notif.message}</Text>
+                    <Text style={styles.text}>{notif.referenceData}</Text>
                   </View>
                 ) : (
                   <View>
                     <View style={styles.view4}>
-                      <Text style={styles.notifTitleDim}>{notif.title}</Text>
-                      <Text style={styles.subTextDim}>
-                        {formatDateTime(notif.date, notif.time)}
-                      </Text>
+                      <Text style={styles.notifTitleDim}>{notif.triggerEntity.name}</Text>
+                      <Text style={styles.subTextDim}>{formatDateTime(notif.createdAt)}</Text>
                     </View>
-                    <Text style={styles.textDim}>{notif.message}</Text>
+                    <Text style={styles.textDim}>{notif.referenceData}</Text>
                   </View>
                 )}
               </View>

@@ -1,21 +1,30 @@
 export type NotificationType = 'navigable' | 'actionable'
 
 export type NotificationCategory =
-  | 'friends'
-  | 'locations'
-  | 'trips'
-  | 'reminders'
-  | 'weather'
+  | 'tripGenerated'
+  | 'friendRequestReceived'
+  | 'friendRequestAccepted'
+  | 'tripInvitationReceived'
+  | 'tripGeneratedFailed'
+
+type referenceEntity = {
+  id: number
+  type: NotificationCategory
+}
+
+type triggerEntity = {
+  id: number
+  avatar: string
+  name: string
+  type: string
+}
 
 export interface Notification {
   id: number
-  title: string
-  message: string
+  createdAt: string
+  isSeen: boolean
+  referenceData: string
+  referenceEntity: referenceEntity
+  triggerEntity: triggerEntity
   type: NotificationType
-  category: NotificationCategory
-  date: string
-  time: string
-  sender: string
-  senderAvatar: string
-  unread: boolean
 }

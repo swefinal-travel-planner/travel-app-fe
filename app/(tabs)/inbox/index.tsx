@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 
 import Ionicons from '@expo/vector-icons/Ionicons'
@@ -11,47 +11,60 @@ import { colorPalettes } from '@/constants/Itheme'
 
 import Chip from '@/components/Chip'
 import { FontFamily, FontSize } from '@/constants/font'
-import inbox from '@/lib/mock_data/inbox'
+import beApi from '@/lib/beApi'
+import { generateMessage } from '@/utils/genNotiMessage'
 import NotificationList from './components/NotificationList'
 
 export default function Inbox() {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
 
-  const [notifications, setNotifications] = useState<Notification[]>(
-    inbox as Notification[]
-  )
+  const [notifications, setNotifications] = useState<Notification[]>()
+  //inbox as Notification[]
 
   const categories: NotificationCategory[] = [
-    'friends',
-    'locations',
-    'trips',
-    'reminders',
-    'weather',
+    'tripGenerated',
+    'friendRequestReceived',
+    'friendRequestAccepted',
+    'tripInvitationReceived',
+    'tripGeneratedFailed',
   ]
+  const getNotifications = async () => {
+    try {
+      const response = await beApi.get('/notifications')
+      const rawNotifications: Notification[] = response.data.data
 
-  const [activeCategories, setActiveCategories] = useState<
-    NotificationCategory[]
-  >([])
+      const enrichedNotifications: Notification[] = rawNotifications.map((notif) => ({
+        ...notif,
+        referenceData: generateMessage(notif), // gán message trực tiếp vào referenceData
+      }))
+
+      console.log('Enriched notifications:', enrichedNotifications)
+      setNotifications(enrichedNotifications)
+    } catch (error) {
+      console.error('Error fetching notifications:', error)
+    }
+  }
+  useEffect(() => {
+    getNotifications()
+  }, [])
+
+  const [activeCategories, setActiveCategories] = useState<NotificationCategory[]>([])
 
   const filteredNotifications =
     activeCategories.length === 0
       ? notifications
-      : notifications.filter((n) =>
-          activeCategories.includes(
-            n.category.toLowerCase() as NotificationCategory
-          )
+      : notifications?.filter((n) =>
+          activeCategories.includes(n.referenceEntity.type.toLowerCase() as NotificationCategory)
         )
 
   const removeNotification = (id: number) => {
-    setNotifications(notifications.filter((notif) => notif.id !== id))
+    setNotifications(notifications?.filter((notif) => notif.referenceEntity.id !== id))
   }
 
   const markAsRead = (id: number) => {
     setNotifications(
-      notifications.map((notif) =>
-        notif.id === id ? { ...notif, unread: false } : notif
-      )
+      notifications?.map((notif) => (notif.referenceEntity.id === id ? { ...notif, isSeen: true } : notif))
     )
   }
 
@@ -71,21 +84,15 @@ export default function Inbox() {
               value={cat.charAt(0).toUpperCase() + cat.slice(1)}
               size="small"
               onSelect={() => setActiveCategories([...activeCategories, cat])}
-              onDeselect={() =>
-                setActiveCategories(activeCategories.filter((c) => c !== cat))
-              }
+              onDeselect={() => setActiveCategories(activeCategories.filter((c) => c !== cat))}
             />
           ))}
         </ScrollView>
       </View>
 
-      {filteredNotifications.length === 0 ? (
+      {filteredNotifications?.length === 0 ? (
         <View style={styles.noNotifContainer}>
-          <Ionicons
-            name="notifications-off-outline"
-            size={48}
-            color={theme.text}
-          />
+          <Ionicons name="notifications-off-outline" size={48} color={theme.text} />
 
           <Text style={styles.regularText}>No notifications</Text>
         </View>
