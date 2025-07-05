@@ -33,16 +33,11 @@ export default function Inbox() {
     try {
       const response = await beApi.get('/notifications')
       const rawNotifications: Notification[] = response.data.data
-
-      console.log('Raw notifications:', rawNotifications)
-
       const enrichedNotifications: Notification[] = rawNotifications.map((notif) => ({
         ...notif,
         referenceData: generateMessage(notif),
         action: getAction(notif),
       }))
-
-      console.log('Enriched notifications:', enrichedNotifications)
       setNotifications(enrichedNotifications)
     } catch (error) {
       console.error('Error fetching notifications:', error)
