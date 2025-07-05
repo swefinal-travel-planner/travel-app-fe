@@ -5,6 +5,7 @@ import { colorPalettes } from '@/constants/Itheme'
 import { Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import beApi from '@/lib/beApi'
+import coreApi from '@/lib/coreApi'
 import { Trip, TripItem } from '@/lib/types/Trip'
 import { formatTripStatus } from '@/utils/tripAttributes'
 import Ionicons from '@expo/vector-icons/Ionicons'
@@ -12,7 +13,10 @@ import { useLocalSearchParams, useRouter } from 'expo-router'
 import React, { useEffect, useMemo, useState } from 'react'
 import { Image, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
-const url = process.env.EXPO_PUBLIC_BE_API_URL
+type DistanceTime = {
+  distance: string
+  time: string
+}
 
 const TripDetailViewScreen = () => {
   const theme = useThemeStyle()
@@ -20,6 +24,7 @@ const TripDetailViewScreen = () => {
   const [trip, setTrip] = useState<Trip>()
   const [tripItems, setTripItems] = useState<TripItem[]>([])
   const [groupedItems, setGroupedItems] = useState<{ day: number; date: string; spots: any[] }[]>([])
+  const [distanceTimes, setDistanceTimes] = useState<DistanceTime[]>([])
 
   const [activeDay, setActiveDay] = useState(0)
   const router = useRouter()
@@ -77,8 +82,24 @@ const TripDetailViewScreen = () => {
     try {
       const tripItemData = await beApi.get(`/trips/${id}/trip-items`)
 
-      const items: TripItem[] = tripItemData.data.data
+      let items: TripItem[] = tripItemData.data.data
+      const placeIDs = items.map((item) => item.placeID)
+
+      items = items.map((item, index) => ({
+        ...item,
+        orderInTrip: index, // Thêm trường orderInTrip để xác định thứ tự trong chuyến đi
+      }))
+
       setTripItems(items)
+
+      // Lấy thông tin khoảng cách và thời gian di chuyển giữa các địa điểm từ API
+      const distanceTimeData = await coreApi.post(`/distance_time/calc`, { place_ids: placeIDs })
+      setDistanceTimes(
+        distanceTimeData.data.data.map((item: any) => ({
+          distance: item.distance,
+          time: item.time,
+        }))
+      )
 
       // Nhóm items theo ngày
       const start = trip?.startDate ? new Date(trip.startDate) : new Date()
@@ -106,6 +127,8 @@ const TripDetailViewScreen = () => {
                 address: spot.placeInfo?.address ?? 'Unknown address',
                 image: { uri: spot.placeInfo?.images?.[0] ?? '' },
                 timeSlot: spot.timeInDate,
+                orderInTrip: spot.orderInTrip,
+                orderInDay: spot.orderInDay,
               })),
           }
         })
@@ -206,28 +229,52 @@ const TripDetailViewScreen = () => {
         <Text style={styles.mapInstructionText}>Tap a spot to view its details</Text>
 
         {/* Spots List */}
-        {groupedItems[activeDay] && (
-          <>
-            {groupedItems[activeDay].spots.map((spot) => (
-              <PressableOpacity key={spot.id} onPress={() => handleSpotDetail(spot.id)}>
-                <View style={styles.spotCard}>
-                  <View style={styles.spotImageContainer}>
-                    <Image source={spot.image} style={styles.spotImage} />
-                  </View>
-                  <View style={styles.spotDetails}>
-                    <Text style={styles.spotName}>{spot.name}</Text>
-                    <View style={styles.spotLocationContainer}>
-                      <Ionicons name="location-outline" size={14} color={theme.text} style={{ paddingTop: 5 }} />
-                      <Text style={styles.spotAddress} numberOfLines={1}>
-                        {spot.address}
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-              </PressableOpacity>
+        {groupedItems[activeDay] &&
+          ['morning', 'afternoon', 'evening', 'night']
+            .filter((timeSlot) => groupedItems[activeDay].spots.some((spot) => spot.timeSlot === timeSlot))
+            .map((timeSlot) => (
+              <View style={styles.timeGroup} key={timeSlot}>
+                <Text style={styles.timeGroupTitle}>{timeSlot.charAt(0).toUpperCase() + timeSlot.slice(1)}</Text>
+                {groupedItems[activeDay].spots
+                  .filter((spot) => spot.timeSlot === timeSlot)
+                  .map((spot) => {
+                    // Skip first spot (orderInTrip === 0) for distance/time data
+                    const distanceTimeIndex = spot.orderInTrip > 0 ? spot.orderInTrip - 1 : -1
+                    const distanceTime = distanceTimeIndex >= 0 ? distanceTimes[distanceTimeIndex] : null
+
+                    return (
+                      <PressableOpacity key={spot.id} onPress={() => handleSpotDetail(spot.id)}>
+                        <View style={styles.spotCard}>
+                          <View style={styles.spotImageContainer}>
+                            <Image source={spot.image} style={styles.spotImage} />
+                          </View>
+                          <View style={styles.spotDetails}>
+                            <Text style={styles.spotName}>{spot.name}</Text>
+                            <View style={styles.spotLocationContainer}>
+                              <Ionicons name="location-outline" size={14} color={theme.text} />
+                              <Text style={styles.spotAddress} numberOfLines={1}>
+                                {spot.address}
+                              </Text>
+                            </View>
+                            {distanceTime && spot.orderInDay !== 1 && (
+                              <View style={styles.spotDistanceTimeContainer}>
+                                <Ionicons name="car-outline" size={14} color={theme.text} />
+                                <Text style={styles.spotAddress} numberOfLines={1}>
+                                  {distanceTime.distance} km
+                                </Text>
+                                <Ionicons name="time-outline" size={14} color={theme.text} />
+                                <Text style={styles.spotAddress} numberOfLines={1}>
+                                  {distanceTime.time} min
+                                </Text>
+                              </View>
+                            )}
+                          </View>
+                        </View>
+                      </PressableOpacity>
+                    )
+                  })}
+              </View>
             ))}
-          </>
-        )}
       </ScrollView>
 
       {/* Edit Button */}
@@ -346,15 +393,23 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     },
     spotName: {
       fontFamily: FontFamily.BOLD,
-      fontSize: FontSize.MD,
+      fontSize: FontSize.LG,
       marginBottom: 2,
       color: theme.primary,
       paddingRight: 8,
     },
     spotLocationContainer: {
       flexDirection: 'row',
-      alignItems: 'baseline',
+      alignItems: 'flex-end',
       paddingRight: 20,
+      marginTop: 4,
+    },
+    spotDistanceTimeContainer: {
+      flexDirection: 'row',
+      alignItems: 'flex-end',
+      justifyContent: 'space-between',
+      paddingRight: 20,
+      marginTop: 4,
     },
     spotAddress: {
       color: theme.text,
@@ -369,16 +424,15 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       margin: 16,
       backgroundColor: 'transparent',
     },
-    editButton: {
-      backgroundColor: '#3F6453',
-      borderRadius: 24,
-      paddingVertical: 16,
-      alignItems: 'center',
+    timeGroup: {
+      marginBottom: 20,
     },
-    editButtonText: {
-      color: '#fff',
-      fontSize: 16,
-      fontWeight: '500',
+    timeGroupTitle: {
+      fontSize: FontSize.XL,
+      fontFamily: FontFamily.BOLD,
+      color: theme.text,
+      marginBottom: 8,
+      marginLeft: 24,
     },
   })
 
