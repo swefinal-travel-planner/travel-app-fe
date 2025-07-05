@@ -17,6 +17,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     },
     package: 'com.qhuongng.travelapp',
     googleServicesFile: './google-services.json',
+    permissions: ['INTERNET'],
   },
   plugins: [
     'expo-router',
