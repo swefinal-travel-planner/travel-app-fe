@@ -1,19 +1,23 @@
+import Pressable from '@/components/Pressable'
+import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
+import { useThemeStyle } from '@/hooks/useThemeStyle'
 import * as SecureStore from 'expo-secure-store'
-import React, { useEffect, useState } from 'react'
-import { StyleSheet, View } from 'react-native'
-import { Button, Text } from 'react-native-ui-lib'
+import React, { useEffect, useMemo, useState } from 'react'
+import { StyleSheet, Text, View } from 'react-native'
 
 const url = process.env.EXPO_PUBLIC_BE_API_URL
 
 type ProfileStatsProps = {
-  theme: typeof colorPalettes.light
   onGoToTrips: () => void
 }
 
-const ProfileStats = ({ theme, onGoToTrips }: ProfileStatsProps) => {
+const ProfileStats = ({ onGoToTrips }: ProfileStatsProps) => {
   const [numTrips, setNumTrips] = useState(0)
   const [numCompletedTrips, setNumCompletedTrips] = useState(0)
+
+  const theme = useThemeStyle()
+  const styles = useMemo(() => createStyles(theme), [theme])
 
   const getAllTrips = async () => {
     try {
@@ -45,38 +49,60 @@ const ProfileStats = ({ theme, onGoToTrips }: ProfileStatsProps) => {
   }, [])
 
   return (
-    <View style={[styles.statsContainer, { borderColor: theme.background }]}>
-      <View style={styles.statsItem}>
-        <Text text70>Number of Trips</Text>
-        <Text text50BO>{numTrips}</Text>
-        <Button label="Go to My trips" backgroundColor={theme.primary} onPress={onGoToTrips} />
+    <View style={[styles.statsContainer]}>
+      <View style={[styles.statsGroup]}>
+        <View style={styles.statsItem}>
+          <Text style={styles.statsHeader}>Number of trips</Text>
+          <Text style={styles.statsValue}>{numTrips}</Text>
+        </View>
+        <View style={[styles.statsItem, { borderRightColor: theme.background }]}>
+          <Text style={styles.statsHeader}>Completed trips</Text>
+          <Text style={styles.statsValue}>{numCompletedTrips}</Text>
+        </View>
       </View>
-      <View style={[styles.statsItem, { borderRightColor: theme.background }]}>
-        <Text text70>Completed Trips</Text>
-        <Text text50BO>{numCompletedTrips}</Text>
-        <Button label="View Trip history" backgroundColor={theme.primary} onPress={onGoToTrips} />
-      </View>
+
+      <Pressable
+        title="See my trips"
+        style={{ backgroundColor: theme.primary, color: theme.white }}
+        onPress={onGoToTrips}
+      />
     </View>
   )
 }
 
-const styles = StyleSheet.create({
-  statsContainer: {
-    borderWidth: 2,
-    borderRadius: 10,
-    marginTop: 20,
-    marginBottom: 25,
-    paddingVertical: 10,
-    flexDirection: 'row',
-  },
-  statsItem: {
-    borderRightWidth: 2,
-    flex: 1,
-    justifyContent: 'center',
-    alignContent: 'center',
-    alignItems: 'center',
-    padding: 10,
-  },
-})
+const createStyles = (theme: typeof colorPalettes.light) =>
+  StyleSheet.create({
+    statsContainer: {
+      borderRadius: 10,
+      marginTop: 20,
+      marginBottom: 25,
+      paddingVertical: 10,
+      flexDirection: 'column',
+      backgroundColor: theme.secondary,
+      paddingHorizontal: 16,
+      paddingBottom: 20,
+    },
+    statsGroup: {
+      flexDirection: 'row',
+    },
+    statsItem: {
+      flex: 1,
+      justifyContent: 'center',
+      alignContent: 'center',
+      alignItems: 'center',
+      padding: 10,
+    },
+    statsHeader: {
+      fontSize: FontSize.LG,
+      fontFamily: FontFamily.REGULAR,
+      color: theme.text,
+    },
+    statsValue: {
+      fontSize: FontSize.XXXL,
+      fontFamily: FontFamily.BOLD,
+      color: theme.primary,
+      marginBottom: 10,
+    },
+  })
 
 export default ProfileStats

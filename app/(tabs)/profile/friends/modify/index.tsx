@@ -23,14 +23,14 @@ import {
 } from 'react-native'
 import { Avatar } from 'react-native-ui-lib'
 
-type TripCompanion = {
-  user_id: string
+type Friend = {
+  id: string
   email: string
   username: string
   status: 'pending' | 'accepted' | 'declined'
 }
 
-const TripCompanionInviteScreen = () => {
+const TripFriendInviteScreen = () => {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
   const router = useRouter()
@@ -38,34 +38,45 @@ const TripCompanionInviteScreen = () => {
 
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<SearchResult[]>([])
-  const [companions, setCompanions] = useState<TripCompanion[]>([])
-  const [pendingInvites, setPendingInvites] = useState<number[]>([])
+  const [friends, setFriends] = useState<Friend[]>([])
+  const [pendingInvites, setPendingInvites] = useState<string[]>([])
   const [isSearching, setIsSearching] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
   // Load initial data on component mount
   useEffect(() => {
-    loadCompanions()
+    loadFriends()
     loadPendingInvites()
-  }, [tripId])
+  }, [])
 
-  const loadCompanions = useCallback(async () => {
+  const loadFriends = useCallback(async () => {
     try {
-      const response = await beApi.get(`/trips/${tripId}/members`)
-      setCompanions(response.data.data || [])
+      const response = await beApi.get(`/friends`)
+      setFriends(response.data.data || [])
     } catch (error) {
-      console.error('Error loading companions:', error)
+      console.error('Error loading friends:', error)
     }
-  }, [tripId])
+  }, [])
 
   const loadPendingInvites = useCallback(async () => {
     try {
-      const response = await beApi.get(`/trips/${tripId}/pending-invitations`)
-      setPendingInvites(response.data.data?.map((invite: any) => invite.receiverId) || [])
+      const response1 = await beApi.get(`/invitation-friends/requested`)
+      const response2 = await beApi.get(`/invitation-friends/received`)
+
+      // Extract usernames from both responses and merge them
+      const requestedUsernames = response1.data.data?.map((invite: any) => invite.receiverUsername) || []
+      const receivedUsernames = response2.data.data?.map((invite: any) => invite.senderUsername) || [] // Assuming received invites have senderUsername
+
+      // Merge both arrays and remove duplicates
+      const allPendingInvites = [...new Set([...requestedUsernames, ...receivedUsernames])]
+
+      console.log('All pending invites:', allPendingInvites)
+
+      setPendingInvites(allPendingInvites)
     } catch (error) {
       console.error('Error loading pending invites:', error)
     }
-  }, [tripId])
+  }, [])
 
   const searchUsers = useCallback(
     async (email: string) => {
@@ -87,14 +98,14 @@ const TripCompanionInviteScreen = () => {
         if (searchResponse.ok) {
           const searchData = await searchResponse.json()
 
-          // Filter out existing companions from search results
-          const companionIds = companions.map((comp: TripCompanion) => comp.user_id)
+          // Filter out existing friends from search results
+          const friendIds = friends.map((f: Friend) => f.id)
 
-          if (searchData.data && !companionIds.includes(searchData.data.id)) {
+          if (searchData.data && !friendIds.includes(searchData.data.id)) {
             const result: SearchResult = {
               ...searchData.data,
-              isInvited: pendingInvites.includes(searchData.data.id),
-              isCompanion: false,
+              isInvited: pendingInvites.includes(searchData.data.username),
+              isFriend: false,
             }
             setSearchResults([result])
           } else {
@@ -110,7 +121,7 @@ const TripCompanionInviteScreen = () => {
         setIsSearching(false)
       }
     },
-    [tripId, pendingInvites, companions]
+    [tripId, pendingInvites, friends]
   )
 
   const handleSearchChange = useCallback(
@@ -126,18 +137,19 @@ const TripCompanionInviteScreen = () => {
   )
 
   const sendInvitation = useCallback(
-    async (userId: number) => {
+    async (username: string, email: string) => {
       setIsLoading(true)
       try {
-        const response = await beApi.post(`/invitation-trips`, {
-          receiverId: userId,
-          tripId: tripId,
+        const response = await beApi.post(`/invitation-friends`, {
+          receiverEmail: email,
         })
 
         // Server returns 204 No Content for successful invitation
         if (response.status === 204 || response.data) {
-          setPendingInvites((prev) => [...prev, userId])
-          setSearchResults((prev) => prev.map((user) => (user.id === userId ? { ...user, isInvited: true } : user)))
+          setPendingInvites((prev) => [...prev, username])
+          setSearchResults((prev) =>
+            prev.map((user) => (user.username === username ? { ...user, isInvited: true } : user))
+          )
           Alert.alert('Success', 'Invitation sent successfully!')
         }
       } catch (error: any) {
@@ -165,13 +177,13 @@ const TripCompanionInviteScreen = () => {
         </View>
       </View>
       <Pressable
-        title={item.isInvited ? 'Invited' : 'Invite'}
+        title={item.isInvited ? 'Pending invitation' : 'Invite'}
         disabled={item.isInvited || isLoading}
         style={{
           backgroundColor: item.isInvited ? theme.disabled : theme.primary,
           color: theme.white,
         }}
-        onPress={() => sendInvitation(item.id)}
+        onPress={() => sendInvitation(item.username, item.email)}
         size="small"
       />
     </View>
@@ -184,7 +196,7 @@ const TripCompanionInviteScreen = () => {
         <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
           <Ionicons name="arrow-back-outline" size={24} color={theme.text} />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: theme.text }]}>Invite companions</Text>
+        <Text style={[styles.headerTitle, { color: theme.text }]}>Invite friends</Text>
         <View style={styles.placeholder} />
       </View>
 
@@ -240,26 +252,6 @@ const TripCompanionInviteScreen = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
       />
-
-      {/* Instructions */}
-      {searchQuery.length === 0 && (
-        <View style={styles.instructionsContainer}>
-          <View style={styles.instructionItem}>
-            <Ionicons name="search" size={24} color={theme.text} />
-            <Text style={[styles.instructionText, { color: theme.text }]}>
-              Search for friends by their email address
-            </Text>
-          </View>
-          <View style={styles.instructionItem}>
-            <Ionicons name="person-add" size={24} color={theme.text} />
-            <Text style={[styles.instructionText, { color: theme.text }]}>Send invitation to join your trip</Text>
-          </View>
-          <View style={styles.instructionItem}>
-            <Ionicons name="people" size={24} color={theme.text} />
-            <Text style={[styles.instructionText, { color: theme.text }]}>Collaborate and plan together</Text>
-          </View>
-        </View>
-      )}
     </KeyboardAvoidingView>
   )
 }
@@ -322,7 +314,8 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       paddingVertical: 8,
     },
     statusText: {
-      fontSize: 14,
+      fontSize: FontSize.MD,
+      fontFamily: FontFamily.REGULAR,
       textAlign: 'center',
     },
     resultsList: {
@@ -379,4 +372,4 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     },
   })
 
-export default TripCompanionInviteScreen
+export default TripFriendInviteScreen

@@ -15,6 +15,7 @@ interface TextFieldProps {
   type?: string
   value?: string
   autoCapitalize?: 'none' | 'sentences'
+  keyboardType?: 'default' | 'numeric' | 'email-address' | 'phone-pad'
   onChange?: (text: string) => void
   onBlur?: () => void
 }
@@ -30,6 +31,7 @@ const CustomTextField: React.FC<TextFieldProps> = ({
   onChange,
   onBlur,
   value,
+  keyboardType = 'default',
   autoCapitalize = 'sentences',
 }) => {
   const theme = useThemeStyle()
@@ -50,6 +52,8 @@ const CustomTextField: React.FC<TextFieldProps> = ({
         }}
         underlineColorAndroid="transparent"
         autoComplete={type ? (type as any) : 'none'}
+        value={value}
+        keyboardType={keyboardType ? keyboardType : 'default'}
         autoCapitalize={autoCapitalize === 'none' ? 'none' : 'sentences'}
       />
       {rightIcon && <Ionicons name={rightIcon as any} style={styles.rightIcon} size={24} />}

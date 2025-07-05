@@ -124,14 +124,16 @@ export default function Login() {
 
       const response = await beApi.post(`${BE_URL}/auth/login`, payload)
 
+      console.log('Login response:', response.data)
+
       await saveLoginInfo(
-        response.data.data.userId,
-        response.data.data.accessToken,
-        response.data.data.refreshToken,
+        response.data.data.userId || 0,
         response.data.data.phoneNumber || '',
-        response.data.data.email,
-        response.data.data.photoURL || '',
-        response.data.data.name
+        response.data.data.accessToken || '',
+        response.data.data.refreshToken || '',
+        response.data.data.email || '',
+        response.data.data.name || '',
+        response.data.data.photoURL || ''
       )
 
       await updateNotifToken()

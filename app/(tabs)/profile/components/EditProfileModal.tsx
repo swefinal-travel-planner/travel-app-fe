@@ -1,25 +1,31 @@
+import CustomTextField from '@/components/input/CustomTextField'
+import Pressable from '@/components/Pressable'
+import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
-import React, { useEffect, useState } from 'react'
-import { KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { Radius } from '@/constants/theme'
+import { useThemeStyle } from '@/hooks/useThemeStyle'
+import React, { useEffect, useMemo, useState } from 'react'
+import { KeyboardAvoidingView, Platform, StyleSheet, Text, View } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Modal from 'react-native-modal'
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated'
 import { z } from 'zod'
 
-const url = process.env.EXPO_PUBLIC_API_URL
-
 interface EditProfileModalProps {
-  theme: typeof colorPalettes.light
   visible: boolean
   closeModal: () => void
   field: string
   value: string
   onSave: (value: string, field: string) => void
 }
-const EditProfileModal: React.FC<EditProfileModalProps> = ({ theme, visible, closeModal, field, value, onSave }) => {
-  const [tempValue, setTempValue] = useState(value)
+
+const EditProfileModal: React.FC<EditProfileModalProps> = ({ visible, closeModal, field, value, onSave }) => {
+  const [tempValue, setTempValue] = useState(value === 'No phone number set' ? '' : value)
   const [error, setError] = useState('')
   const translateY = useSharedValue(0)
+
+  const theme = useThemeStyle()
+  const styles = useMemo(() => createStyles(theme), [theme])
 
   useEffect(() => {
     setTempValue(value)
@@ -91,8 +97,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ theme, visible, clo
             </Text>
 
             {/* Input */}
-            <TextInput
-              style={styles.input}
+            <CustomTextField
               placeholder={
                 field.includes('name')
                   ? 'Enter your name'
@@ -102,21 +107,19 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ theme, visible, clo
               }
               keyboardType={field.includes('phone') ? 'phone-pad' : 'default'}
               value={tempValue}
-              onChangeText={(text: string) => {
+              onChange={(text: string) => {
                 setTempValue(text)
                 validateInput(text)
               }}
             />
+
             {error ? <Text style={styles.error}>{error}</Text> : null}
 
-            {/* Nút Lưu */}
-            <TouchableOpacity
-              style={[styles.saveButton, { backgroundColor: error ? 'gray' : theme.primary }]}
+            <Pressable
+              title="Save"
+              style={{ backgroundColor: theme.primary, color: theme.white, marginTop: 20 }}
               onPress={() => onSave(tempValue, field)}
-              disabled={!!error}
-            >
-              <Text style={styles.saveText}>Save</Text>
-            </TouchableOpacity>
+            />
           </Animated.View>
         </GestureDetector>
       </KeyboardAvoidingView>
@@ -124,60 +127,51 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ theme, visible, clo
   )
 }
 
-const styles = StyleSheet.create({
-  modalContainer: {
-    justifyContent: 'flex-end',
-    margin: 0,
-  },
-  keyboardAvoiding: {
-    flex: 1,
-    justifyContent: 'flex-end',
-  },
-  modalContent: {
-    backgroundColor: '#FFF',
-    padding: 20,
-    borderTopLeftRadius: 40,
-    borderTopRightRadius: 40,
-    alignItems: 'center',
-    height: '80%',
-  },
-  dragHandle: {
-    width: 40,
-    height: 5,
-    backgroundColor: '#ccc',
-    borderRadius: 10,
-    marginBottom: 10,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 15,
-    textAlign: 'center',
-  },
-  input: {
-    width: '100%',
-    borderWidth: 1,
-    borderColor: '#3F6453',
-    borderRadius: 10,
-    padding: 10,
-    marginBottom: 10,
-  },
-  error: {
-    color: 'red',
-    marginBottom: 10,
-  },
-  saveButton: {
-    width: '100%',
-    padding: 15,
-    borderRadius: 30,
-    alignItems: 'center',
-  },
-  saveText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-})
+const createStyles = (theme: typeof colorPalettes.light) =>
+  StyleSheet.create({
+    modalContainer: {
+      justifyContent: 'flex-end',
+      margin: 0,
+    },
+    keyboardAvoiding: {
+      flex: 1,
+      justifyContent: 'flex-end',
+    },
+    modalContent: {
+      backgroundColor: theme.white,
+      padding: 20,
+      borderTopLeftRadius: 40,
+      borderTopRightRadius: 40,
+      alignItems: 'center',
+      height: '80%',
+      fontFamily: FontFamily.REGULAR,
+    },
+    dragHandle: {
+      width: 40,
+      height: 5,
+      backgroundColor: '#ccc',
+      borderRadius: 10,
+      marginBottom: 10,
+    },
+    title: {
+      fontSize: FontSize.XXL,
+      marginBottom: 20,
+      fontFamily: FontFamily.BOLD,
+      textAlign: 'center',
+    },
+    error: {
+      color: theme.error,
+      marginTop: 20,
+      fontSize: FontSize.SM,
+      fontFamily: FontFamily.REGULAR,
+    },
+    saveButton: {
+      width: '100%',
+      padding: 15,
+      borderRadius: Radius.FULL,
+      alignItems: 'center',
+    },
+  })
 
 export default EditProfileModal
 
