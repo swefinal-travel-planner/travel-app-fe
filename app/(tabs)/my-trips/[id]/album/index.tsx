@@ -10,7 +10,9 @@ import { uploadImage2Cloud } from '@/utils/uploadImage2Cloud'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useRouter } from 'expo-router'
 import React, { useMemo, useState } from 'react'
-import { Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Image } from 'expo-image'
+import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { getPlaceHolder } from '@/components/AdaptiveImage'
 
 export default function AlbumScreen() {
   const tripId = useTripId()
@@ -45,7 +47,7 @@ export default function AlbumScreen() {
                   <Image source={{ uri: item.imageUrl }} style={styles.image} />
                 ) : (
                   <View style={styles.imagePlaceholder}>
-                    <Image source={require('@/assets/images/alligator.jpg')} style={styles.placeholderImage} />
+                    <Image source={getPlaceHolder(50, 50)} style={styles.placeholderImage} />
                   </View>
                 )}
               </TouchableOpacity>

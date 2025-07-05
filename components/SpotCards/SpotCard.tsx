@@ -6,6 +6,7 @@ import Ionicons from '@expo/vector-icons/Ionicons'
 import { useMemo, useState } from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import PressableOpacity from '../PressableOpacity'
+import { getPlaceHolder } from '../AdaptiveImage'
 
 interface SpotCardProps {
   name: string
@@ -22,7 +23,7 @@ const SpotCard: React.FC<SpotCardProps> = ({ name, image, address, isSaved }) =>
   return (
     <View style={styles.wrapper}>
       <View style={styles.imageContainer}>
-        <Image source={{ uri: image }} defaultSource={require('@/assets/images/alligator.jpg')} style={styles.image} />
+        <Image source={{ uri: image }} defaultSource={{ uri: getPlaceHolder(50, 50) }} style={styles.image} />
 
         {/* <PressableOpacity
           style={styles.overlay}
