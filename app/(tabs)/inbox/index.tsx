@@ -12,7 +12,7 @@ import { colorPalettes } from '@/constants/Itheme'
 import Chip from '@/components/Chip'
 import { FontFamily, FontSize } from '@/constants/font'
 import beApi from '@/lib/beApi'
-import { generateMessage } from '@/utils/genNotiMessage'
+import { generateMessage, getAction } from '@/utils/genNotiMessage'
 import NotificationList from './components/NotificationList'
 
 export default function Inbox() {
@@ -34,9 +34,12 @@ export default function Inbox() {
       const response = await beApi.get('/notifications')
       const rawNotifications: Notification[] = response.data.data
 
+      console.log('Raw notifications:', rawNotifications)
+
       const enrichedNotifications: Notification[] = rawNotifications.map((notif) => ({
         ...notif,
-        referenceData: generateMessage(notif), // gán message trực tiếp vào referenceData
+        referenceData: generateMessage(notif),
+        action: getAction(notif),
       }))
 
       console.log('Enriched notifications:', enrichedNotifications)

@@ -31,13 +31,13 @@ function NotificationList({ notificationList, removeNotification, markAsRead }: 
     >
       {notificationList?.map((notif) => (
         <Drawer
-          key={`${notif.referenceEntity.id}-${notif.isSeen ? 'unread' : 'read'}`}
+          key={`${notif.referenceEntity.id}-${!notif.isSeen ? 'unread' : 'read'}`}
           leftItem={
-            notif.type === 'actionable'
+            notif.action === 'actionable'
               ? {
-                  text: notif.isSeen ? 'Accept' : 'Accepted',
-                  background: notif.isSeen ? Colors.green30 : Colors.grey50,
-                  onPress: notif.isSeen ? () => markAsRead(notif.referenceEntity.id) : () => {},
+                  text: !notif.isSeen ? 'Accept' : 'Accepted',
+                  background: !notif.isSeen ? Colors.green30 : Colors.grey50,
+                  onPress: !notif.isSeen ? () => markAsRead(notif.referenceEntity.id) : () => {},
                 }
               : undefined
           }
@@ -50,24 +50,31 @@ function NotificationList({ notificationList, removeNotification, markAsRead }: 
           ]}
           style={{
             borderRadius: Radius.ROUNDED,
-            backgroundColor: notif.isSeen ? theme.secondary : Colors.grey80,
+            backgroundColor: !notif.isSeen ? theme.secondary : Colors.grey80,
             marginBottom: 10,
           }}
           disableHaptic
           fullSwipeRight
           onFullSwipeRight={() => removeNotification(notif.referenceEntity.id)}
-          fullSwipeLeft={notif.isSeen}
+          fullSwipeLeft={!notif.isSeen}
           onFullSwipeLeft={() => markAsRead(notif.referenceEntity.id)}
         >
-          <Pressable onPress={notif.type === 'navigable' ? () => markAsRead(notif.referenceEntity.id) : undefined}>
-            <View style={notif.isSeen ? styles.unreadNotifContainer : styles.notifContainer}>
-              <Avatar source={notif.triggerEntity.avatar} size={40} />
+          <Pressable onPress={notif.action === 'navigable' ? () => markAsRead(notif.referenceEntity.id) : undefined}>
+            <View style={!notif.isSeen ? styles.unreadNotifContainer : styles.notifContainer}>
+              <Avatar
+                source={
+                  notif.triggerEntity.type === 'user'
+                    ? notif.triggerEntity.avatar
+                    : require('@/assets/icons/ios-light.png')
+                }
+                size={40}
+              />
 
               <View style={styles.view3}>
-                {notif.isSeen ? (
+                {!notif.isSeen ? (
                   <View>
                     <View style={styles.view4}>
-                      <Text style={styles.notifTitle}>{notif.triggerEntity.name}</Text>
+                      <Text style={styles.notifTitle}>{notif.type.charAt(0).toUpperCase() + notif.type.slice(1)}</Text>
                       <Text style={styles.subText}>{formatDateTime(notif.createdAt)}</Text>
                     </View>
                     <Text style={styles.text}>{notif.referenceData}</Text>
@@ -75,7 +82,9 @@ function NotificationList({ notificationList, removeNotification, markAsRead }: 
                 ) : (
                   <View>
                     <View style={styles.view4}>
-                      <Text style={styles.notifTitleDim}>{notif.triggerEntity.name}</Text>
+                      <Text style={styles.notifTitleDim}>
+                        {notif.type.charAt(0).toUpperCase() + notif.type.slice(1)}
+                      </Text>
                       <Text style={styles.subTextDim}>{formatDateTime(notif.createdAt)}</Text>
                     </View>
                     <Text style={styles.textDim}>{notif.referenceData}</Text>

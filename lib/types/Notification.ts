@@ -26,5 +26,6 @@ export interface Notification {
   referenceData: string
   referenceEntity: referenceEntity
   triggerEntity: triggerEntity
-  type: NotificationType
+  type: NotificationCategory
+  action: string
 }
