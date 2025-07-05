@@ -92,7 +92,7 @@ function NotificationList({ notificationList, removeNotification, markAsRead }: 
               <Avatar
                 source={
                   notif.triggerEntity.type === 'user'
-                    ? notif.triggerEntity.avatar
+                    ? { uri: notif.triggerEntity.avatar }
                     : require('@/assets/icons/ios-light.png')
                 }
                 size={40}
