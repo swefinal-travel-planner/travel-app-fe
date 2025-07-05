@@ -28,10 +28,8 @@ function NotificationList({ notificationList, removeNotification, markAsRead }: 
   const handleNavigate = (notif: Notification) => {
     if (!notif.isSeen) markAsRead(notif.id)
 
-    switch (notif.referenceEntity.type) {
+    switch (notif.type) {
       case 'tripGenerated':
-        router.push('/my-trips')
-        break
       case 'tripGeneratedFailed':
         router.push('/my-trips')
         break
