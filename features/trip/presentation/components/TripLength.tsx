@@ -31,22 +31,15 @@ const formatDate = (date: Date) => {
   return `${year}-${month}-${day}`
 }
 
-export default function TripLength({
-  theme,
-  nextFn,
-}: Readonly<TripLengthProps>) {
+export default function TripLength({ theme, nextFn }: Readonly<TripLengthProps>) {
   const setManualTrip = useManualTripStore((state) => state.setManualTrip)
 
   const setTripLength = useAiTripStore((state) => state.setTripLength)
   const setTitle = useAiTripStore((state) => state.setTitle)
   const request = useAiTripStore((state) => state.request)
 
-  const [startDate, setStartDate] = useState<string | null>(
-    request?.startDate ?? null
-  )
-  const [endDate, setEndDate] = useState<string | null>(
-    addDays(request?.startDate, (request?.days ?? 0) - 1) ?? null
-  )
+  const [startDate, setStartDate] = useState<string | null>(request?.startDate ?? null)
+  const [endDate, setEndDate] = useState<string | null>(addDays(request?.startDate, (request?.days ?? 0) - 1) ?? null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const getDayDiff = (start: string, end: string) => {
@@ -83,31 +76,16 @@ export default function TripLength({
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.textQuestion, { color: theme.primary }]}>
-        When will your trip start and end?
-      </Text>
+      <Text style={[styles.textQuestion, { color: theme.primary }]}>When will your trip start and end?</Text>
 
       <View style={styles.textFieldContainer}>
-        <DateRangeField
-          startDate={startDate}
-          endDate={endDate}
-          setStartDate={setStartDate}
-          setEndDate={setEndDate}
-        />
+        <DateRangeField startDate={startDate} endDate={endDate} setStartDate={setStartDate} setEndDate={setEndDate} />
 
-        <Text
-          style={[styles.textField, { color: theme.primary, marginTop: 40 }]}
-        >
-          {startDate && endDate
-            ? `Number of days: ${getDayDiff(startDate, endDate)}`
-            : ''}
+        <Text style={[styles.textField, { color: theme.primary, marginTop: 40 }]}>
+          {startDate && endDate ? `Number of days: ${getDayDiff(startDate, endDate)}` : ''}
         </Text>
 
-        {errorMessage && (
-          <Text style={[styles.errorText, { color: theme.error ?? 'red' }]}>
-            {errorMessage}
-          </Text>
-        )}
+        {errorMessage && <Text style={[styles.errorText, { color: theme.error ?? 'red' }]}>{errorMessage}</Text>}
       </View>
 
       <Pressable

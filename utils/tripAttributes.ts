@@ -20,3 +20,18 @@ export const formatAttribute = (attr: string) => {
 
   return formatted
 }
+
+export const formatTripStatus = (status: 'not_started' | 'in_progress' | 'completed' | 'cancelled'): string => {
+  switch (status) {
+    case 'not_started':
+      return 'Not Started'
+    case 'in_progress':
+      return 'In Progress'
+    case 'completed':
+      return 'Completed'
+    case 'cancelled':
+      return 'Cancelled'
+    default:
+      return status
+  }
+}

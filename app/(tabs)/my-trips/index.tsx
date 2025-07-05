@@ -12,12 +12,13 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { FlatList, RefreshControl, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 
 export default function MyTrips() {
-  const [trips, setTrips] = useState<Trip[]>([])
-  const [search, setSearch] = useState('')
   const [refreshing, setRefreshing] = useState(false)
   const router = useRouter()
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
+
+  const [trips, setTrips] = useState<Trip[]>([])
+  const [search, setSearch] = useState('')
   const [filteredTrips, setFilteredTrips] = useState<Trip[]>(trips)
 
   const getAllTrips = async () => {
@@ -62,7 +63,7 @@ export default function MyTrips() {
           <Ionicons name="search" size={20} color={theme.text} style={styles.searchIcon} />
           <TextInput
             style={[styles.searchInput, { color: theme.text }]}
-            placeholder="Search for your trips..."
+            placeholder="Search for your trips"
             placeholderTextColor={theme.dimText}
             value={search}
             onChangeText={setSearch}
@@ -76,9 +77,6 @@ export default function MyTrips() {
           )}
         </View>
       </View>
-
-      {/* Divider */}
-      <View style={styles.divider} />
 
       {/* Danh sách chuyến đi */}
       {filteredTrips.length <= 0 ? (
@@ -94,7 +92,7 @@ export default function MyTrips() {
               tripName={item.title}
               tripImage={item.image?.[0] || ''}
               days={item.days}
-              num_members={item.numMembers}
+              num_members={item.memberCount}
               budget={item.budget}
               isPinned={item.pinned}
               status={item.status}

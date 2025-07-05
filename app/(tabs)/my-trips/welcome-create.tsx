@@ -11,9 +11,9 @@ import { Alert, StyleSheet, Text, View } from 'react-native'
 export default function WelcomeCreateScreen() {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
-
   const router = useRouter()
   const navigation = useNavigation()
+
   const resetManualTrip = useManualTripStore((state) => state.resetManualTrip)
 
   useFocusEffect(
@@ -48,7 +48,14 @@ export default function WelcomeCreateScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.textQuestion, { color: theme.primary }]}>Let our AI help you plan your next trip!</Text>
+      <Text style={[styles.textQuestion, { color: theme.primary }]}>
+        Let our{'  '}
+        <Text style={{ color: theme.error, fontSize: FontSize.HUGE, fontFamily: FontFamily.BOLD_ITALIC }}>
+          Travle AI
+        </Text>
+        {'  '}
+        help you plan your next trip!
+      </Text>
 
       <View style={styles.textFieldContainer}></View>
 

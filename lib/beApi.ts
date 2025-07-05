@@ -40,11 +40,6 @@ beApi.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config
 
-    console.log('Original Request:', originalRequest?.url)
-    console.log('Error Status:', error.response?.status)
-    console.log('Error Message:', error.message)
-    console.log('Full Error Object:', JSON.stringify(error, null, 2))
-
     // If the error has a response and it's a 204, treat it as success
     if (error.response && error.response.status === 204) {
       console.log('Received 204 No Content - treating as success')
@@ -54,9 +49,7 @@ beApi.interceptors.response.use(
     // Handle 401 Unauthorized and try to refresh token
     // Check both error.response.status and error.status for 401
     const is401Error =
-      (error.response && error.response.status === 401) ||
-      error.status === 401 ||
-      (error.message && error.message.includes('401'))
+      (error.response && error.response.status === 401) || error.status === 401 || error.message?.includes('401')
 
     if (is401Error && !originalRequest._retry) {
       console.log('Received 401 Unauthorized - attempting to refresh token')
@@ -92,9 +85,6 @@ beApi.interceptors.response.use(
         const refreshResponse = await refreshApi.post('/auth/refresh', {
           refreshToken: refreshToken,
         })
-
-        console.log('Refresh response received:', refreshResponse.status)
-        console.log('Refresh response data:', refreshResponse.data)
 
         const newAccessToken = refreshResponse.data.data
         if (!newAccessToken) {

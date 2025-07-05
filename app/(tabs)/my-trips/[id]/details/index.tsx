@@ -6,9 +6,9 @@ import { Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import beApi from '@/lib/beApi'
 import { Trip, TripItem } from '@/lib/types/Trip'
+import { formatTripStatus } from '@/utils/tripAttributes'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import * as SecureStore from 'expo-secure-store'
 import React, { useEffect, useMemo, useState } from 'react'
 import { Image, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
@@ -78,7 +78,6 @@ const TripDetailViewScreen = () => {
       const tripItemData = await beApi.get(`/trips/${id}/trip-items`)
 
       const items: TripItem[] = tripItemData.data.data
-      console.log(tripItemData.data.data)
       setTripItems(items)
 
       // Nhóm items theo ngày
@@ -170,11 +169,11 @@ const TripDetailViewScreen = () => {
             </View>
             <View style={styles.tripInfoItem}>
               <Text style={styles.tripInfoLabel}>Members</Text>
-              <Text style={styles.tripInfoValue}>{trip.numMembers}</Text>
+              <Text style={styles.tripInfoValue}>{trip.memberCount}</Text>
             </View>
             <View style={styles.tripInfoItem}>
               <Text style={styles.tripInfoLabel}>Status</Text>
-              <Text style={styles.tripInfoValue}></Text>
+              <Text style={styles.tripInfoValue}>{formatTripStatus(trip.status)}</Text>
             </View>
           </View>
         </View>
