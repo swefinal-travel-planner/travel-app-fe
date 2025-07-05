@@ -18,9 +18,7 @@ export default function SpotType({ theme, nextFn }: Readonly<SpotTypeProps>) {
   const setLocAttributes = useAiTripStore((state) => state.setLocAttributes)
   const request = useAiTripStore((state) => state.request)
 
-  const [spotTypes, setSpotTypes] = useState<string[]>(
-    request?.enLocationAttributes ?? []
-  )
+  const [spotTypes, setSpotTypes] = useState<string[]>(request?.enLocationAttributes ?? [])
 
   useEffect(() => {
     setLocAttributes(
@@ -31,24 +29,16 @@ export default function SpotType({ theme, nextFn }: Readonly<SpotTypeProps>) {
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.textQuestion, { color: theme.primary }]}>
-        What type of spots do you want to visit?
-      </Text>
+      <Text style={[styles.textQuestion, { color: theme.primary }]}>What type of spots do you want to visit?</Text>
 
       <Text style={[styles.subTextQuestion, { color: theme.text }]}>
         Scroll to see all categories, and tap to expand each category.
       </Text>
 
-      <Text style={[styles.subTextQuestion, { color: theme.text }]}>
-        Select at least one category to continue.
-      </Text>
+      <Text style={[styles.subTextQuestion, { color: theme.text }]}>Select at least one category to continue.</Text>
 
       <View style={styles.textFieldContainer}>
-        <CollapsibleSectionList
-          data={spotTypeData}
-          selectedValues={spotTypes}
-          onValueChange={setSpotTypes}
-        />
+        <CollapsibleSectionList data={spotTypeData} selectedValues={spotTypes} onValueChange={setSpotTypes} />
       </View>
 
       {spotTypes.length > 0 && (

@@ -12,18 +12,15 @@ import { StatusBar } from 'expo-status-bar'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Platform } from 'react-native'
 
-// Types
 interface NotificationState {
   notification: Notifications.Notification | undefined
   isReady: boolean
   isHealthy: boolean
 }
 
-// Constants
 const GOOGLE_WEB_CLIENT_ID = '490333496504-qe9p6s4an7ub4ros021q2p6kda9hakhm.apps.googleusercontent.com'
 const MAPBOX_TOKEN = process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN ?? ''
 
-// Configuration
 const configureNotifications = () => {
   Notifications.setNotificationHandler({
     handleNotification: async () => ({

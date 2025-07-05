@@ -16,17 +16,19 @@ type ImageActionSheetProps = {
   visible: boolean
   onDismiss: () => void
   onImagePicked: (uri: string) => void
+  aspect?: [number, number]
+  allowsEditing?: boolean
 }
 
-const ImageActionSheet = ({ visible, onDismiss, onImagePicked }: ImageActionSheetProps) => {
+const ImageActionSheet = ({ visible, onDismiss, onImagePicked, aspect, allowsEditing }: ImageActionSheetProps) => {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
-      allowsEditing: true,
-      aspect: [1, 1],
+      allowsEditing,
+      aspect: allowsEditing ? aspect : undefined,
       quality: 1,
     })
     if (!result.canceled && result.assets.length > 0) {
@@ -37,8 +39,8 @@ const ImageActionSheet = ({ visible, onDismiss, onImagePicked }: ImageActionShee
 
   const takePhoto = async () => {
     let result = await ImagePicker.launchCameraAsync({
-      allowsEditing: true,
-      aspect: [1, 1],
+      allowsEditing,
+      aspect: allowsEditing ? aspect : undefined,
       quality: 1,
     })
     if (!result.canceled && result.assets.length > 0) {

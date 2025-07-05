@@ -6,6 +6,8 @@ export const FontSize = {
   XL: 18,
   XXL: 20,
   XXXL: 24,
+  HUGE: 28,
+  GIGANTIC: 32,
 }
 
 export const FontFamily = {

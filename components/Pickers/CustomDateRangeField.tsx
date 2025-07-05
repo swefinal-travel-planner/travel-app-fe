@@ -8,54 +8,57 @@ import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Calendar, DateData } from 'react-native-calendars'
 import Pressable from '../Pressable'
 
-type DateRangeFieldProps = {
+type CustomDateRangeFieldProps = {
   startDate: string | null
   endDate: string | null
   setStartDate: (date: string | null) => void
   setEndDate: (date: string | null) => void
+  markingType?: 'dot' | 'custom' | 'period'
 }
 
-const DateRangeField = ({ startDate, endDate, setStartDate, setEndDate }: DateRangeFieldProps) => {
+const CustomDateRangeField = ({
+  startDate,
+  endDate,
+  setStartDate,
+  setEndDate,
+  markingType = 'dot',
+}: CustomDateRangeFieldProps) => {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
 
   const [modalVisible, setModalVisible] = useState(false)
-
-  // Temp state for selection before confirmation
   const [tempStart, setTempStart] = useState<string | null>(null)
   const [tempEnd, setTempEnd] = useState<string | null>(null)
 
   const onDayPress = (date: DateData) => {
     const selectedDate = date
 
-    // If no start date is selected or if both start and end dates are selected
-    // reset the selection
     if (!tempStart || tempEnd) {
       setTempStart(selectedDate.dateString)
       setTempEnd(null)
       return
     }
 
-    // Start date is already selected
-    // If the selected date is after the start date, set it as the end date
     if (new Date(selectedDate.dateString) > new Date(tempStart)) {
       setTempEnd(selectedDate.dateString)
       return
     }
 
-    // If the selected date is before the start date, set it as the new start date
     setTempStart(selectedDate.dateString)
     setTempEnd(null)
   }
 
-  const getMarkedDates = () => {
+  // Dot marking for period selection
+  const getDotMarkedDates = () => {
     let marked: any = {}
 
     if (tempStart) {
       marked[tempStart] = {
-        startingDay: true,
-        color: theme.primary,
-        textColor: 'white',
+        marked: true,
+        dotColor: theme.primary,
+        selected: true,
+        selectedColor: theme.primary,
+        selectedTextColor: 'white',
       }
     }
 
@@ -67,13 +70,18 @@ const DateRangeField = ({ startDate, endDate, setStartDate, setEndDate }: DateRa
         const dateStr = current.toISOString().split('T')[0]
         if (dateStr === tempStart || dateStr === tempEnd) {
           marked[dateStr] = {
-            ...(dateStr === tempStart ? { startingDay: true } : {}),
-            ...(dateStr === tempEnd ? { endingDay: true } : {}),
-            color: theme.primary,
-            textColor: 'white',
+            marked: true,
+            dotColor: theme.primary,
+            selected: true,
+            selectedColor: theme.primary,
+            selectedTextColor: 'white',
           }
         } else {
-          marked[dateStr] = { color: theme.secondary, textColor: 'black' }
+          marked[dateStr] = {
+            marked: true,
+            dotColor: theme.primary,
+            textColor: 'black',
+          }
         }
         current.setDate(current.getDate() + 1)
       }
@@ -82,9 +90,86 @@ const DateRangeField = ({ startDate, endDate, setStartDate, setEndDate }: DateRa
     return marked
   }
 
+  // Custom marking with period styling and dots
+  const getCustomMarkedDates = () => {
+    let marked: any = {}
+
+    if (tempStart && tempEnd) {
+      let current = new Date(tempStart)
+      const end = new Date(tempEnd)
+
+      while (current <= end) {
+        const dateStr = current.toISOString().split('T')[0]
+        const isStart = dateStr === tempStart
+        const isEnd = dateStr === tempEnd
+
+        marked[dateStr] = {
+          marked: true,
+          customStyles: {
+            container: {
+              backgroundColor: isStart || isEnd ? theme.primary : theme.secondary,
+              borderRadius: isStart ? 20 : isEnd ? 20 : 0,
+            },
+            text: {
+              color: isStart || isEnd ? 'white' : 'black',
+              fontWeight: isStart || isEnd ? 'bold' : 'normal',
+            },
+          },
+        }
+        current.setDate(current.getDate() + 1)
+      }
+    }
+
+    return marked
+  }
+
+  // Period marking with dots
+  const getPeriodMarkedDates = () => {
+    let marked: any = {}
+
+    if (tempStart && tempEnd) {
+      let current = new Date(tempStart)
+      const end = new Date(tempEnd)
+
+      while (current <= end) {
+        const dateStr = current.toISOString().split('T')[0]
+        const isStart = dateStr === tempStart
+        const isEnd = dateStr === tempEnd
+
+        marked[dateStr] = {
+          periods: [
+            {
+              color: theme.primary,
+              startingDay: isStart,
+              endingDay: isEnd,
+            },
+          ],
+          marked: true,
+          dotColor: '#ffffff',
+        }
+        current.setDate(current.getDate() + 1)
+      }
+    }
+
+    return marked
+  }
+
+  const getMarkedDates = () => {
+    switch (markingType) {
+      case 'dot':
+        return getDotMarkedDates()
+      case 'custom':
+        return getCustomMarkedDates()
+      case 'period':
+        return getPeriodMarkedDates()
+      default:
+        return getDotMarkedDates()
+    }
+  }
+
   const handleConfirm = () => {
     setStartDate(tempStart)
-    setEndDate(tempEnd ?? tempStart)
+    setEndDate(tempEnd)
     setModalVisible(false)
   }
 
@@ -106,14 +191,14 @@ const DateRangeField = ({ startDate, endDate, setStartDate, setEndDate }: DateRa
       <Modal visible={modalVisible} transparent animationType="slide">
         <View style={styles.modalBackdrop}>
           <View style={styles.modalContent}>
-            <Calendar markingType={'period'} markedDates={getMarkedDates()} onDayPress={onDayPress} />
+            <Calendar markingType={markingType} markedDates={getMarkedDates()} onDayPress={onDayPress} />
 
             <View style={styles.buttons}>
               <Pressable
                 onPress={handleConfirm}
                 title="Confirm"
                 style={{ color: theme.white, backgroundColor: theme.primary }}
-                disabled={!tempStart}
+                disabled={!tempStart || !tempEnd}
               />
 
               <Pressable
@@ -173,4 +258,4 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     },
   })
 
-export default DateRangeField
+export default CustomDateRangeField

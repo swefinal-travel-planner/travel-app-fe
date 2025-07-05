@@ -30,7 +30,8 @@ export class TripRepositoryImpl implements TripRepository {
 
   async postTripImage(tripId: number, image: string): Promise<void> {
     const response = await beApi.post(`/trips/${tripId}/images`, { imageUrl: image })
-    if (!response.data.success) {
+
+    if (response.status !== 204) {
       throw new Error('Failed to post trip image')
     }
   }
