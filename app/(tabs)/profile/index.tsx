@@ -9,6 +9,7 @@ import beApi from '@/lib/beApi'
 import { Friend } from '@/lib/types/Profile'
 import { useThemeStore } from '@/store/themeStore'
 import { clearLoginInfo } from '@/utils/clearLoginInfo'
+import { uploadImage2Cloud } from '@/utils/uploadImage2Cloud'
 import { useQuery } from '@tanstack/react-query'
 import { useRouter } from 'expo-router'
 import * as SecureStore from 'expo-secure-store'
@@ -17,15 +18,13 @@ import { ScrollView, StyleSheet } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { PaperProvider } from 'react-native-paper'
 import EditProfileModal from './components/EditProfileModal'
-import FriendListModal from './components/FriendListModal'
-import { uploadImage2Cloud } from '@/utils/uploadImage2Cloud'
-import { set } from 'react-hook-form'
 
 export type SettingSection = {
   title: string
   icon:
     | 'camera-outline'
     | 'pencil'
+    | 'pencil-outline'
     | 'call-outline'
     | 'mail-outline'
     | 'trash-outline'
@@ -34,8 +33,6 @@ export type SettingSection = {
   onPress?: () => void
 }
 
-const url = process.env.EXPO_PUBLIC_API_URL
-
 const ProfileScreen = () => {
   const router = useRouter()
   const generalSection: SettingSection[] = [
@@ -43,7 +40,7 @@ const ProfileScreen = () => {
       title: 'Edit profile picture',
       icon: 'camera-outline',
     },
-    { title: 'Edit name', icon: 'pencil' },
+    { title: 'Edit name', icon: 'pencil-outline' },
     { title: 'Edit phone number', icon: 'call-outline' },
     { title: 'Edit email', icon: 'mail-outline' },
   ]
@@ -59,6 +56,7 @@ const ProfileScreen = () => {
       },
     },
   ]
+
   const theme = useThemeStyle()
   const { setTheme } = useThemeStore()
   //const { setLanguage } = useThemeStore()
@@ -67,11 +65,9 @@ const ProfileScreen = () => {
   const [friendListModalVisible, setFriendListModalVisible] = useState<boolean>(false)
   const [name, setName] = useState<string>('')
   const [email, setEmail] = useState<string>('')
-  const [phone, setPhone] = useState<string>('<phone_number>')
+  const [phone, setPhone] = useState<string>('No phone number set')
   const [selectedField, setSelectedField] = useState<string>('Edit name')
-  const [profilePic, setProfilePic] = useState(
-    'https://res.cloudinary.com/dt8neu8lq/image/upload/v1751294848/vryqz6ly8amli7stwjik.png'
-  )
+  const [profilePic, setProfilePic] = useState('')
   const [isDarkTheme, setIsDarkTheme] = useState(false)
 
   useEffect(() => {
@@ -79,12 +75,14 @@ const ProfileScreen = () => {
       const name = await SecureStore.getItemAsync('name')
       const email = await SecureStore.getItemAsync('email')
       const phone = await SecureStore.getItemAsync('phoneNumber')
-      if (name && email && phone) {
-        setName(name)
-        setEmail(email)
-        setPhone(phone)
-      }
+
+      console.log('User info:', { name, email, phone })
+
+      setName(name || '')
+      setEmail(email || '')
+      setPhone(phone || 'No phone number set')
     }
+
     getUserInfo()
   }, [])
 
@@ -167,22 +165,13 @@ const ProfileScreen = () => {
           <ProfileAvatar theme={theme} profilePic={profilePic} name={name} email={email} phone={phone} />
 
           {/* Statistics */}
-          <ProfileStats theme={theme} onGoToTrips={() => router.push('/my-trips')} />
+          <ProfileStats onGoToTrips={() => router.push('/my-trips')} />
 
           {/* Friendlist */}
-          <ProfileFriendSection
-            theme={theme}
-            isError={isError}
-            isLoading={isLoading}
-            friendList={friendList}
-            friendListModalVisible={friendListModalVisible}
-            setFriendListModalVisible={setFriendListModalVisible}
-            closeFriendListModal={closeFriendListModal}
-          />
+          <ProfileFriendSection isError={isError} isLoading={isLoading} friendList={friendList} />
 
           {/* Personal Information */}
           <ProfileSettingsSection
-            theme={theme}
             generalSection={generalSection}
             openModal={openModal}
             setShowActionSheet={setShowActionSheet}
@@ -190,7 +179,6 @@ const ProfileScreen = () => {
 
           {/* Danger Zone */}
           <ProfileDangerSection
-            theme={theme}
             dangerSection={dangerSection}
             isDarkTheme={isDarkTheme}
             setIsDarkTheme={setIsDarkTheme}
@@ -200,21 +188,11 @@ const ProfileScreen = () => {
 
         {/* Popup modal */}
         <EditProfileModal
-          theme={theme}
           value={selectedField === 'Edit name' ? name : selectedField === 'Edit phone number' ? phone : email}
           visible={modalVisible}
           field={selectedField}
           onSave={handleSave}
           closeModal={() => setModalVisible(false)}
-        />
-
-        {/* Friend list modal */}
-        <FriendListModal
-          theme={theme}
-          visible={friendListModalVisible}
-          closeModal={closeFriendListModal}
-          friendList={friendList}
-          //onUpdateFriendList={setFriendList}
         />
 
         {/* Choose profile picture */}

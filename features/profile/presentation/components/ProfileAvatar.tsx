@@ -1,7 +1,9 @@
+import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
-import React from 'react'
-import { Dimensions, StyleSheet, View } from 'react-native'
-import { Image, Text } from 'react-native-ui-lib'
+import { Radius } from '@/constants/theme'
+import React, { useEffect } from 'react'
+import { Dimensions, StyleSheet, Text, View } from 'react-native'
+import { Image } from 'react-native-ui-lib'
 
 type ProfileAvatarProps = {
   theme: typeof colorPalettes.light
@@ -11,35 +13,39 @@ type ProfileAvatarProps = {
   phone: string
 }
 
-const ProfileAvatar = ({ theme, profilePic, name, email, phone }: ProfileAvatarProps) => (
-  <View style={styles.avatarContainer}>
-    <Image source={{ uri: profilePic }} style={[styles.profileImage, { borderColor: theme.primary }]} />
-    <View style={[styles.userInfoContainer, { backgroundColor: theme.primary }]}>
-      <Text text50 marginT-10 color="white">
-        {name}
-      </Text>
-      <Text text70 color="white">
-        {email}
-      </Text>
-      <Text text70 color="white">
-        {phone}
-      </Text>
+const ProfileAvatar = ({ theme, profilePic, name, email, phone }: ProfileAvatarProps) => {
+  useEffect(() => {
+    // Log the profile picture URL to console for debugging
+    console.log(name, email, phone, profilePic)
+  }, [])
+
+  return (
+    <View style={styles.avatarContainer}>
+      <Image source={{ uri: profilePic }} style={[styles.profileImage, { borderColor: theme.primary }]} />
+      <View style={[styles.userInfoContainer, { backgroundColor: theme.primary }]}>
+        <Text style={{ fontFamily: FontFamily.BOLD, fontSize: FontSize.XXXL, color: 'white', marginBottom: 8 }}>
+          {name}
+        </Text>
+        <Text style={{ fontFamily: FontFamily.REGULAR, color: 'white', marginBottom: 4 }}>{email}</Text>
+        <Text style={{ fontFamily: FontFamily.REGULAR, color: 'white' }}>{phone}</Text>
+      </View>
     </View>
-  </View>
-)
+  )
+}
 
 const styles = StyleSheet.create({
   avatarContainer: {
     alignItems: 'center',
     justifyContent: 'center',
+    paddingTop: 40,
     marginBottom: 60,
     position: 'relative',
   },
   profileImage: {
-    width: Dimensions.get('window').width - 50,
-    height: Dimensions.get('window').width - 50,
-    borderRadius: 20,
-    borderWidth: 4,
+    width: Dimensions.get('window').width - 120,
+    height: Dimensions.get('window').width - 120,
+    borderRadius: Radius.FULL,
+    backgroundColor: '#efefef',
     resizeMode: 'cover',
   },
   userInfoContainer: {
@@ -52,7 +58,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     marginHorizontal: 20,
-    borderRadius: 10,
+    borderRadius: Radius.ROUNDED,
   },
 })
 
