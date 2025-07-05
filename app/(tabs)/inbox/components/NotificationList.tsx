@@ -31,13 +31,13 @@ function NotificationList({ notificationList, removeNotification, markAsRead }: 
     >
       {notificationList?.map((notif) => (
         <Drawer
-          key={`${notif.referenceEntity.id}-${!notif.isSeen ? 'unread' : 'read'}`}
+          key={`${notif.id}-${!notif.isSeen ? 'unread' : 'read'}`}
           leftItem={
             notif.action === 'actionable'
               ? {
                   text: !notif.isSeen ? 'Accept' : 'Accepted',
                   background: !notif.isSeen ? Colors.green30 : Colors.grey50,
-                  onPress: !notif.isSeen ? () => markAsRead(notif.referenceEntity.id) : () => {},
+                  onPress: !notif.isSeen ? () => markAsRead(notif.id) : () => {},
                 }
               : undefined
           }
@@ -45,7 +45,7 @@ function NotificationList({ notificationList, removeNotification, markAsRead }: 
             {
               text: 'Delete',
               background: Colors.red30,
-              onPress: () => removeNotification(notif.referenceEntity.id),
+              onPress: () => removeNotification(notif.id),
             },
           ]}
           style={{
@@ -55,11 +55,11 @@ function NotificationList({ notificationList, removeNotification, markAsRead }: 
           }}
           disableHaptic
           fullSwipeRight
-          onFullSwipeRight={() => removeNotification(notif.referenceEntity.id)}
+          onFullSwipeRight={() => removeNotification(notif.id)}
           fullSwipeLeft={!notif.isSeen}
-          onFullSwipeLeft={() => markAsRead(notif.referenceEntity.id)}
+          onFullSwipeLeft={() => markAsRead(notif.id)}
         >
-          <Pressable onPress={notif.action === 'navigable' ? () => markAsRead(notif.referenceEntity.id) : undefined}>
+          <Pressable onPress={notif.action === 'navigable' ? () => markAsRead(notif.id) : undefined}>
             <View style={!notif.isSeen ? styles.unreadNotifContainer : styles.notifContainer}>
               <Avatar
                 source={

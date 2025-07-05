@@ -57,18 +57,19 @@ export default function Inbox() {
   const filteredNotifications =
     activeCategories.length === 0
       ? notifications
-      : notifications?.filter((n) =>
-          activeCategories.includes(n.referenceEntity.type.toLowerCase() as NotificationCategory)
-        )
+      : notifications?.filter((n) => activeCategories.includes(n.type as NotificationCategory))
 
   const removeNotification = (id: number) => {
-    setNotifications(notifications?.filter((notif) => notif.referenceEntity.id !== id))
+    setNotifications(notifications?.filter((notif) => notif.id !== id))
   }
 
-  const markAsRead = (id: number) => {
-    setNotifications(
-      notifications?.map((notif) => (notif.referenceEntity.id === id ? { ...notif, isSeen: true } : notif))
-    )
+  const markAsRead = async (id: number) => {
+    setNotifications(notifications?.map((notif) => (notif.id === id ? { ...notif, isSeen: true } : notif)))
+    try {
+      await beApi.post(`/notifications/${id}/seen`)
+    } catch (error) {
+      console.error('Error updatings notification state:', error)
+    }
   }
 
   // useEffect(() => {
