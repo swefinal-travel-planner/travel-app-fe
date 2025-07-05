@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
 
 import { FontFamily } from '@/constants/font'
@@ -60,11 +60,11 @@ const TripCard: React.FC<TripCardProps> = ({
 
           {status === 'ai_generating' ? (
             <Text style={[styles.location, { fontFamily: FontFamily.BOLD }]} numberOfLines={1}>
-              Generating...
+              Still planning...
             </Text>
           ) : status === 'failed' ? (
             <Text style={[styles.location, { fontFamily: FontFamily.BOLD }]} numberOfLines={1}>
-              Failed to generate
+              Failed to plan
             </Text>
           ) : null}
         </View>
