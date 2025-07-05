@@ -1,20 +1,11 @@
+import { getPlaceHolder } from '@/components/AdaptiveImage'
 import { colorPalettes } from '@/constants/Itheme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import React, { useEffect, useMemo, useState } from 'react'
-import {
-  Alert,
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native'
-import DraggableFlatList, {
-  RenderItemParams,
-  ScaleDecorator,
-} from 'react-native-draggable-flatlist'
+import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import DraggableFlatList, { RenderItemParams, ScaleDecorator } from 'react-native-draggable-flatlist'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 type SpotItem = {
@@ -61,9 +52,7 @@ const TripDetailModifyScreen = () => {
         text: 'Delete',
         style: 'destructive',
         onPress: () => {
-          const updatedItems = tripItems.filter(
-            (item) => item.id !== itemToDelete.id
-          )
+          const updatedItems = tripItems.filter((item) => item.id !== itemToDelete.id)
           setTripItems(updatedItems)
         },
       },
@@ -81,20 +70,14 @@ const TripDetailModifyScreen = () => {
           activeOpacity={1}
           onLongPress={drag}
           disabled={isActive}
-          style={[
-            styles.spotCard,
-            { backgroundColor: isActive ? '#f0f0f0' : '#FFFFFF' },
-          ]}
+          style={[styles.spotCard, { backgroundColor: isActive ? '#f0f0f0' : '#FFFFFF' }]}
         >
           <View style={styles.dragHandle}>
             <Ionicons name="menu-outline" size={24} color="#666" />
           </View>
 
           <View style={styles.spotImageContainer}>
-            <Image
-              source={item.image ?? require('@/assets/images/alligator.jpg')}
-              style={styles.spotImage}
-            />
+            <Image source={item.image ?? getPlaceHolder(50, 50)} style={styles.spotImage} />
           </View>
           <View style={styles.spotDetails}>
             <Text style={styles.spotName}>{item.name}</Text>
@@ -104,10 +87,7 @@ const TripDetailModifyScreen = () => {
             </View>
           </View>
 
-          <TouchableOpacity
-            style={styles.deleteButton}
-            onPress={() => handleDeleteItem(item)}
-          >
+          <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteItem(item)}>
             <Ionicons name="trash-outline" size={24} color="#FF6B6B" />
           </TouchableOpacity>
         </TouchableOpacity>

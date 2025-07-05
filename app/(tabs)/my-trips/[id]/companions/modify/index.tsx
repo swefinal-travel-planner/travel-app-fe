@@ -1,3 +1,4 @@
+import { getPlaceHolder } from '@/components/AdaptiveImage'
 import Pressable from '@/components/Pressable'
 import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
@@ -5,6 +6,7 @@ import { Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { useTripId } from '@/hooks/useTripId'
 import beApi from '@/lib/beApi'
+import { SearchResult } from '@/lib/types/UserSearch'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useRouter } from 'expo-router'
 import * as SecureStore from 'expo-secure-store'
@@ -22,23 +24,11 @@ import {
 } from 'react-native'
 import { Avatar } from 'react-native-ui-lib'
 
-type User = {
-  id: number
-  email: string
-  username: string
-  avatar?: string
-}
-
 type TripCompanion = {
   user_id: string
   email: string
   username: string
   status: 'pending' | 'accepted' | 'declined'
-}
-
-type SearchResult = User & {
-  isInvited: boolean
-  isCompanion: boolean
 }
 
 const TripCompanionInviteScreen = () => {
@@ -169,7 +159,7 @@ const TripCompanionInviteScreen = () => {
   const renderSearchResult = ({ item }: { item: SearchResult }) => (
     <View style={styles.resultCard}>
       <View style={styles.userInfo}>
-        <Avatar size={50} source={item.avatar ? { uri: item.avatar } : require('@/assets/images/pig.jpg')} />
+        <Avatar size={50} source={item.avatar ? { uri: item.avatar } : getPlaceHolder(50, 50)} />
         <View style={styles.userDetails}>
           <Text style={styles.username}>{item.username}</Text>
           <Text style={styles.email}>{item.email}</Text>

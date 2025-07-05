@@ -86,7 +86,9 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <Ionicons name={focused ? 'person' : 'person-outline'} color={color} size={24} />
           ),
-          tabBarButton: (props) => <Pressable {...props} android_ripple={null} />,
+          tabBarButton: (props) => (
+            <Pressable {...props} android_ripple={null} onPress={() => router.push('/profile')} />
+          ),
         }}
       />
     </Tabs>

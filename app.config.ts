@@ -17,6 +17,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     },
     package: 'com.qhuongng.travelapp',
     googleServicesFile: './google-services.json',
+    permissions: ['INTERNET'],
   },
   plugins: [
     'expo-router',
@@ -62,6 +63,18 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       },
     ],
     'expo-asset',
+    [
+      'expo-build-properties',
+      {
+        android: {
+          manifest: {
+            application: {
+              usesCleartextTraffic: true,
+            },
+          },
+        },
+      },
+    ],
   ],
   experiments: {
     typedRoutes: true,

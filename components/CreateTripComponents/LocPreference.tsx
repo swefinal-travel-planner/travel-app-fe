@@ -20,43 +20,31 @@ const descriptions = [
   'The spots will adhere better to your preferences, even if it means traveling further.',
 ]
 
-export default function LocPreference({
-  theme,
-  nextFn,
-}: Readonly<LocPreferenceProps>) {
+export default function LocPreference({ theme, nextFn }: Readonly<LocPreferenceProps>) {
   const setLocPreference = useAiTripStore((state) => state.setLocPreference)
-  const setTripCreated = useAiTripStore((state) => state.setTripCreated)
   const request = useAiTripStore((state) => state.request)
+  const clearRequest = useAiTripStore((state) => state.clearRequest)
 
   // 0: proximity, 1: balanced, 2: distance
   const [preference, setPreference] = useState<number>(
-    request?.locationPreference === 'proximity'
-      ? 0
-      : request?.locationPreference === 'relevance'
-        ? 2
-        : 1
+    request?.locationPreference === 'proximity' ? 0 : request?.locationPreference === 'relevance' ? 2 : 1
   )
 
   const submitTrip = async (payload: AiTripRequest) => {
     try {
-      setLocPreference(
-        preference === 0
-          ? 'proximity'
-          : preference === 1
-            ? 'balanced'
-            : 'relevance'
-      )
+      setLocPreference(preference === 0 ? 'proximity' : preference === 1 ? 'balanced' : 'relevance')
 
       payload = {
         ...payload,
         startDate: new Date(payload.startDate).toISOString(),
       }
 
-      setTripCreated(false)
-
       console.log(payload)
 
       await beApi.post(`${BE_URL}/trips/ai`, payload)
+
+      // clear the request from store
+      clearRequest()
 
       nextFn()
     } catch (error) {
@@ -70,20 +58,12 @@ export default function LocPreference({
   }
 
   useEffect(() => {
-    setLocPreference(
-      preference === 0
-        ? 'proximity'
-        : preference === 1
-          ? 'balanced'
-          : 'relevance'
-    )
+    setLocPreference(preference === 0 ? 'proximity' : preference === 1 ? 'balanced' : 'relevance')
   }, [preference])
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.textQuestion, { color: theme.primary }]}>
-        How would you like your trip to be prepared?
-      </Text>
+      <Text style={[styles.textQuestion, { color: theme.primary }]}>How would you like your trip to be prepared?</Text>
 
       <Text style={[styles.subTextQuestion, { color: theme.text }]}>
         This will change the way our AI finds spots for your trip.
@@ -115,9 +95,7 @@ export default function LocPreference({
         />
       </View>
 
-      <Text style={[styles.textField, { color: theme.primary }]}>
-        {descriptions[preference]}
-      </Text>
+      <Text style={[styles.textField, { color: theme.primary }]}>{descriptions[preference]}</Text>
 
       <Pressable
         onPress={() => request && submitTrip(request)}

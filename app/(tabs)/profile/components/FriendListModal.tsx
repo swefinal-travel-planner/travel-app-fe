@@ -1,13 +1,14 @@
+import { getPlaceHolder } from '@/components/AdaptiveImage'
 import { colorPalettes } from '@/constants/Itheme'
+import { useThemeStyle } from '@/hooks/useThemeStyle'
 import beApi from '@/lib/beApi'
 import { Friend } from '@/lib/types/Profile'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
-import * as SecureStore from 'expo-secure-store'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { KeyboardAvoidingView, Platform, Share, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
+import { KeyboardAvoidingView, Platform, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
 import Dialog from 'react-native-dialog'
 import { ScrollView } from 'react-native-gesture-handler'
 import Modal from 'react-native-modal'
@@ -17,19 +18,16 @@ import { Avatar, Button, Card, Text, Toast, View } from 'react-native-ui-lib'
 import { z } from 'zod'
 
 interface FriendListModalProps {
-  theme: typeof colorPalettes.light
   visible: boolean
   closeModal: () => void
   friendList: Friend[]
 }
 
-const url = process.env.EXPO_PUBLIC_API_URL
-
 const searchSchema = z.object({
   email: z.string({ required_error: 'Email cannot be empty' }).email({ message: 'Invalid email format' }),
 })
 
-const FriendListModal = ({ theme, visible, closeModal, friendList }: FriendListModalProps) => {
+const FriendListModal = ({ visible, closeModal, friendList }: FriendListModalProps) => {
   const [isSearching, setIsSearching] = useState(false)
   const [visibleFriends, setVisibleFriends] = useState(3)
   const animatedHeight = useSharedValue(225)
@@ -38,24 +36,8 @@ const FriendListModal = ({ theme, visible, closeModal, friendList }: FriendListM
   const [filteredFriendlist, setFilteredFriendlist] = useState<Friend[]>(friendList)
   const [add, setAdd] = useState(false)
 
-  const shareText = async () => {
-    try {
-      const message = 'Test sharing invitation from Trip 🚀'
-      const url = 'https://example.com'
-      const shareOptions = Platform.select({
-        ios: { message: `${message} ${url}` },
-        android: { message, url },
-      })
-
-      if (shareOptions) {
-        await Share.share(shareOptions)
-      } else {
-        console.error('No valid share options available')
-      }
-    } catch (error) {
-      console.log('Error sharing:', error)
-    }
-  }
+  const theme = useThemeStyle()
+  const styles = useMemo(() => createStyles(theme), [theme])
 
   useEffect(() => {
     setIsSearching(false)
@@ -233,7 +215,7 @@ const FriendListModal = ({ theme, visible, closeModal, friendList }: FriendListM
               <View row spread centerV paddingH-20 marginT-10>
                 <View row centerV gap-10>
                   <View style={styles.greenBorder}>
-                    <Avatar size={40} source={require('@/assets/images/pig.jpg')} />
+                    <Avatar size={40} source={getPlaceHolder(50, 50)} />
                   </View>
                   <Text text60>{searchFriendMutation.data.username}</Text>
                 </View>
@@ -274,7 +256,7 @@ const FriendListModal = ({ theme, visible, closeModal, friendList }: FriendListM
                       <View key={index} row spread paddingV-10 centerV>
                         <View row center gap-10>
                           <View style={styles.greenBorder}>
-                            <Avatar size={40} source={require('@/assets/images/pig.jpg')} />
+                            <Avatar size={40} source={getPlaceHolder(50, 50)} />
                           </View>
                           <Text text60>{friend.name}</Text>
                         </View>
@@ -297,25 +279,6 @@ const FriendListModal = ({ theme, visible, closeModal, friendList }: FriendListM
                   />
                 )}
               </Card>
-
-              <View style={styles.sectionHeader}>
-                <Ionicons name="paper-plane" size={25} color="black" />
-                <Text text60>Share your request link</Text>
-              </View>
-
-              <Card style={styles.whiteCard}>
-                <TouchableOpacity onPress={shareText}>
-                  <View style={styles.cardItem}>
-                    <View style={styles.cardItemContent}>
-                      <View style={styles.linkCircle}>
-                        <Ionicons name="link" size={30} color="white" />
-                      </View>
-                      <Text>Share your request link</Text>
-                    </View>
-                    <Ionicons name="chevron-forward-outline" size={20} color="black" />
-                  </View>
-                </TouchableOpacity>
-              </Card>
             </ScrollView>
           </View>
         </KeyboardAvoidingView>
@@ -324,108 +287,109 @@ const FriendListModal = ({ theme, visible, closeModal, friendList }: FriendListM
   )
 }
 
-const styles = StyleSheet.create({
-  boldText: { fontWeight: 'bold' },
-  modal: { margin: 0, justifyContent: 'flex-end' },
-  keyboardAvoid: { flex: 1 },
-  container: {
-    height: '95%',
-    backgroundColor: 'white',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    marginTop: 'auto',
-  },
-  handleBarContainer: {
-    marginVertical: 10,
-    alignItems: 'center',
-  },
-  handleBar: {
-    width: 40,
-    height: 5,
-    backgroundColor: 'rgb(173, 171, 171)',
-    borderRadius: 10,
-    marginBottom: 10,
-  },
-  addFriendContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  searchLabelContainer: {
-    alignSelf: 'flex-start',
-    borderRadius: 20,
-    padding: 15,
-    width: '90%',
-    marginLeft: 20,
-    backgroundColor: '#f0f0f0',
-  },
-  searchInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f0f0f0',
-    padding: 15,
-    borderRadius: 60,
-  },
-  textInput: {
-    flexGrow: 1,
-    marginLeft: 10,
-  },
-  errorText: {
-    marginVertical: 10,
-    alignItems: 'center',
-  },
-  greenBorder: {
-    borderWidth: 3,
-    borderColor: 'green',
-    borderRadius: 100,
-    padding: 3,
-  },
-  scrollContainer: { padding: 20 },
-  sectionHeader: {
-    marginTop: 20,
-    marginBottom: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-  },
-  whiteCard: {
-    backgroundColor: 'white',
-    padding: 15,
-    marginBottom: 25,
-    borderRadius: 10,
-  },
-  cardItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 10,
-  },
-  cardItemContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  overflowHidden: { overflow: 'hidden' },
-  fullHeight: { height: '100%' },
-  toggleButton: {
-    width: 'auto',
-    alignSelf: 'center',
-    marginTop: 10,
-  },
-  linkCircle: {
-    backgroundColor: '#32ADE6',
-    borderRadius: 100,
-    width: 50,
-    height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-})
+const createStyles = (theme: typeof colorPalettes.light) =>
+  StyleSheet.create({
+    boldText: { fontWeight: 'bold' },
+    modal: { margin: 0, justifyContent: 'flex-end' },
+    keyboardAvoid: { flex: 1 },
+    container: {
+      height: '95%',
+      backgroundColor: 'white',
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      marginTop: 'auto',
+    },
+    handleBarContainer: {
+      marginVertical: 10,
+      alignItems: 'center',
+    },
+    handleBar: {
+      width: 40,
+      height: 5,
+      backgroundColor: 'rgb(173, 171, 171)',
+      borderRadius: 10,
+      marginBottom: 10,
+    },
+    addFriendContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    searchLabelContainer: {
+      alignSelf: 'flex-start',
+      borderRadius: 20,
+      padding: 15,
+      width: '90%',
+      marginLeft: 20,
+      backgroundColor: '#f0f0f0',
+    },
+    searchInputContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: 20,
+    },
+    inputContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: '#f0f0f0',
+      padding: 15,
+      borderRadius: 60,
+    },
+    textInput: {
+      flexGrow: 1,
+      marginLeft: 10,
+    },
+    errorText: {
+      marginVertical: 10,
+      alignItems: 'center',
+    },
+    greenBorder: {
+      borderWidth: 3,
+      borderColor: 'green',
+      borderRadius: 100,
+      padding: 3,
+    },
+    scrollContainer: { padding: 20 },
+    sectionHeader: {
+      marginTop: 20,
+      marginBottom: 10,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 5,
+    },
+    whiteCard: {
+      backgroundColor: 'white',
+      padding: 15,
+      marginBottom: 25,
+      borderRadius: 10,
+    },
+    cardItem: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingVertical: 10,
+    },
+    cardItemContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+    },
+    overflowHidden: { overflow: 'hidden' },
+    fullHeight: { height: '100%' },
+    toggleButton: {
+      width: 'auto',
+      alignSelf: 'center',
+      marginTop: 10,
+    },
+    linkCircle: {
+      backgroundColor: '#32ADE6',
+      borderRadius: 100,
+      width: 50,
+      height: 50,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+  })
 
 export default FriendListModal
