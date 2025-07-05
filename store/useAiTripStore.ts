@@ -16,7 +16,6 @@ export interface AiTripRequest {
   viLocationAttributes: string[]
   viMedicalConditions: string[]
   viSpecialRequirements: string[]
-  tripCreated: boolean
 }
 
 interface AiTripState {
@@ -27,13 +26,9 @@ interface AiTripState {
   setFoodAttributes: (enAttributes: string[], viAttributes: string[]) => void
   setLocAttributes: (enAttributes: string[], viAttributes: string[]) => void
   setMedicalConditions: (enConditions: string[], viConditions: string[]) => void
-  setSpecialRequirements: (
-    enRequirements: string[],
-    viRequirements: string[]
-  ) => void
+  setSpecialRequirements: (enRequirements: string[], viRequirements: string[]) => void
   setTitle: (title: string) => void
   setLocPreference: (preference: string) => void
-  setTripCreated: (tripCreated: boolean) => void
   clearRequest: () => void
 }
 
@@ -79,10 +74,7 @@ export const useAiTripStore = create<AiTripState>()((set) => ({
         viMedicalConditions: viConditions,
       } as AiTripRequest,
     })),
-  setSpecialRequirements: (
-    enRequirements: string[],
-    viRequirements: string[]
-  ) =>
+  setSpecialRequirements: (enRequirements: string[], viRequirements: string[]) =>
     set((state) => ({
       request: {
         ...state.request,
@@ -100,10 +92,6 @@ export const useAiTripStore = create<AiTripState>()((set) => ({
         ...state.request,
         locationPreference: preference,
       } as AiTripRequest,
-    })),
-  setTripCreated: (tripCreated: boolean) =>
-    set((state) => ({
-      request: { ...state.request, tripCreated } as AiTripRequest,
     })),
   clearRequest: () => set({ request: null }),
 }))
