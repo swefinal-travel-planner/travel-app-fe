@@ -38,6 +38,7 @@ export interface TripItem {
   timeInDate: string
   tripDay: number
   tripID: number
+  orderInTrip?: number // Thêm trường này để xác định thứ tự trong chuyến đi
 }
 
 export interface Trip {
