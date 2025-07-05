@@ -63,6 +63,18 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       },
     ],
     'expo-asset',
+    [
+      'expo-build-properties',
+      {
+        android: {
+          manifest: {
+            application: {
+              usesCleartextTraffic: true,
+            },
+          },
+        },
+      },
+    ],
   ],
   experiments: {
     typedRoutes: true,
