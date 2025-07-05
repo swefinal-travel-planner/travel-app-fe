@@ -1,3 +1,5 @@
+import { getPlaceHolder } from '@/components/AdaptiveImage'
+
 export default [
   {
     id: 1,
@@ -8,7 +10,7 @@ export default [
     date: '2025-04-04',
     time: '10:30:50',
     sender: 'An Nguyễn',
-    senderAvatar: require('@/assets/images/capy.jpg'),
+    senderAvatar: require(getPlaceHolder(50, 50)),
     unread: true,
   },
   {
@@ -20,7 +22,7 @@ export default [
     date: '2025-04-03',
     time: '16:45:50',
     sender: 'Minh Trần',
-    senderAvatar: require('@/assets/images/capy.jpg'),
+    senderAvatar: require(getPlaceHolder(50, 50)),
     unread: false,
   },
   {
@@ -32,7 +34,7 @@ export default [
     date: '2025-04-02',
     time: '08:20:50',
     sender: 'Hoài Phương',
-    senderAvatar: require('@/assets/images/capy.jpg'),
+    senderAvatar: require(getPlaceHolder(50, 50)),
     unread: true,
   },
   {
@@ -44,20 +46,19 @@ export default [
     date: '2025-04-01',
     time: '09:00:50',
     sender: 'Hệ thống',
-    senderAvatar: require('@/assets/images/capy.jpg'),
+    senderAvatar: require(getPlaceHolder(50, 50)),
     unread: true,
   },
   {
     id: 5,
     title: 'Lịch trình chưa hoàn tất',
-    message:
-      'Bạn còn 2 địa điểm hôm nay chưa tham quan, có muốn dời sang ngày mai không?',
+    message: 'Bạn còn 2 địa điểm hôm nay chưa tham quan, có muốn dời sang ngày mai không?',
     type: 'navigable',
     category: 'reminders',
     date: '2025-04-01',
     time: '17:15:50',
     sender: 'Hệ thống',
-    senderAvatar: require('@/assets/images/capy.jpg'),
+    senderAvatar: require(getPlaceHolder(50, 50)),
     unread: false,
   },
   {
@@ -69,7 +70,7 @@ export default [
     date: '2025-04-04',
     time: '07:30:50',
     sender: 'Hệ thống',
-    senderAvatar: require('@/assets/images/capy.jpg'),
+    senderAvatar: require(getPlaceHolder(50, 50)),
     unread: true,
   },
   {
@@ -81,7 +82,7 @@ export default [
     date: '2025-03-30',
     time: '14:10:50',
     sender: 'Thư Vy',
-    senderAvatar: require('@/assets/images/capy.jpg'),
+    senderAvatar: require(getPlaceHolder(50, 50)),
     unread: false,
   },
   {
@@ -93,7 +94,7 @@ export default [
     date: '2025-04-04',
     time: '10:30:50',
     sender: 'An Nguyễn',
-    senderAvatar: require('@/assets/images/capy.jpg'),
+    senderAvatar: require(getPlaceHolder(50, 50)),
     unread: true,
   },
 ]

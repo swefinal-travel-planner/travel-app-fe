@@ -1,3 +1,4 @@
+import { getPlaceHolder } from '@/components/AdaptiveImage'
 import { colorPalettes } from '@/constants/Itheme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import beApi from '@/lib/beApi'
@@ -214,7 +215,7 @@ const FriendListModal = ({ visible, closeModal, friendList }: FriendListModalPro
               <View row spread centerV paddingH-20 marginT-10>
                 <View row centerV gap-10>
                   <View style={styles.greenBorder}>
-                    <Avatar size={40} source={require('@/assets/images/pig.jpg')} />
+                    <Avatar size={40} source={getPlaceHolder(50, 50)} />
                   </View>
                   <Text text60>{searchFriendMutation.data.username}</Text>
                 </View>
@@ -255,7 +256,7 @@ const FriendListModal = ({ visible, closeModal, friendList }: FriendListModalPro
                       <View key={index} row spread paddingV-10 centerV>
                         <View row center gap-10>
                           <View style={styles.greenBorder}>
-                            <Avatar size={40} source={require('@/assets/images/pig.jpg')} />
+                            <Avatar size={40} source={getPlaceHolder(50, 50)} />
                           </View>
                           <Text text60>{friend.name}</Text>
                         </View>
