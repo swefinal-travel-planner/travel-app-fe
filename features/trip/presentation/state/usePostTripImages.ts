@@ -14,6 +14,7 @@ export const usePostTripImages = () => {
     try {
       await postTripImageUseCase.execute(tripId, image)
     } catch (err) {
+      console.log('objectusePostTripImages.ts: postTripImage error:', err)
       setError(err instanceof Error ? err : new Error('Failed to upload images'))
     } finally {
       setIsLoading(false)

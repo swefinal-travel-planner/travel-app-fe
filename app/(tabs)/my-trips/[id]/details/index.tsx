@@ -7,6 +7,7 @@ import { useThemeStyle } from '@/hooks/useThemeStyle'
 import beApi from '@/lib/beApi'
 import coreApi from '@/lib/coreApi'
 import { Trip, TripItem } from '@/lib/types/Trip'
+import { formatTripStatus } from '@/utils/tripAttributes'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import React, { useEffect, useMemo, useState } from 'react'
@@ -191,11 +192,11 @@ const TripDetailViewScreen = () => {
             </View>
             <View style={styles.tripInfoItem}>
               <Text style={styles.tripInfoLabel}>Members</Text>
-              <Text style={styles.tripInfoValue}>{trip.numMembers}</Text>
+              <Text style={styles.tripInfoValue}>{trip.memberCount}</Text>
             </View>
             <View style={styles.tripInfoItem}>
               <Text style={styles.tripInfoLabel}>Status</Text>
-              <Text style={styles.tripInfoValue}></Text>
+              <Text style={styles.tripInfoValue}>{formatTripStatus(trip.status)}</Text>
             </View>
           </View>
         </View>

@@ -1,144 +1,131 @@
+import AlbumGrid from '@/components/Album/AlbumGrid'
+import ErrorState from '@/components/Album/ErrorState'
+import ImageGalleryModal from '@/components/Album/ImageGalleryModal'
+import LoadingState from '@/components/Album/LoadingState'
 import ImageActionSheet from '@/components/ImageActionSheet'
-import { FontFamily, FontSize } from '@/constants/font'
-import { colorPalettes } from '@/constants/Itheme'
-import { Radius } from '@/constants/theme'
+import { useToast } from '@/components/ToastContext'
 import { useGetTripImages } from '@/features/trip/presentation/state/useGetTripImages'
 import { usePostTripImages } from '@/features/trip/presentation/state/usePostTripImages'
-import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { useTripId } from '@/hooks/useTripId'
 import { uploadImage2Cloud } from '@/utils/uploadImage2Cloud'
-import Ionicons from '@expo/vector-icons/Ionicons'
-import { useRouter } from 'expo-router'
-import React, { useMemo, useState } from 'react'
-import { Image } from 'expo-image'
-import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { getPlaceHolder } from '@/components/AdaptiveImage'
+import React, { useState } from 'react'
+import { Alert, SafeAreaView, StyleSheet } from 'react-native'
 
 export default function AlbumScreen() {
   const tripId = useTripId()
-
-  const router = useRouter()
+  const { showToast } = useToast()
 
   if (!tripId) {
     console.log(`Invalid tripId: ${tripId}`) // Log an error if tripId is not valid
   }
 
-  const theme = useThemeStyle()
-  const styles = useMemo(() => createStyles(theme), [theme])
   const [showActionSheet, setShowActionSheet] = useState(false)
+  const [retryKey, setRetryKey] = useState(0)
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null)
 
   const { tripImages: images, isLoading: getTripImageIsLoading, error: getTripImageError } = useGetTripImages(tripId)
-  const { postTripImage, isLoading, error } = usePostTripImages()
+  const { postTripImage, isLoading: postImageIsLoading, error: postImageError } = usePostTripImages()
+
+  // Handle post image error
+  React.useEffect(() => {
+    if (postImageError) {
+      console.log('postimageeror', postImageError)
+      Alert.alert('Error', 'Failed to upload image. Please try again.', [{ text: 'OK', onPress: () => {} }])
+    }
+  }, [postImageError])
 
   // log the trip images
   console.log('object')
   console.log(images)
 
+  const openImageModal = (index: number) => {
+    setSelectedImageIndex(index)
+  }
+
+  const closeImageModal = () => {
+    setSelectedImageIndex(null)
+  }
+
+  const goToNextImage = () => {
+    if (selectedImageIndex !== null && selectedImageIndex < images.length - 1) {
+      setSelectedImageIndex(selectedImageIndex + 1)
+    }
+  }
+
+  const goToPreviousImage = () => {
+    if (selectedImageIndex !== null && selectedImageIndex > 0) {
+      setSelectedImageIndex(selectedImageIndex - 1)
+    }
+  }
+
+  const handleRetry = () => {
+    setRetryKey((prev) => prev + 1)
+    // Force a re-render which will trigger the query to run again
+  }
+
+  const handleAddPhoto = () => {
+    setShowActionSheet(true)
+  }
+
+  const handleImageUpload = async (uri: string) => {
+    if (tripId && uri) {
+      try {
+        await postTripImage(tripId, (await uploadImage2Cloud(uri, 'trip_images')) ?? '')
+        showToast({
+          type: 'success',
+          message: 'Image uploaded successfully!',
+          position: 'bottom',
+        })
+        setShowActionSheet(false)
+      } catch (error) {
+        console.error('Failed to upload image:', error)
+        Alert.alert('Error', 'Failed to upload image. Please try again.')
+      }
+    }
+  }
+
+  // Loading state
+  if (getTripImageIsLoading) {
+    return <LoadingState />
+  }
+
+  // Error state
+  if (getTripImageError) {
+    return <ErrorState onRetry={handleRetry} />
+  }
+
   return (
     <SafeAreaView style={styles.container}>
-      {/* Album grid */}
-      <ScrollView style={styles.scrollView}>
-        <View style={styles.albumGrid}>
-          {/* Album items */}
-          {images.map((item) => (
-            <View key={item.id} style={styles.albumItem}>
-              <TouchableOpacity style={styles.imageContainer}>
-                {item.imageUrl ? (
-                  <Image source={{ uri: item.imageUrl }} style={styles.image} />
-                ) : (
-                  <View style={styles.imagePlaceholder}>
-                    <Image source={getPlaceHolder(50, 50)} style={styles.placeholderImage} />
-                  </View>
-                )}
-              </TouchableOpacity>
-              <Text style={styles.imageTitle}>{'Hello'}</Text>
-            </View>
-          ))}
+      <AlbumGrid
+        images={images}
+        onImagePress={openImageModal}
+        onAddPhotoPress={handleAddPhoto}
+        isUploading={postImageIsLoading}
+      />
 
-          {/* Add photo button */}
-          <View style={styles.albumItem}>
-            <TouchableOpacity
-              style={[styles.imageContainer, styles.addPhotoButton]}
-              onPress={() => setShowActionSheet(true)}
-            >
-              <View style={styles.addPhotoBorder}>
-                <Ionicons name="add" size={24} color={theme.white} />
-              </View>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </ScrollView>
+      <ImageGalleryModal
+        visible={selectedImageIndex !== null}
+        images={images}
+        selectedIndex={selectedImageIndex}
+        onClose={closeImageModal}
+        onNext={goToNextImage}
+        onPrevious={goToPreviousImage}
+      />
 
       <ImageActionSheet
         visible={showActionSheet}
         onDismiss={() => setShowActionSheet(false)}
-        onImagePicked={async (uri) => {
-          if (tripId && uri) {
-            await postTripImage(tripId, (await uploadImage2Cloud(uri, 'trip_images')) ?? '')
-            setShowActionSheet(false)
-          }
-        }}
+        onImagePicked={handleImageUpload}
+        allowsEditing={false}
       />
     </SafeAreaView>
   )
 }
 
-const createStyles = (theme: typeof colorPalettes.light) =>
-  StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: '#FFFFFF',
-      paddingHorizontal: 22,
-    },
-    scrollView: {
-      flex: 1,
-      paddingVertical: 16,
-    },
-    albumGrid: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      justifyContent: 'space-between',
-    },
-    albumItem: {
-      width: '30%',
-      marginBottom: 24,
-    },
-    imageContainer: {
-      aspectRatio: 0.75,
-      backgroundColor: '#E8DED1',
-      borderRadius: Radius.ROUNDED,
-    },
-    image: {
-      width: '100%',
-      height: '100%',
-    },
-    imagePlaceholder: {
-      width: '100%',
-      height: '100%',
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    placeholderImage: {
-      width: '100%',
-      height: '100%',
-      borderRadius: 8,
-    },
-    imageTitle: {
-      textAlign: 'center',
-      marginTop: 8,
-      fontSize: FontSize.MD,
-      fontFamily: FontFamily.REGULAR,
-      color: theme.text,
-    },
-    addPhotoBorder: {
-      alignSelf: 'center',
-      backgroundColor: theme.primary,
-      borderRadius: Radius.FULL,
-      padding: 10,
-    },
-    addPhotoButton: {
-      backgroundColor: theme.secondary,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-  })
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 22,
+  },
+})

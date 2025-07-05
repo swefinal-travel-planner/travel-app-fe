@@ -2,9 +2,11 @@ import CreateTripNavigationBar from '@/components/CreateTripComponents/CreateTri
 import { createAiTripSteps, TRIP_TYPES } from '@/constants/createTrip'
 import { colorPalettes } from '@/constants/Itheme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
-import { useRouter } from 'expo-router'
+import { useAiTripStore } from '@/store/useAiTripStore'
+import { useFocusEffect } from '@react-navigation/native'
+import { useNavigation, useRouter } from 'expo-router'
 import React, { useMemo, useState } from 'react'
-import { StyleSheet } from 'react-native'
+import { Alert, StyleSheet } from 'react-native'
 import { View } from 'react-native-ui-lib'
 
 export default function AiCreateTripScreen() {
@@ -13,6 +15,40 @@ export default function AiCreateTripScreen() {
   const [currentStep, setCurrentStep] = useState(0)
   const StepComponent = createAiTripSteps[currentStep]
   const router = useRouter()
+  const navigation = useNavigation()
+
+  const clearRequest = useAiTripStore((state) => state.clearRequest)
+
+  // Handle Android back button
+  useFocusEffect(
+    React.useCallback(() => {
+      const handleBackPress = (e: any) => {
+        // Prevent default navigation
+        e.preventDefault()
+
+        Alert.alert('Discard Changes', 'Are you sure you want to go back? All trip data will be cleared.', [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
+            text: 'Yes, go back',
+            style: 'destructive',
+            onPress: () => {
+              clearRequest()
+              router.push('/(tabs)/my-trips')
+            },
+          },
+        ])
+      }
+
+      navigation.addListener('beforeRemove', handleBackPress)
+
+      return () => {
+        navigation.removeListener('beforeRemove', handleBackPress)
+      }
+    }, [navigation, clearRequest, router])
+  )
 
   const goNext = () => {
     if (currentStep < createAiTripSteps.length - 1) {

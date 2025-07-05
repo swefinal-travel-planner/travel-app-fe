@@ -45,7 +45,7 @@ export interface Trip {
   budget: number
   city: string
   days: number
-  numMembers: number
+  memberCount: number
   role: string
   startDate: string
   status: 'not_started' | 'in_progress' | 'completed' | 'cancelled'

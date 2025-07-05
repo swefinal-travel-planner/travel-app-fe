@@ -124,8 +124,6 @@ export default function Login() {
 
       const response = await beApi.post(`${BE_URL}/auth/login`, payload)
 
-      console.log('Login response:', response.data)
-
       await saveLoginInfo(
         response.data.data.userId || 0,
         response.data.data.phoneNumber || '',
