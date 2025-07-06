@@ -42,14 +42,22 @@ export default function TripLength({ theme, nextFn }: Readonly<TripLengthProps>)
   const [endDate, setEndDate] = useState<string | null>(addDays(request?.startDate, (request?.days ?? 0) - 1) ?? null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
+  const handleStartDateChange = (date: string | null) => {
+    setStartDate(date)
+    setErrorMessage(null)
+  }
+
+  const handleEndDateChange = (date: string | null) => {
+    setEndDate(date)
+    setErrorMessage(null)
+  }
+
   const getDayDiff = (start: string, end: string) => {
     const diffMs = new Date(end).getTime() - new Date(start).getTime()
     return diffMs / (1000 * 60 * 60 * 24) + 1
   }
 
   const handleNext = () => {
-    nextFn()
-
     if (!startDate || !endDate) {
       setErrorMessage('Please select a start and end date.')
       return
@@ -63,7 +71,7 @@ export default function TripLength({ theme, nextFn }: Readonly<TripLengthProps>)
     }
 
     setManualTrip({
-      startDate: new Date(startDate),
+      startDate: startDate,
       days: days,
     })
 
@@ -79,7 +87,12 @@ export default function TripLength({ theme, nextFn }: Readonly<TripLengthProps>)
       <Text style={[styles.textQuestion, { color: theme.primary }]}>When will your trip start and end?</Text>
 
       <View style={styles.textFieldContainer}>
-        <DateRangeField startDate={startDate} endDate={endDate} setStartDate={setStartDate} setEndDate={setEndDate} />
+        <DateRangeField
+          startDate={startDate}
+          endDate={endDate}
+          setStartDate={handleStartDateChange}
+          setEndDate={handleEndDateChange}
+        />
 
         <Text style={[styles.textField, { color: theme.primary, marginTop: 40 }]}>
           {startDate && endDate ? `Number of days: ${getDayDiff(startDate, endDate)}` : ''}

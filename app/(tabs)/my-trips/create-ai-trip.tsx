@@ -18,6 +18,7 @@ export default function AiCreateTripScreen() {
   const navigation = useNavigation()
 
   const clearRequest = useAiTripStore((state) => state.clearRequest)
+  const setRequest = useAiTripStore((state) => state.setRequest)
 
   // Handle Android back button
   useFocusEffect(
@@ -75,7 +76,7 @@ export default function AiCreateTripScreen() {
         currentStep={currentStep}
         isLastStep={currentStep === createAiTripSteps.length - 1}
       />
-      <StepComponent theme={theme} nextFn={goNext} />
+      <StepComponent theme={theme} nextFn={goNext} setTripState={setRequest} />
     </View>
   )
 }
