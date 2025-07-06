@@ -4,16 +4,13 @@ import MedicalReqs from '@/components/CreateTripComponents/MedicalReq'
 import OtherReqs from '@/components/CreateTripComponents/OtherReq'
 import SpotNumber from '@/components/CreateTripComponents/SpotNumber'
 import SpotType from '@/components/CreateTripComponents/SpotType'
+import TripRename from '@/components/CreateTripComponents/TripRename'
 import WaitScreen from '@/components/CreateTripComponents/WaitScreen'
 import ManualTripCreate from '@/features/trip/presentation/components/ManualTripCreate'
 import TripLength from '@/features/trip/presentation/components/TripLength'
 import ChooseLocation from '@/features/trip/presentation/components/TripLocation'
 
-export const createManualTripSteps = [
-  ChooseLocation,
-  TripLength,
-  ManualTripCreate,
-]
+export const createManualTripSteps = [ChooseLocation, TripLength, ManualTripCreate, TripRename]
 
 export const TRIP_TYPES = {
   MANUAL: 'MANUAL',
@@ -29,6 +26,7 @@ export const createAiTripSteps = [
   MedicalReqs,
   OtherReqs,
   LocPreference,
+  TripRename,
   WaitScreen,
 ]
 

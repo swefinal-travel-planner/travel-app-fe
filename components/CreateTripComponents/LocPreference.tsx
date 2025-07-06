@@ -2,7 +2,7 @@ import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import { Radius } from '@/constants/theme'
 import beApi, { BE_URL } from '@/lib/beApi'
-import { AiTripRequest, useAiTripStore } from '@/store/useAiTripStore'
+import { TripRequest, useAiTripStore } from '@/store/useAiTripStore'
 import SegmentedControl from '@react-native-segmented-control/segmented-control'
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
@@ -30,7 +30,7 @@ export default function LocPreference({ theme, nextFn }: Readonly<LocPreferenceP
     request?.locationPreference === 'proximity' ? 0 : request?.locationPreference === 'relevance' ? 2 : 1
   )
 
-  const submitTrip = async (payload: AiTripRequest) => {
+  const submitTrip = async (payload: TripRequest) => {
     try {
       setLocPreference(preference === 0 ? 'proximity' : preference === 1 ? 'balanced' : 'relevance')
 
