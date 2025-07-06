@@ -80,7 +80,7 @@ const TripDetailViewScreen = () => {
       return
     }
     try {
-      const tripItemData = await beApi.get(`/trips/${id}/trip-items`)
+      const tripItemData = await beApi.get(`/trips/${id}/trip-items?language=en`)
 
       let items: TripItem[] = tripItemData.data.data
       const placeIDs = items.map((item) => item.placeID)
