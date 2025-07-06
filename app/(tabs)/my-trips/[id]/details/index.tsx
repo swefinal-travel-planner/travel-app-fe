@@ -348,7 +348,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       marginHorizontal: 24,
     },
     dayNavigationButton: {
-      // padding: 8,
+      padding: 8,
     },
     dayText: {
       flex: 1,
