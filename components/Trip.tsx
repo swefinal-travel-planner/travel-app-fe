@@ -16,13 +16,9 @@ export default function TripCard({ trip }: Readonly<{ trip: Trip }>) {
   console.log(trip.imageUrl)
   return (
     <View style={styles.container}>
-      <Image
-        style={styles.image}
-        placeholder={{ blurhash }}
-        source={{ uri: trip.imageUrl }}
-      />
+      <Image style={styles.image} placeholder={{ blurhash }} source={{ uri: trip.imageUrl }} />
       <View style={{ padding: 10 }}>
-        <Text>{trip.name}</Text>
+        <Text>{trip.title}</Text>
         <Text>{trip.location}</Text>
       </View>
     </View>

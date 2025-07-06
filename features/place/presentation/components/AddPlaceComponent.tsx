@@ -3,9 +3,10 @@ import { Place } from '@/features/place/domain/models/Place'
 import { TimeSlot } from '@/features/trip/domain/models/Trip'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import React, { useEffect, useState } from 'react'
-import { ActivityIndicator, FlatList, Image, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, FlatList, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { usePlaces } from '../state/usePlaces'
 import { LabelFilterModal } from './LabelFilterModal'
+import { Image } from 'expo-image'
 
 export interface AddPlaceModalProps {
   visible: boolean

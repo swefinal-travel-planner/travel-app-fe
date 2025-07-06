@@ -1,8 +1,9 @@
 import Ionicons from '@expo/vector-icons/Ionicons'
 import React from 'react'
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { ScaleDecorator } from 'react-native-draggable-flatlist'
 import { TypedTripItem } from './DayPlanner'
+import { Image } from 'expo-image'
 
 export type TripItemCardProps = {
   item: TypedTripItem
