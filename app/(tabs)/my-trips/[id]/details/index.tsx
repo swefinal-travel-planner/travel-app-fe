@@ -175,8 +175,6 @@ const TripDetailViewScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
-
       <ScrollView style={styles.content}>
         {/* Trip Info Card */}
         <View style={styles.tripCard}>
@@ -293,11 +291,11 @@ const createStyles = (theme: typeof colorPalettes.light) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: '#FFFFFF',
+      backgroundColor: theme.white,
     },
     content: {
       flex: 1,
-      marginTop: 16,
+      marginTop: 20,
     },
     tripCard: {
       backgroundColor: theme.secondary,

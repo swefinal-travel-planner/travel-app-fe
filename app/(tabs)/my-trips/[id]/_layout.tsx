@@ -37,7 +37,7 @@ export default function TripDetailLayout() {
       {!isModifyScreen && (
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()}>
-            <Ionicons name="arrow-back" size={24} color="#000" />
+            <Ionicons name="arrow-back" size={24} color={theme.text} />
           </TouchableOpacity>
         </View>
       )}
@@ -49,7 +49,7 @@ export default function TripDetailLayout() {
           tabBarPosition: 'top',
           tabBarStyle: {
             elevation: 0,
-            backgroundColor: '#FFFFFF',
+            backgroundColor: theme.white,
             height: isModifyScreen ? 0 : 60,
             borderBottomWidth: 0,
             borderBottomColor: theme.primary,
@@ -107,6 +107,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       paddingHorizontal: 24,
       backgroundColor: '#fff',
       paddingTop: 40,
+      paddingBottom: 16,
     },
     headerTitle: {
       marginLeft: 15,

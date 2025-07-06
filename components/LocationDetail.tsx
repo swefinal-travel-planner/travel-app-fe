@@ -116,8 +116,8 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       backgroundColor: theme.white,
     },
     backButton: {
-      width: 40,
-      height: 40,
+      width: 20,
+      height: 20,
       justifyContent: 'center',
       alignItems: 'center',
     },

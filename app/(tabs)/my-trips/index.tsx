@@ -124,7 +124,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      paddingTop: 50,
+      paddingTop: 40,
       backgroundColor: theme.white,
       alignItems: 'center',
       paddingHorizontal: 24,
