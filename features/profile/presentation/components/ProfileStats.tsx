@@ -2,11 +2,9 @@ import Pressable from '@/components/Pressable'
 import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
-import * as SecureStore from 'expo-secure-store'
+import beApi from '@/lib/beApi'
 import React, { useEffect, useMemo, useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-
-const url = process.env.EXPO_PUBLIC_BE_API_URL
 
 type ProfileStatsProps = {
   onGoToTrips: () => void
@@ -21,22 +19,9 @@ const ProfileStats = ({ onGoToTrips }: ProfileStatsProps) => {
 
   const getAllTrips = async () => {
     try {
-      const accessToken = await SecureStore.getItemAsync('accessToken')
-      const response = await fetch(`${url}/trips`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-      })
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
-      const data = await response.json()
-      setNumTrips(data.data.length)
-      const completedTrips = data.data.filter((trip: any) => trip.status === 'completed')
+      const response = await beApi.get('/trips')
+      setNumTrips(response.data.data.length)
+      const completedTrips = response.data.data.filter((trip: any) => trip.status === 'completed')
       setNumCompletedTrips(completedTrips.length)
     } catch (error) {
       console.log('Profile stats fetch trips failed:', error)

@@ -20,14 +20,11 @@ export type TripRequest = {
 
 interface AiTripState {
   request: TripRequest | null
-  setCity: (city: string) => void
-  setTripLength: (startDate: string, days: number) => void
   setLocsPerDay: (locationsPerDay: number) => void
   setFoodAttributes: (enAttributes: string[], viAttributes: string[]) => void
   setLocAttributes: (enAttributes: string[], viAttributes: string[]) => void
   setMedicalConditions: (enConditions: string[], viConditions: string[]) => void
   setSpecialRequirements: (enRequirements: string[], viRequirements: string[]) => void
-  setTitle: (title: string) => void
   setLocPreference: (preference: string) => void
   setRequest: (updates: Partial<TripRequest>) => void
   clearRequest: () => void
@@ -35,18 +32,6 @@ interface AiTripState {
 
 export const useAiTripStore = create<AiTripState>()((set) => ({
   request: null,
-  setCity: (city: string) =>
-    set((state) => ({
-      request: { ...state.request, city } as TripRequest,
-    })),
-  setTripLength: (startDate: string, days: number) =>
-    set((state) => ({
-      request: {
-        ...state.request,
-        startDate: startDate,
-        days,
-      } as TripRequest,
-    })),
   setLocsPerDay: (locationsPerDay: number) =>
     set((state) => ({
       request: { ...state.request, locationsPerDay } as TripRequest,
@@ -82,10 +67,6 @@ export const useAiTripStore = create<AiTripState>()((set) => ({
         enSpecialRequirements: enRequirements,
         viSpecialRequirements: viRequirements,
       } as TripRequest,
-    })),
-  setTitle: (title: string) =>
-    set((state) => ({
-      request: { ...state.request, title } as TripRequest,
     })),
   setLocPreference: (preference: string) =>
     set((state) => ({

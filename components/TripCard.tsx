@@ -7,7 +7,7 @@ import { Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import PressableOpacity from './PressableOpacity'
 
-interface TripCardProps {
+type TripCardProps = {
   tripId: string
   tripName: string
   tripImage: string
@@ -78,7 +78,6 @@ export default TripCard
 const createStyles = (theme: typeof colorPalettes.light) =>
   StyleSheet.create({
     wrapper: {
-      width: 360,
       alignItems: 'center',
       justifyContent: 'flex-start',
       borderRadius: Radius.ROUNDED,

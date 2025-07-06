@@ -1,12 +1,24 @@
+import { getPlaceHolder } from '@/components/AdaptiveImage'
 import Pressable from '@/components/Pressable'
+import PressableOpacity from '@/components/PressableOpacity'
 import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import { Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import beApi from '@/lib/beApi'
+import Ionicons from '@expo/vector-icons/Ionicons'
+import { Image } from 'expo-image'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { Image, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native'
+
+type Companion = {
+  user_id: string
+  name: string
+  photo_url: string
+  role: string
+}
+
 export default function TripCompanionsScreen() {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
@@ -14,7 +26,7 @@ export default function TripCompanionsScreen() {
   const router = useRouter()
   const params = useLocalSearchParams()
   const tripId = params.id
-  const [companions, setCompanions] = useState([] as { user_id: string; name: string; photo_url: string }[])
+  const [companions, setCompanions] = useState([] as Companion[])
 
   const handleAddCompanions = () => {
     if (!tripId) {
@@ -22,12 +34,7 @@ export default function TripCompanionsScreen() {
       return
     }
 
-    router.push({
-      pathname: `/my-trips/${tripId}/companions/modify`,
-      params: {
-        tripId: tripId,
-      },
-    })
+    router.push(`/my-trips/${tripId}/companions/modify`)
   }
 
   useEffect(() => {
@@ -37,11 +44,16 @@ export default function TripCompanionsScreen() {
   const loadCompanions = useCallback(async () => {
     try {
       const response = await beApi.get(`/trips/${tripId}/members`)
-      setCompanions(response.data.data || [])
+      setCompanions(response.data.data ?? [])
     } catch (error) {
       console.error('Error loading companions:', error)
     }
   }, [tripId])
+
+  const handleRemoveCompanion = (userId: string) => {
+    // Implement the logic to remove a companion
+    console.log(`Removing companion with user_id: ${userId}`)
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -50,8 +62,14 @@ export default function TripCompanionsScreen() {
           {companions.length > 0 ? (
             companions.map((companion) => (
               <View key={companion.user_id} style={styles.companionItem}>
-                <Image source={{ uri: companion.photo_url }} style={styles.image} />
-                <Text style={styles.companionName}>{companion.name}</Text>
+                <Image source={{ uri: companion.photo_url || getPlaceHolder(50, 50) }} style={styles.image} />
+                <View style={styles.companionInfo}>
+                  <Text style={styles.companionName}>{companion.name}</Text>
+                  <Text style={styles.companionRole}>{companion.role}</Text>
+                </View>
+                <PressableOpacity style={styles.removeButton} onPress={() => handleRemoveCompanion(companion.user_id)}>
+                  <Ionicons name="trash-outline" size={24} color={theme.primary} />
+                </PressableOpacity>
               </View>
             ))
           ) : (
@@ -80,7 +98,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     },
     content: {
       flexGrow: 0,
-      marginTop: 40,
+      marginTop: 20,
       borderRadius: Radius.ROUNDED,
       paddingVertical: 8,
       paddingHorizontal: 16,
@@ -90,12 +108,21 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     companionItem: {
       flexDirection: 'row',
       alignItems: 'center',
+      justifyContent: 'space-between',
       width: '100%',
       marginVertical: 8,
+    },
+    removeButton: {
+      padding: 8,
+      borderRadius: Radius.ROUNDED,
     },
     companionName: {
       fontFamily: FontFamily.BOLD,
       fontSize: FontSize.LG,
+      color: theme.primary,
+    },
+    companionRole: {
+      fontSize: FontSize.SM,
       color: theme.primary,
     },
     image: {
@@ -103,6 +130,11 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       height: 50,
       borderRadius: 25,
       marginRight: 16,
+    },
+    companionInfo: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'flex-start',
     },
     emptyCompanionText: {
       textAlign: 'center',

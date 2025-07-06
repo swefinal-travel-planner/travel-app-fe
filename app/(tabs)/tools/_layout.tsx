@@ -23,7 +23,7 @@ export default function ToolLayout() {
         />
         <TabButton
           icon="cash"
-          active={pathname.startsWith('/tools/currency-converter')}
+          active={pathname.startsWith('/tools/currency-converter') || pathname === '/tools'}
           onPress={() => router.push('/(tabs)/tools/currency-converter')}
         />
         <TabButton
@@ -35,8 +35,8 @@ export default function ToolLayout() {
 
       {/* Nested Stack Navigator */}
       <Stack screenOptions={{ headerShown: false, contentStyle: { flex: 1 } }}>
-        <Stack.Screen name="weather" />
         <Stack.Screen name="currency-converter" />
+        <Stack.Screen name="weather" />
         <Stack.Screen name="translate" />
         <Stack.Screen name="forecast" />
       </Stack>
