@@ -8,7 +8,7 @@ export const uploadImage2Cloud = async (uri: string, uploadPreset: string): Prom
       uri,
       name: uri.split('/').pop() ?? 'image.jpg',
       type: 'image/jpeg',
-      folder: 'trip_images',
+      folder: uploadPreset,
     } as any)
 
     formData.append('upload_preset', uploadPreset)

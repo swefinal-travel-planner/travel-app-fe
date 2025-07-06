@@ -18,6 +18,8 @@ import { ScrollView, StyleSheet } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { PaperProvider } from 'react-native-paper'
 import EditProfileModal from '../../../components/EditProfileModal'
+import { EMPTY_STRING } from '@/constants/utilConstants'
+import { useToast } from '@/components/ToastContext'
 
 export type SettingSection = {
   title: string
@@ -69,16 +71,19 @@ const ProfileScreen = () => {
   const [selectedField, setSelectedField] = useState<string>('Edit name')
   const [profilePic, setProfilePic] = useState('')
   const [isDarkTheme, setIsDarkTheme] = useState(false)
+  const { showToast } = useToast()
 
   useEffect(() => {
     const getUserInfo = async () => {
       const name = await SecureStore.getItemAsync('name')
       const email = await SecureStore.getItemAsync('email')
       const phone = await SecureStore.getItemAsync('phoneNumber')
+      const profilePic = await SecureStore.getItemAsync('profilePic')
 
       setName(name || '')
       setEmail(email || '')
       setPhone(phone || 'No phone number set')
+      setProfilePic(profilePic || '')
     }
 
     getUserInfo()
@@ -127,18 +132,23 @@ const ProfileScreen = () => {
   const handleSave = async (value: string, field: string) => {
     try {
       const key = mapFieldKey(field)
+
+      // Update local state
+      if (key === 'name') setName(value)
+      else if (key === 'phoneNumber') setPhone(value)
+      else if (key === 'email') setEmail(value)
+      else if (key === 'photoURL') setProfilePic(value)
       const response = await beApi.patch('/users/me', {
         [key]: value,
       })
       if (response.status !== 204) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
-      // Update local state
-      if (key === 'name') setName(value)
-      else if (key === 'phoneNumber') setPhone(value)
-      else if (key === 'email') setEmail(value)
-      else if (key === 'photo_url') setProfilePic(value)
-      setProfilePic(value)
+      showToast({
+        type: 'success',
+        message: `${field} updated successfully!`,
+        position: 'bottom',
+      })
       setModalVisible(false)
     } catch (error) {
       console.log('Update profile failed:', error)
@@ -198,7 +208,7 @@ const ProfileScreen = () => {
           visible={showActionSheet}
           onDismiss={() => setShowActionSheet(false)}
           onImagePicked={async (uri) => {
-            handleSave((await uploadImage2Cloud(uri, 'avatars')) ?? uri, 'Edit profile picture')
+            handleSave((await uploadImage2Cloud(uri, 'avatars')) ?? EMPTY_STRING, 'Edit profile picture')
           }}
           aspect={[1, 1]}
           allowsEditing={true}

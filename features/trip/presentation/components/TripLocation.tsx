@@ -13,9 +13,10 @@ type TripLocationProps = {
   theme: typeof colorPalettes.light
   nextFn: () => void
   setTripState: (trip: Partial<TripRequest>) => void
+  getTripState?: TripRequest | null
 }
 
-export default function TripLocation({ theme, nextFn, setTripState }: Readonly<TripLocationProps>) {
+export default function TripLocation({ theme, nextFn, setTripState, getTripState }: Readonly<TripLocationProps>) {
   const styles = useMemo(() => createStyles(theme), [theme])
   const [selectedValue, setSelectedValue] = useState(Location[0].key)
 
@@ -60,7 +61,10 @@ export default function TripLocation({ theme, nextFn, setTripState }: Readonly<T
         </MapView>
       </View>
       <Pressable
-        onPress={nextFn}
+        onPress={() => {
+          nextFn()
+          setTripState({ city: Location.find((loc) => loc.key === selectedValue)?.label + ', Ho Chi Minh' })
+        }}
         title="Next"
         style={{
           color: theme.white,
