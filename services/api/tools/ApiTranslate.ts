@@ -1,9 +1,9 @@
-import { TranslateResponse } from '@/types/Translate/TranslateResponse'
-import beApi from '../../../lib/beApi'
 import createAxiosInstance from '@/lib/axios'
+import { TranslateResponse } from '@/types/Translate/TranslateResponse'
+import Constants from 'expo-constants'
 
 const url = process.env.EXPO_PUBLIC_TRANSLATE_API_URL ?? ''
-const key = process.env.EXPO_PUBLIC_TRANSLATE_API_KEY
+const key = Constants.expoConfig?.extra?.translateApiKey ?? ''
 
 const api = createAxiosInstance(url)
 
