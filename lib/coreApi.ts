@@ -2,6 +2,7 @@ import { EMPTY_STRING } from '@/constants/utilConstants'
 import { AxiosError, InternalAxiosRequestConfig } from 'axios'
 import { getItemAsync, setItemAsync } from 'expo-secure-store'
 import createAxiosInstance from './axios'
+import Constants from 'expo-constants'
 
 // Types
 interface ExtendedAxiosRequestConfig extends InternalAxiosRequestConfig {
@@ -20,7 +21,7 @@ interface TokenResponse {
 // Constants
 const TOKEN_STORAGE_KEY = 'coreAccessToken'
 export const CORE_URL = process.env.EXPO_PUBLIC_CORE_API_URL ?? EMPTY_STRING
-const SECRET_KEY = process.env.EXPO_PUBLIC_CORE_SECRET_TOKEN
+const SECRET_KEY = Constants.expoConfig?.extra?.coreSecretToken ?? EMPTY_STRING
 
 // API instance
 const coreApi = createAxiosInstance(CORE_URL)
@@ -61,9 +62,7 @@ const processQueue = (error: Error | null = null) => {
  * @param forceRefresh If true, will always request a new token
  * @returns The token string
  */
-export const getCoreAccessToken = async (
-  forceRefresh = false
-): Promise<string> => {
+export const getCoreAccessToken = async (forceRefresh = false): Promise<string> => {
   if (!SECRET_KEY) {
     throw new Error('Secret token not found in environment variables')
   }
@@ -106,8 +105,7 @@ coreApi.interceptors.request.use(
     }
     return config
   },
-  (error) =>
-    Promise.reject(error instanceof Error ? error : new Error(String(error)))
+  (error) => Promise.reject(error instanceof Error ? error : new Error(String(error)))
 )
 
 // Response interceptor
@@ -116,11 +114,7 @@ coreApi.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config as ExtendedAxiosRequestConfig
 
-    if (
-      error.response?.status !== 401 ||
-      !originalRequest ||
-      originalRequest._retry
-    ) {
+    if (error.response?.status !== 401 || !originalRequest || originalRequest._retry) {
       return Promise.reject(error)
     }
 

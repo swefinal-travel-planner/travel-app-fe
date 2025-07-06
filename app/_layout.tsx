@@ -1,4 +1,5 @@
 import { ToastProvider } from '@/components/ToastContext'
+import { EMPTY_STRING } from '@/constants/utilConstants'
 import { getCoreAccessToken } from '@/lib/coreApi'
 import { GoogleSignin } from '@react-native-google-signin/google-signin'
 import Mapbox from '@rnmapbox/maps'
@@ -19,7 +20,7 @@ interface NotificationState {
 }
 
 const GOOGLE_WEB_CLIENT_ID = '490333496504-qe9p6s4an7ub4ros021q2p6kda9hakhm.apps.googleusercontent.com'
-const MAPBOX_TOKEN = process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN ?? ''
+const MAPBOX_TOKEN = Constants.expoConfig?.extra?.mapboxAccessToken ?? EMPTY_STRING
 
 const configureNotifications = () => {
   Notifications.setNotificationHandler({
