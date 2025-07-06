@@ -1,11 +1,12 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { Image, StyleSheet, Text, View } from 'react-native'
 
 import Ionicons from '@expo/vector-icons/Ionicons'
 
 import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
-import { useMemo } from 'react'
+import { TripItem } from '@/lib/types/Trip'
+import { useEffect, useMemo } from 'react'
 import PressableOpacity from '../PressableOpacity'
 
 interface Location {
@@ -14,46 +15,35 @@ interface Location {
 }
 
 interface SpotCardProps {
-  id: string
-  location: Location
-  name: string
-  properties: string[]
-  type: string[]
-  images: string[]
-  address: string
+  tripItem?: TripItem
   onCheckIn?: () => void
 }
 
-const CarouselSpotCard: React.FC<SpotCardProps> = ({
-  id,
-  location,
-  name,
-  properties,
-  type,
-  images,
-  address,
-  onCheckIn,
-}) => {
+const CarouselSpotCard: React.FC<SpotCardProps> = ({ tripItem, onCheckIn }) => {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
 
+  useEffect(() => {
+    console.log('Trip item:', tripItem)
+  }, [])
+
   return (
     <PressableOpacity style={styles.wrapper}>
-      {/* <View style={styles.imageContainer}>
-        <Image source={{ uri: images }} style={styles.image} />
-      </View> */}
+      <View style={styles.imageContainer}>
+        <Image source={{ uri: tripItem?.placeInfo.images[0] }} style={styles.image} />
+      </View>
 
       <View style={styles.infoContainer}>
         <View style={styles.spotInfo}>
           <Text style={styles.name} numberOfLines={1} ellipsizeMode="tail">
-            {name}
+            {tripItem?.placeInfo?.name || 'Unknown Spot'}
           </Text>
 
           <View style={styles.locationContainer}>
             <Ionicons name="location-outline" size={16} color={theme.text} style={{ marginRight: 4 }} />
 
             <Text style={styles.location} numberOfLines={1} ellipsizeMode="tail">
-              {location.long.toFixed(6)}, {location.lat.toFixed(6)}
+              {tripItem?.placeInfo?.address || 'Unknown Location'}
             </Text>
           </View>
         </View>
