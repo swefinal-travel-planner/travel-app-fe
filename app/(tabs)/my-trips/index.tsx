@@ -4,12 +4,12 @@ import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import { Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
-import beApi from '@/lib/beApi'
+import beApi, { safeApiCall } from '@/lib/beApi'
 import { Trip } from '@/lib/types/Trip'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useRouter } from 'expo-router'
 import React, { useEffect, useMemo, useState } from 'react'
-import { FlatList, RefreshControl, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { Alert, FlatList, RefreshControl, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 
 export default function MyTrips() {
   const [refreshing, setRefreshing] = useState(false)
@@ -23,12 +23,43 @@ export default function MyTrips() {
 
   const getAllTrips = async () => {
     try {
-      const response = await beApi.get('/trips')
+      const response = await safeApiCall(() => beApi.get('/trips'))
+
+      // If response is null, it means it was a silent error
+      if (!response) {
+        setTrips([])
+        setFilteredTrips([])
+        return
+      }
+
       const sortedTrips = response.data.data.sort((a: Trip, b: Trip) => Number(b.id) - Number(a.id))
       setTrips(sortedTrips)
       setFilteredTrips(sortedTrips)
     } catch (error) {
       console.error('Error fetching trips:', error)
+      setTrips([])
+      setFilteredTrips([])
+    }
+  }
+
+  const deleteTrip = async (tripId: string) => {
+    try {
+      const response = await safeApiCall(() => beApi.delete(`/trips/${tripId}`))
+
+      // If response is null, it means it was a silent error
+      if (!response) {
+        Alert.alert('Error', 'Failed to delete trip. Please try again.')
+        return
+      }
+
+      // Remove the trip from the local state
+      setTrips((prevTrips) => prevTrips.filter((trip) => trip.id !== tripId))
+      setFilteredTrips((prevTrips) => prevTrips.filter((trip) => trip.id !== tripId))
+
+      Alert.alert('Success', 'Trip deleted successfully!')
+    } catch (error) {
+      console.error('Error deleting trip:', error)
+      Alert.alert('Error', 'Failed to delete trip. Please try again.')
     }
   }
 
@@ -85,6 +116,7 @@ export default function MyTrips() {
         </View>
       ) : (
         <FlatList
+          style={{ width: '100%' }}
           data={filteredTrips}
           renderItem={({ item }) => (
             <TripCard
@@ -97,6 +129,7 @@ export default function MyTrips() {
               isPinned={item.pinned}
               status={item.status}
               onPress={() => router.push(`/my-trips/${item.id}/details` as const)}
+              onDelete={() => deleteTrip(item.id)}
             />
           )}
           keyExtractor={(item) => item.id}
