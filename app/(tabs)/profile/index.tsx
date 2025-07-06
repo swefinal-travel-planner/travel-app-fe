@@ -154,6 +154,7 @@ const ProfileScreen = () => {
       if (!response) {
         return
       }
+
       if (response.status !== 204) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
