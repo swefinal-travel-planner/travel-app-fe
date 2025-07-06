@@ -4,9 +4,10 @@ import { useThemeStyle } from '@/hooks/useThemeStyle'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import React, { useEffect, useMemo, useState } from 'react'
-import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import DraggableFlatList, { RenderItemParams, ScaleDecorator } from 'react-native-draggable-flatlist'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import { Image } from 'expo-image'
 
 type SpotItem = {
   id: string

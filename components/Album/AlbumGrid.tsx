@@ -6,7 +6,8 @@ import { TripImage } from '@/features/trip/domain/models/TripImage'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import React, { useMemo } from 'react'
-import { ActivityIndicator, Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native'
+import { Image } from 'expo-image'
 
 interface AlbumGridProps {
   images: TripImage[]

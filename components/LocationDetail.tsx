@@ -1,7 +1,8 @@
 import { Radius, Size, SpacingScale } from '@/constants/theme'
 import { Ionicons } from '@expo/vector-icons'
 import { useMemo } from 'react'
-import { Image, Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Image } from 'expo-image'
 
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 

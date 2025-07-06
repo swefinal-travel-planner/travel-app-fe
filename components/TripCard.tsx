@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
-import { Image, StyleSheet, Text, View } from 'react-native'
-
+import { StyleSheet, Text, View } from 'react-native'
+import { Image } from 'expo-image'
 import { FontFamily } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import { Radius } from '@/constants/theme'

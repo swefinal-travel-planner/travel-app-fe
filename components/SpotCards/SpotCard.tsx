@@ -4,7 +4,8 @@ import { Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useMemo, useState } from 'react'
-import { Image, StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
+import { Image } from 'expo-image'
 import PressableOpacity from '../PressableOpacity'
 import { getPlaceHolder } from '../AdaptiveImage'
 
@@ -23,7 +24,7 @@ const SpotCard: React.FC<SpotCardProps> = ({ name, image, address, isSaved }) =>
   return (
     <View style={styles.wrapper}>
       <View style={styles.imageContainer}>
-        <Image source={{ uri: image }} defaultSource={{ uri: getPlaceHolder(50, 50) }} style={styles.image} />
+        <Image source={{ uri: image || getPlaceHolder(50, 50) }} style={styles.image} />
 
         {/* <PressableOpacity
           style={styles.overlay}

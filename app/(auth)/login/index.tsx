@@ -1,7 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link, useRouter } from 'expo-router'
 import { Controller, useForm } from 'react-hook-form'
-import { Image, Keyboard, Text, TouchableWithoutFeedback, View } from 'react-native'
+import { Keyboard, Text, TouchableWithoutFeedback, View } from 'react-native'
+import { Image } from 'expo-image'
 import { z } from 'zod'
 
 import { auth } from '@/firebaseConfig'
