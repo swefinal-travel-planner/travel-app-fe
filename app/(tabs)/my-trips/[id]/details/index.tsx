@@ -80,7 +80,7 @@ const TripDetailViewScreen = () => {
       return
     }
     try {
-      const tripItemData = await beApi.get(`/trips/${id}/trip-items`)
+      const tripItemData = await beApi.get(`/trips/${id}/trip-items?language=en`)
 
       let items: TripItem[] = tripItemData.data.data
       const placeIDs = items.map((item) => item.placeID)
@@ -175,8 +175,6 @@ const TripDetailViewScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
-
       <ScrollView style={styles.content}>
         {/* Trip Info Card */}
         <View style={styles.tripCard}>
@@ -293,11 +291,11 @@ const createStyles = (theme: typeof colorPalettes.light) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: '#FFFFFF',
+      backgroundColor: theme.white,
     },
     content: {
       flex: 1,
-      marginTop: 16,
+      marginTop: 20,
     },
     tripCard: {
       backgroundColor: theme.secondary,
@@ -348,7 +346,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       marginHorizontal: 24,
     },
     dayNavigationButton: {
-      // padding: 8,
+      padding: 8,
     },
     dayText: {
       flex: 1,
