@@ -20,8 +20,6 @@ import { ScrollView, StyleSheet } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { PaperProvider } from 'react-native-paper'
 import EditProfileModal from '../../../components/EditProfileModal'
-import { EMPTY_STRING } from '@/constants/utilConstants'
-import { useToast } from '@/components/ToastContext'
 
 export type SettingSection = {
   title: string
