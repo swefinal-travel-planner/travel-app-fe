@@ -18,6 +18,7 @@ export default function ManualCreateTripScreen() {
   const navigation = useNavigation()
 
   const resetManualTrip = useManualTripStore((state) => state.resetManualTrip)
+  const setManualTrip = useManualTripStore((state) => state.setManualTrip)
 
   // Handle Android back button
   useFocusEffect(
@@ -68,7 +69,7 @@ export default function ManualCreateTripScreen() {
   return (
     <View style={styles.safeAreaContainer}>
       <CreateTripNavigationBar type={TRIP_TYPES.MANUAL} theme={theme} goback={goBack} currentStep={currentStep} />
-      <StepComponent theme={theme} nextFn={goNext} />
+      <StepComponent theme={theme} nextFn={goNext} setTripState={setManualTrip} />
     </View>
   )
 }

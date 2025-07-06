@@ -1,4 +1,5 @@
-import { TimeSlot, Trip, TripItem } from '@/features/trip/domain/models/Trip'
+import { TimeSlot, TripItem } from '@/features/trip/domain/models/Trip'
+import { TripRequest } from '@/store/useAiTripStore'
 import { create } from 'zustand'
 
 type TripItemsByDate = {
@@ -9,10 +10,10 @@ type TripItemsByDate = {
 
 // Trip state management using Zustand
 type ManualTripState = {
-  trip: Partial<Trip>
+  trip: Partial<TripRequest>
   itemsByDate: TripItemsByDate
   deleteTripItem: (itemId: string, date: Date) => void
-  setManualTrip: (trip: Partial<Trip>) => void
+  setManualTrip: (trip: Partial<TripRequest>) => void
   resetManualTrip: () => void
   updateTripItem: (updatedItem: TripItem, date: Date) => void
   addTripItems: (items: TripItem[], date: Date) => void
@@ -52,11 +53,7 @@ export const useManualTripStore = create<ManualTripState>((set, get) => ({
         const timeSlot = item.timeInDate
         newItemsByDate[timeSlot] ??= []
         // Only add the item if it's not already in the array
-        if (
-          !newItemsByDate[timeSlot]?.some(
-            (existingItem) => existingItem.item_id === item.item_id
-          )
-        ) {
+        if (!newItemsByDate[timeSlot]?.some((existingItem) => existingItem.item_id === item.item_id)) {
           newItemsByDate[timeSlot]?.push(item)
         }
       })
@@ -81,9 +78,7 @@ export const useManualTripStore = create<ManualTripState>((set, get) => ({
       }
 
       const updatedItems = currentItemsByDate[timeSlot]?.map((item) =>
-        item.item_id === updatedItem.item_id
-          ? { ...item, ...updatedItem }
-          : item
+        item.item_id === updatedItem.item_id ? { ...item, ...updatedItem } : item
       )
 
       return {
@@ -107,9 +102,9 @@ export const useManualTripStore = create<ManualTripState>((set, get) => ({
       // Remove item from its time slot
       Object.keys(newItemsByDate).forEach((timeSlot) => {
         if (newItemsByDate[timeSlot as TimeSlot]) {
-          newItemsByDate[timeSlot as TimeSlot] = newItemsByDate[
-            timeSlot as TimeSlot
-          ]?.filter((item) => item.item_id !== itemId)
+          newItemsByDate[timeSlot as TimeSlot] = newItemsByDate[timeSlot as TimeSlot]?.filter(
+            (item) => item.item_id !== itemId
+          )
         }
       })
 

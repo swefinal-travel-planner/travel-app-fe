@@ -3,25 +3,27 @@ import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import { Location } from '@/constants/location'
 import { Radius } from '@/constants/theme'
-import { useAiTripStore } from '@/store/useAiTripStore'
+import { TripRequest } from '@/store/useAiTripStore'
 import { Camera, MapView } from '@rnmapbox/maps'
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import { StyleSheet } from 'react-native'
 import { Picker, Text, View } from 'react-native-ui-lib'
 
 type TripLocationProps = {
   theme: typeof colorPalettes.light
   nextFn: () => void
+  setTripState: (trip: Partial<TripRequest>) => void
 }
 
-export default function TripLocation({ theme, nextFn }: Readonly<TripLocationProps>) {
+export default function TripLocation({ theme, nextFn, setTripState }: Readonly<TripLocationProps>) {
   const styles = useMemo(() => createStyles(theme), [theme])
-  const setCity = useAiTripStore((state) => state.setCity)
-  const request = useAiTripStore((state) => state.request)
+  const [selectedValue, setSelectedValue] = useState(Location[0].key)
 
-  const [selectedValue, setSelectedValue] = React.useState<string>(
-    Location.find((loc) => loc.label === request?.city)?.key ?? ''
-  )
+  // Ensure we always have valid coordinates
+  const mapCoordinates = useMemo(() => {
+    const location = Location.find((loc) => loc.key === selectedValue)
+    return location?.coordinates || Location[0].coordinates
+  }, [selectedValue])
 
   return (
     <View style={[styles.container, { backgroundColor: theme.white }]}>
@@ -46,7 +48,7 @@ export default function TripLocation({ theme, nextFn }: Readonly<TripLocationPro
               label={location.label}
               onPress={() => {
                 setSelectedValue(location.key)
-                setCity(location.label)
+                setTripState({ city: location.label })
               }}
             />
           )
@@ -54,10 +56,7 @@ export default function TripLocation({ theme, nextFn }: Readonly<TripLocationPro
       </Picker>
       <View style={styles.mapContainer}>
         <MapView style={{ flex: 1 }} logoEnabled={true} scaleBarPosition={{ top: 8, left: 16 }}>
-          <Camera
-            centerCoordinate={Location.find((loc) => loc.key == selectedValue)?.coordinates || Location[0].coordinates}
-            zoomLevel={11}
-          />
+          <Camera centerCoordinate={mapCoordinates} zoomLevel={13} />
         </MapView>
       </View>
       <Pressable
@@ -67,7 +66,7 @@ export default function TripLocation({ theme, nextFn }: Readonly<TripLocationPro
           color: theme.white,
           backgroundColor: theme.primary,
         }}
-        // disabled={!selectedValue} TODO: enable later
+        disabled={!selectedValue}
       />
     </View>
   )
