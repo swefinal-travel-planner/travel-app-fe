@@ -17,7 +17,7 @@ import React, { useEffect, useState } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { PaperProvider } from 'react-native-paper'
-import EditProfileModal from './components/EditProfileModal'
+import EditProfileModal from '../../../components/EditProfileModal'
 
 export type SettingSection = {
   title: string
@@ -75,8 +75,6 @@ const ProfileScreen = () => {
       const name = await SecureStore.getItemAsync('name')
       const email = await SecureStore.getItemAsync('email')
       const phone = await SecureStore.getItemAsync('phoneNumber')
-
-      console.log('User info:', { name, email, phone })
 
       setName(name || '')
       setEmail(email || '')
@@ -202,6 +200,8 @@ const ProfileScreen = () => {
           onImagePicked={async (uri) => {
             handleSave((await uploadImage2Cloud(uri, 'avatars')) ?? uri, 'Edit profile picture')
           }}
+          aspect={[1, 1]}
+          allowsEditing={true}
         />
       </GestureHandlerRootView>
     </PaperProvider>

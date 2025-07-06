@@ -67,11 +67,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       'expo-build-properties',
       {
         android: {
-          manifest: {
-            application: {
-              usesCleartextTraffic: true,
-            },
-          },
+          usesCleartextTraffic: true,
         },
       },
     ],

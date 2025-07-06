@@ -38,13 +38,14 @@ export interface TripItem {
   timeInDate: string
   tripDay: number
   tripID: number
+  orderInTrip?: number // Thêm trường này để xác định thứ tự trong chuyến đi
 }
 
 export interface Trip {
   budget: number
   city: string
   days: number
-  numMembers: number
+  memberCount: number
   role: string
   startDate: string
   status: 'not_started' | 'in_progress' | 'completed' | 'cancelled'
