@@ -14,21 +14,14 @@ type MedicalReqProps = {
   nextFn: () => void
 }
 
-export default function MedicalReq({
-  theme,
-  nextFn,
-}: Readonly<MedicalReqProps>) {
+export default function MedicalReq({ theme, nextFn }: Readonly<MedicalReqProps>) {
   const request = useAiTripStore((state) => state.request)
 
   const [medicalReqs, setMedicalReqs] = useState<string[]>(
-    request?.enMedicalConditions
-      ? request.enMedicalConditions.filter((req) => req !== 'none')
-      : []
+    request?.enMedicalConditions ? request.enMedicalConditions.filter((req) => req !== 'none') : []
   )
 
-  const setMedicalConditions = useAiTripStore(
-    (state) => state.setMedicalConditions
-  )
+  const setMedicalConditions = useAiTripStore((state) => state.setMedicalConditions)
 
   const handleNext = () => {
     nextFn()
@@ -55,12 +48,12 @@ export default function MedicalReq({
         Scroll to see all categories, and tap to expand each category.
       </Text>
 
+      <Text style={[styles.subTextQuestion, { color: theme.text, marginTop: -16 }]}>
+        If you have no requirements, you can skip this step and press Next.
+      </Text>
+
       <View style={styles.textFieldContainer}>
-        <CollapsibleSectionList
-          data={medicalReqData}
-          selectedValues={medicalReqs}
-          onValueChange={setMedicalReqs}
-        />
+        <CollapsibleSectionList data={medicalReqData} selectedValues={medicalReqs} onValueChange={setMedicalReqs} />
       </View>
 
       {medicalReqs.length > 0 && (

@@ -18,14 +18,10 @@ export default function OtherReq({ theme, nextFn }: Readonly<OtherReqProps>) {
   const request = useAiTripStore((state) => state.request)
 
   const [otherReqs, setOtherReqs] = useState<string[]>(
-    request?.enSpecialRequirements
-      ? request.enSpecialRequirements.filter((req) => req !== 'none')
-      : []
+    request?.enSpecialRequirements ? request.enSpecialRequirements.filter((req) => req !== 'none') : []
   )
 
-  const setSpecialRequirements = useAiTripStore(
-    (state) => state.setSpecialRequirements
-  )
+  const setSpecialRequirements = useAiTripStore((state) => state.setSpecialRequirements)
 
   const handleNext = () => {
     nextFn()
@@ -52,12 +48,12 @@ export default function OtherReq({ theme, nextFn }: Readonly<OtherReqProps>) {
         Scroll to see all categories, and tap to expand each category.
       </Text>
 
+      <Text style={[styles.subTextQuestion, { color: theme.text, marginTop: -16 }]}>
+        If you have no requirements, you can skip this step and press Next.
+      </Text>
+
       <View style={styles.textFieldContainer}>
-        <CollapsibleSectionList
-          data={otherReqData}
-          selectedValues={otherReqs}
-          onValueChange={setOtherReqs}
-        />
+        <CollapsibleSectionList data={otherReqData} selectedValues={otherReqs} onValueChange={setOtherReqs} />
       </View>
 
       {otherReqs.length > 0 && (
