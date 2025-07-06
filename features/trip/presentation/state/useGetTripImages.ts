@@ -9,9 +9,6 @@ export const useGetTripImages = (tripId: number) => {
     queryKey: ['tripImages', tripId],
     queryFn: () => {
       return getTripImageUseCase.execute(tripId).then((images) => {
-        if (!images) {
-          throw new Error('No images found for this trip')
-        }
         return images
       })
     },

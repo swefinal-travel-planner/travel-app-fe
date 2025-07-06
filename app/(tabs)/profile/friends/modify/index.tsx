@@ -9,7 +9,6 @@ import beApi from '@/lib/beApi'
 import { SearchResult } from '@/lib/types/UserSearch'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useRouter } from 'expo-router'
-import * as SecureStore from 'expo-secure-store'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   Alert,
@@ -89,23 +88,18 @@ const TripFriendInviteScreen = () => {
       setIsSearching(true)
 
       try {
-        const token = await SecureStore.getItemAsync('accessToken')
-
-        // Search for users by email
-        const searchResponse = await fetch(`${process.env.EXPO_PUBLIC_BE_API_URL}/users?userEmail=${email}`, {
-          headers: { Authorization: `Bearer ${token}` },
+        const searchResponse = await beApi.get(`/users`, {
+          params: { userEmail: email },
         })
 
-        if (searchResponse.ok) {
-          const searchData = await searchResponse.json()
-
+        if (searchResponse.data.data) {
           // Filter out existing friends from search results
           const friendIds = friends.map((f: Friend) => f.id)
 
-          if (searchData.data && !friendIds.includes(searchData.data.id)) {
+          if (searchResponse.data && !friendIds.includes(searchResponse.data.id)) {
             const result: SearchResult = {
-              ...searchData.data,
-              isInvited: pendingInvites.includes(searchData.data.username),
+              ...searchResponse.data,
+              isInvited: pendingInvites.includes(searchResponse.data.username),
               isFriend: false,
             }
             setSearchResults([result])

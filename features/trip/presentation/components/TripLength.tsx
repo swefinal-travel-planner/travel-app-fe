@@ -3,7 +3,7 @@ import Pressable from '@/components/Pressable'
 import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import { useManualTripStore } from '@/features/trip/presentation/state/useManualTrip'
-import { useAiTripStore } from '@/store/useAiTripStore'
+import { TripRequest, useAiTripStore } from '@/store/useAiTripStore'
 import React, { useState } from 'react'
 import { StyleSheet } from 'react-native'
 import { Text, View } from 'react-native-ui-lib'
@@ -11,6 +11,8 @@ import { Text, View } from 'react-native-ui-lib'
 type TripLengthProps = {
   theme: typeof colorPalettes.light
   nextFn: () => void
+  setTripState?: (trip: Partial<TripRequest>) => void
+  getTripState?: TripRequest | null
 }
 
 const addDays = (date: string | undefined, days: number | undefined) => {
@@ -31,15 +33,9 @@ const formatDate = (date: Date) => {
   return `${year}-${month}-${day}`
 }
 
-export default function TripLength({ theme, nextFn }: Readonly<TripLengthProps>) {
-  const setManualTrip = useManualTripStore((state) => state.setManualTrip)
-
-  const setTripLength = useAiTripStore((state) => state.setTripLength)
-  const setTitle = useAiTripStore((state) => state.setTitle)
-  const request = useAiTripStore((state) => state.request)
-
-  const [startDate, setStartDate] = useState<string | null>(request?.startDate ?? null)
-  const [endDate, setEndDate] = useState<string | null>(addDays(request?.startDate, (request?.days ?? 0) - 1) ?? null)
+export default function TripLength({ theme, nextFn, setTripState, getTripState }: Readonly<TripLengthProps>) {
+  const [startDate, setStartDate] = useState<string | null>(null)
+  const [endDate, setEndDate] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const handleStartDateChange = (date: string | null) => {
@@ -70,13 +66,10 @@ export default function TripLength({ theme, nextFn }: Readonly<TripLengthProps>)
       return
     }
 
-    setManualTrip({
-      startDate: startDate,
-      days: days,
+    setTripState?.({
+      startDate,
+      days,
     })
-
-    setTripLength(startDate, days)
-    setTitle(`${days}-Day ${request?.city} Trip`)
 
     setErrorMessage(null)
     nextFn()

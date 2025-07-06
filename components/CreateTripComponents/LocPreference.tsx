@@ -20,19 +20,43 @@ const descriptions = [
   'The spots will adhere better to your preferences, even if it means traveling further.',
 ]
 
+// Helper function to convert preference string to index
+const getPreferenceIndex = (preference?: string): number => {
+  switch (preference) {
+    case 'proximity':
+      return 0
+    case 'relevance':
+      return 2
+    case 'balanced':
+    default:
+      return 1
+  }
+}
+
+// Helper function to convert index to preference string
+const getPreferenceString = (index: number): string => {
+  switch (index) {
+    case 0:
+      return 'proximity'
+    case 2:
+      return 'relevance'
+    case 1:
+    default:
+      return 'balanced'
+  }
+}
+
 export default function LocPreference({ theme, nextFn }: Readonly<LocPreferenceProps>) {
   const setLocPreference = useAiTripStore((state) => state.setLocPreference)
   const request = useAiTripStore((state) => state.request)
   const clearRequest = useAiTripStore((state) => state.clearRequest)
 
-  // 0: proximity, 1: balanced, 2: distance
-  const [preference, setPreference] = useState<number>(
-    request?.locationPreference === 'proximity' ? 0 : request?.locationPreference === 'relevance' ? 2 : 1
-  )
+  // 0: proximity, 1: balanced, 2: relevance
+  const [preference, setPreference] = useState<number>(getPreferenceIndex(request?.locationPreference))
 
   const submitTrip = async (payload: TripRequest) => {
     try {
-      setLocPreference(preference === 0 ? 'proximity' : preference === 1 ? 'balanced' : 'relevance')
+      setLocPreference(getPreferenceString(preference))
 
       payload = {
         ...payload,
@@ -58,7 +82,7 @@ export default function LocPreference({ theme, nextFn }: Readonly<LocPreferenceP
   }
 
   useEffect(() => {
-    setLocPreference(preference === 0 ? 'proximity' : preference === 1 ? 'balanced' : 'relevance')
+    setLocPreference(getPreferenceString(preference))
   }, [preference])
 
   return (

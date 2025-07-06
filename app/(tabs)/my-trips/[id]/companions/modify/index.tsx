@@ -5,11 +5,10 @@ import { colorPalettes } from '@/constants/Itheme'
 import { Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { useTripId } from '@/hooks/useTripId'
-import beApi from '@/lib/beApi'
+import beApi, { safeApiCall } from '@/lib/beApi'
 import { SearchResult } from '@/lib/types/UserSearch'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useRouter } from 'expo-router'
-import * as SecureStore from 'expo-secure-store'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   Alert,
@@ -52,19 +51,35 @@ const TripCompanionInviteScreen = () => {
 
   const loadCompanions = useCallback(async () => {
     try {
-      const response = await beApi.get(`/trips/${tripId}/members`)
+      const response = await safeApiCall(() => beApi.get(`/trips/${tripId}/members`))
+
+      // If response is null, it means it was a silent error
+      if (!response) {
+        setCompanions([])
+        return
+      }
+
       setCompanions(response.data.data || [])
     } catch (error) {
       console.error('Error loading companions:', error)
+      setCompanions([])
     }
   }, [tripId])
 
   const loadPendingInvites = useCallback(async () => {
     try {
-      const response = await beApi.get(`/trips/${tripId}/pending-invitations`)
+      const response = await safeApiCall(() => beApi.get(`/trips/${tripId}/pending-invitations`))
+
+      // If response is null, it means it was a silent error
+      if (!response) {
+        setPendingInvites([])
+        return
+      }
+
       setPendingInvites(response.data.data?.map((invite: any) => invite.receiverId) || [])
     } catch (error) {
       console.error('Error loading pending invites:', error)
+      setPendingInvites([])
     }
   }, [tripId])
 
@@ -78,15 +93,16 @@ const TripCompanionInviteScreen = () => {
       setIsSearching(true)
 
       try {
-        const token = await SecureStore.getItemAsync('accessToken')
+        const searchResponse = await safeApiCall(() => beApi.get(`/users?userEmail=${email}`))
 
-        // Search for users by email
-        const searchResponse = await fetch(`${process.env.EXPO_PUBLIC_BE_API_URL}/users?userEmail=${email}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
+        // If response is null, it means it was a silent error
+        if (!searchResponse) {
+          setSearchResults([])
+          return
+        }
 
-        if (searchResponse.ok) {
-          const searchData = await searchResponse.json()
+        if (searchResponse.status === 200) {
+          const searchData = searchResponse.data
 
           // Filter out existing companions from search results
           const companionIds = companions.map((comp: TripCompanion) => comp.user_id)
@@ -130,10 +146,18 @@ const TripCompanionInviteScreen = () => {
     async (userId: number) => {
       setIsLoading(true)
       try {
-        const response = await beApi.post(`/invitation-trips`, {
-          receiverId: userId,
-          tripId: tripId,
-        })
+        const response = await safeApiCall(() =>
+          beApi.post(`/invitation-trips`, {
+            receiverId: userId,
+            tripId: tripId,
+          })
+        )
+
+        // If response is null, it means it was a silent error
+        if (!response) {
+          Alert.alert('Error', 'Failed to send invitation. Please try again.')
+          return
+        }
 
         // Server returns 204 No Content for successful invitation
         if (response.status === 204 || response.data) {

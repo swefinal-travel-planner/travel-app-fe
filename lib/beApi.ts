@@ -8,6 +8,8 @@ const refreshApi = createAxiosInstance(BE_URL)
 
 let isRefreshing = false
 let failedQueue: any[] = []
+let refreshAttempts = 0
+const MAX_REFRESH_ATTEMPTS = 1
 
 const processQueue = (error: any, token: string | null = null) => {
   failedQueue.forEach((prom) => {
@@ -18,6 +20,31 @@ const processQueue = (error: any, token: string | null = null) => {
     }
   })
   failedQueue = []
+}
+
+// Utility function to handle silent error responses
+export const handleApiResponse = (response: any) => {
+  if (response && response.silent) {
+    // Handle silent errors - don't show popups but log for debugging
+    console.log('Silent API error:', response.message || 'Authentication failed')
+    return null
+  }
+  return response
+}
+
+// Wrapper function for API calls that handles silent errors
+export const safeApiCall = async (apiCall: () => Promise<any>) => {
+  try {
+    const response = await apiCall()
+    return handleApiResponse(response)
+  } catch (error) {
+    // Check if it's a silent error response
+    if (error && typeof error === 'object' && 'silent' in error) {
+      return handleApiResponse(error)
+    }
+    // Re-throw other errors
+    throw error
+  }
 }
 
 // Add authentication interceptor
@@ -68,11 +95,18 @@ beApi.interceptors.response.use(
             return beApi(originalRequest)
           })
           .catch((err) => {
-            return Promise.reject(new Error('Failed to refresh token: ' + err))
+            // Only show error if we've exhausted refresh attempts
+            if (refreshAttempts >= MAX_REFRESH_ATTEMPTS) {
+              return Promise.reject(new Error('Failed to refresh token: ' + err))
+            }
+            // Silently fail and let the user continue
+            return Promise.resolve({ status: 401, data: null, silent: true })
           })
       }
 
       isRefreshing = true
+      refreshAttempts++
+
       try {
         const refreshToken = await getItemAsync('refreshToken')
         if (!refreshToken) {
@@ -94,6 +128,9 @@ beApi.interceptors.response.use(
         // Save new access token
         await setItemAsync('accessToken', newAccessToken)
 
+        // Reset refresh attempts on successful refresh
+        refreshAttempts = 0
+
         processQueue(null, newAccessToken)
 
         // Retry the original request with new token
@@ -101,13 +138,28 @@ beApi.interceptors.response.use(
         return beApi(originalRequest)
       } catch (refreshError) {
         console.error('Refresh token error:', refreshError)
-        processQueue(refreshError, null)
 
-        // Clear tokens on refresh failure
-        await setItemAsync('accessToken', '')
-        await setItemAsync('refreshToken', '')
+        // Only clear tokens and show error if we've exhausted all attempts
+        if (refreshAttempts >= MAX_REFRESH_ATTEMPTS) {
+          processQueue(refreshError, null)
 
-        return Promise.reject(new Error('Failed to refresh token: ' + refreshError))
+          // Clear tokens on refresh failure
+          await setItemAsync('accessToken', '')
+          await setItemAsync('refreshToken', '')
+
+          return Promise.reject(new Error('Failed to refresh token: ' + refreshError))
+        } else {
+          // For first attempt, process queue with error but don't throw
+          processQueue(refreshError, null)
+
+          // Return a silent error response instead of throwing
+          return Promise.resolve({
+            status: 401,
+            data: null,
+            silent: true,
+            message: 'Authentication failed, please login again',
+          })
+        }
       } finally {
         isRefreshing = false
       }
@@ -120,3 +172,50 @@ beApi.interceptors.response.use(
 )
 
 export default beApi
+
+/**
+ * Backend API Configuration with Silent Error Handling
+ *
+ * This module provides an enhanced API client that handles token refresh automatically
+ * and suppresses error popups during authentication failures to improve UX.
+ *
+ * Key Features:
+ * - Automatic token refresh on 401 errors
+ * - Silent error handling to prevent popup spam
+ * - Queue system for concurrent requests during refresh
+ * - Graceful degradation when refresh fails
+ *
+ * Usage:
+ * 1. Use `safeApiCall()` wrapper for API calls that should handle silent errors
+ * 2. Use `handleApiResponse()` to process responses and check for silent errors
+ * 3. Direct `beApi` calls will still work but may show error popups
+ *
+ * Example:
+ * ```typescript
+ * // Correct pattern for using safeApiCall with status checking
+ * const response = await safeApiCall(() => beApi.get('/users/me'))
+ *
+ * // Always check for null first (silent error)
+ * if (!response) {
+ *   // Silent error occurred, handle gracefully
+ *   return
+ * }
+ *
+ * // Now you can safely access response.status and response.data
+ * if (response.status === 200) {
+ *   const userData = response.data
+ *   // Process user data
+ * }
+ *
+ * // For POST requests
+ * const postResponse = await safeApiCall(() => beApi.post('/users', userData))
+ * if (!postResponse) {
+ *   // Handle silent error
+ *   return
+ * }
+ *
+ * if (postResponse.status === 201) {
+ *   // Success
+ * }
+ * ```
+ */

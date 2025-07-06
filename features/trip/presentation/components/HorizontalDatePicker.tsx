@@ -1,13 +1,13 @@
 import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import { Radius } from '@/constants/theme'
-import { Trip } from '@/features/trip/domain/models/Trip'
+import { TripRequest } from '@/store/useAiTripStore'
 import React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 type HorizontalDatePickerProps = {
   theme: typeof colorPalettes.light
-  trip?: Partial<Trip>
+  trip?: Partial<TripRequest>
   selectedDate: Date | null
   onSelectDate?: (date: Date) => void
 }
@@ -30,18 +30,13 @@ export default function HorizontalDatePicker({
   })
 
   return (
-    <View
-      style={[{ backgroundColor: theme?.background ?? 'blue' }, styles.wrapper]}
-    >
+    <View style={[{ backgroundColor: theme?.background ?? 'blue' }, styles.wrapper]}>
       {dates.map((date) => {
         const isSelected = date.toDateString() === selectedDate?.toDateString()
         return (
           <TouchableOpacity
             key={date.toDateString()}
-            style={[
-              styles.dateItem,
-              isSelected && { backgroundColor: theme?.primary ?? '#3e5d4f' },
-            ]}
+            style={[styles.dateItem, isSelected && { backgroundColor: theme?.primary ?? '#3e5d4f' }]}
             onPress={() => onSelectDate?.(date)}
           >
             <Text style={[styles.dayText, isSelected && styles.selectedText]}>
@@ -51,9 +46,7 @@ export default function HorizontalDatePicker({
                 })
                 .toUpperCase()}
             </Text>
-            <Text style={[styles.dateText, isSelected && styles.selectedText]}>
-              {date.getDate()}
-            </Text>
+            <Text style={[styles.dateText, isSelected && styles.selectedText]}>{date.getDate()}</Text>
           </TouchableOpacity>
         )
       })}
