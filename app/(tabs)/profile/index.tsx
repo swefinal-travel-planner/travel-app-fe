@@ -91,7 +91,13 @@ const ProfileScreen = () => {
 
   const fetchFriends = async () => {
     try {
-      const response = await beApi.get('/friends')
+      const response = await safeApiCall(() => beApi.get('/friends'))
+
+      // If response is null, it means it was a silent error
+      if (!response) {
+        return []
+      }
+
       const data = response.data
       const friends: Friend[] = (data.data ?? []).map((f: any) => ({
         id: f.id,
@@ -138,9 +144,16 @@ const ProfileScreen = () => {
       else if (key === 'phoneNumber') setPhone(value)
       else if (key === 'email') setEmail(value)
       else if (key === 'photoURL') setProfilePic(value)
-      const response = await beApi.patch('/users/me', {
-        [key]: value,
-      })
+      const response = await safeApiCall(() =>
+        beApi.patch('/users/me', {
+          [key]: value,
+        })
+      )
+
+      // If response is null, it means it was a silent error
+      if (!response) {
+        return
+      }
       if (response.status !== 204) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
