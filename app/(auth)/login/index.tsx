@@ -11,7 +11,7 @@ import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth'
 
 import saveLoginInfo from '@/utils/saveLoginInfo'
 
-import beApi, { BE_URL, safeApiCall } from '@/lib/beApi'
+import beApi, { BE_URL, safeBeApiCall } from '@/lib/beApi'
 import axios from 'axios'
 
 import CustomTextField from '@/components/input/CustomTextField'
@@ -76,7 +76,7 @@ export default function Login() {
           id_token: idToken,
         }
 
-        const response = await safeApiCall(() => beApi.post(`${BE_URL}/auth/google-login`, payload))
+        const response = await safeBeApiCall(() => beApi.post(`${BE_URL}/auth/google-login`, payload))
 
         // If response is null, it means it was a silent error
         if (!response) {
@@ -128,7 +128,7 @@ export default function Login() {
         password: data.password || '',
       }
 
-      const response = await safeApiCall(() => beApi.post(`${BE_URL}/auth/login`, payload))
+      const response = await safeBeApiCall(() => beApi.post(`${BE_URL}/auth/login`, payload))
 
       // If response is null, it means it was a silent error
       if (!response) {

@@ -1,10 +1,8 @@
 import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import { Radius } from '@/constants/theme'
-import beApi, { BE_URL } from '@/lib/beApi'
-import { TripRequest, useAiTripStore } from '@/store/useAiTripStore'
+import { useAiTripStore } from '@/store/useAiTripStore'
 import SegmentedControl from '@react-native-segmented-control/segmented-control'
-import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import Pressable from '../Pressable'
@@ -49,41 +47,18 @@ const getPreferenceString = (index: number): string => {
 export default function LocPreference({ theme, nextFn }: Readonly<LocPreferenceProps>) {
   const setLocPreference = useAiTripStore((state) => state.setLocPreference)
   const request = useAiTripStore((state) => state.request)
-  const clearRequest = useAiTripStore((state) => state.clearRequest)
 
   // 0: proximity, 1: balanced, 2: relevance
   const [preference, setPreference] = useState<number>(getPreferenceIndex(request?.locationPreference))
 
-  const submitTrip = async (payload: TripRequest) => {
-    try {
-      setLocPreference(getPreferenceString(preference))
-
-      payload = {
-        ...payload,
-        startDate: new Date(payload.startDate).toISOString(),
-      }
-
-      console.log(payload)
-
-      await beApi.post(`${BE_URL}/trips/ai`, payload)
-
-      // clear the request from store
-      clearRequest()
-
-      nextFn()
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        // handle errors coming from the API call
-        console.error('API error:', error.response?.data || error.message)
-      } else {
-        console.error('AI trip creation error:', error)
-      }
-    }
-  }
-
   useEffect(() => {
     setLocPreference(getPreferenceString(preference))
-  }, [preference])
+  }, [preference, setLocPreference])
+
+  const handleNext = () => {
+    setLocPreference(getPreferenceString(preference))
+    nextFn()
+  }
 
   return (
     <View style={styles.container}>
@@ -122,7 +97,7 @@ export default function LocPreference({ theme, nextFn }: Readonly<LocPreferenceP
       <Text style={[styles.textField, { color: theme.primary }]}>{descriptions[preference]}</Text>
 
       <Pressable
-        onPress={() => request && submitTrip(request)}
+        onPress={handleNext}
         title="Next"
         style={{
           color: theme.white,

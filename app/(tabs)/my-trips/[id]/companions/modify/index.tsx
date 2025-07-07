@@ -5,7 +5,7 @@ import { colorPalettes } from '@/constants/Itheme'
 import { Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { useTripId } from '@/hooks/useTripId'
-import beApi, { safeApiCall } from '@/lib/beApi'
+import beApi, { safeBeApiCall } from '@/lib/beApi'
 import { SearchResult } from '@/lib/types/UserSearch'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useRouter } from 'expo-router'
@@ -51,7 +51,7 @@ const TripCompanionInviteScreen = () => {
 
   const loadCompanions = useCallback(async () => {
     try {
-      const response = await safeApiCall(() => beApi.get(`/trips/${tripId}/members`))
+      const response = await safeBeApiCall(() => beApi.get(`/trips/${tripId}/members`))
 
       // If response is null, it means it was a silent error
       if (!response) {
@@ -68,7 +68,7 @@ const TripCompanionInviteScreen = () => {
 
   const loadPendingInvites = useCallback(async () => {
     try {
-      const response = await safeApiCall(() => beApi.get(`/trips/${tripId}/pending-invitations`))
+      const response = await safeBeApiCall(() => beApi.get(`/trips/${tripId}/pending-invitations`))
 
       // If response is null, it means it was a silent error
       if (!response) {
@@ -93,7 +93,7 @@ const TripCompanionInviteScreen = () => {
       setIsSearching(true)
 
       try {
-        const searchResponse = await safeApiCall(() => beApi.get(`/users?userEmail=${email}`))
+        const searchResponse = await safeBeApiCall(() => beApi.get(`/users?userEmail=${email}`))
 
         // If response is null, it means it was a silent error
         if (!searchResponse) {
@@ -146,7 +146,7 @@ const TripCompanionInviteScreen = () => {
     async (userId: number) => {
       setIsLoading(true)
       try {
-        const response = await safeApiCall(() =>
+        const response = await safeBeApiCall(() =>
           beApi.post(`/invitation-trips`, {
             receiverId: userId,
             tripId: tripId,

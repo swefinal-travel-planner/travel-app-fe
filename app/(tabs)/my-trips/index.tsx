@@ -4,7 +4,7 @@ import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import { Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
-import beApi, { safeApiCall } from '@/lib/beApi'
+import beApi, { safeBeApiCall } from '@/lib/beApi'
 import { Trip } from '@/lib/types/Trip'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useRouter } from 'expo-router'
@@ -23,10 +23,11 @@ export default function MyTrips() {
 
   const getAllTrips = async () => {
     try {
-      const response = await safeApiCall(() => beApi.get('/trips'))
+      const response = await safeBeApiCall(() => beApi.get('/trips'))
 
       // If response is null, it means it was a silent error
       if (!response) {
+        console.log('response is null', __filename)
         setTrips([])
         setFilteredTrips([])
         return
@@ -44,7 +45,7 @@ export default function MyTrips() {
 
   const deleteTrip = async (tripId: string) => {
     try {
-      const response = await safeApiCall(() => beApi.delete(`/trips/${tripId}`))
+      const response = await safeBeApiCall(() => beApi.delete(`/trips/${tripId}`))
 
       // If response is null, it means it was a silent error
       if (!response) {

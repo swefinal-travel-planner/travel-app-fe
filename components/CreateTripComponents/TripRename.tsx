@@ -9,21 +9,41 @@ import { Text, TextField, View } from 'react-native-ui-lib'
 
 type TripRenameProps = {
   theme: typeof colorPalettes.light
-  nextFn: () => void
+  nextFn?: () => void
   setTripState: (trip: Partial<TripRequest>) => void
   getTripState?: TripRequest | null
+  onSubmit?: (title: string) => void
+  isSubmitting?: boolean
 }
 
-export default function TripRename({ theme, nextFn, setTripState, getTripState }: Readonly<TripRenameProps>) {
+export default function TripRename({
+  theme,
+  nextFn,
+  setTripState,
+  getTripState,
+  onSubmit,
+  isSubmitting = false,
+}: Readonly<TripRenameProps>) {
   const styles = useMemo(() => createStyles(theme), [theme])
   const [title, setTitle] = useState(getTripState?.title ?? '')
 
-  const handleNext = () => {
+  const handleSubmit = () => {
     if (title.trim()) {
       setTripState({ title: title.trim() })
-      nextFn()
+
+      if (onSubmit) {
+        // New pattern: call onSubmit with title
+        onSubmit(title.trim())
+      } else if (nextFn) {
+        // Legacy pattern: call nextFn
+        nextFn()
+      }
     }
   }
+
+  const isDisabled = !title.trim() || isSubmitting
+  const buttonTitle = isSubmitting ? 'Creating...' : 'Create Trip'
+
   console.log('city', getTripState?.city)
 
   return (
@@ -38,6 +58,7 @@ export default function TripRename({ theme, nextFn, setTripState, getTripState }
           style={styles.textField}
           placeholderTextColor={theme.dimText}
           maxLength={50}
+          editable={!isSubmitting}
         />
         {getTripState?.city && (
           <Text style={[styles.locationText, { color: theme.dimText }]}>Trip to {getTripState.city}</Text>
@@ -45,13 +66,13 @@ export default function TripRename({ theme, nextFn, setTripState, getTripState }
       </View>
 
       <Pressable
-        onPress={handleNext}
-        title="Next"
+        onPress={handleSubmit}
+        title={buttonTitle}
         style={{
           color: theme.white,
-          backgroundColor: theme.primary,
+          backgroundColor: isDisabled ? theme.disabled : theme.primary,
         }}
-        disabled={!title.trim()}
+        disabled={isDisabled}
       />
     </View>
   )

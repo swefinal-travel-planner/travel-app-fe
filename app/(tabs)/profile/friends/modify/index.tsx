@@ -5,7 +5,7 @@ import { colorPalettes } from '@/constants/Itheme'
 import { Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { useTripId } from '@/hooks/useTripId'
-import beApi, { safeApiCall } from '@/lib/beApi'
+import beApi, { safeBeApiCall } from '@/lib/beApi'
 import { SearchResult } from '@/lib/types/UserSearch'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useRouter } from 'expo-router'
@@ -135,7 +135,7 @@ const TripFriendInviteScreen = () => {
     async (username: string, email: string) => {
       setIsLoading(true)
       try {
-        const response = await safeApiCall(() =>
+        const response = await safeBeApiCall(() =>
           beApi.post(`/invitation-friends`, {
             receiverEmail: email,
           })

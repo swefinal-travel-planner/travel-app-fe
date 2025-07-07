@@ -4,6 +4,7 @@ import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import { useManualTripStore } from '@/features/trip/presentation/state/useManualTrip'
 import { TripRequest, useAiTripStore } from '@/store/useAiTripStore'
+import { DebugWrapper } from '@/utils/DebugWrapper'
 import React, { useState } from 'react'
 import { StyleSheet } from 'react-native'
 import { Text, View } from 'react-native-ui-lib'
@@ -78,7 +79,6 @@ export default function TripLength({ theme, nextFn, setTripState, getTripState }
   return (
     <View style={styles.container}>
       <Text style={[styles.textQuestion, { color: theme.primary }]}>When will your trip start and end?</Text>
-
       <View style={styles.textFieldContainer}>
         <DateRangeField
           startDate={startDate}

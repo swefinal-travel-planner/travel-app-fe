@@ -4,6 +4,7 @@ import { colorPalettes } from '@/constants/Itheme'
 import { Location } from '@/constants/location'
 import { Radius } from '@/constants/theme'
 import { TripRequest } from '@/store/useAiTripStore'
+import { DebugWrapper } from '@/utils/DebugWrapper'
 import { Camera, MapView } from '@rnmapbox/maps'
 import React, { useMemo, useState } from 'react'
 import { StyleSheet } from 'react-native'
@@ -27,8 +28,9 @@ export default function TripLocation({ theme, nextFn, setTripState, getTripState
   }, [selectedValue])
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.white }]}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       <Text style={[styles.text, { color: theme.primary }]}>Where is your trip located ?</Text>
+
       <Picker
         placeholder="Select a destination"
         value={selectedValue}
@@ -55,11 +57,15 @@ export default function TripLocation({ theme, nextFn, setTripState, getTripState
           )
         })}
       </Picker>
+
       <View style={styles.mapContainer}>
         <MapView style={{ flex: 1 }} logoEnabled={true} scaleBarPosition={{ top: 8, left: 16 }}>
-          <Camera centerCoordinate={mapCoordinates} zoomLevel={13} />
+          <DebugWrapper>
+            <Camera centerCoordinate={mapCoordinates} zoomLevel={13} />
+          </DebugWrapper>
         </MapView>
       </View>
+
       <Pressable
         onPress={() => {
           nextFn()
@@ -101,7 +107,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     picker: {
       fontFamily: FontFamily.REGULAR,
       fontSize: FontSize.LG,
-      backgroundColor: theme.background,
+      backgroundColor: theme.white,
       minWidth: '100%',
       height: 48,
       borderRadius: Radius.FULL,

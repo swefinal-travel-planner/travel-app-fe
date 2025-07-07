@@ -62,10 +62,6 @@ interface QueueItem {
   reject: (reason?: unknown) => void
 }
 
-interface TokenResponse {
-  token: string
-}
-
 // Constants
 const TOKEN_STORAGE_KEY = 'coreAccessToken'
 export const CORE_URL = process.env.EXPO_PUBLIC_CORE_API_URL ?? EMPTY_STRING
@@ -73,22 +69,6 @@ const SECRET_KEY = Constants.expoConfig?.extra?.coreSecretToken ?? EMPTY_STRING
 
 // API instance
 const coreApi = createAxiosInstance(CORE_URL)
-
-// Endpoint utilities
-const createEndpoint = (path: string) => `${CORE_URL}${path}`
-
-export const ENDPOINTS = {
-  AUTH: {
-    TOKEN: createEndpoint('/auth/generate_token'),
-  },
-  PLACES: {
-    BASE: createEndpoint('/places'),
-    BY_ID: (id: string) => createEndpoint(`/places/${id}`),
-  },
-  LABELS: {
-    BASE: createEndpoint('/labels'),
-  },
-} as const
 
 // Token refresh state
 let isRefreshing = false
@@ -123,6 +103,7 @@ export const safeCoreApiCall = async (apiCall: () => Promise<any>) => {
     const response = await apiCall()
     return handleCoreApiResponse(response)
   } catch (error) {
+    console.log('Error in safeCoreApiCall:', error)
     // Check if it's a silent error response
     if (error && typeof error === 'object' && 'silent' in error) {
       return handleCoreApiResponse(error)
@@ -152,19 +133,19 @@ export const getCoreAccessToken = async (forceRefresh = false): Promise<string> 
     }
 
     // Get new token
-    const { data } = await coreApi.post<TokenResponse>(ENDPOINTS.AUTH.TOKEN, {
+    const response = await coreApi.post('/auth/generate_token', {
       secret_key: SECRET_KEY,
     })
 
-    if (typeof data.token !== 'string') {
+    if (typeof response.data.token !== 'string') {
       throw new Error('Invalid token received from server')
     }
 
     // Store and setup new token
-    await setItemAsync(TOKEN_STORAGE_KEY, data.token)
-    coreApi.defaults.headers.common['Authorization'] = `Bearer ${data.token}`
+    await setItemAsync(TOKEN_STORAGE_KEY, response.data.token)
+    coreApi.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`
 
-    return data.token
+    return response.data.token
   } catch (error) {
     await setItemAsync(TOKEN_STORAGE_KEY, '')
     throw error instanceof Error ? error : new Error('Failed to get token')
@@ -176,7 +157,7 @@ coreApi.interceptors.request.use(
   async (config) => {
     const token = await getItemAsync(TOKEN_STORAGE_KEY)
     if (token && typeof token === 'string') {
-      config.headers.Authorization = `Bearer ${token}`
+      config.headers.Authorization = `Bearer ${token} `
     }
     return config
   },
@@ -222,7 +203,7 @@ coreApi.interceptors.response.use(
       processQueue()
 
       if (originalRequest.headers) {
-        originalRequest.headers.Authorization = `Bearer ${newToken}`
+        originalRequest.headers.Authorization = `Bearer ${newToken} `
       }
 
       return coreApi(originalRequest)

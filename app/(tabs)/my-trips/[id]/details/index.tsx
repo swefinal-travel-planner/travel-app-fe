@@ -4,15 +4,15 @@ import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import { Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
-import beApi from '@/lib/beApi'
+import beApi, { safeBeApiCall } from '@/lib/beApi'
 import coreApi, { safeCoreApiCall } from '@/lib/coreApi'
 import { Trip, TripItem } from '@/lib/types/Trip'
 import { formatTripStatus } from '@/utils/tripAttributes'
 import Ionicons from '@expo/vector-icons/Ionicons'
+import { Image } from 'expo-image'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import React, { useEffect, useMemo, useState } from 'react'
 import { SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { Image } from 'expo-image'
 
 type DistanceTime = {
   distance: string
@@ -69,7 +69,7 @@ const TripDetailViewScreen = () => {
 
   const getTripDetail = async () => {
     try {
-      const tripData = await beApi.get(`/trips/${id}`)
+      const tripData = await safeBeApiCall(() => beApi.get(`/trips/${id}`))
       setTrip(tripData.data.data)
     } catch (error) {
       console.error('Error fetching trip detail by ID:', error)
