@@ -1,25 +1,21 @@
-import CreateTripNavigationBar from '@/components/CreateTripComponents/CreateTripNavigationBar'
+import UnifiedTripCreator from '@/components/CreateTripComponents/UnifiedTripCreator'
 import { createManualTripSteps, TRIP_TYPES } from '@/constants/createTrip'
 import { colorPalettes } from '@/constants/Itheme'
 import { useManualTripStore } from '@/features/trip/presentation/state/useManualTrip'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { useFocusEffect } from '@react-navigation/native'
 import { useNavigation, useRouter } from 'expo-router'
-import React, { useMemo, useState } from 'react'
+import React, { useMemo } from 'react'
 import { Alert, StyleSheet } from 'react-native'
 import { View } from 'react-native-ui-lib'
 
 export default function ManualCreateTripScreen() {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
-  const [currentStep, setCurrentStep] = useState(0)
-  const StepComponent = createManualTripSteps[currentStep]
   const router = useRouter()
   const navigation = useNavigation()
 
   const resetManualTrip = useManualTripStore((state) => state.resetManualTrip)
-  const setManualTrip = useManualTripStore((state) => state.setRequest)
-  const getManualTrip = useManualTripStore((state) => state.request)
 
   // Handle Android back button
   useFocusEffect(
@@ -52,25 +48,23 @@ export default function ManualCreateTripScreen() {
     }, [navigation, resetManualTrip, router])
   )
 
-  const goNext = () => {
-    if (currentStep < createManualTripSteps.length - 1) {
-      setCurrentStep(currentStep + 1)
-    }
+  const handleComplete = () => {
+    router.push('/(tabs)/my-trips')
   }
 
-  const goBack = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1)
-    }
-    if (currentStep === 0) {
-      router.back()
-    }
+  const handleBack = () => {
+    router.back()
   }
 
   return (
     <View style={styles.safeAreaContainer}>
-      <CreateTripNavigationBar type={TRIP_TYPES.MANUAL} theme={theme} goback={goBack} currentStep={currentStep} />
-      <StepComponent theme={theme} nextFn={goNext} setTripState={setManualTrip} getTripState={getManualTrip} />
+      <UnifiedTripCreator
+        tripType={TRIP_TYPES.MANUAL}
+        steps={createManualTripSteps}
+        theme={theme}
+        onComplete={handleComplete}
+        onBack={handleBack}
+      />
     </View>
   )
 }
@@ -83,8 +77,5 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       alignItems: 'center',
       backgroundColor: '#eef8ef',
       paddingTop: 55,
-    },
-    container: {
-      flex: 1,
     },
   })

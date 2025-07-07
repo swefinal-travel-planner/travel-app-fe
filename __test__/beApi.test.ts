@@ -1,4 +1,4 @@
-import { handleApiResponse, safeApiCall } from '../lib/beApi'
+import { handleApiResponse, safeBeApiCall } from '../lib/beApi'
 
 describe('beApi Silent Error Handling', () => {
   describe('handleApiResponse', () => {
@@ -20,11 +20,11 @@ describe('beApi Silent Error Handling', () => {
     })
   })
 
-  describe('safeApiCall', () => {
+  describe('safeBeApiCall', () => {
     it('should handle successful API calls', async () => {
       const mockApiCall = jest.fn().mockResolvedValue({ status: 200, data: 'success' })
 
-      const result = await safeApiCall(mockApiCall)
+      const result = await safeBeApiCall(mockApiCall)
 
       expect(result).toEqual({ status: 200, data: 'success' })
       expect(mockApiCall).toHaveBeenCalledTimes(1)
@@ -34,7 +34,7 @@ describe('beApi Silent Error Handling', () => {
       const silentError = { status: 401, data: null, silent: true, message: 'Auth failed' }
       const mockApiCall = jest.fn().mockResolvedValue(silentError)
 
-      const result = await safeApiCall(mockApiCall)
+      const result = await safeBeApiCall(mockApiCall)
 
       expect(result).toBeNull()
       expect(mockApiCall).toHaveBeenCalledTimes(1)
@@ -44,7 +44,7 @@ describe('beApi Silent Error Handling', () => {
       const regularError = new Error('Network error')
       const mockApiCall = jest.fn().mockRejectedValue(regularError)
 
-      await expect(safeApiCall(mockApiCall)).rejects.toThrow('Network error')
+      await expect(safeBeApiCall(mockApiCall)).rejects.toThrow('Network error')
       expect(mockApiCall).toHaveBeenCalledTimes(1)
     })
 
@@ -52,7 +52,7 @@ describe('beApi Silent Error Handling', () => {
       const silentError = { status: 401, data: null, silent: true, message: 'Auth failed' }
       const mockApiCall = jest.fn().mockRejectedValue(silentError)
 
-      const result = await safeApiCall(mockApiCall)
+      const result = await safeBeApiCall(mockApiCall)
 
       expect(result).toBeNull()
       expect(mockApiCall).toHaveBeenCalledTimes(1)

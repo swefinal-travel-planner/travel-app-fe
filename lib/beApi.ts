@@ -33,7 +33,7 @@ export const handleApiResponse = (response: any) => {
 }
 
 // Wrapper function for API calls that handles silent errors
-export const safeApiCall = async (apiCall: () => Promise<any>) => {
+export const safeBeApiCall = async (apiCall: () => Promise<any>) => {
   try {
     const response = await apiCall()
     return handleApiResponse(response)
@@ -186,14 +186,14 @@ export default beApi
  * - Graceful degradation when refresh fails
  *
  * Usage:
- * 1. Use `safeApiCall()` wrapper for API calls that should handle silent errors
+ * 1. Use `safeBeApiCall()` wrapper for API calls that should handle silent errors
  * 2. Use `handleApiResponse()` to process responses and check for silent errors
  * 3. Direct `beApi` calls will still work but may show error popups
  *
  * Example:
  * ```typescript
- * // Correct pattern for using safeApiCall with status checking
- * const response = await safeApiCall(() => beApi.get('/users/me'))
+ * // Correct pattern for using safeBeApiCall with status checking
+ * const response = await safeBeApiCall(() => beApi.get('/users/me'))
  *
  * // Always check for null first (silent error)
  * if (!response) {
@@ -208,7 +208,7 @@ export default beApi
  * }
  *
  * // For POST requests
- * const postResponse = await safeApiCall(() => beApi.post('/users', userData))
+ * const postResponse = await safeBeApiCall(() => beApi.post('/users', userData))
  * if (!postResponse) {
  *   // Handle silent error
  *   return

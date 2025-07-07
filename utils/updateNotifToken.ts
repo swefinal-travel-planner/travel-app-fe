@@ -2,7 +2,7 @@ import Constants from 'expo-constants'
 import * as Notifications from 'expo-notifications'
 import * as SecureStore from 'expo-secure-store'
 
-import beApi, { BE_URL, safeApiCall } from '@/lib/beApi'
+import beApi, { BE_URL, safeBeApiCall } from '@/lib/beApi'
 import axios from 'axios'
 
 export default async function updateNotifToken(): Promise<void> {
@@ -30,7 +30,7 @@ export default async function updateNotifToken(): Promise<void> {
       notificationToken: token,
     }
 
-    const response = await safeApiCall(() => beApi.put(`${BE_URL}/users/notification-token`, payload))
+    const response = await safeBeApiCall(() => beApi.put(`${BE_URL}/users/notification-token`, payload))
 
     // If response is null, it means it was a silent error
     if (!response) {

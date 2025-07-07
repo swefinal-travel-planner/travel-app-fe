@@ -7,7 +7,7 @@ import ProfileFriendSection from '@/features/profile/presentation/components/Pro
 import ProfileSettingsSection from '@/features/profile/presentation/components/ProfileSettingsSection'
 import ProfileStats from '@/features/profile/presentation/components/ProfileStats'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
-import beApi, { safeApiCall } from '@/lib/beApi'
+import beApi, { safeBeApiCall } from '@/lib/beApi'
 import { Friend } from '@/lib/types/Profile'
 import { useThemeStore } from '@/store/themeStore'
 import { clearLoginInfo } from '@/utils/clearLoginInfo'
@@ -91,7 +91,7 @@ const ProfileScreen = () => {
 
   const fetchFriends = async () => {
     try {
-      const response = await safeApiCall(() => beApi.get('/friends'))
+      const response = await safeBeApiCall(() => beApi.get('/friends'))
 
       // If response is null, it means it was a silent error
       if (!response) {
@@ -106,7 +106,7 @@ const ProfileScreen = () => {
       }))
       return friends
     } catch (error) {
-      console.log('Fetch friends failed:', error)
+      console.log('Error:', error, ' File:', __filename)
       throw error
     }
   }
@@ -144,7 +144,7 @@ const ProfileScreen = () => {
       else if (key === 'phoneNumber') setPhone(value)
       else if (key === 'email') setEmail(value)
       else if (key === 'photoURL') setProfilePic(value)
-      const response = await safeApiCall(() =>
+      const response = await safeBeApiCall(() =>
         beApi.patch('/users/me', {
           [key]: value,
         })
@@ -165,7 +165,7 @@ const ProfileScreen = () => {
       })
       setModalVisible(false)
     } catch (error) {
-      console.log('Update profile failed:', error)
+      console.log('Update profile failed:', error, ' File:', __filename)
       throw error
     }
   }
