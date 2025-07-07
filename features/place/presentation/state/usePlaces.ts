@@ -1,5 +1,5 @@
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { PlaceRepoImpl } from '../../data/PlaceRepoImpl'
+import { PlaceRepositoryProvider } from '../../data/PlaceRepositoryProvider'
 import { Place } from '../../domain/models/Place'
 import { GetPlacesParams } from '../../domain/repositories/IPlaceRepository'
 import { GetAllPlaces } from '../../domain/usecases/GetAllPlaces'
@@ -10,16 +10,10 @@ interface UsePlacesParams extends GetPlacesParams {
 
 export const usePlaces = (params: UsePlacesParams) => {
   const { enabled = true, ...queryParams } = params
-  const getAllPlaces = new GetAllPlaces(new PlaceRepoImpl())
+  const placeRepository = PlaceRepositoryProvider.getInstance()
+  const getAllPlaces = new GetAllPlaces(placeRepository)
 
-  const {
-    data,
-    isLoading,
-    error,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useInfiniteQuery({
+  const { data, isLoading, error, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
     queryKey: ['places', queryParams],
     queryFn: async ({ pageParam }) => {
       const result = await getAllPlaces.execute({

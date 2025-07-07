@@ -1,3 +1,4 @@
+import { TripRequest } from '@/store/useAiTripStore'
 import { TimeSlot, Trip, TripItem } from '../domain/models/Trip'
 import { UpdateTripItemDTO } from '../domain/models/UpdateTripItemDTO'
 
@@ -7,10 +8,7 @@ export type TripItemsByDate = {
   }
 }
 
-export const ensureAllDatesIncluded = (
-  trip: Partial<Trip>,
-  itemsByDate: TripItemsByDate
-): TripItemsByDate => {
+export const ensureAllDatesIncluded = (trip: Partial<TripRequest>, itemsByDate: TripItemsByDate): TripItemsByDate => {
   if (!trip.startDate || !trip.days) {
     return itemsByDate
   }
@@ -38,7 +36,7 @@ export const ensureAllDatesIncluded = (
 }
 
 export const convertManualTripToDTO = (
-  trip: Partial<Trip>,
+  trip: Partial<TripRequest>,
   itemsByDate: TripItemsByDate
 ): UpdateTripItemDTO[] => {
   const result: UpdateTripItemDTO[] = []

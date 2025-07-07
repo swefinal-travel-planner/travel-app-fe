@@ -1,8 +1,8 @@
 import beApi from '@/lib/beApi'
 import { CreateTripDTO } from '../../domain/models/Trip'
+import { TripImage } from '../../domain/models/TripImage'
 import { UpdateTripItemDTO } from '../../domain/models/UpdateTripItemDTO'
 import { TripRepository } from '../../domain/repositories/TripRepository'
-import { TripImage } from '../../domain/models/TripImage'
 
 export class TripRepositoryImpl implements TripRepository {
   async createTrip(trip: CreateTripDTO): Promise<number | null> {
@@ -33,6 +33,14 @@ export class TripRepositoryImpl implements TripRepository {
 
     if (response.status !== 204) {
       throw new Error('Failed to post trip image')
+    }
+  }
+
+  async deleteTrip(tripId: number): Promise<void> {
+    const response = await beApi.delete(`/trips/${tripId}`)
+
+    if (response.status !== 204) {
+      throw new Error('Failed to delete trip')
     }
   }
 }

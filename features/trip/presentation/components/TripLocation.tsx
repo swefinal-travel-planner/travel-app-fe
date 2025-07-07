@@ -3,29 +3,34 @@ import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import { Location } from '@/constants/location'
 import { Radius } from '@/constants/theme'
-import { useAiTripStore } from '@/store/useAiTripStore'
+import { TripRequest } from '@/store/useAiTripStore'
+import { DebugWrapper } from '@/utils/DebugWrapper'
 import { Camera, MapView } from '@rnmapbox/maps'
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import { StyleSheet } from 'react-native'
 import { Picker, Text, View } from 'react-native-ui-lib'
 
 type TripLocationProps = {
   theme: typeof colorPalettes.light
   nextFn: () => void
+  setTripState: (trip: Partial<TripRequest>) => void
+  getTripState?: TripRequest | null
 }
 
-export default function TripLocation({ theme, nextFn }: Readonly<TripLocationProps>) {
+export default function TripLocation({ theme, nextFn, setTripState, getTripState }: Readonly<TripLocationProps>) {
   const styles = useMemo(() => createStyles(theme), [theme])
-  const setCity = useAiTripStore((state) => state.setCity)
-  const request = useAiTripStore((state) => state.request)
+  const [selectedValue, setSelectedValue] = useState(Location[0].key)
 
-  const [selectedValue, setSelectedValue] = React.useState<string>(
-    Location.find((loc) => loc.label === request?.city)?.key ?? ''
-  )
+  // Ensure we always have valid coordinates
+  const mapCoordinates = useMemo(() => {
+    const location = Location.find((loc) => loc.key === selectedValue)
+    return location?.coordinates || Location[0].coordinates
+  }, [selectedValue])
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.white }]}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       <Text style={[styles.text, { color: theme.primary }]}>Where is your trip located ?</Text>
+
       <Picker
         placeholder="Select a destination"
         value={selectedValue}
@@ -46,28 +51,32 @@ export default function TripLocation({ theme, nextFn }: Readonly<TripLocationPro
               label={location.label}
               onPress={() => {
                 setSelectedValue(location.key)
-                setCity(location.label)
+                setTripState({ city: location.label })
               }}
             />
           )
         })}
       </Picker>
+
       <View style={styles.mapContainer}>
         <MapView style={{ flex: 1 }} logoEnabled={true} scaleBarPosition={{ top: 8, left: 16 }}>
-          <Camera
-            centerCoordinate={Location.find((loc) => loc.key == selectedValue)?.coordinates || Location[0].coordinates}
-            zoomLevel={11}
-          />
+          <DebugWrapper>
+            <Camera centerCoordinate={mapCoordinates} zoomLevel={13} />
+          </DebugWrapper>
         </MapView>
       </View>
+
       <Pressable
-        onPress={nextFn}
+        onPress={() => {
+          nextFn()
+          setTripState({ city: Location.find((loc) => loc.key === selectedValue)?.label + ', Ho Chi Minh' })
+        }}
         title="Next"
         style={{
           color: theme.white,
           backgroundColor: theme.primary,
         }}
-        // disabled={!selectedValue} TODO: enable later
+        disabled={!selectedValue}
       />
     </View>
   )
@@ -98,7 +107,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     picker: {
       fontFamily: FontFamily.REGULAR,
       fontSize: FontSize.LG,
-      backgroundColor: theme.background,
+      backgroundColor: theme.white,
       minWidth: '100%',
       height: 48,
       borderRadius: Radius.FULL,

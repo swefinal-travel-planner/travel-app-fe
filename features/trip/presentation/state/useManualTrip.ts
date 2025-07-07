@@ -1,4 +1,5 @@
-import { TimeSlot, Trip, TripItem } from '@/features/trip/domain/models/Trip'
+import { TimeSlot, TripItem } from '@/features/trip/domain/models/Trip'
+import { TripRequest } from '@/store/useAiTripStore'
 import { create } from 'zustand'
 
 type TripItemsByDate = {
@@ -9,10 +10,10 @@ type TripItemsByDate = {
 
 // Trip state management using Zustand
 type ManualTripState = {
-  trip: Partial<Trip>
-  itemsByDate: TripItemsByDate
+  request: TripRequest | null
+  itemsByDate: TripItemsByDate | null
   deleteTripItem: (itemId: string, date: Date) => void
-  setManualTrip: (trip: Partial<Trip>) => void
+  setRequest: (updates: Partial<TripRequest>) => void
   resetManualTrip: () => void
   updateTripItem: (updatedItem: TripItem, date: Date) => void
   addTripItems: (items: TripItem[], date: Date) => void
@@ -22,22 +23,21 @@ type ManualTripState = {
 
 export const useManualTripStore = create<ManualTripState>((set, get) => ({
   // Initialize trip with an empty object
-  trip: {},
-  itemsByDate: {},
-
+  request: null,
+  itemsByDate: null,
   // Set the new trip data, merging with existing state
-  setManualTrip: (trip) =>
+  setRequest: (updates: Partial<TripRequest>) =>
     set((state) => ({
-      trip: { ...state.trip, ...trip },
+      request: { ...state.request, ...updates } as TripRequest,
     })),
 
   // Reset trip to an empty object
-  resetManualTrip: () => set({ trip: {}, itemsByDate: {} }),
+  resetManualTrip: () => set({ request: null, itemsByDate: null }),
 
   // Get items for a specific date
   getItemsForDate: (date: Date) => {
     const dateStr = date.toDateString()
-    const itemsByDate = get().itemsByDate[dateStr] || {}
+    const itemsByDate = get().itemsByDate?.[dateStr] || {}
     return Object.values(itemsByDate).flat()
   },
 
@@ -52,11 +52,7 @@ export const useManualTripStore = create<ManualTripState>((set, get) => ({
         const timeSlot = item.timeInDate
         newItemsByDate[timeSlot] ??= []
         // Only add the item if it's not already in the array
-        if (
-          !newItemsByDate[timeSlot]?.some(
-            (existingItem) => existingItem.item_id === item.item_id
-          )
-        ) {
+        if (!newItemsByDate[timeSlot]?.some((existingItem) => existingItem.item_id === item.item_id)) {
           newItemsByDate[timeSlot]?.push(item)
         }
       })
@@ -73,7 +69,7 @@ export const useManualTripStore = create<ManualTripState>((set, get) => ({
   updateTripItem: (updatedItem: TripItem, date: Date) =>
     set((state) => {
       const dateStr = date.toDateString()
-      const currentItemsByDate = state.itemsByDate[dateStr] || {}
+      const currentItemsByDate = state.itemsByDate?.[dateStr] || {}
       const timeSlot = updatedItem.timeInDate
 
       if (!currentItemsByDate[timeSlot]) {
@@ -81,9 +77,7 @@ export const useManualTripStore = create<ManualTripState>((set, get) => ({
       }
 
       const updatedItems = currentItemsByDate[timeSlot]?.map((item) =>
-        item.item_id === updatedItem.item_id
-          ? { ...item, ...updatedItem }
-          : item
+        item.item_id === updatedItem.item_id ? { ...item, ...updatedItem } : item
       )
 
       return {
@@ -101,15 +95,15 @@ export const useManualTripStore = create<ManualTripState>((set, get) => ({
   deleteTripItem: (itemId: string, date: Date) =>
     set((state) => {
       const dateStr = date.toDateString()
-      const currentItemsByDate = state.itemsByDate[dateStr] || {}
+      const currentItemsByDate = state.itemsByDate?.[dateStr] || {}
       const newItemsByDate = { ...currentItemsByDate }
 
       // Remove item from its time slot
       Object.keys(newItemsByDate).forEach((timeSlot) => {
         if (newItemsByDate[timeSlot as TimeSlot]) {
-          newItemsByDate[timeSlot as TimeSlot] = newItemsByDate[
-            timeSlot as TimeSlot
-          ]?.filter((item) => item.item_id !== itemId)
+          newItemsByDate[timeSlot as TimeSlot] = newItemsByDate[timeSlot as TimeSlot]?.filter(
+            (item) => item.item_id !== itemId
+          )
         }
       })
 
@@ -127,7 +121,7 @@ export const useManualTripStore = create<ManualTripState>((set, get) => ({
       'Manual Trip State:',
       JSON.stringify(
         {
-          trip: state.trip,
+          trip: state.request,
           itemsByDate: state.itemsByDate,
         },
         null,

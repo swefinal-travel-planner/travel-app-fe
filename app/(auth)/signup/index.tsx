@@ -1,9 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link, useRouter } from 'expo-router'
 import { Controller, useForm } from 'react-hook-form'
-import { Image, Keyboard, Text, TouchableWithoutFeedback, View } from 'react-native'
+import { Keyboard, Text, TouchableWithoutFeedback, View } from 'react-native'
 import { z } from 'zod'
-
+import { Image } from 'expo-image'
 import { auth } from '@/firebaseConfig'
 import { GoogleSignin, isErrorWithCode, statusCodes } from '@react-native-google-signin/google-signin'
 import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth'
@@ -95,7 +95,9 @@ export default function SignUp() {
           response.data.data.accessToken,
           response.data.data.refreshToken,
           response.data.data.email,
-          response.data.data.name
+          response.data.data.name,
+          response.data.data.phoneNumber ?? '',
+          response.data.data.photoURL ?? ''
         )
 
         router.replace('/(tabs)')

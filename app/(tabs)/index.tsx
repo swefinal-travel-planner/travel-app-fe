@@ -1,5 +1,6 @@
 import { SpotData } from '@/lib/types/Spots'
 import { useRouter } from 'expo-router'
+import * as SecureStore from 'expo-secure-store'
 import { useEffect, useState } from 'react'
 import { Dimensions, FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
@@ -11,10 +12,11 @@ import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import { Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
+import beApi from '@/lib/beApi'
+import { Trip, TripItem } from '@/lib/types/Trip'
 import { useMemo } from 'react'
 import { Carousel } from 'react-native-ui-lib'
 
-const hasTrip = false
 const EXPO_PUBLIC_CORE_API_URL = process.env.EXPO_PUBLIC_CORE_API_URL
 
 // get screen width for responsive sizing
@@ -24,6 +26,10 @@ const cardWidth = screenWidth - 120 // account for margins and padding
 const Index = () => {
   const [coolSpots, setCoolSpots] = useState<SpotData[]>([])
   const [topPicks, setTopPicks] = useState<SpotData[]>([])
+  const [username, setUsername] = useState('')
+  const [ongoingTrip, setOngoingTrip] = useState<Trip | null>(null)
+  const [ongoingTripItems, setOngoingTripItems] = useState<TripItem[]>([])
+  const [tripDay, setTripDay] = useState(1)
 
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
@@ -53,8 +59,54 @@ const Index = () => {
     }
   }
 
+  const getOngoingTrip = async () => {
+    try {
+      const response = await beApi.get('/trips')
+      const ongoingTrip = response.data.data.filter((trip: Trip) => trip.status === 'in_progress')[0]
+      setOngoingTrip(ongoingTrip)
+
+      const tripItemData = await beApi.get(`/trips/${ongoingTrip.id}/trip-items?language=en`)
+
+      // Check if the response data is null or undefined
+      if (!tripItemData.data?.data) {
+        console.warn('No trip items data received from API')
+        return
+      }
+
+      let items: TripItem[] = tripItemData.data.data
+
+      // Check if items array is empty
+      if (!items || items.length === 0) {
+        console.warn('No trip items found')
+        return
+      }
+
+      const dayInTrip = new Date().getDay() - new Date(ongoingTrip.startDate).getDay() + 1
+      setTripDay(dayInTrip)
+
+      items = items.filter((item: TripItem) => item.tripDay === dayInTrip)
+
+      setOngoingTripItems(items)
+    } catch (error) {
+      console.error('Error fetching ongoing trips:', error)
+    }
+  }
+
+  const getUsername = async () => {
+    let name = await SecureStore.getItemAsync('name')
+
+    if (name) {
+      const firstName = name.split(' ')[0]
+      setUsername(`, ${firstName}`)
+    } else {
+      setUsername('')
+    }
+  }
+
   useEffect(() => {
     getSpots()
+    getOngoingTrip()
+    getUsername()
   }, [])
 
   const handlePress = (item: SpotData) => {
@@ -81,12 +133,14 @@ const Index = () => {
     <ScrollView style={styles.mainContainer} contentContainerStyle={styles.scrollContent}>
       <View style={styles.container}>
         <View style={styles.topCenter}>
-          <Text style={styles.hugeText}>Welcome back, bro!</Text>
+          <Text style={styles.hugeText}>Welcome back{username}!</Text>
 
-          {hasTrip ? (
+          {ongoingTrip ? (
             <View style={styles.currentTrip}>
-              <Text style={styles.subText}>This morning's plan</Text>
-              <Text style={styles.mainText}>Ho Chi Minh City</Text>
+              <Text style={styles.subText}>Today's plan</Text>
+              <Text style={styles.mainText}>
+                {ongoingTrip.title} (day {tripDay})
+              </Text>
 
               <Carousel
                 pagingEnabled
@@ -100,12 +154,16 @@ const Index = () => {
                 pageControlPosition={Carousel.pageControlPositions.UNDER}
                 pageControlProps={{ color: theme.primary }}
               >
-                {data.map((item, index) => (
-                  <CarouselSpotCard key={index} {...item} />
+                {ongoingTripItems.map((item, index) => (
+                  <CarouselSpotCard key={index} tripItem={item} />
                 ))}
               </Carousel>
 
-              <Pressable title={'View trip details'} style={styles.button}></Pressable>
+              <Pressable
+                title={'View trip details'}
+                style={styles.button}
+                onPress={() => router.push(`/my-trips/${ongoingTrip.id}/details` as const)}
+              ></Pressable>
             </View>
           ) : (
             <View style={styles.currentTrip}>

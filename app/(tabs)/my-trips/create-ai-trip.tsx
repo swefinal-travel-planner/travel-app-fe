@@ -1,19 +1,14 @@
-import CreateTripNavigationBar from '@/components/CreateTripComponents/CreateTripNavigationBar'
+import UnifiedTripCreator from '@/components/CreateTripComponents/UnifiedTripCreator'
 import { createAiTripSteps, TRIP_TYPES } from '@/constants/createTrip'
-import { colorPalettes } from '@/constants/Itheme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { useAiTripStore } from '@/store/useAiTripStore'
 import { useFocusEffect } from '@react-navigation/native'
 import { useNavigation, useRouter } from 'expo-router'
-import React, { useMemo, useState } from 'react'
-import { Alert, StyleSheet } from 'react-native'
-import { View } from 'react-native-ui-lib'
+import React from 'react'
+import { Alert } from 'react-native'
 
 export default function AiCreateTripScreen() {
   const theme = useThemeStyle()
-  const styles = useMemo(() => createStyles(theme), [theme])
-  const [currentStep, setCurrentStep] = useState(0)
-  const StepComponent = createAiTripSteps[currentStep]
   const router = useRouter()
   const navigation = useNavigation()
 
@@ -50,46 +45,21 @@ export default function AiCreateTripScreen() {
     }, [navigation, clearRequest, router])
   )
 
-  const goNext = () => {
-    if (currentStep < createAiTripSteps.length - 1) {
-      setCurrentStep(currentStep + 1)
-    }
+  const handleComplete = () => {
+    router.push('/(tabs)/my-trips')
   }
 
-  const goBack = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1)
-    }
-
-    if (currentStep === 0) {
-      router.back()
-    }
+  const handleBack = () => {
+    router.back()
   }
 
   return (
-    <View style={styles.safeAreaContainer}>
-      <CreateTripNavigationBar
-        type={TRIP_TYPES.AI}
-        theme={theme}
-        goback={goBack}
-        currentStep={currentStep}
-        isLastStep={currentStep === createAiTripSteps.length - 1}
-      />
-      <StepComponent theme={theme} nextFn={goNext} />
-    </View>
+    <UnifiedTripCreator
+      tripType={TRIP_TYPES.AI}
+      steps={createAiTripSteps}
+      theme={theme}
+      onComplete={handleComplete}
+      onBack={handleBack}
+    />
   )
 }
-
-const createStyles = (theme: typeof colorPalettes.light) =>
-  StyleSheet.create({
-    safeAreaContainer: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: theme.white,
-      paddingVertical: 40,
-    },
-    container: {
-      flex: 1,
-    },
-  })

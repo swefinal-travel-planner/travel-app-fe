@@ -4,14 +4,15 @@ import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import { Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
-import beApi from '@/lib/beApi'
-import coreApi from '@/lib/coreApi'
+import beApi, { safeBeApiCall } from '@/lib/beApi'
+import coreApi, { safeCoreApiCall } from '@/lib/coreApi'
 import { Trip, TripItem } from '@/lib/types/Trip'
 import { formatTripStatus } from '@/utils/tripAttributes'
 import Ionicons from '@expo/vector-icons/Ionicons'
+import { Image } from 'expo-image'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import React, { useEffect, useMemo, useState } from 'react'
-import { Image, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 type DistanceTime = {
   distance: string
@@ -36,8 +37,9 @@ const TripDetailViewScreen = () => {
     }
 
     router.push({
-      pathname: `my-trips/${trip.id}/details/modify`,
+      pathname: '/my-trips/[id]/details/modify',
       params: {
+        id: trip.id,
         tripData: JSON.stringify(groupedItems[activeDay]?.spots ?? []),
         tripDate: groupedItems[activeDay]?.date ?? '',
         tripDay: groupedItems[activeDay]?.day ?? 1,
@@ -67,7 +69,7 @@ const TripDetailViewScreen = () => {
 
   const getTripDetail = async () => {
     try {
-      const tripData = await beApi.get(`/trips/${id}`)
+      const tripData = await safeBeApiCall(() => beApi.get(`/trips/${id}`))
       setTrip(tripData.data.data)
     } catch (error) {
       console.error('Error fetching trip detail by ID:', error)
@@ -80,9 +82,28 @@ const TripDetailViewScreen = () => {
       return
     }
     try {
-      const tripItemData = await beApi.get(`/trips/${id}/trip-items`)
+      const tripItemData = await beApi.get(`/trips/${id}/trip-items?language=en`)
+
+      // Check if the response data is null or undefined
+      if (!tripItemData.data?.data) {
+        console.warn('No trip items data received from API')
+        setTripItems([])
+        setDistanceTimes([])
+        setGroupedItems([])
+        return
+      }
 
       let items: TripItem[] = tripItemData.data.data
+
+      // Check if items array is empty
+      if (!items || items.length === 0) {
+        console.warn('No trip items found')
+        setTripItems([])
+        setDistanceTimes([])
+        setGroupedItems([])
+        return
+      }
+
       const placeIDs = items.map((item) => item.placeID)
 
       items = items.map((item, index) => ({
@@ -93,7 +114,14 @@ const TripDetailViewScreen = () => {
       setTripItems(items)
 
       // Lấy thông tin khoảng cách và thời gian di chuyển giữa các địa điểm từ API
-      const distanceTimeData = await coreApi.post(`/distance_time/calc`, { place_ids: placeIDs })
+      const distanceTimeData = await safeCoreApiCall(() => coreApi.post(`/distance_time/calc`, { place_ids: placeIDs }))
+
+      // If response is null, it means it was a silent error
+      if (!distanceTimeData) {
+        setDistanceTimes([])
+        return
+      }
+
       setDistanceTimes(
         distanceTimeData.data.data.map((item: any) => ({
           distance: item.distance,
@@ -175,8 +203,6 @@ const TripDetailViewScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
-
       <ScrollView style={styles.content}>
         {/* Trip Info Card */}
         <View style={styles.tripCard}>
@@ -187,8 +213,8 @@ const TripDetailViewScreen = () => {
 
           <View style={styles.tripInfoRow}>
             <View style={styles.tripInfoItem}>
-              <Text style={styles.tripInfoLabel}>Budget</Text>
-              <Text style={styles.tripInfoValue}>{trip.budget.toLocaleString('vi-VN')}</Text>
+              <Text style={styles.tripInfoLabel}>Location</Text>
+              <Text style={styles.tripInfoValue}>{trip.city}</Text>
             </View>
             <View style={styles.tripInfoItem}>
               <Text style={styles.tripInfoLabel}>Members</Text>
@@ -229,7 +255,13 @@ const TripDetailViewScreen = () => {
         <Text style={styles.mapInstructionText}>Tap a spot to view its details</Text>
 
         {/* Spots List */}
-        {groupedItems[activeDay] &&
+        {groupedItems.length === 0 ? (
+          <View style={styles.noItemsContainer}>
+            <Text style={styles.noItemsText}>No trip items found</Text>
+            <Text style={styles.noItemsSubText}>This trip doesn't have any planned spots yet.</Text>
+          </View>
+        ) : (
+          groupedItems[activeDay] &&
           ['morning', 'afternoon', 'evening', 'night']
             .filter((timeSlot) => groupedItems[activeDay].spots.some((spot) => spot.timeSlot === timeSlot))
             .map((timeSlot) => (
@@ -274,7 +306,8 @@ const TripDetailViewScreen = () => {
                     )
                   })}
               </View>
-            ))}
+            ))
+        )}
       </ScrollView>
 
       {/* Edit Button */}
@@ -293,11 +326,11 @@ const createStyles = (theme: typeof colorPalettes.light) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: '#FFFFFF',
+      backgroundColor: theme.white,
     },
     content: {
       flex: 1,
-      marginTop: 16,
+      marginTop: 20,
     },
     tripCard: {
       backgroundColor: theme.secondary,
@@ -348,7 +381,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       marginHorizontal: 24,
     },
     dayNavigationButton: {
-      // padding: 8,
+      padding: 8,
     },
     dayText: {
       flex: 1,
@@ -433,6 +466,26 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       color: theme.text,
       marginBottom: 8,
       marginLeft: 24,
+    },
+    noItemsContainer: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: 40,
+      marginHorizontal: 24,
+    },
+    noItemsText: {
+      fontSize: FontSize.XL,
+      fontFamily: FontFamily.BOLD,
+      color: theme.text,
+      marginBottom: 8,
+      textAlign: 'center',
+    },
+    noItemsSubText: {
+      fontSize: FontSize.MD,
+      fontFamily: FontFamily.REGULAR,
+      color: theme.text,
+      textAlign: 'center',
+      opacity: 0.7,
     },
   })
 

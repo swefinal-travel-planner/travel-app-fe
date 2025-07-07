@@ -1,11 +1,13 @@
 import ImageActionSheet from '@/components/ImageActionSheet'
+import { useToast } from '@/components/ToastContext'
+import { EMPTY_STRING } from '@/constants/utilConstants'
 import ProfileAvatar from '@/features/profile/presentation/components/ProfileAvatar'
 import ProfileDangerSection from '@/features/profile/presentation/components/ProfileDangerSection'
 import ProfileFriendSection from '@/features/profile/presentation/components/ProfileFriendSection'
 import ProfileSettingsSection from '@/features/profile/presentation/components/ProfileSettingsSection'
 import ProfileStats from '@/features/profile/presentation/components/ProfileStats'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
-import beApi from '@/lib/beApi'
+import beApi, { safeBeApiCall } from '@/lib/beApi'
 import { Friend } from '@/lib/types/Profile'
 import { useThemeStore } from '@/store/themeStore'
 import { clearLoginInfo } from '@/utils/clearLoginInfo'
@@ -69,16 +71,19 @@ const ProfileScreen = () => {
   const [selectedField, setSelectedField] = useState<string>('Edit name')
   const [profilePic, setProfilePic] = useState('')
   const [isDarkTheme, setIsDarkTheme] = useState(false)
+  const { showToast } = useToast()
 
   useEffect(() => {
     const getUserInfo = async () => {
       const name = await SecureStore.getItemAsync('name')
       const email = await SecureStore.getItemAsync('email')
       const phone = await SecureStore.getItemAsync('phoneNumber')
+      const profilePic = await SecureStore.getItemAsync('profilePic')
 
       setName(name || '')
       setEmail(email || '')
       setPhone(phone || 'No phone number set')
+      setProfilePic(profilePic || '')
     }
 
     getUserInfo()
@@ -86,7 +91,13 @@ const ProfileScreen = () => {
 
   const fetchFriends = async () => {
     try {
-      const response = await beApi.get('/friends')
+      const response = await safeBeApiCall(() => beApi.get('/friends'))
+
+      // If response is null, it means it was a silent error
+      if (!response) {
+        return []
+      }
+
       const data = response.data
       const friends: Friend[] = (data.data ?? []).map((f: any) => ({
         id: f.id,
@@ -95,7 +106,7 @@ const ProfileScreen = () => {
       }))
       return friends
     } catch (error) {
-      console.log('Fetch friends failed:', error)
+      console.log('Error:', error, ' File:', __filename)
       throw error
     }
   }
@@ -127,21 +138,34 @@ const ProfileScreen = () => {
   const handleSave = async (value: string, field: string) => {
     try {
       const key = mapFieldKey(field)
-      const response = await beApi.patch('/users/me', {
-        [key]: value,
-      })
-      if (response.status !== 204) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
+
       // Update local state
       if (key === 'name') setName(value)
       else if (key === 'phoneNumber') setPhone(value)
       else if (key === 'email') setEmail(value)
-      else if (key === 'photo_url') setProfilePic(value)
-      setProfilePic(value)
+      else if (key === 'photoURL') setProfilePic(value)
+      const response = await safeBeApiCall(() =>
+        beApi.patch('/users/me', {
+          [key]: value,
+        })
+      )
+
+      // If response is null, it means it was a silent error
+      if (!response) {
+        return
+      }
+
+      if (response.status !== 204) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      showToast({
+        type: 'success',
+        message: `${field} updated successfully!`,
+        position: 'bottom',
+      })
       setModalVisible(false)
     } catch (error) {
-      console.log('Update profile failed:', error)
+      console.log('Update profile failed:', error, ' File:', __filename)
       throw error
     }
   }
@@ -198,7 +222,7 @@ const ProfileScreen = () => {
           visible={showActionSheet}
           onDismiss={() => setShowActionSheet(false)}
           onImagePicked={async (uri) => {
-            handleSave((await uploadImage2Cloud(uri, 'avatars')) ?? uri, 'Edit profile picture')
+            handleSave((await uploadImage2Cloud(uri, 'avatars')) ?? EMPTY_STRING, 'Edit profile picture')
           }}
           aspect={[1, 1]}
           allowsEditing={true}

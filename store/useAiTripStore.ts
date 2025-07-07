@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-export interface AiTripRequest {
+export type TripRequest = {
   budget: number
   city: string
   days: number
@@ -19,36 +19,22 @@ export interface AiTripRequest {
 }
 
 interface AiTripState {
-  request: AiTripRequest | null
-  setCity: (city: string) => void
-  setTripLength: (startDate: string, days: number) => void
+  request: TripRequest | null
   setLocsPerDay: (locationsPerDay: number) => void
   setFoodAttributes: (enAttributes: string[], viAttributes: string[]) => void
   setLocAttributes: (enAttributes: string[], viAttributes: string[]) => void
   setMedicalConditions: (enConditions: string[], viConditions: string[]) => void
   setSpecialRequirements: (enRequirements: string[], viRequirements: string[]) => void
-  setTitle: (title: string) => void
   setLocPreference: (preference: string) => void
+  setRequest: (updates: Partial<TripRequest>) => void
   clearRequest: () => void
 }
 
 export const useAiTripStore = create<AiTripState>()((set) => ({
   request: null,
-  setCity: (city: string) =>
-    set((state) => ({
-      request: { ...state.request, city } as AiTripRequest,
-    })),
-  setTripLength: (startDate: string, days: number) =>
-    set((state) => ({
-      request: {
-        ...state.request,
-        startDate: startDate,
-        days,
-      } as AiTripRequest,
-    })),
   setLocsPerDay: (locationsPerDay: number) =>
     set((state) => ({
-      request: { ...state.request, locationsPerDay } as AiTripRequest,
+      request: { ...state.request, locationsPerDay } as TripRequest,
     })),
   setFoodAttributes: (enAttributes: string[], viAttributes: string[]) =>
     set((state) => ({
@@ -56,7 +42,7 @@ export const useAiTripStore = create<AiTripState>()((set) => ({
         ...state.request,
         enFoodAttributes: enAttributes,
         viFoodAttributes: viAttributes,
-      } as AiTripRequest,
+      } as TripRequest,
     })),
   setLocAttributes: (enAttributes: string[], viAttributes: string[]) =>
     set((state) => ({
@@ -64,7 +50,7 @@ export const useAiTripStore = create<AiTripState>()((set) => ({
         ...state.request,
         enLocationAttributes: enAttributes,
         viLocationAttributes: viAttributes,
-      } as AiTripRequest,
+      } as TripRequest,
     })),
   setMedicalConditions: (enConditions: string[], viConditions: string[]) =>
     set((state) => ({
@@ -72,7 +58,7 @@ export const useAiTripStore = create<AiTripState>()((set) => ({
         ...state.request,
         enMedicalConditions: enConditions,
         viMedicalConditions: viConditions,
-      } as AiTripRequest,
+      } as TripRequest,
     })),
   setSpecialRequirements: (enRequirements: string[], viRequirements: string[]) =>
     set((state) => ({
@@ -80,18 +66,18 @@ export const useAiTripStore = create<AiTripState>()((set) => ({
         ...state.request,
         enSpecialRequirements: enRequirements,
         viSpecialRequirements: viRequirements,
-      } as AiTripRequest,
-    })),
-  setTitle: (title: string) =>
-    set((state) => ({
-      request: { ...state.request, title } as AiTripRequest,
+      } as TripRequest,
     })),
   setLocPreference: (preference: string) =>
     set((state) => ({
       request: {
         ...state.request,
         locationPreference: preference,
-      } as AiTripRequest,
+      } as TripRequest,
+    })),
+  setRequest: (updates: Partial<TripRequest>) =>
+    set((state) => ({
+      request: { ...state.request, ...updates } as TripRequest,
     })),
   clearRequest: () => set({ request: null }),
 }))

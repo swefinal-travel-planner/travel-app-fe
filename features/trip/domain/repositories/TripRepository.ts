@@ -7,4 +7,5 @@ export type TripRepository = {
   updateTripItems(tripId: number, tripItem: UpdateTripItemDTO[]): Promise<void>
   getTripImage(tripId: number): Promise<TripImage[] | null>
   postTripImage(tripId: number, image: string): Promise<void>
+  deleteTrip(tripId: number): Promise<void>
 }

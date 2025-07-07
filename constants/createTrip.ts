@@ -4,32 +4,52 @@ import MedicalReqs from '@/components/CreateTripComponents/MedicalReq'
 import OtherReqs from '@/components/CreateTripComponents/OtherReq'
 import SpotNumber from '@/components/CreateTripComponents/SpotNumber'
 import SpotType from '@/components/CreateTripComponents/SpotType'
+import TripRename from '@/components/CreateTripComponents/TripRename'
 import WaitScreen from '@/components/CreateTripComponents/WaitScreen'
 import ManualTripCreate from '@/features/trip/presentation/components/ManualTripCreate'
 import TripLength from '@/features/trip/presentation/components/TripLength'
 import ChooseLocation from '@/features/trip/presentation/components/TripLocation'
-
-export const createManualTripSteps = [
-  ChooseLocation,
-  TripLength,
-  ManualTripCreate,
-]
+import { ComponentType } from 'react'
 
 export const TRIP_TYPES = {
   MANUAL: 'MANUAL',
   AI: 'AI',
+} as const
+
+export type TripType = keyof typeof TRIP_TYPES
+
+// Base step interface
+export interface TripStep {
+  component: ComponentType<any>
+  isLastStep?: boolean
 }
 
-export const createAiTripSteps = [
-  ChooseLocation,
-  TripLength,
-  SpotNumber,
-  SpotType,
-  FoodSpotType,
-  MedicalReqs,
-  OtherReqs,
-  LocPreference,
-  WaitScreen,
+// AI Trip Steps
+export const createAiTripSteps: TripStep[] = [
+  { component: ChooseLocation },
+  { component: TripLength },
+  { component: SpotNumber },
+  { component: SpotType },
+  { component: FoodSpotType },
+  { component: MedicalReqs },
+  { component: OtherReqs },
+  { component: LocPreference },
+  {
+    component: TripRename,
+    isLastStep: true,
+  },
+  { component: WaitScreen },
+]
+
+// Manual Trip Steps
+export const createManualTripSteps: TripStep[] = [
+  { component: ChooseLocation },
+  { component: TripLength },
+  { component: ManualTripCreate },
+  {
+    component: TripRename,
+    isLastStep: true,
+  },
 ]
 
 export const MAX_TRIP_LENGTH = 7

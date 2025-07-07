@@ -1,7 +1,8 @@
 import { Radius, Size, SpacingScale } from '@/constants/theme'
 import { Ionicons } from '@expo/vector-icons'
 import { useMemo } from 'react'
-import { Image, Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Image } from 'expo-image'
 
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 
@@ -116,8 +117,8 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       backgroundColor: theme.white,
     },
     backButton: {
-      width: 40,
-      height: 40,
+      width: 20,
+      height: 20,
       justifyContent: 'center',
       alignItems: 'center',
     },

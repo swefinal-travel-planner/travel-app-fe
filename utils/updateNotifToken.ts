@@ -2,7 +2,7 @@ import Constants from 'expo-constants'
 import * as Notifications from 'expo-notifications'
 import * as SecureStore from 'expo-secure-store'
 
-import beApi, { BE_URL } from '@/lib/beApi'
+import beApi, { BE_URL, safeBeApiCall } from '@/lib/beApi'
 import axios from 'axios'
 
 export default async function updateNotifToken(): Promise<void> {
@@ -10,9 +10,7 @@ export default async function updateNotifToken(): Promise<void> {
     let token = await SecureStore.getItemAsync('expoPushToken')
 
     if (!token || token === '') {
-      const projectId =
-        Constants?.expoConfig?.extra?.eas?.projectId ??
-        Constants?.easConfig?.projectId
+      const projectId = Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId
 
       if (!projectId) {
         console.error('From updateNotifToken: project ID not found')
@@ -32,7 +30,12 @@ export default async function updateNotifToken(): Promise<void> {
       notificationToken: token,
     }
 
-    await beApi.put(`${BE_URL}/users/notification-token`, payload)
+    const response = await safeBeApiCall(() => beApi.put(`${BE_URL}/users/notification-token`, payload))
+
+    // If response is null, it means it was a silent error
+    if (!response) {
+      return
+    }
   } catch (error) {
     if (axios.isAxiosError(error)) {
       // handle errors coming from the API call

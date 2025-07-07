@@ -3,7 +3,7 @@ import { colorPalettes } from '@/constants/Itheme'
 import { Radius } from '@/constants/theme'
 import React, { useEffect } from 'react'
 import { Dimensions, StyleSheet, Text, View } from 'react-native'
-import { Image } from 'react-native-ui-lib'
+import { Image } from 'expo-image'
 
 type ProfileAvatarProps = {
   theme: typeof colorPalettes.light
@@ -17,6 +17,7 @@ const ProfileAvatar = ({ theme, profilePic, name, email, phone }: ProfileAvatarP
   useEffect(() => {
     // Log the profile picture URL to console for debugging
     console.log(name, email, phone, profilePic)
+    console.log('debug profilePic', profilePic)
   }, [])
 
   return (

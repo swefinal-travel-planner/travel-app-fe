@@ -2,7 +2,9 @@ import { ConfigContext, ExpoConfig } from 'expo/config'
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
-  name: 'travel-app-fe',
+  name: 'Travel AI App',
+  description:
+    'An AI-powered travel app that helps users plan their trips with personalized recommendations and real-time updates.',
   slug: 'travel-app-fe',
   version: '1.0.0',
   orientation: 'portrait',
@@ -82,6 +84,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     policy: 'appVersion',
   },
   extra: {
+    weatherApiKey: process.env.EXPO_SECRET_WEATHER_API_KEY,
+    translateApiKey: process.env.EXPO_SECRET_TRANSLATE_API_KEY,
+    mapboxAccessToken: process.env.EXPO_SECRET_MAPBOX_ACCESS_TOKEN,
+    coreSecretToken: process.env.EXPO_SECRET_CORE_SECRET_TOKEN,
     router: {
       origin: false,
     },

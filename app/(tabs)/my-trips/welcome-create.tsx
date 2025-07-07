@@ -3,10 +3,11 @@ import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import { useManualTripStore } from '@/features/trip/presentation/state/useManualTrip'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
+import { Ionicons } from '@expo/vector-icons'
 import { useFocusEffect } from '@react-navigation/native'
 import { useNavigation, useRouter } from 'expo-router'
 import React, { useMemo } from 'react'
-import { Alert, StyleSheet, Text, View } from 'react-native'
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 export default function WelcomeCreateScreen() {
   const theme = useThemeStyle()
@@ -15,6 +16,10 @@ export default function WelcomeCreateScreen() {
   const navigation = useNavigation()
 
   const resetManualTrip = useManualTripStore((state) => state.resetManualTrip)
+
+  const onBack = () => {
+    router.back()
+  }
 
   useFocusEffect(
     React.useCallback(() => {
@@ -48,10 +53,16 @@ export default function WelcomeCreateScreen() {
 
   return (
     <View style={styles.container}>
+      <View>
+        <TouchableOpacity style={styles.backButton} onPress={onBack}>
+          <Ionicons name="arrow-back" size={24} color={theme.text} />
+        </TouchableOpacity>
+      </View>
+
       <Text style={[styles.textQuestion, { color: theme.primary }]}>
         Let our{'  '}
         <Text style={{ color: theme.error, fontSize: FontSize.HUGE, fontFamily: FontFamily.BOLD_ITALIC }}>
-          Travle AI
+          Travel AI
         </Text>
         {'  '}
         help you plan your next trip!
@@ -74,6 +85,7 @@ export default function WelcomeCreateScreen() {
         style={{
           color: theme.text,
           backgroundColor: theme.secondary,
+          marginBottom: 40,
         }}
       />
     </View>
@@ -87,9 +99,8 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       width: '100%',
       flexDirection: 'column',
       justifyContent: 'space-between',
-      alignItems: 'center',
       paddingHorizontal: 24,
-      paddingVertical: 120,
+      paddingVertical: 40,
       backgroundColor: theme.white,
     },
     textFieldContainer: {
@@ -104,6 +115,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       textAlign: 'center',
       fontFamily: FontFamily.BOLD,
       fontSize: FontSize.XXXL,
+      marginTop: 40,
     },
     subTextQuestion: {
       display: 'flex',
@@ -121,12 +133,6 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       fontFamily: FontFamily.REGULAR,
       fontSize: FontSize.LG,
     },
-    button: {
-      width: '100%',
-      paddingVertical: 15,
-      fontFamily: FontFamily.BOLD,
-      fontSize: FontSize.XL,
-    },
     dateField: {
       width: '100%',
       height: 48,
@@ -134,5 +140,11 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       padding: 12,
       backgroundColor: colorPalettes.light.background,
       color: colorPalettes.light.primary,
+    },
+    backButton: {
+      width: 20,
+      height: 20,
+      justifyContent: 'center',
+      alignItems: 'center',
     },
   })

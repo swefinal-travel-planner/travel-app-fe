@@ -1,7 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link, useRouter } from 'expo-router'
 import { Controller, useForm } from 'react-hook-form'
-import { Image, Keyboard, Text, TouchableWithoutFeedback, View } from 'react-native'
+import { Keyboard, Text, TouchableWithoutFeedback, View } from 'react-native'
+import { Image } from 'expo-image'
 import { z } from 'zod'
 
 import { auth } from '@/firebaseConfig'
@@ -10,7 +11,7 @@ import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth'
 
 import saveLoginInfo from '@/utils/saveLoginInfo'
 
-import beApi, { BE_URL } from '@/lib/beApi'
+import beApi, { BE_URL, safeBeApiCall } from '@/lib/beApi'
 import axios from 'axios'
 
 import CustomTextField from '@/components/input/CustomTextField'
@@ -75,7 +76,12 @@ export default function Login() {
           id_token: idToken,
         }
 
-        const response = await beApi.post(`${BE_URL}/auth/google-login`, payload)
+        const response = await safeBeApiCall(() => beApi.post(`${BE_URL}/auth/google-login`, payload))
+
+        // If response is null, it means it was a silent error
+        if (!response) {
+          return
+        }
 
         await saveLoginInfo(
           response.data.data.userId,
@@ -122,7 +128,12 @@ export default function Login() {
         password: data.password || '',
       }
 
-      const response = await beApi.post(`${BE_URL}/auth/login`, payload)
+      const response = await safeBeApiCall(() => beApi.post(`${BE_URL}/auth/login`, payload))
+
+      // If response is null, it means it was a silent error
+      if (!response) {
+        return
+      }
 
       await saveLoginInfo(
         response.data.data.userId || 0,

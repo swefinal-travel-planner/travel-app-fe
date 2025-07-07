@@ -29,14 +29,10 @@ export default function AlbumScreen() {
   // Handle post image error
   React.useEffect(() => {
     if (postImageError) {
-      console.log('postimageeror', postImageError)
+      console.log('Error:', postImageError, ' File:', __filename)
       Alert.alert('Error', 'Failed to upload image. Please try again.', [{ text: 'OK', onPress: () => {} }])
     }
   }, [postImageError])
-
-  // log the trip images
-  console.log('object')
-  console.log(images)
 
   const openImageModal = (index: number) => {
     setSelectedImageIndex(index)

@@ -96,7 +96,7 @@ const FriendListModal = ({ visible, closeModal, friendList }: FriendListModalPro
       const response = await beApi.post('/invitation-friends', { receiverEmail: emailValue })
       if (!response.status.toString().startsWith('2')) {
         const errorBody = await response.data
-        throw new Error(errorBody.message || `HTTP Error: ${response.status}`)
+        throw new Error(errorBody.message ?? `HTTP Error: ${response.status}`)
       }
     },
     onError: (err) => console.log('Mutation failed!', err),
