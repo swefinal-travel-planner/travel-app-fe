@@ -1,35 +1,37 @@
 import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
-import spotTypeData from '@/lib/mock_data/spotTypes'
+import foodSpotTypeData from '@/lib/mock_data/foodSpotTypes'
 import { useAiTripStore } from '@/store/useAiTripStore'
 import { formatAttribute } from '@/utils/tripAttributes'
 import React, { useEffect, useState } from 'react'
 import { StyleSheet } from 'react-native'
 import { Text, View } from 'react-native-ui-lib'
-import CollapsibleSectionList from '../CollapsibleSectionList'
-import Pressable from '../Pressable'
+import CollapsibleSectionList from '../../../../components/CollapsibleSectionList'
+import Pressable from '../../../../components/Pressable'
 
-type SpotTypeProps = {
+type FoodSpotTypeProps = {
   theme: typeof colorPalettes.light
   nextFn: () => void
 }
 
-export default function SpotType({ theme, nextFn }: Readonly<SpotTypeProps>) {
-  const setLocAttributes = useAiTripStore((state) => state.setLocAttributes)
+export default function FoodSpotType({ theme, nextFn }: Readonly<FoodSpotTypeProps>) {
+  const setFoodAttributes = useAiTripStore((state) => state.setFoodAttributes)
   const request = useAiTripStore((state) => state.request)
 
-  const [spotTypes, setSpotTypes] = useState<string[]>(request?.enLocationAttributes ?? [])
+  const [foodSpotTypes, setFoodSpotTypes] = useState<string[]>(request?.enFoodAttributes ?? [])
 
   useEffect(() => {
-    setLocAttributes(
-      spotTypes.map((type) => formatAttribute(type)),
+    setFoodAttributes(
+      foodSpotTypes.map((type) => formatAttribute(type)),
       []
     )
-  }, [spotTypes])
+  }, [foodSpotTypes])
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.textQuestion, { color: theme.primary }]}>What type of spots do you want to visit?</Text>
+      <Text style={[styles.textQuestion, { color: theme.primary }]}>
+        What type of culinary spots do you want to visit?
+      </Text>
 
       <Text style={[styles.subTextQuestion, { color: theme.text }]}>
         Scroll to see all categories, and tap to expand each category.
@@ -38,15 +40,19 @@ export default function SpotType({ theme, nextFn }: Readonly<SpotTypeProps>) {
       <Text style={[styles.subTextQuestion, { color: theme.text }]}>Select at least one category to continue.</Text>
 
       <View style={styles.textFieldContainer}>
-        <CollapsibleSectionList data={spotTypeData} selectedValues={spotTypes} onValueChange={setSpotTypes} />
+        <CollapsibleSectionList
+          data={foodSpotTypeData}
+          selectedValues={foodSpotTypes}
+          onValueChange={setFoodSpotTypes}
+        />
       </View>
 
-      {spotTypes.length > 0 && (
+      {foodSpotTypes.length > 0 && (
         <Text style={[styles.textField, { color: theme.primary }]}>
-          {spotTypes.length === 1
+          {foodSpotTypes.length === 1
             ? 'Selected 1 category'
-            : spotTypes.length > 1
-              ? `Selected ${spotTypes.length} categories`
+            : foodSpotTypes.length > 1
+              ? `Selected ${foodSpotTypes.length} categories`
               : ''}
         </Text>
       )}
@@ -58,7 +64,7 @@ export default function SpotType({ theme, nextFn }: Readonly<SpotTypeProps>) {
           color: theme.white,
           backgroundColor: theme.primary,
         }}
-        disabled={spotTypes.length === 0}
+        disabled={foodSpotTypes.length === 0}
       />
     </View>
   )

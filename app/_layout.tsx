@@ -112,6 +112,7 @@ export default function RootLayout() {
 
       const token = await registerForPushNotificationsAsync()
       console.log('debug noti token', token)
+
       if (token) {
         await updateUserPushToken(token)
       }
