@@ -193,7 +193,7 @@ const TripFriendInviteScreen = () => {
         <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
           <Ionicons name="arrow-back-outline" size={24} color={theme.text} />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: theme.text }]}>Invite friends</Text>
+        <Text style={[styles.headerTitle, { color: theme.text }]}>Add friends</Text>
         <View style={styles.placeholder} />
       </View>
 

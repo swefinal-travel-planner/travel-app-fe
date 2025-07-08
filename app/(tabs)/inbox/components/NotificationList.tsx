@@ -10,7 +10,9 @@ import { colorPalettes } from '@/constants/Itheme'
 
 import { FontFamily, FontSize } from '@/constants/font'
 import { Radius } from '@/constants/theme'
+import beApi from '@/lib/beApi'
 import { formatDateTime } from '@/utils/Datetime'
+import { useRouter } from 'expo-router'
 
 interface NotificationListProps {
   notificationList: Notification[] | undefined
@@ -21,6 +23,32 @@ interface NotificationListProps {
 function NotificationList({ notificationList, removeNotification, markAsRead }: NotificationListProps) {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
+  const router = useRouter()
+
+  const handleNavigate = (notif: Notification) => {
+    if (!notif.isSeen) markAsRead(notif.id)
+
+    switch (notif.type) {
+      case 'tripGenerated':
+      case 'tripGeneratedFailed':
+        router.push('/my-trips')
+        break
+      case 'friendRequestAccepted':
+        router.push('/profile')
+        break
+      default:
+        break
+    }
+  }
+
+  const handleAcceptFriendRequest = async (notif: Notification) => {
+    if (!notif.isSeen) markAsRead(notif.id)
+    try {
+      await beApi.put(`/invitation-friends/accept/${notif.referenceEntity.id}`)
+    } catch (error) {
+      console.error('Error accepting friend request:', error)
+    }
+  }
 
   return (
     <ScrollView
@@ -37,7 +65,7 @@ function NotificationList({ notificationList, removeNotification, markAsRead }: 
               ? {
                   text: !notif.isSeen ? 'Accept' : 'Accepted',
                   background: !notif.isSeen ? Colors.green30 : Colors.grey50,
-                  onPress: !notif.isSeen ? () => markAsRead(notif.id) : () => {},
+                  onPress: !notif.isSeen ? () => handleAcceptFriendRequest(notif) : () => {},
                 }
               : undefined
           }
@@ -57,14 +85,14 @@ function NotificationList({ notificationList, removeNotification, markAsRead }: 
           fullSwipeRight
           onFullSwipeRight={() => removeNotification(notif.id)}
           fullSwipeLeft={!notif.isSeen}
-          onFullSwipeLeft={() => markAsRead(notif.id)}
+          onFullSwipeLeft={() => handleAcceptFriendRequest(notif)}
         >
-          <Pressable onPress={notif.action === 'navigable' ? () => markAsRead(notif.id) : undefined}>
+          <Pressable onPress={notif.action === 'navigable' ? () => handleNavigate(notif) : undefined}>
             <View style={!notif.isSeen ? styles.unreadNotifContainer : styles.notifContainer}>
               <Avatar
                 source={
                   notif.triggerEntity.type === 'user'
-                    ? notif.triggerEntity.avatar
+                    ? { uri: notif.triggerEntity.avatar }
                     : require('@/assets/icons/ios-light.png')
                 }
                 size={40}
