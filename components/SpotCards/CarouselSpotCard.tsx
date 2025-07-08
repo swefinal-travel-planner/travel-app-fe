@@ -6,7 +6,7 @@ import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { TripItem } from '@/lib/types/Trip'
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import PressableOpacity from '../PressableOpacity'
 
 interface Location {
@@ -22,10 +22,6 @@ interface SpotCardProps {
 const CarouselSpotCard: React.FC<SpotCardProps> = ({ tripItem, onCheckIn }) => {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
-
-  useEffect(() => {
-    console.log('Trip item:', tripItem)
-  }, [])
 
   return (
     <PressableOpacity style={styles.wrapper}>

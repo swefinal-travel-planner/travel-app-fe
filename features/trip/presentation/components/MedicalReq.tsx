@@ -1,47 +1,47 @@
 import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
-import otherReqData from '@/lib/mock_data/otherReqs'
+import medicalReqData from '@/lib/mock_data/medicalReqs'
 import { useAiTripStore } from '@/store/useAiTripStore'
 import { formatAttribute } from '@/utils/tripAttributes'
 import React, { useEffect, useState } from 'react'
 import { StyleSheet } from 'react-native'
 import { Text, View } from 'react-native-ui-lib'
-import CollapsibleSectionList from '../CollapsibleSectionList'
-import Pressable from '../Pressable'
+import CollapsibleSectionList from '../../../../components/CollapsibleSectionList'
+import Pressable from '../../../../components/Pressable'
 
-type OtherReqProps = {
+type MedicalReqProps = {
   theme: typeof colorPalettes.light
   nextFn: () => void
 }
 
-export default function OtherReq({ theme, nextFn }: Readonly<OtherReqProps>) {
+export default function MedicalReq({ theme, nextFn }: Readonly<MedicalReqProps>) {
   const request = useAiTripStore((state) => state.request)
 
-  const [otherReqs, setOtherReqs] = useState<string[]>(
-    request?.enSpecialRequirements ? request.enSpecialRequirements.filter((req) => req !== 'none') : []
+  const [medicalReqs, setMedicalReqs] = useState<string[]>(
+    request?.enMedicalConditions ? request.enMedicalConditions.filter((req) => req !== 'none') : []
   )
 
-  const setSpecialRequirements = useAiTripStore((state) => state.setSpecialRequirements)
+  const setMedicalConditions = useAiTripStore((state) => state.setMedicalConditions)
 
   const handleNext = () => {
     nextFn()
   }
 
   useEffect(() => {
-    setSpecialRequirements(
-      otherReqs.map((req) => formatAttribute(req)),
+    setMedicalConditions(
+      medicalReqs.map((req) => formatAttribute(req)),
       []
     )
 
-    if (otherReqs.length === 0) {
-      setSpecialRequirements(['none'], [])
+    if (medicalReqs.length === 0) {
+      setMedicalConditions(['none'], [])
     }
-  }, [otherReqs])
+  }, [medicalReqs])
 
   return (
     <View style={styles.container}>
       <Text style={[styles.textQuestion, { color: theme.primary }]}>
-        Finally, do you have any other requirements or preferences?
+        Do you have any medical or dietary requirements?
       </Text>
 
       <Text style={[styles.subTextQuestion, { color: theme.text }]}>
@@ -53,15 +53,15 @@ export default function OtherReq({ theme, nextFn }: Readonly<OtherReqProps>) {
       </Text>
 
       <View style={styles.textFieldContainer}>
-        <CollapsibleSectionList data={otherReqData} selectedValues={otherReqs} onValueChange={setOtherReqs} />
+        <CollapsibleSectionList data={medicalReqData} selectedValues={medicalReqs} onValueChange={setMedicalReqs} />
       </View>
 
-      {otherReqs.length > 0 && (
+      {medicalReqs.length > 0 && (
         <Text style={[styles.textField, { color: theme.primary }]}>
-          {otherReqs.length === 1
+          {medicalReqs.length === 1 && medicalReqs[0] !== 'none'
             ? 'Selected 1 category'
-            : otherReqs.length > 1
-              ? `Selected ${otherReqs.length} categories`
+            : medicalReqs.length > 1
+              ? `Selected ${medicalReqs.length} categories`
               : ''}
         </Text>
       )}

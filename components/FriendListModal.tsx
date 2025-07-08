@@ -1,5 +1,5 @@
-import { getPlaceHolder } from '@/components/AdaptiveImage'
 import { colorPalettes } from '@/constants/Itheme'
+import { getPlaceHolder } from '@/features/trip/utils/AdaptiveImage'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import beApi from '@/lib/beApi'
 import { Friend } from '@/lib/types/Profile'

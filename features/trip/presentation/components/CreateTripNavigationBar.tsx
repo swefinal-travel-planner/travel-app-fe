@@ -1,8 +1,4 @@
-import {
-  createAiTripSteps,
-  createManualTripSteps,
-  TRIP_TYPES,
-} from '@/constants/createTrip'
+import { createAiTripSteps, createManualTripSteps, TRIP_TYPES } from '@/constants/createTripSteps'
 import { colorPalettes } from '@/constants/Itheme'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import React from 'react'
@@ -24,10 +20,7 @@ export default function CreateTripNavigationBar({
   isLastStep = false,
   type,
 }: Readonly<CreateTripNavigationBarProps>) {
-  const numberOfSteps =
-    type === TRIP_TYPES.MANUAL
-      ? createManualTripSteps.length
-      : createAiTripSteps.length
+  const numberOfSteps = type === TRIP_TYPES.MANUAL ? createManualTripSteps.length : createAiTripSteps.length
 
   return (
     <View style={styles.createTripNavigationBar}>

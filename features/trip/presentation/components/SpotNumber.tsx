@@ -4,24 +4,19 @@ import { useAiTripStore } from '@/store/useAiTripStore'
 import React, { useEffect, useState } from 'react'
 import { StyleSheet } from 'react-native'
 import { Text, View } from 'react-native-ui-lib'
-import NumStepper from '../NumStepper'
-import Pressable from '../Pressable'
+import NumStepper from '../../../../components/NumStepper'
+import Pressable from '../../../../components/Pressable'
 
 type SpotNumberProps = {
   theme: typeof colorPalettes.light
   nextFn: () => void
 }
 
-export default function SpotNumber({
-  theme,
-  nextFn,
-}: Readonly<SpotNumberProps>) {
+export default function SpotNumber({ theme, nextFn }: Readonly<SpotNumberProps>) {
   const setLocsPerDay = useAiTripStore((state) => state.setLocsPerDay)
   const request = useAiTripStore((state) => state.request)
 
-  const [numberOfSpots, setNumberOfSpots] = useState<number>(
-    request?.locationsPerDay ?? 5
-  )
+  const [numberOfSpots, setNumberOfSpots] = useState<number>(request?.locationsPerDay ?? 5)
 
   useEffect(() => {
     setLocsPerDay(numberOfSpots)
@@ -29,18 +24,10 @@ export default function SpotNumber({
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.textQuestion, { color: theme.primary }]}>
-        How many spots do you want to visit per day?
-      </Text>
+      <Text style={[styles.textQuestion, { color: theme.primary }]}>How many spots do you want to visit per day?</Text>
 
       <View>
-        <NumStepper
-          size="large"
-          value={numberOfSpots}
-          onValueChange={setNumberOfSpots}
-          minValue={5}
-          maxValue={9}
-        />
+        <NumStepper size="large" value={numberOfSpots} onValueChange={setNumberOfSpots} minValue={5} maxValue={9} />
       </View>
 
       <Pressable

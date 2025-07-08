@@ -1,17 +1,14 @@
-import UnifiedTripCreator from '@/components/CreateTripComponents/UnifiedTripCreator'
-import { createManualTripSteps, TRIP_TYPES } from '@/constants/createTrip'
-import { colorPalettes } from '@/constants/Itheme'
+import { createManualTripSteps, TRIP_TYPES } from '@/constants/createTripSteps'
+import UnifiedTripCreator from '@/features/trip/presentation/components/UnifiedTripCreator'
 import { useManualTripStore } from '@/features/trip/presentation/state/useManualTrip'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { useFocusEffect } from '@react-navigation/native'
 import { useNavigation, useRouter } from 'expo-router'
-import React, { useMemo } from 'react'
-import { Alert, StyleSheet } from 'react-native'
-import { View } from 'react-native-ui-lib'
+import React from 'react'
+import { Alert } from 'react-native'
 
 export default function ManualCreateTripScreen() {
   const theme = useThemeStyle()
-  const styles = useMemo(() => createStyles(theme), [theme])
   const router = useRouter()
   const navigation = useNavigation()
 
@@ -57,25 +54,12 @@ export default function ManualCreateTripScreen() {
   }
 
   return (
-    <View style={styles.safeAreaContainer}>
-      <UnifiedTripCreator
-        tripType={TRIP_TYPES.MANUAL}
-        steps={createManualTripSteps}
-        theme={theme}
-        onComplete={handleComplete}
-        onBack={handleBack}
-      />
-    </View>
+    <UnifiedTripCreator
+      tripType={TRIP_TYPES.MANUAL}
+      steps={createManualTripSteps}
+      theme={theme}
+      onComplete={handleComplete}
+      onBack={handleBack}
+    />
   )
 }
-
-const createStyles = (theme: typeof colorPalettes.light) =>
-  StyleSheet.create({
-    safeAreaContainer: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: '#eef8ef',
-      paddingTop: 55,
-    },
-  })

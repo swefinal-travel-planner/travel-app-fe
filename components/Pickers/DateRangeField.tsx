@@ -79,6 +79,13 @@ const DateRangeField = ({ startDate, endDate, setStartDate, setEndDate }: DateRa
       }
     }
 
+    // Mark today if not already marked
+    const today = new Date()
+    const todayStr = today.toISOString().split('T')[0]
+    marked[todayStr] ??= {
+      color: theme.secondary,
+    }
+
     return marked
   }
 

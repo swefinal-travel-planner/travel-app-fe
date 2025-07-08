@@ -9,10 +9,10 @@ import { Text, TextField, View } from 'react-native-ui-lib'
 
 type TripRenameProps = {
   theme: typeof colorPalettes.light
-  nextFn?: () => void
+  nextFn: () => void
   setTripState: (trip: Partial<TripRequest>) => void
   getTripState?: TripRequest | null
-  onSubmit?: (title: string) => void
+  onSubmit?: () => void
   isSubmitting?: boolean
 }
 
@@ -25,26 +25,19 @@ export default function TripRename({
   isSubmitting = false,
 }: Readonly<TripRenameProps>) {
   const styles = useMemo(() => createStyles(theme), [theme])
-  const [title, setTitle] = useState(getTripState?.title ?? '')
+  const [title, setTitle] = useState('')
 
   const handleSubmit = () => {
-    if (title.trim()) {
-      setTripState({ title: title.trim() })
+    setTripState({ title: title.trim() })
 
-      if (onSubmit) {
-        // New pattern: call onSubmit with title
-        onSubmit(title.trim())
-      } else if (nextFn) {
-        // Legacy pattern: call nextFn
-        nextFn()
-      }
+    if (onSubmit) {
+      onSubmit()
     }
+    nextFn()
   }
 
   const isDisabled = !title.trim() || isSubmitting
   const buttonTitle = isSubmitting ? 'Creating...' : 'Create Trip'
-
-  console.log('city', getTripState?.city)
 
   return (
     <View style={[styles.container, { backgroundColor: theme.white }]}>

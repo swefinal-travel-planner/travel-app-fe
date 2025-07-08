@@ -1,4 +1,4 @@
-import { getPlaceHolder } from '@/components/AdaptiveImage'
+import { getPlaceHolder } from '@/features/trip/utils/AdaptiveImage'
 
 export default [
   {

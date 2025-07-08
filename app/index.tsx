@@ -7,42 +7,34 @@ import { useEffect, useState } from 'react'
 import { ActivityIndicator, View } from 'react-native'
 
 export default function Index() {
-  const [isLoading, setIsLoading] = useState(true)
-  const [isServerDown, setIsServerDown] = useState(false)
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [state, setState] = useState({
+    isLoading: true,
+    isServerDown: false,
+    isLoggedIn: false,
+  })
 
   useEffect(() => {
-    const checkApiHealthStatus = async () => {
+    const checkAll = async () => {
       try {
-        const beApiHealth = await checkApiHealth(BE_URL)
-        const coreApiHealth = await checkApiHealth(CORE_URL)
-
-        if (!beApiHealth || !coreApiHealth) {
-          setIsServerDown(true)
-        } else {
-          // If APIs are healthy, redirect to main app
-          setIsServerDown(false)
-        }
+        const [beApiHealth, coreApiHealth, accessToken, refreshToken] = await Promise.all([
+          checkApiHealth(BE_URL),
+          checkApiHealth(CORE_URL),
+          getItemAsync('accessToken'),
+          getItemAsync('refreshToken'),
+        ])
+        setState({
+          isLoading: false,
+          isServerDown: !beApiHealth || !coreApiHealth,
+          isLoggedIn: !!(accessToken && refreshToken),
+        })
       } catch (error) {
-        console.error('Error checking API health:', error)
-        setIsServerDown(true)
-      } finally {
-        setIsLoading(false)
+        setState({ isLoading: false, isServerDown: true, isLoggedIn: false })
       }
     }
-
-    const checkUserLoggedIn = async () => {
-      const accessToken = await getItemAsync('accessToken')
-      const refreshToken = await getItemAsync('refreshToken')
-      if (accessToken && refreshToken) {
-        setIsLoggedIn(true)
-      }
-    }
-    checkUserLoggedIn()
-    checkApiHealthStatus()
+    checkAll()
   }, [])
 
-  if (isLoading) {
+  if (state.isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator size="large" />
@@ -50,16 +42,7 @@ export default function Index() {
     )
   }
 
-  if (isServerDown) {
-    // Show a debug for BE_URL and CORE_URL with UI
-    return <Redirect href="/server-down" />
-  }
-
-  if (!isLoggedIn) {
-    // Redirect to login page if not logged in
-    return <Redirect href="/login" />
-  }
-
-  // If APIs are healthy, redirect to main app (you can change this to your main route)
+  if (state.isServerDown) return <Redirect href="/server-down" />
+  if (!state.isLoggedIn) return <Redirect href="/login" />
   return <Redirect href="/(tabs)" />
 }
