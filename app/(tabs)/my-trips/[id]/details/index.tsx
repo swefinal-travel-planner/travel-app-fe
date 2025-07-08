@@ -61,6 +61,9 @@ const TripDetailViewScreen = () => {
         address: spot?.address,
         types: spot?.type,
         images: JSON.stringify(spot?.images),
+        status: spot?.status,
+        tripId: spot?.tripId,
+        tripItemId: spot?.tripItemId,
       },
     })
   }
@@ -311,13 +314,15 @@ const TripDetailViewScreen = () => {
       </ScrollView>
 
       {/* Edit Button */}
-      <View style={styles.buttonContainer}>
-        <Pressable
-          title="Edit"
-          style={{ color: theme.white, backgroundColor: theme.primary }}
-          onPress={handleEditTrip}
-        ></Pressable>
-      </View>
+      {trip.status !== 'completed' && trip.status !== 'cancelled' && (
+        <View style={styles.buttonContainer}>
+          <Pressable
+            title="Edit"
+            style={{ color: theme.white, backgroundColor: theme.primary }}
+            onPress={handleEditTrip}
+          ></Pressable>
+        </View>
+      )}
     </SafeAreaView>
   )
 }

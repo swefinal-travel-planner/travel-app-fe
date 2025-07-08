@@ -121,6 +121,9 @@ const Index = () => {
         address: item.address,
         types: item.type,
         images: JSON.stringify(item.images),
+        status: null,
+        tripId: null,
+        tripItemId: null,
       },
     })
   }

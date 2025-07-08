@@ -1,15 +1,13 @@
-import { Radius, Size, SpacingScale } from '@/constants/theme'
-import { Ionicons } from '@expo/vector-icons'
-import { useMemo } from 'react'
-import { Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { Image } from 'expo-image'
-
-import { useThemeStyle } from '@/hooks/useThemeStyle'
-
 import { colorPalettes } from '@/constants/Itheme'
-
 import { FontFamily, FontSize } from '@/constants/font'
+import { Radius, Size, SpacingScale } from '@/constants/theme'
+import { useThemeStyle } from '@/hooks/useThemeStyle'
+import beApi from '@/lib/beApi'
 import { getGroupIconsFromTypes } from '@/utils/TypeBadges'
+import { Ionicons } from '@expo/vector-icons'
+import { Image } from 'expo-image'
+import { useEffect, useMemo, useState } from 'react'
+import { Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Carousel } from 'react-native-ui-lib'
 import Pressable from './Pressable'
 
@@ -22,6 +20,9 @@ type LocationDetailProps = {
   images?: string[]
   address?: string
   onBack?: () => void
+  status: 'not_started' | 'in_progress' | 'completed' | 'cancelled' | null
+  tripId?: string | null
+  tripItemId?: string | null
 }
 
 type OpenMapArgs = {
@@ -38,10 +39,51 @@ const openMap = ({ lat, lng, label }: OpenMapArgs) => {
   }
 }
 
-const LocationDetail = ({ title, properties, types, images, address, onBack, lat, lng }: LocationDetailProps) => {
+const dummyCheckinImages = [
+  'https://images.unsplash.com/photo-1607746882042-944635dfe10e',
+  'https://images.unsplash.com/photo-1506744038136-46273834b3fb',
+  'https://images.unsplash.com/photo-1523413651479-597eb2da0ad6',
+  'https://images.unsplash.com/photo-1529333166437-7750a6dd5a70',
+  'https://images.unsplash.com/photo-1534081333815-ae5019106622',
+]
+
+const LocationDetail = ({
+  title,
+  properties,
+  types,
+  images,
+  address,
+  onBack,
+  lat,
+  lng,
+  status,
+  tripId,
+  tripItemId,
+}: LocationDetailProps) => {
   const groupIcons = getGroupIconsFromTypes(types)
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
+
+  const [checkinImages, setCheckinImages] = useState<string[]>(dummyCheckinImages)
+  const [loadingImages, setLoadingImages] = useState(false)
+
+  useEffect(() => {
+    const fetchCheckinImages = async () => {
+      if (!tripId || !tripItemId) return
+
+      try {
+        setLoadingImages(true)
+        const response = await beApi.get(`/trips/${tripId}/items/${tripItemId}/checkins`)
+        setCheckinImages(response.data.images || [])
+      } catch (error) {
+        console.error('Error fetching check-in images:', error)
+      } finally {
+        setLoadingImages(false)
+      }
+    }
+
+    fetchCheckinImages()
+  }, [tripId, tripItemId])
 
   return (
     <View style={styles.container}>
@@ -100,6 +142,36 @@ const LocationDetail = ({ title, properties, types, images, address, onBack, lat
             </View>
           ))}
         </View>
+
+        {status && (
+          <Pressable
+            title="Checkin"
+            style={{
+              backgroundColor: theme.primary,
+              color: theme.white,
+              marginBottom: SpacingScale.HUGE,
+            }}
+            onPress={() => {
+              console.log(`Checkin at ${title} (tripItemId: ${tripItemId})`)
+            }}
+          />
+        )}
+        {status && (
+          <>
+            <Text style={styles.subtitle}>Check-in Photos</Text>
+            {loadingImages ? (
+              <Text style={styles.loadingText}>Loading images...</Text>
+            ) : checkinImages.length === 0 ? (
+              <Text style={styles.emptyText}>No check-in photos yet.</Text>
+            ) : (
+              <View style={styles.imageGrid}>
+                {checkinImages.map((uri, index) => (
+                  <Image key={index} source={{ uri }} style={styles.checkinImage} />
+                ))}
+              </View>
+            )}
+          </>
+        )}
       </ScrollView>
     </View>
   )
@@ -202,6 +274,32 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       textAlign: 'center',
       fontWeight: '500',
       fontFamily: FontFamily.REGULAR,
+    },
+    imageGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'space-between',
+      rowGap: 12,
+      marginBottom: SpacingScale.XXLARGE,
+    },
+    checkinImage: {
+      width: '32%',
+      aspectRatio: 1,
+      borderRadius: Radius.MEDIUM,
+      resizeMode: 'cover',
+      marginBottom: 12,
+    },
+    loadingText: {
+      fontSize: Size.NORMAL,
+      color: theme.dimText,
+      fontFamily: FontFamily.REGULAR,
+      marginBottom: SpacingScale.MEDIUM,
+    },
+    emptyText: {
+      fontSize: Size.NORMAL,
+      color: theme.dimText,
+      fontFamily: FontFamily.ITALIC,
+      marginBottom: SpacingScale.MEDIUM,
     },
   })
 export default LocationDetail
