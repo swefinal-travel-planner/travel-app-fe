@@ -63,6 +63,14 @@ const Index = () => {
     try {
       const response = await beApi.get('/trips')
       const ongoingTrip = response.data.data.filter((trip: Trip) => trip.status === 'in_progress')[0]
+
+      if (!ongoingTrip) {
+        console.warn('No ongoing trip found')
+        setOngoingTrip(null)
+        setOngoingTripItems([])
+        return
+      }
+
       setOngoingTrip(ongoingTrip)
 
       const tripItemData = await beApi.get(`/trips/${ongoingTrip.id}/trip-items?language=en`)
