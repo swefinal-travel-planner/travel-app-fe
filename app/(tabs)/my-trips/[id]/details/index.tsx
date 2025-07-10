@@ -40,9 +40,8 @@ const TripDetailViewScreen = () => {
       pathname: '/my-trips/[id]/details/modify',
       params: {
         id: trip.id,
-        tripData: JSON.stringify(groupedItems[activeDay]?.spots ?? []),
-        tripDate: groupedItems[activeDay]?.date ?? '',
-        tripDay: groupedItems[activeDay]?.day ?? 1,
+        trip: JSON.stringify(trip),
+        tripData: JSON.stringify(groupedItems),
       },
     })
   }
@@ -161,6 +160,8 @@ const TripDetailViewScreen = () => {
           }
         })
         .sort((a, b) => a.day - b.day)
+
+      console.log('Grouped items:', groupedList)
 
       setGroupedItems(groupedList)
     } catch (error) {
