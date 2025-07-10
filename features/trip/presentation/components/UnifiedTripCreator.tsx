@@ -40,9 +40,8 @@ export default function UnifiedTripCreator({
   const submitAiTrip = async () => {
     try {
       setIsSubmitting(true)
-      console.log('Submitting AI trip with request:', aiTripStore.request)
 
-      const response = await safeBeApiCall(() => beApi.post(`${BE_URL}/trips/ai`, aiTripStore.request))
+      const response = await safeBeApiCall(() => beApi.post(`${BE_URL}/trips/ai`, useAiTripStore.getState().request))
 
       if (!response) {
         Alert.alert('Error', 'Failed to create AI trip. Please try again.')

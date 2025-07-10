@@ -6,6 +6,7 @@ import { TripRequest } from '@/store/useAiTripStore'
 import React, { useMemo, useState } from 'react'
 import { StyleSheet } from 'react-native'
 import { Text, TextField, View } from 'react-native-ui-lib'
+import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry'
 
 type TripRenameProps = {
   theme: typeof colorPalettes.light
@@ -25,18 +26,18 @@ export default function TripRename({
   isSubmitting = false,
 }: Readonly<TripRenameProps>) {
   const styles = useMemo(() => createStyles(theme), [theme])
-  const [title, setTitle] = useState('')
+  const [localTitle, setLocalTitle] = useState('')
 
   const handleSubmit = () => {
-    setTripState({ title: title.trim() })
-
+    setTripState({ title: localTitle.trim() })
     if (onSubmit) {
+      // Use localTitle directly, since it's the source of truth here
       onSubmit()
     }
     nextFn()
   }
 
-  const isDisabled = !title.trim() || isSubmitting
+  const isDisabled = !localTitle.trim() || isSubmitting
   const buttonTitle = isSubmitting ? 'Creating...' : 'Create Trip'
 
   return (
@@ -46,8 +47,8 @@ export default function TripRename({
       <View style={styles.inputContainer}>
         <TextField
           placeholder="Enter trip title"
-          value={title}
-          onChangeText={setTitle}
+          value={localTitle}
+          onChangeText={setLocalTitle}
           style={styles.textField}
           placeholderTextColor={theme.dimText}
           maxLength={50}
