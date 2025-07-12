@@ -52,9 +52,6 @@ export default function TripLocation({ theme, nextFn, setTripState }: Readonly<T
             // Reset district to first of new city
             const city = Cities.find((city) => city.key === item)
             setSelectedDistrictKey(city?.districts[0].key ?? '')
-            setTripState({
-              city: city?.districts[0] ? `${city.label}, ${city.districts[0].label}` : city?.label,
-            })
           }}
           topBarProps={{ title: 'Cities' }}
           style={styles.picker}
@@ -67,7 +64,6 @@ export default function TripLocation({ theme, nextFn, setTripState }: Readonly<T
               onPress={() => {
                 setSelectedCityKey(city.key)
                 setSelectedDistrictKey(city.districts[0].key)
-                setTripState({ city: `${city.label}, ${city.districts[0].label}` })
               }}
             />
           ))}
@@ -96,7 +92,6 @@ export default function TripLocation({ theme, nextFn, setTripState }: Readonly<T
               label={district.label}
               onPress={() => {
                 setSelectedDistrictKey(district.key)
-                setTripState({ city: `${district.label},${selectedCity.label},` })
               }}
             />
           ))}
@@ -114,7 +109,7 @@ export default function TripLocation({ theme, nextFn, setTripState }: Readonly<T
       <Pressable
         onPress={() => {
           nextFn()
-          setTripState({ city: ` ${selectedDistrict.label},${selectedCity.label}` })
+          setTripState({ city: `${selectedDistrict.label},${selectedCity.label}` })
         }}
         title="Next"
         style={{
