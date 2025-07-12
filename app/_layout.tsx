@@ -111,7 +111,6 @@ export default function RootLayout() {
       configureGoogleSignIn()
 
       const token = await registerForPushNotificationsAsync()
-      console.log('debug noti token', token)
 
       if (token) {
         await updateUserPushToken(token)

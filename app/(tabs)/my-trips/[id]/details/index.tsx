@@ -161,8 +161,6 @@ const TripDetailViewScreen = () => {
         })
         .sort((a, b) => a.day - b.day)
 
-      console.log('Grouped items:', groupedList)
-
       setGroupedItems(groupedList)
     } catch (error) {
       console.error('Error fetching trip items:', error)

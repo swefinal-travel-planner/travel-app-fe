@@ -70,8 +70,6 @@ const TripFriendInviteScreen = () => {
       // Merge both arrays and remove duplicates
       const allPendingInvites = [...new Set([...requestedUsernames, ...receivedUsernames])]
 
-      console.log('All pending invites:', allPendingInvites)
-
       setPendingInvites(allPendingInvites)
     } catch (error) {
       console.error('Error loading pending invites:', error)
