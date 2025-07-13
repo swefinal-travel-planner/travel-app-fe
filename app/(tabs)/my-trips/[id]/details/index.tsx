@@ -17,8 +17,9 @@ const TripDetailViewScreen = () => {
   const router = useRouter()
   const { id } = useLocalSearchParams()
 
-  const { trip, tripItems, groupedItems, distanceTimes, activeDay, loading, goToPreviousDay, goToNextDay } =
-    useTripDetails(id as string)
+  const { trip, tripItems, groupedItems, activeDay, loading, goToPreviousDay, goToNextDay } = useTripDetails(
+    id as string
+  )
 
   const handleEditTrip = () => {
     router.push({
@@ -80,7 +81,6 @@ const TripDetailViewScreen = () => {
                 key={timeSlot}
                 timeSlot={timeSlot}
                 spots={groupedItems[activeDay].spots}
-                distanceTimes={distanceTimes}
                 onSpotPress={handleSpotDetail}
               />
             ))
