@@ -9,13 +9,11 @@ type TripItemsByDate = {
 }
 
 // Trip state management using Zustand
-type ManualTripRequest = TripRequest & { id?: number }
-
 type ManualTripState = {
-  request: ManualTripRequest | null
+  request: TripRequest | null
   itemsByDate: TripItemsByDate | null
   deleteTripItem: (itemId: string, date: Date) => void
-  setRequest: (updates: Partial<ManualTripRequest>) => void
+  setRequest: (updates: Partial<TripRequest>) => void
   resetManualTrip: () => void
   updateTripItem: (updatedItem: TripItem, date: Date) => void
   addTripItems: (items: TripItem[], date: Date) => void

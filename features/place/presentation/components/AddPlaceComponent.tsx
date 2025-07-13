@@ -133,10 +133,7 @@ export const AddPlaceModal: React.FC<AddPlaceModalProps> = ({ visible, selectedT
         <View style={styles.contentContainer}>
           <View style={styles.placeInfo}>
             <Text style={styles.placeName}>{item.name}</Text>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Ionicons name="location-outline" size={16} color="#888" style={{ marginRight: 4 }} />
-              <Text style={styles.placeType}>{item.address}</Text>
-            </View>
+            <Text style={styles.placeType}>{item.type}</Text>
           </View>
           <TouchableOpacity
             style={[styles.addButton, isSelected && styles.selectedButton]}

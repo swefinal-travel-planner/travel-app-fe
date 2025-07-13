@@ -1,7 +1,7 @@
-import { TimeSlot } from '@/features/trip/domain/models/Trip'
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6'
 import React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { TimeSlot } from '../../domain/models/Trip'
 
 type SectionHeaderProps = {
   time: TimeSlot

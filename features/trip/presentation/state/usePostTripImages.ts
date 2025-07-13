@@ -1,12 +1,12 @@
 import { useState } from 'react'
-import { tripRepository } from '../../di/container'
+import { TripRepositoryImpl } from '../../data/repositories/TripRepositoryImpl'
 import { PostTripImageUseCase } from '../../domain/usecases/PostTripImageUseCase'
 
 export const usePostTripImages = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
 
-  const postTripImageUseCase = new PostTripImageUseCase(tripRepository)
+  const postTripImageUseCase = new PostTripImageUseCase(new TripRepositoryImpl())
 
   const postTripImage = async (tripId: number, image: string): Promise<void> => {
     setIsLoading(true)

@@ -6,7 +6,7 @@ export class PlaceApi {
   static async getPlaces(params: GetPlacesParams): Promise<Place[]> {
     try {
       const response = await safeCoreApiCall(() =>
-        coreApi.get('/places', {
+        coreApi.get(ENDPOINTS.PLACES.BASE, {
           params: {
             limit: params.limit,
             location: params.location,
@@ -31,7 +31,7 @@ export class PlaceApi {
 
   static async getPlaceById(id: string): Promise<Place> {
     try {
-      const response = await safeCoreApiCall(() => coreApi.get(`places/${id}`))
+      const response = await safeCoreApiCall(() => coreApi.get(ENDPOINTS.PLACES.BY_ID(id)))
 
       // If response is null, it means it was a silent error
       if (!response) {

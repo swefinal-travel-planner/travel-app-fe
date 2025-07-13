@@ -37,6 +37,7 @@ export default function ManualTripCreate({ nextFn }: Readonly<ManualTripCreatePr
     const items = getItemsForDate(selectedDate)
 
     const createTripDTO: CreateTripDTO = {
+      city: 'Ho Chi Minh City', // Default city, can be changed later
       title: request?.title ?? 'Untitled Trip',
       startDate: selectedDate,
       days: request?.days ?? 1,

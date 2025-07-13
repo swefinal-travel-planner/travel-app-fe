@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
-import { tripRepository } from '../../di/container'
+import { TripRepositoryImpl } from '../../data/repositories/TripRepositoryImpl'
 import { GetTripImageUseCase } from '../../domain/usecases/GetTripImageUseCase'
 
 export const useGetTripImages = (tripId: number) => {
-  const getTripImageUseCase = new GetTripImageUseCase(tripRepository)
+  const getTripImageUseCase = new GetTripImageUseCase(new TripRepositoryImpl())
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['tripImages', tripId],

@@ -6,7 +6,6 @@ import { useAiTripStore } from '@/store/useAiTripStore'
 import React, { useCallback, useMemo, useState } from 'react'
 import { Alert, StyleSheet } from 'react-native'
 import { View } from 'react-native-ui-lib'
-import { useUpdateTrip } from '../../state/useUpdateTrip'
 import CreateTripNavigationBar from './CreateTripNavigationBar'
 
 interface UnifiedTripCreatorProps {
@@ -62,6 +61,7 @@ export default function UnifiedTripCreator({
     try {
       setIsSubmitting(true)
       const request = manualTripStore.request
+      const itemsByDate = manualTripStore.itemsByDate
       const resetManualTrip = manualTripStore.resetManualTrip
 
       if (!request) {
@@ -73,10 +73,10 @@ export default function UnifiedTripCreator({
       }
       const payload = {
         ...request,
+        tripItems: itemsByDate ? Object.values(itemsByDate).flat() : [],
       }
 
-      const { updateTrip, isLoading: isUpdating, error: updateError } = useUpdateTrip()
-      const response = await updateTrip({ title: payload.title, id: payload.id ? payload.id : 0 })
+      const response = await safeBeApiCall(() => beApi.post(`${BE_URL}/trips/manual`, payload))
 
       if (!response) {
         Alert.alert('Error', 'Failed to create manual trip. Please try again.')
