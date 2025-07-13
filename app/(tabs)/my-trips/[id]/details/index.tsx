@@ -80,6 +80,7 @@ const TripDetailViewScreen = () => {
                 key={timeSlot}
                 timeSlot={timeSlot}
                 spots={groupedItems[activeDay].spots}
+                distanceTimes={distanceTimes}
                 onSpotPress={handleSpotDetail}
               />
             ))

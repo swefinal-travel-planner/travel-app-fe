@@ -29,8 +29,8 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     distanceTimeContainer: {
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'center',
-      marginBottom: 10,
+      marginLeft: 32,
+      marginVertical: 4,
     },
     distanceTimeText: {
       fontSize: FontSize.SM,
