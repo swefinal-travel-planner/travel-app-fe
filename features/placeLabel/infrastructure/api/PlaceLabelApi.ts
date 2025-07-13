@@ -1,11 +1,11 @@
-import coreApi, { ENDPOINTS, safeCoreApiCall } from '../../../../lib/coreApi'
+import coreApi, { safeCoreApiCall } from '../../../../lib/coreApi'
 import { PlaceLabel } from '../../domain/models/PlaceLabel'
 
 export class PlaceLabelApi {
   static async getPlaceLabels({ language }: { language: string }): Promise<PlaceLabel> {
     try {
       const response = await safeCoreApiCall(() =>
-        coreApi.get(ENDPOINTS.LABELS.BASE, {
+        coreApi.get('/labels', {
           params: { language },
         })
       )

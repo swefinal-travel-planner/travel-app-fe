@@ -24,11 +24,15 @@ export type Trip = {
   items: TripItem[]
 }
 
-export interface CreateTripDTO {
+export type CreateTripDTO = {
   city?: string
   days?: number
   startDate?: Date
   title?: string
+}
+
+export type UpdateTripDTO = CreateTripDTO & {
+  id: number
 }
 
 export type TripDate = {
