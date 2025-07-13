@@ -7,7 +7,12 @@ interface PressableOpacityProps {
   onPress?: () => void
 }
 
-const PressableOpacity = ({ children, onPress, style, ...props }: PressableOpacityProps) => {
+const PressableOpacity = ({
+  children,
+  onPress,
+  style,
+  ...props
+}: PressableOpacityProps) => {
   const animated = useRef(new Animated.Value(1)).current
 
   const fadeIn = () => {
@@ -30,10 +35,12 @@ const PressableOpacity = ({ children, onPress, style, ...props }: PressableOpaci
       onPressIn={fadeIn}
       onPressOut={fadeOut}
       onPress={onPress}
-      style={{ width: '100%', justifyContent: 'center' }}
+      style={{ alignSelf: 'stretch', justifyContent: 'center' }}
       {...props}
     >
-      <Animated.View style={[style, { opacity: animated }]}>{children}</Animated.View>
+      <Animated.View style={[style, { opacity: animated }]}>
+        {children}
+      </Animated.View>
     </Pressable>
   )
 }
