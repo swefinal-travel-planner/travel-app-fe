@@ -130,23 +130,18 @@ const TripDetailModifyScreen = () => {
     // Immediately update the current list data
     setCurrentListData(newData)
 
-    // Extract only trip items and update their timeSlot and orderInDay based on position
+    // Extract only trip items and update their timeSlot based on position
     const tripItemsOnly = newData.filter(
       (item): item is TripItem =>
         !('type' in item) || (item.type !== 'time-divider' && item.type !== 'combined-divider')
     ) as TripItem[]
 
-    // Track order within each day only
-    const dayOrders: { [key: number]: number } = {}
-
-    // Update timeSlot and orderInDay based on the nearest time divider above each item
+    // Update timeSlot based on the nearest time divider above each item
     const updatedTripItems = tripItemsOnly.map((item) => {
       const itemIndex = newData.findIndex((dataItem) => !('type' in dataItem) && dataItem.id === item.id)
 
       // Find the nearest time divider above this item
       let timeSlot = 'morning' // default
-      let currentDay = item.tripDay // Keep the original day for now
-
       for (let i = itemIndex - 1; i >= 0; i--) {
         const checkItem = newData[i]
         if ('type' in checkItem && (checkItem.type === 'time-divider' || checkItem.type === 'combined-divider')) {
@@ -155,17 +150,9 @@ const TripDetailModifyScreen = () => {
         }
       }
 
-      // Initialize or increment the order for this day only
-      if (!dayOrders[currentDay]) {
-        dayOrders[currentDay] = 1
-      } else {
-        dayOrders[currentDay]++
-      }
-
       return {
         ...item,
         timeSlot,
-        orderInDay: dayOrders[currentDay],
       }
     })
 
