@@ -7,23 +7,23 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 type HorizontalDatePickerProps = {
   theme: typeof colorPalettes.light
-  trip?: Partial<TripRequest>
+  request?: Partial<TripRequest | null>
   selectedDate: Date | null
   onSelectDate?: (date: Date) => void
 }
 
 export default function HorizontalDatePicker({
   theme,
-  trip,
+  request,
   selectedDate,
   onSelectDate,
 }: Readonly<HorizontalDatePickerProps>) {
-  if (!trip?.startDate || !trip?.days) return null
+  if (!request?.startDate || !request?.days) return null
 
-  const startDate = new Date(trip.startDate)
+  const startDate = new Date(request.startDate)
 
   // Generate an array of dates based on the start date and number of days
-  const dates = Array.from({ length: trip.days }, (_, i) => {
+  const dates = Array.from({ length: request.days }, (_, i) => {
     const date = new Date(startDate)
     date.setDate(startDate.getDate() + i)
     return date
