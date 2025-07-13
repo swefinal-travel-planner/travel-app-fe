@@ -21,26 +21,26 @@ export const createStyles = (theme: typeof colorPalettes.light) =>
       color: theme.white,
     },
     title: {
-      color: '#3F6453',
+      color: theme.primary,
       fontSize: 28,
       fontFamily: FontFamily.BOLD,
       marginBottom: 12,
     },
     subtitle: {
-      color: '#3F6453',
+      color: theme.primary,
       fontSize: 16,
-      fontFamily: 'PlusJakartaSans_400Regular',
+      fontFamily: FontFamily.REGULAR,
       marginBottom: 20,
     },
     text: {
-      color: '#3F6453',
+      color: theme.primary,
       fontSize: 12,
-      fontFamily: 'PlusJakartaSans_400Regular',
+      fontFamily: FontFamily.REGULAR,
     },
     link: {
-      color: '#3F6453',
+      color: theme.primary,
       fontSize: 12,
-      fontFamily: 'PlusJakartaSans_700Bold',
+      fontFamily: FontFamily.BOLD,
       textDecorationLine: 'underline',
     },
     span: {
@@ -60,8 +60,8 @@ export const createStyles = (theme: typeof colorPalettes.light) =>
       height: 40,
     },
     error: {
-      color: '#A82A00',
+      color: theme.error,
       fontSize: 12,
-      fontFamily: 'PlusJakartaSans_400Regular',
+      fontFamily: FontFamily.REGULAR,
     },
   })
