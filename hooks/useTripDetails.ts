@@ -40,7 +40,6 @@ export const useTripDetails = (tripId: string) => {
       if (!tripItemData.data?.data) {
         console.warn('No trip items data received from API')
         setTripItems([])
-        setDistanceTimes([])
         setGroupedItems([])
         return
       }
@@ -51,12 +50,51 @@ export const useTripDetails = (tripId: string) => {
       if (!items || items.length === 0) {
         console.warn('No trip items found')
         setTripItems([])
-        setDistanceTimes([])
         setGroupedItems([])
         return
       }
 
-      const placeIDs = items.map((item) => item.placeID)
+      // Group items by tripDay
+      const grouped: { [day: number]: TripItem[] } = {}
+      items.forEach((item) => {
+        if (!grouped[item.tripDay]) grouped[item.tripDay] = []
+        grouped[item.tripDay].push(item)
+      })
+
+      // Sort each day's items by orderInDay
+      for (const day in grouped) {
+        grouped[day].sort((a, b) => a.orderInDay - b.orderInDay)
+      }
+
+      // Calculate distance/time per day
+      for (const [dayStr, dayItems] of Object.entries(grouped)) {
+        const sortedItems = dayItems // already sorted by orderInDay
+        const placeIDs = sortedItems.map((item) => item.placeID)
+
+        if (placeIDs.length < 2) {
+          // Only one spot, no travel
+          sortedItems[0].distance = 0
+          sortedItems[0].time = 0
+          continue
+        }
+
+        const distanceTimeData = await safeCoreApiCall(() =>
+          coreApi.post(`/distance_time/calc`, { place_ids: placeIDs })
+        )
+
+        if (distanceTimeData?.data?.data) {
+          const dtList = distanceTimeData.data.data
+
+          // First item: no previous distance/time
+          sortedItems[0].distance = null
+          sortedItems[0].time = null
+
+          for (let i = 1; i < sortedItems.length; i++) {
+            sortedItems[i].distance = dtList[i - 1].distance
+            sortedItems[i].time = dtList[i - 1].time
+          }
+        }
+      }
 
       items = items.map((item, index) => ({
         ...item,
@@ -64,30 +102,8 @@ export const useTripDetails = (tripId: string) => {
       }))
 
       setTripItems(items)
-
-      // Get distance and time information
-      const distanceTimeData = await safeCoreApiCall(() => coreApi.post(`/distance_time/calc`, { place_ids: placeIDs }))
-
-      if (!distanceTimeData) {
-        setDistanceTimes([])
-        return
-      }
-
-      setDistanceTimes(
-        distanceTimeData.data.data.map((item: any) => ({
-          distance: item.distance,
-          time: item.time,
-        }))
-      )
-
       // Group items by day
       const start = trip?.startDate ? new Date(trip.startDate) : new Date()
-
-      const grouped: { [day: number]: TripItem[] } = {}
-      items.forEach((item) => {
-        if (!grouped[item.tripDay]) grouped[item.tripDay] = []
-        grouped[item.tripDay].push(item)
-      })
 
       const groupedList = Object.entries(grouped)
         .map(([dayStr, items]) => {
@@ -109,6 +125,9 @@ export const useTripDetails = (tripId: string) => {
                 timeSlot: spot.timeInDate,
                 orderInTrip: spot.orderInTrip,
                 orderInDay: spot.orderInDay,
+                placeID: spot.placeID,
+                distance: spot.distance ?? null,
+                time: spot.time ?? null,
               })),
           }
         })
@@ -148,7 +167,6 @@ export const useTripDetails = (tripId: string) => {
     trip,
     tripItems,
     groupedItems,
-    distanceTimes,
     activeDay,
     loading,
     goToPreviousDay,

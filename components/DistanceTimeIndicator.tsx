@@ -6,8 +6,8 @@ import React, { useMemo } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 
 interface DistanceTimeIndicatorProps {
-  distance: string
-  time: string
+  distance: number
+  time: number
 }
 
 const DistanceTimeIndicator: React.FC<DistanceTimeIndicatorProps> = ({ distance, time }) => {
@@ -27,10 +27,11 @@ const DistanceTimeIndicator: React.FC<DistanceTimeIndicatorProps> = ({ distance,
 const createStyles = (theme: typeof colorPalettes.light) =>
   StyleSheet.create({
     distanceTimeContainer: {
+      flex: 1,
       flexDirection: 'row',
       alignItems: 'center',
-      marginLeft: 32,
-      marginVertical: 4,
+      justifyContent: 'center',
+      marginBottom: 10,
     },
     distanceTimeText: {
       fontSize: FontSize.SM,
