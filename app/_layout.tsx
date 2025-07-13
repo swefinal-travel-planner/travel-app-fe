@@ -11,7 +11,9 @@ import * as SecureStore from 'expo-secure-store'
 import * as SplashScreen from 'expo-splash-screen'
 import { StatusBar } from 'expo-status-bar'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { Platform } from 'react-native'
+import { LogBox, Platform } from 'react-native'
+
+LogBox.ignoreAllLogs() // Ignore all log notifications
 
 interface NotificationState {
   notification: Notifications.Notification | undefined
