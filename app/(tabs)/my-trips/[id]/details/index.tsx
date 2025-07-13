@@ -40,7 +40,6 @@ const TripDetailViewScreen = () => {
       pathname: '/my-trips/[id]/details/modify',
       params: {
         id: trip.id,
-        trip: JSON.stringify(trip),
         tripData: JSON.stringify(groupedItems),
       },
     })
@@ -150,6 +149,7 @@ const TripDetailViewScreen = () => {
               .sort((a, b) => a.orderInDay - b.orderInDay)
               .map((spot) => ({
                 id: spot.placeID,
+                tripDay: spot.tripDay,
                 name: spot.placeInfo?.name ?? 'Unknown',
                 address: spot.placeInfo?.address ?? 'Unknown address',
                 image: { uri: spot.placeInfo?.images?.[0] ?? '' },
@@ -453,7 +453,8 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       marginRight: 8,
     },
     buttonContainer: {
-      margin: 16,
+      marginVertical: 16,
+      paddingHorizontal: 24,
       backgroundColor: 'transparent',
     },
     timeGroup: {

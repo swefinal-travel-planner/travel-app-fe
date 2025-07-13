@@ -265,26 +265,6 @@ const TripCompanionInviteScreen = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
       />
-
-      {/* Instructions */}
-      {searchQuery.length === 0 && (
-        <View style={styles.instructionsContainer}>
-          <View style={styles.instructionItem}>
-            <Ionicons name="search" size={24} color={theme.text} />
-            <Text style={[styles.instructionText, { color: theme.text }]}>
-              Search for friends by their email address
-            </Text>
-          </View>
-          <View style={styles.instructionItem}>
-            <Ionicons name="person-add" size={24} color={theme.text} />
-            <Text style={[styles.instructionText, { color: theme.text }]}>Send invitation to join your trip</Text>
-          </View>
-          <View style={styles.instructionItem}>
-            <Ionicons name="people" size={24} color={theme.text} />
-            <Text style={[styles.instructionText, { color: theme.text }]}>Collaborate and plan together</Text>
-          </View>
-        </View>
-      )}
     </KeyboardAvoidingView>
   )
 }
@@ -301,7 +281,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       alignItems: 'center',
       justifyContent: 'space-between',
       paddingHorizontal: 20,
-      paddingVertical: 16,
+      paddingBottom: 16,
     },
     backButton: {
       padding: 8,
