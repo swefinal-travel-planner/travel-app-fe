@@ -31,6 +31,7 @@ interface PlaceInfo {
 }
 
 export interface TripItem {
+  timeSlot: string
   id: number
   orderInDay: number
   placeID: string

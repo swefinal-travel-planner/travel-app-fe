@@ -1,20 +1,23 @@
+import Pressable from '@/components/Pressable'
+import { useToast } from '@/components/ToastContext'
 import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import { Radius } from '@/constants/theme'
 import { getPlaceHolder } from '@/features/trip/utils/AdaptiveImage'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
+import beApi from '@/lib/beApi'
 import { TripItem } from '@/lib/types/Trip'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { Image } from 'expo-image'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import React, { useEffect, useMemo, useState } from 'react'
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Alert, Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import DraggableFlatList, { RenderItemParams, ScaleDecorator } from 'react-native-draggable-flatlist'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 type TripModification = {
   orderInDay: number
-  placeID: string
+  placeID: string | number
   timeInDate: string
   tripDay: number
 }
@@ -29,9 +32,11 @@ const TripDetailModifyScreen = () => {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
 
+  const { showToast } = useToast()
+
   const router = useRouter()
-  const { tripData } = useLocalSearchParams()
-  const [tripItems, setTripItems] = useState<TripModification[]>()
+  const { id, tripData } = useLocalSearchParams()
+  const [tripItems, setTripItems] = useState<TripItem[]>()
   const [currentListData, setCurrentListData] = useState<ListItem[]>([])
   const [firstDivider, setFirstDivider] = useState<{
     date: string
@@ -156,7 +161,7 @@ const TripDetailModifyScreen = () => {
   }
 
   const handleDeleteItem = (itemToDelete: TripItem) => {
-    Alert.alert('Delete Spot', 'Are you sure you want to delete this spot?', [
+    Alert.alert('Delete spot', 'Are you sure you want to delete this spot?', [
       {
         text: 'Cancel',
         style: 'cancel',
@@ -174,10 +179,43 @@ const TripDetailModifyScreen = () => {
             (item): item is TripItem =>
               !('type' in item) || (item.type !== 'time-divider' && item.type !== 'combined-divider')
           ) as TripItem[]
+
           setTripItems(updatedTripItems)
         },
       },
     ])
+  }
+
+  const mapModifications = (tripItems: TripItem[]): TripModification[] => {
+    return tripItems.map((item) => ({
+      orderInDay: item.orderInDay,
+      placeID: item.id,
+      timeInDate: item.timeSlot,
+      tripDay: item.tripDay,
+    }))
+  }
+
+  const handleEditTrip = async () => {
+    if (!tripItems) return
+
+    try {
+      const modifications = mapModifications(tripItems)
+
+      const response = await beApi.post(`/trips/${id}/trip-items`, JSON.stringify(modifications))
+
+      showToast({
+        type: 'success',
+        message: 'Trip updated successfully!',
+        position: 'bottom',
+      })
+    } catch (error) {
+      console.error('Error updating trip:', error)
+      showToast({
+        type: 'error',
+        message: 'Failed to update trip items. Please try again.',
+        position: 'bottom',
+      })
+    }
   }
 
   const handleGoBack = () => {
@@ -254,10 +292,12 @@ const TripDetailModifyScreen = () => {
           <Ionicons name="arrow-back-outline" size={24} color={theme.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Modify trip</Text>
+        <View style={styles.placeholder} />
       </View>
 
       {/* Draggable list item */}
       <DraggableFlatList
+        style={{ height: Dimensions.get('window').height - 252 }} // Adjust height to fit screen
         data={currentListData}
         onDragEnd={handleDragEnd}
         keyExtractor={(item) => ('type' in item ? item.id : item.id.toString())}
@@ -276,6 +316,14 @@ const TripDetailModifyScreen = () => {
           </View>
         }
       />
+
+      <View style={styles.buttonContainer}>
+        <Pressable
+          title="Save"
+          style={{ color: theme.white, backgroundColor: theme.primary }}
+          onPress={handleEditTrip}
+        ></Pressable>
+      </View>
     </GestureHandlerRootView>
   )
 }
@@ -292,7 +340,10 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       flexDirection: 'row',
       alignItems: 'center',
       paddingHorizontal: 22,
-      paddingVertical: 16,
+      paddingBottom: 16,
+    },
+    placeholder: {
+      width: 40,
     },
     backButton: {
       marginRight: 16,
@@ -305,8 +356,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       color: theme.text,
     },
     listContent: {
-      paddingHorizontal: 20,
-      paddingBottom: 80,
+      paddingHorizontal: 24,
     },
     spotCard: {
       flexDirection: 'row',
@@ -366,13 +416,12 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       opacity: 0.3,
     },
     dayDivider: {
-      marginVertical: 20,
-      paddingHorizontal: 20,
+      marginTop: 20,
       flexDirection: 'row',
       alignItems: 'center',
     },
     dayDividerText: {
-      fontSize: FontSize.MD,
+      fontSize: FontSize.XL,
       color: theme.primary,
       marginHorizontal: 12,
       fontFamily: FontFamily.BOLD,
@@ -381,13 +430,17 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     },
     timeDivider: {
       marginVertical: 12,
-      paddingHorizontal: 24,
     },
     timeDividerText: {
       fontSize: FontSize.LG,
       color: theme.primary,
       fontFamily: FontFamily.BOLD,
       textAlign: 'left',
+    },
+    buttonContainer: {
+      marginVertical: 16,
+      paddingHorizontal: 24,
+      backgroundColor: 'transparent',
     },
   })
 
