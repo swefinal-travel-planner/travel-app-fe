@@ -13,7 +13,6 @@ export default function TripCard({ trip }: Readonly<{ trip: Trip }>) {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
 
-  console.log(trip.imageUrl)
   return (
     <View style={styles.container}>
       <Image style={styles.image} placeholder={{ blurhash }} source={{ uri: trip.imageUrl }} />
