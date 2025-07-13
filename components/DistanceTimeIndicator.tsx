@@ -30,13 +30,15 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       flex: 1,
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'center',
-      marginBottom: 10,
+      justifyContent: 'flex-end',
+      marginVertical: 4,
     },
     distanceTimeText: {
       fontSize: FontSize.SM,
       color: theme.text,
+      paddingVertical: 2,
       fontFamily: FontFamily.REGULAR,
+      backgroundColor: theme.white,
     },
   })
 
