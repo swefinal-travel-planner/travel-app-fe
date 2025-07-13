@@ -39,7 +39,7 @@ const TripCard: React.FC<TripCardProps> = ({
   const isDisabled = status === 'ai_generating' || status === 'failed'
 
   const handleDelete = () => {
-    Alert.alert('Delete Trip', `Are you sure you want to delete "${tripName}"? This action cannot be undone.`, [
+    Alert.alert('Delete trip', `Are you sure you want to delete "${tripName}"? This action cannot be undone.`, [
       {
         text: 'Cancel',
         style: 'cancel',
