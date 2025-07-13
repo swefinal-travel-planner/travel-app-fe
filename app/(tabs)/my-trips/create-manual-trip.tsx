@@ -1,5 +1,5 @@
 import { createManualTripSteps, TRIP_TYPES } from '@/constants/createTripSteps'
-import UnifiedTripCreator from '@/features/trip/presentation/components/UnifiedTripCreator'
+import UnifiedTripCreator from '@/features/trip/presentation/components/CreateTrip/UnifiedTripCreator'
 import { useManualTripStore } from '@/features/trip/presentation/state/useManualTrip'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { useFocusEffect } from '@react-navigation/native'

@@ -8,17 +8,11 @@ type SectionHeaderProps = {
   onAddItem: (time: TimeSlot) => void
 }
 
-export const SectionHeader: React.FC<SectionHeaderProps> = ({
-  time,
-  onAddItem,
-}) => {
+export const SectionHeader: React.FC<SectionHeaderProps> = ({ time, onAddItem }) => {
   return (
     <View style={styles.sectionHeader}>
       <Text style={styles.sectionTitle}>{time.toUpperCase()}</Text>
-      <TouchableOpacity
-        onPress={() => onAddItem(time)}
-        style={styles.addButton}
-      >
+      <TouchableOpacity onPress={() => onAddItem(time)} style={styles.addButton}>
         <FontAwesome6 name="plus" size={24} color="black" />
       </TouchableOpacity>
     </View>

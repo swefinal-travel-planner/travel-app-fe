@@ -1,11 +1,10 @@
+import NumStepper from '@/components/NumStepper'
 import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import { useAiTripStore } from '@/store/useAiTripStore'
 import React, { useEffect, useState } from 'react'
-import { StyleSheet } from 'react-native'
+import { Pressable, StyleSheet } from 'react-native'
 import { Text, View } from 'react-native-ui-lib'
-import NumStepper from '../../../../components/NumStepper'
-import Pressable from '../../../../components/Pressable'
 
 type SpotNumberProps = {
   theme: typeof colorPalettes.light
