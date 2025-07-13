@@ -150,6 +150,7 @@ const TripCompanionInviteScreen = () => {
           if (searchData.data && !companionIds.includes(searchData.data.id)) {
             const result: SearchResult = {
               ...searchData.data,
+              avatar: searchData.data.imageURL || searchData.data.photoURL || searchData.data.avatar || '',
               isInvited: pendingInvites.includes(searchData.data.id),
               isCompanion: false,
             }
