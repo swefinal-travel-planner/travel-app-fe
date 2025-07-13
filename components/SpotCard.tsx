@@ -49,7 +49,6 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       marginBottom: 12,
       overflow: 'hidden',
       backgroundColor: theme.secondary,
-      marginHorizontal: 24,
     },
     spotImageContainer: {
       width: 120,

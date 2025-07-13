@@ -29,13 +29,15 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     distanceTimeContainer: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginLeft: 32,
+      justifyContent: 'flex-end',
       marginVertical: 4,
     },
     distanceTimeText: {
       fontSize: FontSize.SM,
       color: theme.text,
+      paddingVertical: 2,
       fontFamily: FontFamily.REGULAR,
+      backgroundColor: theme.white,
     },
   })
 
