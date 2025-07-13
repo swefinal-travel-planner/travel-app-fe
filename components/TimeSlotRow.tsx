@@ -15,11 +15,8 @@ interface Spot {
   timeSlot: string
   orderInTrip: number
   orderInDay: number
-}
-
-interface DistanceTime {
-  distance: string
-  time: string
+  distance: number
+  time: number
 }
 
 interface TimeSlotRowProps {
@@ -134,14 +131,18 @@ const createStyles = (theme: typeof colorPalettes.light, marginBottom: number) =
       marginBottom: 8,
       alignItems: 'center',
       minWidth: 80,
-      // No marginHorizontal since we're already inside timeGroup with paddingLeft
     },
     timeSlotLabel: {
       fontSize: FontSize.LG,
       fontFamily: FontFamily.BOLD,
       color: theme.primary,
       textAlign: 'center',
-      lineHeight: 20,
+      alignContent: 'center',
+      justifyContent: 'center',
+      transform: [{ rotate: '-90deg' }],
+      position: 'absolute',
+      minWidth: 100,
+      textAlignVertical: 'center',
     },
     timeGroup: {
       width: '100%',
