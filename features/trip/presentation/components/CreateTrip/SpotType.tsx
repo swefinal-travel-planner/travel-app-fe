@@ -1,11 +1,12 @@
 import CollapsibleSectionList from '@/components/CollapsibleSectionList'
+import Pressable from '@/components/Pressable'
 import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import spotTypeData from '@/lib/mock_data/spotTypes'
 import { useAiTripStore } from '@/store/useAiTripStore'
 import { formatAttribute } from '@/utils/tripAttributes'
 import React, { useEffect, useState } from 'react'
-import { Pressable, StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native'
 import { Text, View } from 'react-native-ui-lib'
 
 type SpotTypeProps = {
