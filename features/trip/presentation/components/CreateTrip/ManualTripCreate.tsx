@@ -2,13 +2,13 @@ import { useThemeStyle } from '@/hooks/useThemeStyle'
 import React, { useEffect, useState } from 'react'
 import { StyleSheet, Text } from 'react-native'
 import { Button, View } from 'react-native-ui-lib'
-import { CreateTripDTO } from '../../domain/models/Trip'
-import { convertManualTripToDTO, ensureAllDatesIncluded } from '../../utils/TripUtils'
-import { useCreateTrip } from '../state/useCreateTrip'
-import { useManualTripStore } from '../state/useManualTrip'
-import { useUpdateTripItem } from '../state/useUpdateTripItem'
 import DayPlanner from './DayPlanner'
 import HorizontalDatePicker from './HorizontalDatePicker'
+import { CreateTripDTO } from '@/features/trip/domain/models/Trip'
+import { ensureAllDatesIncluded, convertManualTripToDTO } from '@/features/trip/utils/TripUtils'
+import { useCreateTrip } from '../../state/useCreateTrip'
+import { useManualTripStore } from '../../state/useManualTrip'
+import { useUpdateTripItem } from '../../state/useUpdateTripItem'
 
 type ManualTripCreateProps = {
   nextFn: () => void

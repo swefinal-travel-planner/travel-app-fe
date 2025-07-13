@@ -49,7 +49,6 @@ export default function UnifiedTripCreator({
       }
 
       aiTripStore.clearRequest()
-      onComplete()
     } catch (error) {
       console.error('AI trip creation error:', error)
       Alert.alert('Error', 'Failed to create AI trip. Please try again.')

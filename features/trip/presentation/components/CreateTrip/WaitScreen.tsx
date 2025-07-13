@@ -1,3 +1,4 @@
+import Pressable from '@/components/Pressable'
 import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import { useRouter } from 'expo-router'
@@ -5,7 +6,6 @@ import LottieView from 'lottie-react-native'
 import React, { useEffect, useRef } from 'react'
 import { StyleSheet } from 'react-native'
 import { Text, View } from 'react-native-ui-lib'
-import Pressable from '../../../../components/Pressable'
 
 type WaitScreenProps = {
   theme: typeof colorPalettes.light

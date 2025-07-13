@@ -1,19 +1,13 @@
 import { Place } from '@/features/place/domain/models/Place'
 import { AddPlaceModal } from '@/features/place/presentation/components/AddPlaceComponent'
-import {
-  TimeSlot,
-  timeSlots,
-  TripItem,
-} from '@/features/trip/domain/models/Trip'
+import { TimeSlot, timeSlots, TripItem } from '@/features/trip/domain/models/Trip'
 import React, { useEffect, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
-import DraggableFlatList, {
-  RenderItemParams,
-} from 'react-native-draggable-flatlist'
+import DraggableFlatList, { RenderItemParams } from 'react-native-draggable-flatlist'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
-import { useManualTripStore } from '../state/useManualTrip'
 import { SectionHeader } from './SectionHeader'
 import { TripItemCard } from './TripItemCard'
+import { useManualTripStore } from '../../state/useManualTrip'
 
 export type SectionHeader = {
   type: 'header'
@@ -41,9 +35,7 @@ function buildList(data: TypedTripItem[]): Item[] {
   return list
 }
 
-export default function DayPlanner({
-  selectedDate,
-}: Readonly<DayPlannerProps>) {
+export default function DayPlanner({ selectedDate }: Readonly<DayPlannerProps>) {
   const [data, setData] = useState<Item[]>([])
   const [modalVisible, setModalVisible] = useState(false)
   const [selectedTime, setSelectedTime] = useState<TimeSlot | null>(null)
@@ -90,12 +82,9 @@ export default function DayPlanner({
   const handleConfirmAdd = (places: Place[]) => {
     if (!selectedTime) return
 
-    const existingItems = data.filter(
-      (item): item is TypedTripItem => item.type === 'item'
-    )
+    const existingItems = data.filter((item): item is TypedTripItem => item.type === 'item')
     const orderNumbers = existingItems.map((item) => item.orderInDay ?? 0)
-    const currentMaxOrder =
-      orderNumbers.length > 0 ? Math.max(...orderNumbers) : 0
+    const currentMaxOrder = orderNumbers.length > 0 ? Math.max(...orderNumbers) : 0
 
     const newItems: TypedTripItem[] = places.map((place, index) => ({
       name: place.name,
@@ -136,9 +125,7 @@ export default function DayPlanner({
       <GestureHandlerRootView style={styles.container}>
         <DraggableFlatList
           data={data}
-          keyExtractor={(item) =>
-            item.type === 'header' ? `header-${item.time}` : item.item_id
-          }
+          keyExtractor={(item) => (item.type === 'header' ? `header-${item.time}` : item.item_id)}
           onDragEnd={onDragEnd}
           renderItem={renderItem}
         />

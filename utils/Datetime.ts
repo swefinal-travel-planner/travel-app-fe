@@ -77,3 +77,17 @@ export function formatDateTime(dateTime: string): string {
     return `${day} ${month}`
   }
 }
+
+export const formatDate = (date: Date): string => {
+  const day = date.getDate().toString().padStart(2, '0')
+  const month = (date.getMonth() + 1).toString().padStart(2, '0')
+  const year = date.getFullYear()
+  return `${day}/${month}/${year}`
+}
+
+export const calculateEndDate = (startDate: string, days: number): string => {
+  const start = new Date(startDate)
+  const end = new Date(start)
+  end.setDate(start.getDate() + days - 1)
+  return formatDate(end)
+}
