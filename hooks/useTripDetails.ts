@@ -33,10 +33,6 @@ export const useTripDetails = (tripId: string) => {
   }
 
   const getTripItems = async () => {
-    if (!trip?.startDate) {
-      console.warn('Trip startDate is undefined — skipping item grouping.')
-      return
-    }
     try {
       const tripItemData = await beApi.get(`/trips/${tripId}/trip-items?language=en`)
 
@@ -71,7 +67,6 @@ export const useTripDetails = (tripId: string) => {
 
       // Get distance and time information
       const distanceTimeData = await safeCoreApiCall(() => coreApi.post(`/distance_time/calc`, { place_ids: placeIDs }))
-      console.log('Distance and time data:', distanceTimeData.data)
 
       if (!distanceTimeData) {
         setDistanceTimes([])

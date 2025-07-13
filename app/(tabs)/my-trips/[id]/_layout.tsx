@@ -6,22 +6,16 @@ import { useTripId } from '@/hooks/useTripId'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { Tabs, useRouter, useSegments } from 'expo-router'
 import React, { useMemo } from 'react'
-import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-
-// Lấy chiều rộng màn hình để tính toán kích thước tab
-const SCREEN_WIDTH = Dimensions.get('window').width
-const TAB_WIDTH = SCREEN_WIDTH / 3 // Chia cho 3 tab
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 export default function TripDetailLayout() {
   const router = useRouter()
   const segments = useSegments()
-
   const tripId = useTripId()
-
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
 
-  const isModifyScreen = segments.includes('modify')
+  const isModifyScreen = (segments as string[]).includes('modify')
 
   // Component tùy chỉnh cho tab label
   const CustomTabLabel = ({ label, focused }: { label: string; focused: boolean }) => (
@@ -58,7 +52,6 @@ export default function TripDetailLayout() {
           },
           tabBarItemStyle: {
             height: 60,
-            width: TAB_WIDTH,
           },
           tabBarLabelStyle: {
             fontSize: FontSize.LG,
@@ -125,7 +118,6 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       flex: 1,
       alignItems: 'center',
       justifyContent: 'center',
-      height: 60,
       position: 'relative',
       width: '100%',
     },
