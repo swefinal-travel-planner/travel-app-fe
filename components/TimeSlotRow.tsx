@@ -14,8 +14,11 @@ interface Spot {
   timeSlot: string
   orderInTrip: number
   orderInDay: number
-  distance: number
-  time: number
+}
+
+interface DistanceTime {
+  distance: string
+  time: string
 }
 
 interface TimeSlotRowProps {
@@ -68,8 +71,14 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       width: 20, // Keep your desired narrow width
       paddingTop: 6,
       alignItems: 'center',
-      justifyContent: 'center',
-      position: 'relative', // Important for absolute positioning
+      minWidth: 80,
+    },
+    inlineTimeSlotLabelContainer: {
+      paddingTop: 6,
+      marginBottom: 8,
+      alignItems: 'center',
+      minWidth: 80,
+      // No marginHorizontal since we're already inside timeGroup with paddingLeft
     },
 
     timeSlotLabel: {
@@ -77,12 +86,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       fontFamily: FontFamily.BOLD,
       color: theme.primary,
       textAlign: 'center',
-      alignContent: 'center',
-      justifyContent: 'center',
-      transform: [{ rotate: '-90deg' }],
-      position: 'absolute',
-      minWidth: 100, // Set minimum width needed for your text
-      textAlignVertical: 'center',
+      lineHeight: 20,
     },
     timeGroup: {
       flex: 1,
