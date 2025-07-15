@@ -40,9 +40,9 @@ const openMap = ({ lat, lng, label }: OpenMapArgs) => {
 }
 
 const dummyCheckinImages = [
-  'https://images.unsplash.com/photo-1607746882042-944635dfe10e',
-  'https://images.unsplash.com/photo-1506744038136-46273834b3fb',
-  'https://images.unsplash.com/photo-1523413651479-597eb2da0ad6',
+  'https://sieuthanhricoh.com.vn/wp-content/uploads/2023/04/thuong-hieu-kfc-noi-tieng.png',
+  'https://file.hstatic.net/200000700229/article/ga-ran-vi-kfc-1_0c2450efe15d4b6f9e6bd2637b71d88d.jpg',
+  'https://aeonmall-review-rikkei.cdn.vccloud.vn/public/wp/16/news/1UWNQoid7nPdu4Eaks2LPskmzJako77Oqj0NXly9.png',
   'https://images.unsplash.com/photo-1529333166437-7750a6dd5a70',
   'https://images.unsplash.com/photo-1534081333815-ae5019106622',
 ]
@@ -82,7 +82,7 @@ const LocationDetail = ({
       }
     }
 
-    fetchCheckinImages()
+    //fetchCheckinImages()
   }, [tripId, tripItemId])
 
   return (
@@ -166,7 +166,7 @@ const LocationDetail = ({
             ) : (
               <View style={styles.imageGrid}>
                 {checkinImages.map((uri, index) => (
-                  <Image key={index} source={{ uri }} style={styles.checkinImage} />
+                  <Image key={index} source={uri} style={styles.checkinImage} />
                 ))}
               </View>
             )}

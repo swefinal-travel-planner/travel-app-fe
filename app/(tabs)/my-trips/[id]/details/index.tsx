@@ -50,6 +50,8 @@ const TripDetailViewScreen = () => {
   const handleSpotDetail = (id: string) => {
     let spot = tripItems.find((item) => item.placeID === id)?.placeInfo
 
+    console.log('Selected spot:', spot)
+
     router.push({
       pathname: '/places/[id]',
       params: {
@@ -61,7 +63,7 @@ const TripDetailViewScreen = () => {
         address: spot?.address,
         types: spot?.type,
         images: JSON.stringify(spot?.images),
-        status: spot?.status,
+        status: trip?.status,
         tripId: spot?.tripId,
         tripItemId: spot?.tripItemId,
       },
