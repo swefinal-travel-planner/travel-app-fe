@@ -2,7 +2,7 @@ import LocationDetail from '@/components/LocationDetail'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 
 const PlaceDetailScreen = () => {
-  const { name, address, images, properties, types, lat, lng } = useLocalSearchParams()
+  const { name, address, images, properties, types, lat, lng, status, tripId, tripItemId } = useLocalSearchParams()
   const router = useRouter()
 
   return (
@@ -14,6 +14,9 @@ const PlaceDetailScreen = () => {
       types={types as string}
       images={images ? JSON.parse(images as string) : []}
       address={address as string}
+      status={status as 'not_started' | 'in_progress' | 'completed' | 'cancelled' | null}
+      tripId={tripId as string | null}
+      tripItemId={tripItemId as string | null}
       onBack={() => router.back()}
     />
   )

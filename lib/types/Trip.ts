@@ -28,6 +28,9 @@ interface PlaceInfo {
   name: string
   properties: string[]
   type: string
+  status: 'not_started' | 'in_progress' | 'completed' | 'cancelled' | null
+  tripId: string | null
+  tripItemId: string | null
 }
 
 export interface TripItem {

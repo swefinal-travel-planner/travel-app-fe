@@ -4,7 +4,6 @@ import { CORE_URL } from '@/lib/coreApi'
 import { Redirect } from 'expo-router'
 import { getItemAsync } from 'expo-secure-store'
 import { useEffect, useState } from 'react'
-import { ActivityIndicator, View } from 'react-native'
 
 export default function Index() {
   const [state, setState] = useState({
