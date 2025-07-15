@@ -2,11 +2,10 @@ import { colorPalettes } from '@/constants/Itheme'
 import { FontFamily, FontSize } from '@/constants/font'
 import { Radius, Size, SpacingScale } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
-import beApi from '@/lib/beApi'
 import { getGroupIconsFromTypes } from '@/utils/TypeBadges'
 import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Carousel } from 'react-native-ui-lib'
 import Pressable from './Pressable'
@@ -39,14 +38,6 @@ const openMap = ({ lat, lng, label }: OpenMapArgs) => {
   }
 }
 
-const dummyCheckinImages = [
-  'https://sieuthanhricoh.com.vn/wp-content/uploads/2023/04/thuong-hieu-kfc-noi-tieng.png',
-  'https://file.hstatic.net/200000700229/article/ga-ran-vi-kfc-1_0c2450efe15d4b6f9e6bd2637b71d88d.jpg',
-  'https://aeonmall-review-rikkei.cdn.vccloud.vn/public/wp/16/news/1UWNQoid7nPdu4Eaks2LPskmzJako77Oqj0NXly9.png',
-  'https://images.unsplash.com/photo-1529333166437-7750a6dd5a70',
-  'https://images.unsplash.com/photo-1534081333815-ae5019106622',
-]
-
 const LocationDetail = ({
   title,
   properties,
@@ -64,26 +55,36 @@ const LocationDetail = ({
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
 
+  const dummyCheckinImages = [
+    'https://picsum.photos/200',
+    'https://sieuthanhricoh.com.vn/wp-content/uploads/2023/04/thuong-hieu-kfc-noi-tieng.png',
+    'https://file.hstatic.net/200000700229/article/ga-ran-vi-kfc-1_0c2450efe15d4b6f9e6bd2637b71d88d.jpg',
+    'https://images.unsplash.com/photo-1529333166437-7750a6dd5a70',
+    'https://images.unsplash.com/photo-1534081333815-ae5019106622',
+  ]
+
   const [checkinImages, setCheckinImages] = useState<string[]>(dummyCheckinImages)
   const [loadingImages, setLoadingImages] = useState(false)
 
-  useEffect(() => {
-    const fetchCheckinImages = async () => {
-      if (!tripId || !tripItemId) return
+  console.log('status: ', status)
 
-      try {
-        setLoadingImages(true)
-        const response = await beApi.get(`/trips/${tripId}/items/${tripItemId}/checkins`)
-        setCheckinImages(response.data.images || [])
-      } catch (error) {
-        console.error('Error fetching check-in images:', error)
-      } finally {
-        setLoadingImages(false)
-      }
-    }
+  // useEffect(() => {
+  //   const fetchCheckinImages = async () => {
+  //     if (!tripId || !tripItemId) return
 
-    //fetchCheckinImages()
-  }, [tripId, tripItemId])
+  //     try {
+  //       setLoadingImages(true)
+  //       const response = await beApi.get(`/trips/${tripId}/items/${tripItemId}/checkins`)
+  //       setCheckinImages(response.data.images || [])
+  //     } catch (error) {
+  //       console.error('Error fetching check-in images:', error)
+  //     } finally {
+  //       setLoadingImages(false)
+  //     }
+  //   }
+
+  //   //fetchCheckinImages()
+  // }, [tripId, tripItemId])
 
   return (
     <View style={styles.container}>
@@ -166,7 +167,7 @@ const LocationDetail = ({
             ) : (
               <View style={styles.imageGrid}>
                 {checkinImages.map((uri, index) => (
-                  <Image key={index} source={uri} style={styles.checkinImage} />
+                  <Image key={index} source={{ uri }} contentFit="cover" style={styles.checkinImage} />
                 ))}
               </View>
             )}
@@ -209,7 +210,6 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     },
     placeImage: {
       flex: 1,
-      resizeMode: 'cover',
       borderRadius: Radius.ROUNDED,
     },
     title: {
@@ -278,16 +278,18 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     imageGrid: {
       flexDirection: 'row',
       flexWrap: 'wrap',
-      justifyContent: 'space-between',
+      justifyContent: 'flex-start',
       rowGap: 12,
+      columnGap: 6,
       marginBottom: SpacingScale.XXLARGE,
     },
     checkinImage: {
       width: '32%',
       aspectRatio: 1,
       borderRadius: Radius.MEDIUM,
-      resizeMode: 'cover',
       marginBottom: 12,
+      borderWidth: 1,
+      height: 180,
     },
     loadingText: {
       fontSize: Size.NORMAL,
