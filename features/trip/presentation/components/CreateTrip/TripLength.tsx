@@ -2,9 +2,7 @@ import DateRangeField from '@/components/Pickers/DateRangeField'
 import Pressable from '@/components/Pressable'
 import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
-import { useManualTripStore } from '@/features/trip/presentation/state/useManualTrip'
-import { TripRequest, useAiTripStore } from '@/store/useAiTripStore'
-import { DebugWrapper } from '@/utils/DebugWrapper'
+import { TripRequest } from '@/store/useAiTripStore'
 import React, { useState } from 'react'
 import { StyleSheet } from 'react-native'
 import { Text, View } from 'react-native-ui-lib'
@@ -60,6 +58,14 @@ export default function TripLength({ theme, nextFn, setTripState, getTripState }
       return
     }
 
+    // Validate start date is later than today
+    const today = new Date()
+    const selectedStart = new Date(startDate)
+    if (selectedStart <= today) {
+      setErrorMessage('Start date must be later than today.')
+      return
+    }
+
     const days = getDayDiff(startDate, endDate)
 
     if (days > 7) {
@@ -68,7 +74,7 @@ export default function TripLength({ theme, nextFn, setTripState, getTripState }
     }
 
     setTripState?.({
-      startDate,
+      startDate: new Date(startDate).toISOString(),
       days,
     })
 

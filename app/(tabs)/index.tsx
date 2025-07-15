@@ -12,7 +12,7 @@ import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import { Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
-import beApi from '@/lib/beApi'
+import beApi, { safeBeApiCall } from '@/lib/beApi'
 import { Trip, TripItem } from '@/lib/types/Trip'
 import { useMemo } from 'react'
 import { Carousel } from 'react-native-ui-lib'
@@ -61,11 +61,19 @@ const Index = () => {
 
   const getOngoingTrip = async () => {
     try {
-      const response = await beApi.get('/trips')
+      const response = await safeBeApiCall(() => beApi.get('/trips'))
       const ongoingTrip = response.data.data.filter((trip: Trip) => trip.status === 'in_progress')[0]
+
+      if (!ongoingTrip) {
+        console.warn('No ongoing trip found')
+        setOngoingTrip(null)
+        setOngoingTripItems([])
+        return
+      }
+
       setOngoingTrip(ongoingTrip)
 
-      const tripItemData = await beApi.get(`/trips/${ongoingTrip.id}/trip-items?language=en`)
+      const tripItemData = await safeBeApiCall(() => beApi.get(`/trips/${ongoingTrip.id}/trip-items?language=en`))
 
       // Check if the response data is null or undefined
       if (!tripItemData.data?.data) {

@@ -36,6 +36,7 @@ export const handleApiResponse = (response: any) => {
 export const safeBeApiCall = async (apiCall: () => Promise<any>) => {
   try {
     const response = await apiCall()
+    console.log('entering safeBeApiCall')
     return handleApiResponse(response)
   } catch (error) {
     // Check if it's a silent error response

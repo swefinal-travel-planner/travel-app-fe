@@ -1,5 +1,5 @@
-import UnifiedTripCreator from '@/components/CreateTripComponents/UnifiedTripCreator'
-import { createAiTripSteps, TRIP_TYPES } from '@/constants/createTrip'
+import { createAiTripSteps, TRIP_TYPES } from '@/constants/createTripSteps'
+import UnifiedTripCreator from '@/features/trip/presentation/components/CreateTrip/UnifiedTripCreator'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { useAiTripStore } from '@/store/useAiTripStore'
 import { useFocusEffect } from '@react-navigation/native'

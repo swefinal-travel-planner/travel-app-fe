@@ -2,41 +2,28 @@ import { useThemeStyle } from '@/hooks/useThemeStyle'
 import React, { useEffect, useState } from 'react'
 import { StyleSheet, Text } from 'react-native'
 import { Button, View } from 'react-native-ui-lib'
-import { CreateTripDTO } from '../../domain/models/Trip'
-import {
-  convertManualTripToDTO,
-  ensureAllDatesIncluded,
-} from '../../utils/TripUtils'
-import { useCreateTrip } from '../state/useCreateTrip'
-import { useManualTripStore } from '../state/useManualTrip'
-import { useUpdateTripItem } from '../state/useUpdateTripItem'
 import DayPlanner from './DayPlanner'
 import HorizontalDatePicker from './HorizontalDatePicker'
+import { CreateTripDTO } from '@/features/trip/domain/models/Trip'
+import { ensureAllDatesIncluded, convertManualTripToDTO } from '@/features/trip/utils/TripUtils'
+import { useCreateTrip } from '../../state/useCreateTrip'
+import { useManualTripStore } from '../../state/useManualTrip'
+import { useUpdateTripItem } from '../../state/useUpdateTripItem'
 
 type ManualTripCreateProps = {
   nextFn: () => void
 }
 
-export default function ManualTripCreate({
-  nextFn,
-}: Readonly<ManualTripCreateProps>) {
-  const {
-    createTrip,
-    isLoading: isCreating,
-    error: createError,
-  } = useCreateTrip()
-  const {
-    updateTripItems,
-    isLoading: isUpdating,
-    error: updateError,
-  } = useUpdateTripItem()
+export default function ManualTripCreate({ nextFn }: Readonly<ManualTripCreateProps>) {
+  const { createTrip, isLoading: isCreating, error: createError } = useCreateTrip()
+  const { updateTripItems, isLoading: isUpdating, error: updateError } = useUpdateTripItem()
 
-  const { trip, setManualTrip, getItemsForDate, log } = useManualTripStore()
+  const { request, getItemsForDate } = useManualTripStore()
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
 
   useEffect(() => {
-    setSelectedDate(trip.startDate ? new Date(trip.startDate) : null)
-  }, [trip.startDate])
+    setSelectedDate(request?.startDate ? new Date(request.startDate) : null)
+  }, [request?.startDate])
 
   const theme = useThemeStyle()
 
@@ -50,22 +37,21 @@ export default function ManualTripCreate({
     const items = getItemsForDate(selectedDate)
 
     const createTripDTO: CreateTripDTO = {
-      city: 'Ho Chi Minh City', // Default city, can be changed later
-      title: trip.title ?? 'Untitled Trip',
+      title: request?.title ?? 'Untitled Trip',
       startDate: selectedDate,
-      days: trip.days ?? 1,
+      days: request?.days ?? 1,
     }
 
     const createdTripId = await createTrip(createTripDTO)
 
     if (createdTripId) {
-      const { trip, itemsByDate } = useManualTripStore.getState()
+      const { request, itemsByDate } = useManualTripStore.getState()
 
       // First ensure all dates are included
-      const completeItemsByDate = ensureAllDatesIncluded(trip, itemsByDate)
+      const completeItemsByDate = ensureAllDatesIncluded(request, itemsByDate)
 
       // Then convert to DTO format for API calls
-      const tripItems = convertManualTripToDTO(trip, completeItemsByDate)
+      const tripItems = convertManualTripToDTO(request, completeItemsByDate)
 
       updateTripItems(createdTripId, tripItems)
 
@@ -86,7 +72,7 @@ export default function ManualTripCreate({
     <View style={[styles.container]}>
       {selectedDate && (
         <HorizontalDatePicker
-          trip={trip}
+          request={request}
           selectedDate={selectedDate}
           onSelectDate={setSelectedDate}
           theme={theme}

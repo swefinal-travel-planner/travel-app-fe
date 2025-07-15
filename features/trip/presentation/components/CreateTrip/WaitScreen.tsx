@@ -1,3 +1,4 @@
+import Pressable from '@/components/Pressable'
 import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import { useRouter } from 'expo-router'
@@ -5,7 +6,6 @@ import LottieView from 'lottie-react-native'
 import React, { useEffect, useRef } from 'react'
 import { StyleSheet } from 'react-native'
 import { Text, View } from 'react-native-ui-lib'
-import Pressable from '../Pressable'
 
 type WaitScreenProps = {
   theme: typeof colorPalettes.light
@@ -21,9 +21,7 @@ export default function WaitScreen({ theme }: Readonly<WaitScreenProps>) {
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.textQuestion, { color: theme.primary }]}>
-        Your trip is being prepared!
-      </Text>
+      <Text style={[styles.textQuestion, { color: theme.primary }]}>Your trip is being prepared!</Text>
 
       <Text style={[styles.subTextQuestion, { color: theme.text }]}>
         This may take a while. We will notify you when it's ready.
@@ -31,7 +29,7 @@ export default function WaitScreen({ theme }: Readonly<WaitScreenProps>) {
 
       <View style={styles.textFieldContainer}>
         <LottieView
-          source={require('../../assets/animations/TripInProgress.json')}
+          source={require('@/assets/animations/TripInProgress.json')}
           autoPlay
           loop
           style={{ width: 300, height: 300 }}

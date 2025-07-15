@@ -58,8 +58,6 @@ export default function SignUpOtp() {
     setIsFilled(otp.length === 6)
   }
 
-  const handlePress = async () => {}
-
   useEffect(() => {
     const interval = setInterval(() => {
       setCountdown((prev) => {
@@ -88,11 +86,14 @@ export default function SignUpOtp() {
 
         <OtpField onChanged={onOtpChanged} onFilled={onOtpFilled} />
 
-        <Pressable title="Verify" disabled={!isFilled} onPress={handlePress} style={styles.primaryButton} />
-
         <Pressable
           title={resendDisabled ? `Send another code in ${countdown} seconds` : 'Send another code'}
           disabled={resendDisabled}
+          style={{
+            marginTop: 36,
+            backgroundColor: resendDisabled ? theme.primary : theme.disabled,
+            color: resendDisabled ? theme.white : theme.text,
+          }}
           onPress={() => setResendDisabled(true)}
         />
       </View>

@@ -3,11 +3,10 @@ import { colorPalettes } from '@/constants/Itheme'
 import { Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import Ionicons from '@expo/vector-icons/Ionicons'
+import { Image } from 'expo-image'
 import { useMemo, useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import { Image } from 'expo-image'
-import PressableOpacity from '../PressableOpacity'
-import { getPlaceHolder } from '../AdaptiveImage'
+import { getPlaceHolder } from '../../features/trip/utils/AdaptiveImage'
 
 interface SpotCardProps {
   name: string

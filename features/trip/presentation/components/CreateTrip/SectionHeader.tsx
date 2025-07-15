@@ -1,24 +1,18 @@
+import { TimeSlot } from '@/features/trip/domain/models/Trip'
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6'
 import React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { TimeSlot } from '../../domain/models/Trip'
 
 type SectionHeaderProps = {
   time: TimeSlot
   onAddItem: (time: TimeSlot) => void
 }
 
-export const SectionHeader: React.FC<SectionHeaderProps> = ({
-  time,
-  onAddItem,
-}) => {
+export const SectionHeader: React.FC<SectionHeaderProps> = ({ time, onAddItem }) => {
   return (
     <View style={styles.sectionHeader}>
       <Text style={styles.sectionTitle}>{time.toUpperCase()}</Text>
-      <TouchableOpacity
-        onPress={() => onAddItem(time)}
-        style={styles.addButton}
-      >
+      <TouchableOpacity onPress={() => onAddItem(time)} style={styles.addButton}>
         <FontAwesome6 name="plus" size={24} color="black" />
       </TouchableOpacity>
     </View>

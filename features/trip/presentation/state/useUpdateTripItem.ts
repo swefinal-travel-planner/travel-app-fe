@@ -1,28 +1,21 @@
+import { UpdateTripItemUseCase } from './../../domain/usecases/UpdateTripItemUseCase'
 import { useState } from 'react'
-import { TripRepositoryImpl } from '../../data/repositories/TripRepositoryImpl'
 import { UpdateTripItemDTO } from '../../domain/models/UpdateTripItemDTO'
-import { UpdateTripItemUseCase } from '../../domain/usecases/UpdateTripItemUseCase'
+import { tripRepository } from '../../di/container'
 
 export const useUpdateTripItem = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
 
-  const updateTripItemUseCase = new UpdateTripItemUseCase(
-    new TripRepositoryImpl()
-  )
+  const updateTripItemUseCase = new UpdateTripItemUseCase(tripRepository)
 
-  const updateTripItems = async (
-    tripId: number,
-    tripItems: UpdateTripItemDTO[]
-  ): Promise<void> => {
+  const updateTripItems = async (tripId: number, tripItems: UpdateTripItemDTO[]): Promise<void> => {
     setIsLoading(true)
     setError(null)
     try {
       await updateTripItemUseCase.execute(tripId, tripItems)
     } catch (err) {
-      setError(
-        err instanceof Error ? err : new Error('Failed to update trip item')
-      )
+      setError(err instanceof Error ? err : new Error('Failed to update trip item'))
     } finally {
       setIsLoading(false)
     }

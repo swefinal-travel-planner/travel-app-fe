@@ -1,20 +1,21 @@
-import { getPlaceHolder } from '@/components/AdaptiveImage'
 import Pressable from '@/components/Pressable'
+import { useToast } from '@/components/ToastContext'
 import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import { Radius } from '@/constants/theme'
+import { getPlaceHolder } from '@/features/trip/utils/AdaptiveImage'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { useTripId } from '@/hooks/useTripId'
 import beApi, { safeBeApiCall } from '@/lib/beApi'
+import { Friend } from '@/lib/types/Profile'
 import { SearchResult } from '@/lib/types/UserSearch'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useRouter } from 'expo-router'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import {
-  Alert,
-  FlatList,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -30,24 +31,26 @@ type TripCompanion = {
   status: 'pending' | 'accepted' | 'declined'
 }
 
+type FriendWithInviteStatus = Friend & {
+  isInvited?: boolean
+  isCompanion?: boolean
+}
+
 const TripCompanionInviteScreen = () => {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
   const router = useRouter()
   const tripId = useTripId()
 
+  const { showToast } = useToast()
+
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<SearchResult[]>([])
   const [companions, setCompanions] = useState<TripCompanion[]>([])
   const [pendingInvites, setPendingInvites] = useState<number[]>([])
+  const [friends, setFriends] = useState<FriendWithInviteStatus[]>([])
   const [isSearching, setIsSearching] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-
-  // Load initial data on component mount
-  useEffect(() => {
-    loadCompanions()
-    loadPendingInvites()
-  }, [tripId])
 
   const loadCompanions = useCallback(async () => {
     try {
@@ -83,6 +86,43 @@ const TripCompanionInviteScreen = () => {
     }
   }, [tripId])
 
+  const loadFriends = useCallback(async () => {
+    try {
+      const response = await safeBeApiCall(() => beApi.get('/friends'))
+
+      // If response is null, it means it was a silent error
+      if (!response) {
+        setFriends([])
+        return
+      }
+
+      // Transform friends data to match Friend interface
+      const friendsData = response.data.data || []
+      const transformedFriends: FriendWithInviteStatus[] = friendsData.map((friend: any) => ({
+        id: friend.id,
+        name: friend.username || friend.name,
+        avatar: friend.imageURL || friend.avatar || '',
+        isInvited: pendingInvites.includes(friend.id),
+        isCompanion: companions.some((comp) => comp.user_id === friend.id.toString()),
+      }))
+      setFriends(transformedFriends)
+    } catch (error) {
+      console.error('Error loading friends:', error)
+      setFriends([])
+    }
+  }, [pendingInvites, companions])
+
+  // Load initial data on component mount
+  useEffect(() => {
+    loadCompanions()
+    loadPendingInvites()
+  }, [tripId])
+
+  // Load friends when companions or pending invites change
+  useEffect(() => {
+    loadFriends()
+  }, [loadFriends])
+
   const searchUsers = useCallback(
     async (email: string) => {
       if (!email.trim() || !email.includes('@')) {
@@ -110,6 +150,7 @@ const TripCompanionInviteScreen = () => {
           if (searchData.data && !companionIds.includes(searchData.data.id)) {
             const result: SearchResult = {
               ...searchData.data,
+              avatar: searchData.data.imageURL || searchData.data.photoURL || searchData.data.avatar || '',
               isInvited: pendingInvites.includes(searchData.data.id),
               isCompanion: false,
             }
@@ -133,7 +174,7 @@ const TripCompanionInviteScreen = () => {
   const handleSearchChange = useCallback(
     (text: string) => {
       setSearchQuery(text)
-      if (text.length > 2) {
+      if (text.includes('@') && text.includes('.') && text.indexOf('@') < text.lastIndexOf('.') && text.length > 2) {
         searchUsers(text)
       } else {
         setSearchResults([])
@@ -155,7 +196,11 @@ const TripCompanionInviteScreen = () => {
 
         // If response is null, it means it was a silent error
         if (!response) {
-          Alert.alert('Error', 'Failed to send invitation. Please try again.')
+          showToast({
+            type: 'error',
+            message: 'Failed to send invitation. Please try again.',
+            position: 'bottom',
+          })
           return
         }
 
@@ -163,12 +208,21 @@ const TripCompanionInviteScreen = () => {
         if (response.status === 204 || response.data) {
           setPendingInvites((prev) => [...prev, userId])
           setSearchResults((prev) => prev.map((user) => (user.id === userId ? { ...user, isInvited: true } : user)))
-          Alert.alert('Success', 'Invitation sent successfully!')
+          setFriends((prev) => prev.map((friend) => (friend.id === userId ? { ...friend, isInvited: true } : friend)))
+          showToast({
+            type: 'success',
+            message: 'Invitation sent successfully!',
+            position: 'bottom',
+          })
         }
       } catch (error: any) {
         console.error('Invitation error:', error.response?.data?.message)
         const errorMessage = error.response?.data?.message || 'Failed to send invitation'
-        Alert.alert('Error', errorMessage)
+        showToast({
+          type: 'error',
+          message: errorMessage,
+          position: 'bottom',
+        })
       } finally {
         setIsLoading(false)
       }
@@ -190,15 +244,47 @@ const TripCompanionInviteScreen = () => {
         </View>
       </View>
       <Pressable
-        title={item.isInvited ? 'Invited' : 'Invite'}
-        disabled={item.isInvited || isLoading}
+        title={item.isInvited ? 'Withdraw' : 'Invite'}
+        disabled={isLoading}
         style={{
-          backgroundColor: item.isInvited ? theme.disabled : theme.primary,
+          backgroundColor: item.isInvited ? theme.error : theme.primary,
           color: theme.white,
         }}
-        onPress={() => sendInvitation(item.id)}
+        onPress={() =>
+          item.isInvited ? console.log('Withdraw invitation for user:', item.id) : sendInvitation(item.id)
+        }
         size="small"
       />
+    </View>
+  )
+
+  const renderFriendResult = ({ item }: { item: FriendWithInviteStatus }) => (
+    <View style={styles.resultCard}>
+      <View style={styles.userInfo}>
+        <Avatar size={50} source={item.avatar ? { uri: item.avatar } : getPlaceHolder(50, 50)} />
+        <View style={styles.userDetails}>
+          <Text style={styles.username}>{item.name}</Text>
+          <Text style={styles.email}>Friend</Text>
+        </View>
+      </View>
+      {item.isCompanion ? (
+        <View style={[styles.statusBadge, { backgroundColor: theme.green }]}>
+          <Text style={styles.statusText}>Companion</Text>
+        </View>
+      ) : (
+        <Pressable
+          title={item.isInvited ? 'Withdraw' : 'Invite'}
+          disabled={isLoading}
+          style={{
+            backgroundColor: item.isInvited ? theme.error : theme.primary,
+            color: theme.white,
+          }}
+          onPress={() =>
+            item.isInvited ? console.log('Withdraw invitation for friend:', item.id) : sendInvitation(item.id)
+          }
+          size="small"
+        />
+      )}
     </View>
   )
 
@@ -257,34 +343,29 @@ const TripCompanionInviteScreen = () => {
       )}
 
       {/* Search Results */}
-      <FlatList
-        data={searchResults}
-        renderItem={renderSearchResult}
-        keyExtractor={(item) => item.id.toString()}
+      <ScrollView
         style={styles.resultsList}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
-      />
+      >
+        {/* Search Results Section */}
+        {searchResults.map((item) => (
+          <View key={item.id.toString()}>{renderSearchResult({ item })}</View>
+        ))}
 
-      {/* Instructions */}
-      {searchQuery.length === 0 && (
-        <View style={styles.instructionsContainer}>
-          <View style={styles.instructionItem}>
-            <Ionicons name="search" size={24} color={theme.text} />
-            <Text style={[styles.instructionText, { color: theme.text }]}>
-              Search for friends by their email address
-            </Text>
-          </View>
-          <View style={styles.instructionItem}>
-            <Ionicons name="person-add" size={24} color={theme.text} />
-            <Text style={[styles.instructionText, { color: theme.text }]}>Send invitation to join your trip</Text>
-          </View>
-          <View style={styles.instructionItem}>
-            <Ionicons name="people" size={24} color={theme.text} />
-            <Text style={[styles.instructionText, { color: theme.text }]}>Collaborate and plan together</Text>
-          </View>
-        </View>
-      )}
+        {/* Friends Section */}
+        {friends.length > 0 && (
+          <>
+            <View style={styles.sectionHeader}>
+              <Ionicons name="people-outline" size={24} color={theme.text} />
+              <Text style={[styles.sectionTitle, { color: theme.text }]}>Your friends</Text>
+            </View>
+            {friends.map((item) => (
+              <View key={`friend-${item.id}`}>{renderFriendResult({ item })}</View>
+            ))}
+          </>
+        )}
+      </ScrollView>
     </KeyboardAvoidingView>
   )
 }
@@ -301,7 +382,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       alignItems: 'center',
       justifyContent: 'space-between',
       paddingHorizontal: 20,
-      paddingVertical: 16,
+      paddingBottom: 16,
     },
     backButton: {
       padding: 8,
@@ -401,6 +482,24 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       flex: 1,
       lineHeight: 22,
       fontFamily: FontFamily.REGULAR,
+    },
+    statusBadge: {
+      backgroundColor: theme.green,
+      borderRadius: 12,
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+    },
+    sectionHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginTop: 24,
+      marginBottom: 8,
+      paddingHorizontal: 4,
+    },
+    sectionTitle: {
+      fontSize: FontSize.LG,
+      fontFamily: FontFamily.BOLD,
+      marginLeft: 4,
     },
   })
 

@@ -5,7 +5,7 @@ import { useAiTripStore } from '@/store/useAiTripStore'
 import SegmentedControl from '@react-native-segmented-control/segmented-control'
 import React, { useEffect, useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import Pressable from '../Pressable'
+import Pressable from '../../../../../../components/Pressable'
 
 type LocPreferenceProps = {
   theme: typeof colorPalettes.light

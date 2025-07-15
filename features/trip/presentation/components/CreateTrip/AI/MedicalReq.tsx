@@ -1,77 +1,78 @@
 import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
-import foodSpotTypeData from '@/lib/mock_data/foodSpotTypes'
+import medicalReqData from '@/lib/mock_data/medicalReqs'
 import { useAiTripStore } from '@/store/useAiTripStore'
 import { formatAttribute } from '@/utils/tripAttributes'
 import React, { useEffect, useState } from 'react'
 import { StyleSheet } from 'react-native'
 import { Text, View } from 'react-native-ui-lib'
-import CollapsibleSectionList from '../CollapsibleSectionList'
-import Pressable from '../Pressable'
+import CollapsibleSectionList from '../../../../../../components/CollapsibleSectionList'
+import Pressable from '../../../../../../components/Pressable'
 
-type FoodSpotTypeProps = {
+type MedicalReqProps = {
   theme: typeof colorPalettes.light
   nextFn: () => void
 }
 
-export default function FoodSpotType({
-  theme,
-  nextFn,
-}: Readonly<FoodSpotTypeProps>) {
-  const setFoodAttributes = useAiTripStore((state) => state.setFoodAttributes)
+export default function MedicalReq({ theme, nextFn }: Readonly<MedicalReqProps>) {
   const request = useAiTripStore((state) => state.request)
 
-  const [foodSpotTypes, setFoodSpotTypes] = useState<string[]>(
-    request?.enFoodAttributes ?? []
+  const [medicalReqs, setMedicalReqs] = useState<string[]>(
+    request?.enMedicalConditions ? request.enMedicalConditions.filter((req) => req !== 'none') : []
   )
 
+  const setMedicalConditions = useAiTripStore((state) => state.setMedicalConditions)
+
+  const handleNext = () => {
+    nextFn()
+  }
+
   useEffect(() => {
-    setFoodAttributes(
-      foodSpotTypes.map((type) => formatAttribute(type)),
+    setMedicalConditions(
+      medicalReqs.map((req) => formatAttribute(req)),
       []
     )
-  }, [foodSpotTypes])
+
+    if (medicalReqs.length === 0) {
+      setMedicalConditions(['none'], [])
+    }
+  }, [medicalReqs])
 
   return (
     <View style={styles.container}>
       <Text style={[styles.textQuestion, { color: theme.primary }]}>
-        What type of culinary spots do you want to visit?
+        Do you have any medical or dietary requirements?
       </Text>
 
       <Text style={[styles.subTextQuestion, { color: theme.text }]}>
         Scroll to see all categories, and tap to expand each category.
       </Text>
 
-      <Text style={[styles.subTextQuestion, { color: theme.text }]}>
-        Select at least one category to continue.
+      <Text style={[styles.subTextQuestion, { color: theme.text, marginTop: -16 }]}>
+        If you have no requirements, you can skip this step and press Next.
       </Text>
 
       <View style={styles.textFieldContainer}>
-        <CollapsibleSectionList
-          data={foodSpotTypeData}
-          selectedValues={foodSpotTypes}
-          onValueChange={setFoodSpotTypes}
-        />
+        <CollapsibleSectionList data={medicalReqData} selectedValues={medicalReqs} onValueChange={setMedicalReqs} />
       </View>
 
-      {foodSpotTypes.length > 0 && (
+      {medicalReqs.length > 0 && (
         <Text style={[styles.textField, { color: theme.primary }]}>
-          {foodSpotTypes.length === 1
+          {medicalReqs.length === 1 && medicalReqs[0] !== 'none'
             ? 'Selected 1 category'
-            : foodSpotTypes.length > 1
-              ? `Selected ${foodSpotTypes.length} categories`
+            : medicalReqs.length > 1
+              ? `Selected ${medicalReqs.length} categories`
               : ''}
         </Text>
       )}
 
       <Pressable
-        onPress={nextFn}
+        onPress={handleNext}
         title="Next"
         style={{
           color: theme.white,
           backgroundColor: theme.primary,
         }}
-        disabled={foodSpotTypes.length === 0}
       />
     </View>
   )

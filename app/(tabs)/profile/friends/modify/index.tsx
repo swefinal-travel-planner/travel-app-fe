@@ -1,8 +1,8 @@
-import { getPlaceHolder } from '@/components/AdaptiveImage'
 import Pressable from '@/components/Pressable'
 import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import { Radius } from '@/constants/theme'
+import { getPlaceHolder } from '@/features/trip/utils/AdaptiveImage'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { useTripId } from '@/hooks/useTripId'
 import beApi, { safeBeApiCall } from '@/lib/beApi'
@@ -69,8 +69,6 @@ const TripFriendInviteScreen = () => {
 
       // Merge both arrays and remove duplicates
       const allPendingInvites = [...new Set([...requestedUsernames, ...receivedUsernames])]
-
-      console.log('All pending invites:', allPendingInvites)
 
       setPendingInvites(allPendingInvites)
     } catch (error) {

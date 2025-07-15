@@ -1,64 +1,78 @@
 import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
-import spotTypeData from '@/lib/mock_data/spotTypes'
+import otherReqData from '@/lib/mock_data/otherReqs'
 import { useAiTripStore } from '@/store/useAiTripStore'
 import { formatAttribute } from '@/utils/tripAttributes'
 import React, { useEffect, useState } from 'react'
 import { StyleSheet } from 'react-native'
 import { Text, View } from 'react-native-ui-lib'
-import CollapsibleSectionList from '../CollapsibleSectionList'
-import Pressable from '../Pressable'
+import CollapsibleSectionList from '../../../../../../components/CollapsibleSectionList'
+import Pressable from '../../../../../../components/Pressable'
 
-type SpotTypeProps = {
+type OtherReqProps = {
   theme: typeof colorPalettes.light
   nextFn: () => void
 }
 
-export default function SpotType({ theme, nextFn }: Readonly<SpotTypeProps>) {
-  const setLocAttributes = useAiTripStore((state) => state.setLocAttributes)
+export default function OtherReq({ theme, nextFn }: Readonly<OtherReqProps>) {
   const request = useAiTripStore((state) => state.request)
 
-  const [spotTypes, setSpotTypes] = useState<string[]>(request?.enLocationAttributes ?? [])
+  const [otherReqs, setOtherReqs] = useState<string[]>(
+    request?.enSpecialRequirements ? request.enSpecialRequirements.filter((req) => req !== 'none') : []
+  )
+
+  const setSpecialRequirements = useAiTripStore((state) => state.setSpecialRequirements)
+
+  const handleNext = () => {
+    nextFn()
+  }
 
   useEffect(() => {
-    setLocAttributes(
-      spotTypes.map((type) => formatAttribute(type)),
+    setSpecialRequirements(
+      otherReqs.map((req) => formatAttribute(req)),
       []
     )
-  }, [spotTypes])
+
+    if (otherReqs.length === 0) {
+      setSpecialRequirements(['none'], [])
+    }
+  }, [otherReqs])
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.textQuestion, { color: theme.primary }]}>What type of spots do you want to visit?</Text>
+      <Text style={[styles.textQuestion, { color: theme.primary }]}>
+        Finally, do you have any other requirements or preferences?
+      </Text>
 
       <Text style={[styles.subTextQuestion, { color: theme.text }]}>
         Scroll to see all categories, and tap to expand each category.
       </Text>
 
-      <Text style={[styles.subTextQuestion, { color: theme.text }]}>Select at least one category to continue.</Text>
+      <Text style={[styles.subTextQuestion, { color: theme.text, marginTop: -16 }]}>
+        If you have no requirements, you can skip this step and press Next.
+      </Text>
 
       <View style={styles.textFieldContainer}>
-        <CollapsibleSectionList data={spotTypeData} selectedValues={spotTypes} onValueChange={setSpotTypes} />
+        <CollapsibleSectionList data={otherReqData} selectedValues={otherReqs} onValueChange={setOtherReqs} />
       </View>
 
-      {spotTypes.length > 0 && (
+      {otherReqs.length > 0 && (
         <Text style={[styles.textField, { color: theme.primary }]}>
-          {spotTypes.length === 1
+          {otherReqs.length === 1
             ? 'Selected 1 category'
-            : spotTypes.length > 1
-              ? `Selected ${spotTypes.length} categories`
+            : otherReqs.length > 1
+              ? `Selected ${otherReqs.length} categories`
               : ''}
         </Text>
       )}
 
       <Pressable
-        onPress={nextFn}
+        onPress={handleNext}
         title="Next"
         style={{
           color: theme.white,
           backgroundColor: theme.primary,
         }}
-        disabled={spotTypes.length === 0}
       />
     </View>
   )

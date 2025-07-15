@@ -1,13 +1,13 @@
-import { getPlaceHolder } from '@/components/AdaptiveImage'
 import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import { Radius } from '@/constants/theme'
 import { TripImage } from '@/features/trip/domain/models/TripImage'
+import { getPlaceHolder } from '@/features/trip/utils/AdaptiveImage'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import Ionicons from '@expo/vector-icons/Ionicons'
+import { Image } from 'expo-image'
 import React, { useMemo } from 'react'
 import { ActivityIndicator, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native'
-import { Image } from 'expo-image'
 
 interface AlbumGridProps {
   images: TripImage[]

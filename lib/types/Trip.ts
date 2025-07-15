@@ -34,6 +34,7 @@ interface PlaceInfo {
 }
 
 export interface TripItem {
+  timeSlot: string
   id: number
   orderInDay: number
   placeID: string
@@ -42,6 +43,8 @@ export interface TripItem {
   tripDay: number
   tripID: number
   orderInTrip?: number // Thêm trường này để xác định thứ tự trong chuyến đi
+  distance?: number | null // Khoảng cách từ điểm trước đó
+  time?: number | null // Thời gian di chuyển từ điểm trước đó
 }
 
 export interface Trip {

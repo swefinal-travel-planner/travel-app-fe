@@ -1,6 +1,6 @@
-import UnifiedTripCreator from '@/components/CreateTripComponents/UnifiedTripCreator'
-import { createAiTripSteps, createManualTripSteps, TRIP_TYPES } from '@/constants/createTrip'
+import { createAiTripSteps, createManualTripSteps, TRIP_TYPES } from '@/constants/createTripSteps'
 import { colorPalettes } from '@/constants/Itheme'
+import UnifiedTripCreator from '@/features/trip/presentation/components/UnifiedTripCreator'
 import { fireEvent, render, waitFor } from '@testing-library/react-native'
 import React from 'react'
 

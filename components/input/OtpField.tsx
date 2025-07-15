@@ -15,7 +15,7 @@ const OtpField: React.FC<OtpFieldProps> = ({ onChanged, onFilled }) => {
   return (
     <OtpInput
       numberOfDigits={6}
-      focusColor="#3F6453"
+      focusColor={theme.primary}
       autoFocus={true}
       hideStick={true}
       blurOnFilled={true}

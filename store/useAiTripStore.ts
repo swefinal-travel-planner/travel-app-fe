@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { immer } from 'zustand/middleware/immer'
 
 export type TripRequest = {
   budget: number
@@ -21,63 +22,74 @@ export type TripRequest = {
 interface AiTripState {
   request: TripRequest | null
   setLocsPerDay: (locationsPerDay: number) => void
-  setFoodAttributes: (enAttributes: string[], viAttributes: string[]) => void
-  setLocAttributes: (enAttributes: string[], viAttributes: string[]) => void
-  setMedicalConditions: (enConditions: string[], viConditions: string[]) => void
-  setSpecialRequirements: (enRequirements: string[], viRequirements: string[]) => void
+  setFoodAttributes: (en: string[], vi: string[]) => void
+  setLocAttributes: (en: string[], vi: string[]) => void
+  setMedicalConditions: (en: string[], vi: string[]) => void
+  setSpecialRequirements: (en: string[], vi: string[]) => void
   setLocPreference: (preference: string) => void
   setRequest: (updates: Partial<TripRequest>) => void
   clearRequest: () => void
 }
 
-export const useAiTripStore = create<AiTripState>()((set) => ({
-  request: null,
-  setLocsPerDay: (locationsPerDay: number) =>
-    set((state) => ({
-      request: { ...state.request, locationsPerDay } as TripRequest,
-    })),
-  setFoodAttributes: (enAttributes: string[], viAttributes: string[]) =>
-    set((state) => ({
-      request: {
-        ...state.request,
-        enFoodAttributes: enAttributes,
-        viFoodAttributes: viAttributes,
-      } as TripRequest,
-    })),
-  setLocAttributes: (enAttributes: string[], viAttributes: string[]) =>
-    set((state) => ({
-      request: {
-        ...state.request,
-        enLocationAttributes: enAttributes,
-        viLocationAttributes: viAttributes,
-      } as TripRequest,
-    })),
-  setMedicalConditions: (enConditions: string[], viConditions: string[]) =>
-    set((state) => ({
-      request: {
-        ...state.request,
-        enMedicalConditions: enConditions,
-        viMedicalConditions: viConditions,
-      } as TripRequest,
-    })),
-  setSpecialRequirements: (enRequirements: string[], viRequirements: string[]) =>
-    set((state) => ({
-      request: {
-        ...state.request,
-        enSpecialRequirements: enRequirements,
-        viSpecialRequirements: viRequirements,
-      } as TripRequest,
-    })),
-  setLocPreference: (preference: string) =>
-    set((state) => ({
-      request: {
-        ...state.request,
-        locationPreference: preference,
-      } as TripRequest,
-    })),
-  setRequest: (updates: Partial<TripRequest>) =>
-    set((state) => ({
-      request: { ...state.request, ...updates } as TripRequest,
-    })),
-  clearRequest: () => set({ request: null }),
-}))
+export const useAiTripStore = create<AiTripState>()(
+  immer((set) => ({
+    request: null,
+
+    setLocsPerDay: (locationsPerDay) =>
+      set((state) => {
+        if (state.request) state.request.locationsPerDay = locationsPerDay
+      }),
+
+    setFoodAttributes: (en, vi) =>
+      set((state) => {
+        if (state.request) {
+          state.request.enFoodAttributes = en
+          state.request.viFoodAttributes = vi
+        }
+      }),
+
+    setLocAttributes: (en, vi) =>
+      set((state) => {
+        if (state.request) {
+          state.request.enLocationAttributes = en
+          state.request.viLocationAttributes = vi
+        }
+      }),
+
+    setMedicalConditions: (en, vi) =>
+      set((state) => {
+        if (state.request) {
+          state.request.enMedicalConditions = en
+          state.request.viMedicalConditions = vi
+        }
+      }),
+
+    setSpecialRequirements: (en, vi) =>
+      set((state) => {
+        if (state.request) {
+          state.request.enSpecialRequirements = en
+          state.request.viSpecialRequirements = vi
+        }
+      }),
+
+    setLocPreference: (preference) =>
+      set((state) => {
+        if (state.request) {
+          state.request.locationPreference = preference
+        }
+      }),
+
+    setRequest: (updates) =>
+      set((state) => {
+        console.log(updates)
+        if (!state.request) state.request = updates as TripRequest
+        else Object.assign(state.request, updates)
+        console.log('Updated request:', state.request)
+      }),
+
+    clearRequest: () =>
+      set((state) => {
+        state.request = null
+      }),
+  }))
+)

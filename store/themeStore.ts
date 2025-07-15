@@ -9,7 +9,6 @@ type Language = 'en' | 'vi'
 interface ThemeState {
   // Current theme name
   themeName: ThemeName
-  theme: Theme
   language: Language
   isSystemTheme: boolean
   setTheme: (themeName: ThemeName) => void
