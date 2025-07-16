@@ -123,8 +123,7 @@ const LocationDetail = ({
           style={{
             backgroundColor: theme.primary,
             color: theme.white,
-            marginBottom: SpacingScale.HUGE,
-            marginTop: SpacingScale.MEDIUM,
+            marginVertical: SpacingScale.LARGE,
           }}
           onPress={() => openMap({ lat, lng, label: title })}
         />
@@ -150,7 +149,7 @@ const LocationDetail = ({
             style={{
               backgroundColor: theme.primary,
               color: theme.white,
-              marginBottom: SpacingScale.HUGE,
+              marginVertical: SpacingScale.LARGE,
             }}
             onPress={() => {
               console.log(`Checkin at ${title} (tripItemId: ${tripItemId})`)
@@ -243,6 +242,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       flexWrap: 'wrap',
       justifyContent: 'flex-start',
       gap: 12,
+      marginBottom: SpacingScale.LARGE,
     },
     activityItem: {
       width: 100,
