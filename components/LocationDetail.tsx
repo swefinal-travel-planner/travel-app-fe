@@ -2,10 +2,11 @@ import { colorPalettes } from '@/constants/Itheme'
 import { FontFamily, FontSize } from '@/constants/font'
 import { Radius, Size, SpacingScale } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
+import beApi from '@/lib/beApi'
 import { getGroupIconsFromTypes } from '@/utils/TypeBadges'
 import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Carousel } from 'react-native-ui-lib'
 import Pressable from './Pressable'
@@ -28,6 +29,13 @@ type OpenMapArgs = {
   lat: string | number
   lng: string | number
   label: string
+}
+
+type CheckinImage = {
+  id: number
+  tripId: string
+  tripItemID: string
+  imageUrl: string
 }
 
 const openMap = ({ lat, lng, label }: OpenMapArgs) => {
@@ -55,36 +63,27 @@ const LocationDetail = ({
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
 
-  const dummyCheckinImages = [
-    'https://picsum.photos/200',
-    'https://sieuthanhricoh.com.vn/wp-content/uploads/2023/04/thuong-hieu-kfc-noi-tieng.png',
-    'https://file.hstatic.net/200000700229/article/ga-ran-vi-kfc-1_0c2450efe15d4b6f9e6bd2637b71d88d.jpg',
-    'https://images.unsplash.com/photo-1529333166437-7750a6dd5a70',
-    'https://images.unsplash.com/photo-1534081333815-ae5019106622',
-  ]
-
-  const [checkinImages, setCheckinImages] = useState<string[]>(dummyCheckinImages)
+  const [checkinImages, setCheckinImages] = useState<CheckinImage[]>([])
   const [loadingImages, setLoadingImages] = useState(false)
 
-  console.log('status: ', status)
+  useEffect(() => {
+    const fetchCheckinImages = async () => {
+      if (!tripId || !tripItemId) return
 
-  // useEffect(() => {
-  //   const fetchCheckinImages = async () => {
-  //     if (!tripId || !tripItemId) return
+      try {
+        setLoadingImages(true)
+        console.log('tripId:', tripId, 'tripItemId:', tripItemId)
+        const response = await beApi.get(`/trips/${tripId}/trip-items/${tripItemId}/images`)
+        setCheckinImages(response.data.data || [])
+      } catch (error) {
+        console.error('Error fetching check-in images:', error)
+      } finally {
+        setLoadingImages(false)
+      }
+    }
 
-  //     try {
-  //       setLoadingImages(true)
-  //       const response = await beApi.get(`/trips/${tripId}/items/${tripItemId}/checkins`)
-  //       setCheckinImages(response.data.images || [])
-  //     } catch (error) {
-  //       console.error('Error fetching check-in images:', error)
-  //     } finally {
-  //       setLoadingImages(false)
-  //     }
-  //   }
-
-  //   //fetchCheckinImages()
-  // }, [tripId, tripItemId])
+    fetchCheckinImages()
+  }, [tripId, tripItemId])
 
   return (
     <View style={styles.container}>
@@ -136,7 +135,7 @@ const LocationDetail = ({
             <View style={styles.activityItem} key={index}>
               <View style={styles.activityBox}>
                 <View style={styles.iconWrapper}>
-                  <Image source={icon.iconSource} style={styles.iconImage} />
+                  <Image source={icon.iconSource} contentFit="contain" style={styles.iconImage} />
                 </View>
                 <Text style={styles.activityText}>{icon.label}</Text>
               </View>
@@ -147,6 +146,7 @@ const LocationDetail = ({
         {status && (
           <Pressable
             title="Checkin"
+            disabled={status === 'completed' || status === 'cancelled' || status === 'not_started'}
             style={{
               backgroundColor: theme.primary,
               color: theme.white,
@@ -166,8 +166,8 @@ const LocationDetail = ({
               <Text style={styles.emptyText}>No check-in photos yet.</Text>
             ) : (
               <View style={styles.imageGrid}>
-                {checkinImages.map((uri, index) => (
-                  <Image key={index} source={{ uri }} contentFit="cover" style={styles.checkinImage} />
+                {checkinImages.map((image, index) => (
+                  <Image key={index} source={image.imageUrl} contentFit="cover" style={styles.checkinImage} />
                 ))}
               </View>
             )}
@@ -267,7 +267,6 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     iconImage: {
       width: 36,
       height: 36,
-      resizeMode: 'contain',
     },
     activityText: {
       fontSize: Size.SMALL,

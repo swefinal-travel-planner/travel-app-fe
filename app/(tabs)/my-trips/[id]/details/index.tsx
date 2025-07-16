@@ -32,24 +32,25 @@ const TripDetailViewScreen = () => {
   }
 
   const handleSpotDetail = (id: string) => {
-    let spot = tripItems.find((item) => item.placeID === id)?.placeInfo
+    console.log('id from selected spot:', id)
+    let spot = tripItems.find((item) => item.placeID === id)
 
     console.log('Selected spot:', spot)
+
+    console.log('tripId:', trip?.id, 'tripItemId:', spot?.id)
 
     router.push({
       pathname: '/places/[id]',
       params: {
         id: spot?.id ?? '',
-        name: spot?.name,
-        lng: spot?.location.long.toString(),
-        lat: spot?.location.lat.toString(),
-        properties: spot?.properties.join(' '),
-        address: spot?.address,
-        types: spot?.type,
-        images: JSON.stringify(spot?.images),
+        name: spot?.placeInfo.name,
+        properties: spot?.placeInfo.properties.join(' '),
+        address: spot?.placeInfo.address,
+        types: spot?.placeInfo.type,
+        images: JSON.stringify(spot?.placeInfo.images),
         status: trip?.status,
-        tripId: spot?.tripId,
-        tripItemId: spot?.tripItemId,
+        tripId: trip?.id,
+        tripItemId: spot?.id,
       },
     })
   }
