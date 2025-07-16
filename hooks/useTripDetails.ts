@@ -46,6 +46,8 @@ export const useTripDetails = (tripId: string) => {
 
       let items: TripItem[] = tripItemData.data.data
 
+      console.log('Fetched trip items:', items)
+
       // Check if items array is empty
       if (!items || items.length === 0) {
         console.warn('No trip items found')

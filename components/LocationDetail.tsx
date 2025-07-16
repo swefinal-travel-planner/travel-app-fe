@@ -31,6 +31,13 @@ type OpenMapArgs = {
   label: string
 }
 
+type CheckinImage = {
+  id: number
+  tripId: string
+  tripItemID: string
+  imageUrl: string
+}
+
 const openMap = ({ lat, lng, label }: OpenMapArgs) => {
   const scheme = `geo:${lat},${lng}?q=${lat},${lng}(${encodeURIComponent(label)})`
 
@@ -38,14 +45,6 @@ const openMap = ({ lat, lng, label }: OpenMapArgs) => {
     Linking.openURL(scheme).catch((err) => console.error('Error opening map: ', err))
   }
 }
-
-const dummyCheckinImages = [
-  'https://sieuthanhricoh.com.vn/wp-content/uploads/2023/04/thuong-hieu-kfc-noi-tieng.png',
-  'https://file.hstatic.net/200000700229/article/ga-ran-vi-kfc-1_0c2450efe15d4b6f9e6bd2637b71d88d.jpg',
-  'https://aeonmall-review-rikkei.cdn.vccloud.vn/public/wp/16/news/1UWNQoid7nPdu4Eaks2LPskmzJako77Oqj0NXly9.png',
-  'https://images.unsplash.com/photo-1529333166437-7750a6dd5a70',
-  'https://images.unsplash.com/photo-1534081333815-ae5019106622',
-]
 
 const LocationDetail = ({
   title,
@@ -64,7 +63,7 @@ const LocationDetail = ({
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
 
-  const [checkinImages, setCheckinImages] = useState<string[]>(dummyCheckinImages)
+  const [checkinImages, setCheckinImages] = useState<CheckinImage[]>([])
   const [loadingImages, setLoadingImages] = useState(false)
 
   useEffect(() => {
@@ -73,8 +72,9 @@ const LocationDetail = ({
 
       try {
         setLoadingImages(true)
-        const response = await beApi.get(`/trips/${tripId}/items/${tripItemId}/checkins`)
-        setCheckinImages(response.data.images || [])
+        console.log('tripId:', tripId, 'tripItemId:', tripItemId)
+        const response = await beApi.get(`/trips/${tripId}/trip-items/${tripItemId}/images`)
+        setCheckinImages(response.data.data || [])
       } catch (error) {
         console.error('Error fetching check-in images:', error)
       } finally {
@@ -82,7 +82,7 @@ const LocationDetail = ({
       }
     }
 
-    //fetchCheckinImages()
+    fetchCheckinImages()
   }, [tripId, tripItemId])
 
   return (
@@ -123,8 +123,7 @@ const LocationDetail = ({
           style={{
             backgroundColor: theme.primary,
             color: theme.white,
-            marginBottom: SpacingScale.HUGE,
-            marginTop: SpacingScale.MEDIUM,
+            marginVertical: SpacingScale.LARGE,
           }}
           onPress={() => openMap({ lat, lng, label: title })}
         />
@@ -135,7 +134,7 @@ const LocationDetail = ({
             <View style={styles.activityItem} key={index}>
               <View style={styles.activityBox}>
                 <View style={styles.iconWrapper}>
-                  <Image source={icon.iconSource} style={styles.iconImage} />
+                  <Image source={icon.iconSource} contentFit="contain" style={styles.iconImage} />
                 </View>
                 <Text style={styles.activityText}>{icon.label}</Text>
               </View>
@@ -146,10 +145,11 @@ const LocationDetail = ({
         {status && (
           <Pressable
             title="Checkin"
+            disabled={status === 'completed' || status === 'cancelled' || status === 'not_started'}
             style={{
               backgroundColor: theme.primary,
               color: theme.white,
-              marginBottom: SpacingScale.HUGE,
+              marginVertical: SpacingScale.LARGE,
             }}
             onPress={() => {
               console.log(`Checkin at ${title} (tripItemId: ${tripItemId})`)
@@ -165,8 +165,8 @@ const LocationDetail = ({
               <Text style={styles.emptyText}>No check-in photos yet.</Text>
             ) : (
               <View style={styles.imageGrid}>
-                {checkinImages.map((uri, index) => (
-                  <Image key={index} source={uri} style={styles.checkinImage} />
+                {checkinImages.map((image, index) => (
+                  <Image key={index} source={image.imageUrl} contentFit="cover" style={styles.checkinImage} />
                 ))}
               </View>
             )}
@@ -209,7 +209,6 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     },
     placeImage: {
       flex: 1,
-      resizeMode: 'cover',
       borderRadius: Radius.ROUNDED,
     },
     title: {
@@ -243,6 +242,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       flexWrap: 'wrap',
       justifyContent: 'flex-start',
       gap: 12,
+      marginBottom: SpacingScale.LARGE,
     },
     activityItem: {
       width: 100,
@@ -267,7 +267,6 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     iconImage: {
       width: 36,
       height: 36,
-      resizeMode: 'contain',
     },
     activityText: {
       fontSize: Size.SMALL,
@@ -278,16 +277,18 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     imageGrid: {
       flexDirection: 'row',
       flexWrap: 'wrap',
-      justifyContent: 'space-between',
+      justifyContent: 'flex-start',
       rowGap: 12,
+      columnGap: 6,
       marginBottom: SpacingScale.XXLARGE,
     },
     checkinImage: {
       width: '32%',
       aspectRatio: 1,
       borderRadius: Radius.MEDIUM,
-      resizeMode: 'cover',
       marginBottom: 12,
+      borderWidth: 1,
+      height: 180,
     },
     loadingText: {
       fontSize: Size.NORMAL,
