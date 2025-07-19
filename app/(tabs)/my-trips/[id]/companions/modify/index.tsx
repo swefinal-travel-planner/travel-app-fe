@@ -124,8 +124,8 @@ const TripCompanionInviteScreen = () => {
   }, [loadFriends])
 
   const searchUsers = useCallback(
-    async (email: string) => {
-      if (!email.trim() || !email.includes('@')) {
+    async (searchTerm: string) => {
+      if (!searchTerm.trim()) {
         setSearchResults([])
         return
       }
@@ -133,7 +133,7 @@ const TripCompanionInviteScreen = () => {
       setIsSearching(true)
 
       try {
-        const searchResponse = await safeBeApiCall(() => beApi.get(`/users?userEmail=${email}`))
+        const searchResponse = await safeBeApiCall(() => beApi.get(`/users?searchTerm=${searchTerm}`))
 
         // If response is null, it means it was a silent error
         if (!searchResponse) {
@@ -147,17 +147,20 @@ const TripCompanionInviteScreen = () => {
           // Filter out existing companions from search results
           const companionIds = companions.map((comp: TripCompanion) => comp.user_id)
 
-          if (searchData.data && !companionIds.includes(searchData.data.id)) {
-            const result: SearchResult = {
-              ...searchData.data,
-              avatar: searchData.data.imageURL || searchData.data.photoURL || searchData.data.avatar || '',
-              isInvited: pendingInvites.includes(searchData.data.id),
+          // Handle the new list format returned by the API
+          const users = Array.isArray(searchData.data) ? searchData.data : searchData.data ? [searchData.data] : []
+
+          const filteredResults: SearchResult[] = users
+            .filter((user: any) => !companionIds.includes(user.id.toString()))
+            .map((user: any) => ({
+              ...user,
+              avatar: user.imageURL || user.photoURL || user.avatar || '',
+              isInvited: pendingInvites.includes(user.id),
               isCompanion: false,
-            }
-            setSearchResults([result])
-          } else {
-            setSearchResults([])
-          }
+            }))
+
+          setSearchResults(filteredResults)
+          console.log('Search results:', filteredResults)
         } else {
           setSearchResults([])
         }
@@ -174,7 +177,7 @@ const TripCompanionInviteScreen = () => {
   const handleSearchChange = useCallback(
     (text: string) => {
       setSearchQuery(text)
-      if (text.includes('@') && text.includes('.') && text.indexOf('@') < text.lastIndexOf('.') && text.length > 2) {
+      if (text.length > 1) {
         searchUsers(text)
       } else {
         setSearchResults([])
@@ -305,11 +308,10 @@ const TripCompanionInviteScreen = () => {
           <Ionicons name="search" size={20} color={theme.text} style={styles.searchIcon} />
           <TextInput
             style={[styles.searchInput, { color: theme.text }]}
-            placeholder="Search by email address..."
+            placeholder="Search by username or email..."
             placeholderTextColor={theme.dimText}
             value={searchQuery}
             onChangeText={handleSearchChange}
-            keyboardType="email-address"
             autoCapitalize="none"
             autoCorrect={false}
           />
@@ -336,9 +338,7 @@ const TripCompanionInviteScreen = () => {
 
       {searchQuery.length > 0 && !isSearching && searchResults.length === 0 && (
         <View style={styles.statusContainer}>
-          <Text style={[styles.statusText, { color: theme.dimText }]}>
-            {searchQuery.includes('@') ? 'No users found' : 'Enter a valid email address'}
-          </Text>
+          <Text style={[styles.statusText, { color: theme.dimText }]}>No users found</Text>
         </View>
       )}
 
@@ -430,6 +430,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     statusText: {
       fontSize: 14,
       textAlign: 'center',
+      fontFamily: FontFamily.REGULAR,
     },
     resultsList: {
       flex: 1,

@@ -77,8 +77,8 @@ const TripFriendInviteScreen = () => {
   }, [])
 
   const searchUsers = useCallback(
-    async (email: string) => {
-      if (!email.includes('@')) {
+    async (searchTerm: string) => {
+      if (!searchTerm.trim()) {
         setSearchResults([])
         return
       }
@@ -86,24 +86,29 @@ const TripFriendInviteScreen = () => {
       setIsSearching(true)
 
       try {
-        const searchResponse = await beApi.get(`/users`, {
-          params: { userEmail: email },
-        })
+        const searchResponse = await beApi.get(`/users?searchTerm=${searchTerm}`)
 
         if (searchResponse.data.data) {
           // Filter out existing friends from search results
           const friendIds = friends.map((f: Friend) => f.id)
 
-          if (searchResponse.data && !friendIds.includes(searchResponse.data.id)) {
-            const result: SearchResult = {
-              ...searchResponse.data,
-              isInvited: pendingInvites.includes(searchResponse.data.username),
+          // Handle the new list format returned by the API
+          const users = Array.isArray(searchResponse.data.data)
+            ? searchResponse.data.data
+            : searchResponse.data.data
+              ? [searchResponse.data.data]
+              : []
+
+          const filteredResults: SearchResult[] = users
+            .filter((user: any) => !friendIds.includes(user.id.toString()))
+            .map((user: any) => ({
+              ...user,
+              avatar: user.imageURL || user.photoURL || user.avatar || '',
+              isInvited: pendingInvites.includes(user.username),
               isFriend: false,
-            }
-            setSearchResults([result])
-          } else {
-            setSearchResults([])
-          }
+            }))
+
+          setSearchResults(filteredResults)
         } else {
           setSearchResults([])
         }
@@ -120,7 +125,7 @@ const TripFriendInviteScreen = () => {
   const handleSearchChange = useCallback(
     (text: string) => {
       setSearchQuery(text)
-      if (text.length > 2) {
+      if (text.length > 1) {
         searchUsers(text)
       } else {
         setSearchResults([])
@@ -201,11 +206,10 @@ const TripFriendInviteScreen = () => {
           <Ionicons name="search" size={20} color={theme.text} style={styles.searchIcon} />
           <TextInput
             style={[styles.searchInput, { color: theme.text }]}
-            placeholder="Search by email address..."
+            placeholder="Search by username or email..."
             placeholderTextColor={theme.dimText}
             value={searchQuery}
             onChangeText={handleSearchChange}
-            keyboardType="email-address"
             autoCapitalize="none"
             autoCorrect={false}
           />
@@ -232,9 +236,7 @@ const TripFriendInviteScreen = () => {
 
       {searchQuery.length > 0 && !isSearching && searchResults.length === 0 && (
         <View style={styles.statusContainer}>
-          <Text style={[styles.statusText, { color: theme.dimText }]}>
-            {searchQuery.includes('@') ? 'No users found' : 'Enter a valid email address'}
-          </Text>
+          <Text style={[styles.statusText, { color: theme.dimText }]}>No users found</Text>
         </View>
       )}
 
