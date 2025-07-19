@@ -82,7 +82,7 @@ export default function LocPreference({ theme, nextFn }: Readonly<LocPreferenceP
             borderRadius: Radius.FULL,
             backgroundColor: theme.primary,
           }}
-          fontStyle={{ fontFamily: FontFamily.REGULAR, fontSize: FontSize.LG }}
+          fontStyle={{ fontFamily: FontFamily.REGULAR, fontSize: FontSize.LG, color: theme.text }}
           activeFontStyle={{
             fontFamily: FontFamily.BOLD,
             fontSize: FontSize.LG,
@@ -114,9 +114,11 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'column',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'stretch',
     paddingHorizontal: 24,
-    paddingVertical: 40,
+    paddingTop: 40,
+    paddingBottom: 80,
+    backgroundColor: '#ffffff',
   },
   textFieldContainer: {
     width: '100%',

@@ -30,7 +30,7 @@ export default function HorizontalDatePicker({
   })
 
   return (
-    <View style={[{ backgroundColor: theme?.background ?? 'blue' }, styles.wrapper]}>
+    <View style={[{ backgroundColor: theme?.white ?? '#ffffff' }, styles.wrapper]}>
       {dates.map((date) => {
         const isSelected = date.toDateString() === selectedDate?.toDateString()
         return (

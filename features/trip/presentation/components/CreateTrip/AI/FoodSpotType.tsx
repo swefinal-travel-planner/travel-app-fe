@@ -76,9 +76,11 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'column',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'stretch',
     paddingHorizontal: 24,
-    paddingVertical: 40,
+    paddingTop: 40,
+    paddingBottom: 80,
+    backgroundColor: '#ffffff',
   },
   textFieldContainer: {
     width: '100%',

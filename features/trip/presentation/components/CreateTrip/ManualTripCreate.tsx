@@ -1,14 +1,15 @@
+import Pressable from '@/components/Pressable'
+import { CreateTripDTO } from '@/features/trip/domain/models/Trip'
+import { convertManualTripToDTO, ensureAllDatesIncluded } from '@/features/trip/utils/TripUtils'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import React, { useEffect, useState } from 'react'
 import { StyleSheet, Text } from 'react-native'
-import { Button, View } from 'react-native-ui-lib'
-import DayPlanner from './DayPlanner'
-import HorizontalDatePicker from './HorizontalDatePicker'
-import { CreateTripDTO } from '@/features/trip/domain/models/Trip'
-import { ensureAllDatesIncluded, convertManualTripToDTO } from '@/features/trip/utils/TripUtils'
+import { View } from 'react-native-ui-lib'
 import { useCreateTrip } from '../../state/useCreateTrip'
 import { useManualTripStore } from '../../state/useManualTrip'
 import { useUpdateTripItem } from '../../state/useUpdateTripItem'
+import DayPlanner from './DayPlanner'
+import HorizontalDatePicker from './HorizontalDatePicker'
 
 type ManualTripCreateProps = {
   nextFn: () => void
@@ -79,13 +80,16 @@ export default function ManualTripCreate({ nextFn }: Readonly<ManualTripCreatePr
         />
       )}
       {selectedDate && <DayPlanner selectedDate={selectedDate} />}
-      <Button
+      <Pressable
         onPress={handleNext}
-        label={isCreating ? 'Creating...' : 'Next'}
+        title={isCreating ? 'Creating...' : 'Next'}
         disabled={isCreating}
-        color={theme.white}
-        backgroundColor={theme.primary}
-        style={{ width: '100%', paddingVertical: 15, marginTop: 15 }}
+        style={{
+          color: theme.white,
+          backgroundColor: theme.primary,
+          paddingVertical: 15,
+          marginTop: 15,
+        }}
       />
     </View>
   )
@@ -99,6 +103,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 15,
     paddingBottom: 15,
+    backgroundColor: '#ffffff',
   },
   centerContent: {
     justifyContent: 'center',

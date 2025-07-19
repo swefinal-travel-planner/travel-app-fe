@@ -26,7 +26,7 @@ export default function SpotNumber({ theme, nextFn }: Readonly<SpotNumberProps>)
     <View style={styles.container}>
       <Text style={[styles.textQuestion, { color: theme.primary }]}>How many spots do you want to visit per day?</Text>
 
-      <View>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 20 }}>
         <NumStepper size="large" value={numberOfSpots} onValueChange={setNumberOfSpots} minValue={5} maxValue={9} />
       </View>
 
@@ -49,9 +49,11 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'column',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'stretch',
     paddingHorizontal: 24,
-    paddingVertical: 40,
+    paddingTop: 40,
+    paddingBottom: 80,
+    backgroundColor: '#ffffff',
   },
   textQuestion: {
     display: 'flex',

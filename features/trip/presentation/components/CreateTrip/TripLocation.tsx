@@ -37,11 +37,11 @@ export default function TripLocation({ theme, nextFn, setTripState }: Readonly<T
   }, [selectedDistrict, selectedCity])
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.background }]}>
+    <View style={[styles.container, { backgroundColor: theme.white }]}>
       <Text style={[styles.text, { color: theme.primary }]}>Where is your trip located ?</Text>
 
-      <View style={[styles.locationContainer, { backgroundColor: theme.background }]}>
-        <Text style={{ alignSelf: 'flex-start', marginBottom: 4, color: theme.primary, fontWeight: 'bold' }}>City</Text>
+      <View style={[styles.locationContainer, { backgroundColor: theme.white }]}>
+        <Text style={styles.pickerLabel}>City</Text>
         {/* City Picker */}
         <Picker
           placeholder="Select a city"
@@ -53,7 +53,7 @@ export default function TripLocation({ theme, nextFn, setTripState }: Readonly<T
             const city = Cities.find((city) => city.key === item)
             setSelectedDistrictKey(city?.districts[0].key ?? '')
           }}
-          topBarProps={{ title: 'Cities' }}
+          topBarProps={{ title: 'Cities', titleStyle: styles.pickerLabel }}
           style={styles.picker}
         >
           {Cities.map((city) => (
@@ -61,6 +61,7 @@ export default function TripLocation({ theme, nextFn, setTripState }: Readonly<T
               key={city.key}
               value={city.key}
               label={city.label}
+              labelStyle={styles.pickerItem}
               onPress={() => {
                 setSelectedCityKey(city.key)
                 setSelectedDistrictKey(city.districts[0].key)
@@ -69,11 +70,7 @@ export default function TripLocation({ theme, nextFn, setTripState }: Readonly<T
           ))}
         </Picker>
 
-        <Text
-          style={{ alignSelf: 'flex-start', marginTop: 16, marginBottom: 4, color: theme.primary, fontWeight: 'bold' }}
-        >
-          District
-        </Text>
+        <Text style={[styles.pickerLabel, { marginTop: 8 }]}>District</Text>
 
         <Picker
           placeholder="Select a destination"
@@ -82,7 +79,7 @@ export default function TripLocation({ theme, nextFn, setTripState }: Readonly<T
           onChange={(item) => {
             setSelectedDistrictKey(item?.toString() ?? '')
           }}
-          topBarProps={{ title: 'Districts' }}
+          topBarProps={{ title: 'Districts', titleStyle: styles.pickerLabel }}
           style={styles.picker}
         >
           {selectedCity.districts.map((district) => (
@@ -90,6 +87,7 @@ export default function TripLocation({ theme, nextFn, setTripState }: Readonly<T
               key={district.key}
               value={district.key}
               label={district.label}
+              labelStyle={styles.pickerItem}
               onPress={() => {
                 setSelectedDistrictKey(district.key)
               }}
@@ -129,10 +127,11 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       flex: 1,
       flexDirection: 'column',
       width: '100%',
+      alignItems: 'stretch',
       justifyContent: 'space-between',
-      alignItems: 'center',
       paddingHorizontal: 24,
-      paddingVertical: 40,
+      paddingTop: 40,
+      paddingBottom: 80,
     },
     locationContainer: {
       marginBottom: 16,
@@ -141,6 +140,8 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     mapContainer: {
       width: '100%',
       flex: 1,
+      maxHeight: '50%',
+      marginVertical: 16,
       borderRadius: Radius.ROUNDED,
       overflow: 'hidden',
     },
@@ -148,15 +149,27 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       fontFamily: FontFamily.BOLD,
       fontSize: FontSize.XXXL,
       textAlign: 'center',
+      alignSelf: 'center',
     },
     picker: {
       fontFamily: FontFamily.REGULAR,
       fontSize: FontSize.LG,
-      backgroundColor: theme.white,
+      backgroundColor: theme.background,
       minWidth: '100%',
       height: 48,
       borderRadius: Radius.FULL,
       padding: 12,
       color: theme.primary,
+    },
+    pickerLabel: {
+      color: theme.primary,
+      fontFamily: FontFamily.BOLD,
+      fontSize: FontSize.LG,
+      marginBottom: 4,
+    },
+    pickerItem: {
+      color: theme.text,
+      fontFamily: FontFamily.REGULAR,
+      fontSize: FontSize.LG,
     },
   })

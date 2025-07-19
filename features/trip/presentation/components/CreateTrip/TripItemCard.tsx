@@ -1,9 +1,9 @@
 import Ionicons from '@expo/vector-icons/Ionicons'
+import { Image } from 'expo-image'
 import React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { ScaleDecorator } from 'react-native-draggable-flatlist'
 import { TypedTripItem } from './DayPlanner'
-import { Image } from 'expo-image'
 
 export type TripItemCardProps = {
   item: TypedTripItem
@@ -18,7 +18,7 @@ export const TripItemCard: React.FC<TripItemCardProps> = ({ item, drag, isActive
         activeOpacity={1}
         onLongPress={drag}
         disabled={isActive}
-        style={[styles.spotCard, { backgroundColor: isActive ? '#f0f0f0' : 'white' }]}
+        style={[styles.spotCard, { backgroundColor: isActive ? '#f0f0f0' : '#ffffff' }]}
       >
         <View style={styles.dragHandle}>
           <Ionicons name="menu-outline" size={24} color="#666" />

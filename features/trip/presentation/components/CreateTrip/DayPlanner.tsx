@@ -5,9 +5,9 @@ import React, { useEffect, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import DraggableFlatList, { RenderItemParams } from 'react-native-draggable-flatlist'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import { useManualTripStore } from '../../state/useManualTrip'
 import { SectionHeader } from './SectionHeader'
 import { TripItemCard } from './TripItemCard'
-import { useManualTripStore } from '../../state/useManualTrip'
 
 export type SectionHeader = {
   type: 'header'
