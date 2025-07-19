@@ -122,8 +122,9 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       color: theme.primary,
     },
     companionRole: {
-      fontSize: FontSize.SM,
+      fontSize: FontSize.MD,
       color: theme.primary,
+      fontFamily: FontFamily.REGULAR,
     },
     image: {
       width: 50,

@@ -119,7 +119,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     },
     contentContainer: {
       flexDirection: 'row',
-      alignItems: 'flex-start',
+      alignItems: 'center',
       justifyContent: 'space-between',
     },
     textContainer: {
