@@ -21,6 +21,8 @@ const TripDetailViewScreen = () => {
     id as string
   )
 
+  console.log(groupedItems)
+
   const handleEditTrip = () => {
     router.push({
       pathname: '/my-trips/[id]/details/modify',
@@ -79,17 +81,23 @@ const TripDetailViewScreen = () => {
         {groupedItems.length === 0 ? (
           <NoItemsMessage />
         ) : (
-          groupedItems[activeDay] &&
-          timeSlots
-            .filter((timeSlot) => groupedItems[activeDay].spots.some((spot) => spot.timeSlot === timeSlot))
-            .map((timeSlot) => (
-              <TimeSlotRow
-                key={timeSlot}
-                timeSlot={timeSlot}
-                spots={groupedItems[activeDay].spots}
-                onSpotPress={handleSpotDetail}
-              />
-            ))
+          <View style={styles.spotsContainer}>
+            <View style={styles.spotsList}>
+              {groupedItems[activeDay] &&
+                timeSlots
+                  .filter((timeSlot) => groupedItems[activeDay].spots.some((spot) => spot.timeSlot === timeSlot))
+                  .map((timeSlot, index) => (
+                    <TimeSlotRow
+                      key={timeSlot}
+                      timeSlot={timeSlot}
+                      spots={groupedItems[activeDay].spots}
+                      onSpotPress={handleSpotDetail}
+                      marginBottom={index === timeSlots.length - 1 ? 0 : 24}
+                    />
+                  ))}
+            </View>
+            <View style={styles.rightBorder} />
+          </View>
         )}
       </ScrollView>
 
@@ -121,6 +129,21 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       marginVertical: 16,
       paddingHorizontal: 24,
       backgroundColor: 'transparent',
+    },
+    spotsContainer: {
+      position: 'relative',
+    },
+    spotsList: {
+      marginRight: 24,
+    },
+    rightBorder: {
+      position: 'absolute',
+      right: 24,
+      top: 36,
+      bottom: 36,
+      width: 1,
+      zIndex: -1,
+      backgroundColor: theme.dimText,
     },
   })
 

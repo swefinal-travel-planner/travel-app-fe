@@ -2,6 +2,7 @@ import DistanceTimeIndicator from '@/components/DistanceTimeIndicator'
 import SpotCard from '@/components/SpotCard'
 import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
+import { Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import React, { useMemo } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
@@ -21,12 +22,13 @@ interface Spot {
 interface TimeSlotRowProps {
   timeSlot: string
   spots: Spot[]
+  marginBottom?: number
   onSpotPress: (id: string) => void
 }
 
-const TimeSlotRow: React.FC<TimeSlotRowProps> = ({ timeSlot, spots, onSpotPress }) => {
+const TimeSlotRow: React.FC<TimeSlotRowProps> = ({ timeSlot, spots, onSpotPress, marginBottom }) => {
   const theme = useThemeStyle()
-  const styles = useMemo(() => createStyles(theme), [theme])
+  const styles = useMemo(() => createStyles(theme, marginBottom || 0), [theme])
 
   const sortedSpots = spots.filter((spot) => spot.timeSlot === timeSlot).sort((a, b) => a.orderInTrip - b.orderInTrip)
 
@@ -36,20 +38,41 @@ const TimeSlotRow: React.FC<TimeSlotRowProps> = ({ timeSlot, spots, onSpotPress 
 
   return (
     <View style={styles.timeSlotRow}>
-      {/* Left Column: Time Slot */}
-      <View style={styles.timeSlotLabelContainer}>
-        <Text style={styles.timeSlotLabel}>{timeSlot.charAt(0).toUpperCase() + timeSlot.slice(1)}</Text>
-      </View>
-
-      {/* Right Column: Spot Cards */}
       <View style={styles.timeGroup}>
         {sortedSpots.map((spot, index) => {
+          const distance = spot.distance
+          const time = spot.time
+          const isFirstSpot = index === 0
+
           return (
             <React.Fragment key={`group-${spot.id}`}>
-              {spot.distance != null && spot.time != null && (
-                <DistanceTimeIndicator distance={spot.distance} time={spot.time} />
-              )}
-              <SpotCard id={spot.id} name={spot.name} address={spot.address} image={spot.image} onPress={onSpotPress} />
+              <View style={styles.distanceTimeRow}>
+                {/* Only show label inline with distance indicator for first spot */}
+                {isFirstSpot && (
+                  <View style={styles.inlineTimeSlotLabelContainer}>
+                    <Text style={styles.timeSlotLabel}>{timeSlot.charAt(0).toUpperCase() + timeSlot.slice(1)}</Text>
+                  </View>
+                )}
+
+                {distance && time && (
+                  <View style={styles.distanceTimeWrapper}>
+                    <DistanceTimeIndicator distance={distance} time={time} />
+                  </View>
+                )}
+              </View>
+
+              <View style={styles.spotCardContainer}>
+                <View style={{ flex: 1 }}>
+                  <SpotCard
+                    id={spot.id}
+                    name={spot.name}
+                    address={spot.address}
+                    image={spot.image}
+                    onPress={onSpotPress}
+                  />
+                </View>
+                <View style={styles.dot} />
+              </View>
             </React.Fragment>
           )
         })}
@@ -58,33 +81,59 @@ const TimeSlotRow: React.FC<TimeSlotRowProps> = ({ timeSlot, spots, onSpotPress 
   )
 }
 
-const createStyles = (theme: typeof colorPalettes.light) =>
+const createStyles = (theme: typeof colorPalettes.light, marginBottom: number) =>
   StyleSheet.create({
     timeSlotRow: {
+      flexDirection: 'column',
+      alignItems: 'flex-start',
+      marginBottom: marginBottom || 0,
+    },
+    spotCardContainer: {
       flexDirection: 'row',
       alignItems: 'center',
     },
-    timeSlotLabelContainer: {
-      width: 20, // Keep your desired narrow width
-      paddingTop: 6,
-      alignItems: 'center',
-      justifyContent: 'center',
-      position: 'relative', // Important for absolute positioning
+    dot: {
+      width: 12,
+      height: 12,
+      borderRadius: Radius.FULL,
+      backgroundColor: theme.dimText,
+      marginLeft: 8,
+      marginRight: -21,
+      borderWidth: 2,
+      borderColor: theme.white,
     },
-
+    timeSlotLabelContainer: {
+      paddingTop: 6,
+      marginHorizontal: 24,
+      marginBottom: 8,
+      alignItems: 'center',
+      minWidth: 80,
+    },
+    inlineTimeSlotLabelContainer: {
+      paddingTop: 6,
+      marginBottom: 8,
+      alignItems: 'center',
+      minWidth: 80,
+      // No marginHorizontal since we're already inside timeGroup with paddingLeft
+    },
     timeSlotLabel: {
-      fontSize: FontSize.MD,
+      fontSize: FontSize.LG,
       fontFamily: FontFamily.BOLD,
       color: theme.primary,
       textAlign: 'center',
-      alignContent: 'center',
-      justifyContent: 'center',
-      transform: [{ rotate: '-90deg' }],
-      position: 'absolute',
-      minWidth: 100, // Set minimum width needed for your text
-      textAlignVertical: 'center',
+      lineHeight: 20,
     },
     timeGroup: {
+      width: '100%',
+      paddingLeft: 24,
+      paddingRight: 16,
+    },
+    distanceTimeRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      width: '100%',
+    },
+    distanceTimeWrapper: {
       flex: 1,
     },
   })

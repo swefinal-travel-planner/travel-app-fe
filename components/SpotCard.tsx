@@ -21,7 +21,7 @@ const SpotCard: React.FC<SpotCardProps> = ({ id, name, address, image, onPress }
   const styles = useMemo(() => createStyles(theme), [theme])
 
   return (
-    <PressableOpacity onPress={() => onPress(id)}>
+    <PressableOpacity style={{ width: '100%' }} onPress={() => onPress(id)}>
       <View style={styles.spotCard}>
         <View style={styles.spotImageContainer}>
           <Image source={image} style={styles.spotImage} />
@@ -49,7 +49,6 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       marginBottom: 12,
       overflow: 'hidden',
       backgroundColor: theme.secondary,
-      marginHorizontal: 24,
     },
     spotImageContainer: {
       width: 120,

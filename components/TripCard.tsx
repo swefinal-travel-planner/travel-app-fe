@@ -63,39 +63,37 @@ const TripCard: React.FC<TripCardProps> = ({
   }
 
   return (
-    <View style={styles.container}>
-      <PressableOpacity
-        style={[styles.wrapper, { backgroundColor: isDisabled ? theme.disabled : theme.secondary }]}
-        onPress={onPress}
-        disabled={isDisabled}
-      >
-        {tripImage && tripImage !== '' && (
-          <View style={styles.imageContainer}>
-            <Image source={{ uri: tripImage }} style={styles.image} contentFit="cover" transition={200} />
-          </View>
-        )}
-
-        <View style={styles.contentContainer}>
-          <View style={styles.textContainer}>
-            <Text style={styles.name} numberOfLines={1}>
-              {tripName}
-            </Text>
-
-            <Text style={styles.location} numberOfLines={1}>
-              {days} days · {num_members} members
-            </Text>
-
-            {renderStatusText()}
-          </View>
-
-          {onDelete && (
-            <PressableOpacity style={styles.deleteButton} onPress={handleDelete}>
-              <Ionicons name="trash-outline" size={24} color={theme.primary} />
-            </PressableOpacity>
-          )}
+    <PressableOpacity
+      style={[styles.wrapper, { backgroundColor: isDisabled ? theme.disabled : theme.secondary }]}
+      onPress={onPress}
+      disabled={isDisabled}
+    >
+      {tripImage && tripImage !== '' && (
+        <View style={styles.imageContainer}>
+          <Image source={{ uri: tripImage }} style={styles.image} contentFit="cover" transition={200} />
         </View>
-      </PressableOpacity>
-    </View>
+      )}
+
+      <View style={styles.contentContainer}>
+        <View style={styles.textContainer}>
+          <Text style={styles.name} numberOfLines={1}>
+            {tripName}
+          </Text>
+
+          <Text style={styles.location} numberOfLines={1}>
+            {days} days · {num_members} members
+          </Text>
+
+          {renderStatusText()}
+        </View>
+
+        {onDelete && (
+          <PressableOpacity style={styles.deleteButton} onPress={handleDelete}>
+            <Ionicons name="trash-outline" size={24} color={theme.primary} />
+          </PressableOpacity>
+        )}
+      </View>
+    </PressableOpacity>
   )
 }
 
@@ -103,9 +101,6 @@ export default TripCard
 
 const createStyles = (theme: typeof colorPalettes.light) =>
   StyleSheet.create({
-    container: {
-      width: '100%',
-    },
     wrapper: {
       borderRadius: Radius.ROUNDED,
       padding: 16,
