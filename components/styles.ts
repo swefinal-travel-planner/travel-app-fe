@@ -9,7 +9,7 @@ export const createStyles = (theme: typeof colorPalettes.light) =>
       gap: 16,
       paddingVertical: 80,
       paddingHorizontal: 40,
-      alignItems: 'flex-start',
+      alignItems: 'stretch',
       justifyContent: 'center',
       backgroundColor: theme.white,
     },
@@ -40,6 +40,7 @@ export const createStyles = (theme: typeof colorPalettes.light) =>
     link: {
       color: theme.primary,
       fontSize: 12,
+      paddingVertical: 8,
       fontFamily: FontFamily.BOLD,
       textDecorationLine: 'underline',
     },
