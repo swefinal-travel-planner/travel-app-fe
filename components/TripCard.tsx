@@ -54,12 +54,15 @@ const TripCard: React.FC<TripCardProps> = ({
 
   const renderStatusText = () => {
     if (status === 'ai_generating') {
-      return <Text style={[styles.statusText, { fontFamily: FontFamily.BOLD }]}>Still planning...</Text>
+      return <Text style={[styles.statusText, { fontFamily: FontFamily.BOLD, opacity: 0.5 }]}>Still planning...</Text>
     }
     if (status === 'failed') {
       return <Text style={[styles.statusText, { fontFamily: FontFamily.BOLD }]}>Failed to plan</Text>
     }
-    return <Text style={[styles.statusText, { fontFamily: FontFamily.BOLD }]}>Ready to go!</Text>
+    if (status === 'completed') {
+      return <Text style={[styles.statusText, { fontFamily: FontFamily.BOLD, opacity: 0.5 }]}>Completed</Text>
+    }
+    return <Text style={[styles.statusText, { fontFamily: FontFamily.BOLD, color: theme.primary }]}>Ready to go!</Text>
   }
 
   return (
