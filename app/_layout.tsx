@@ -5,7 +5,18 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin'
 import Mapbox from '@rnmapbox/maps'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import Constants from 'expo-constants'
-import * as Notifications from 'expo-notifications'
+import {
+  setNotificationHandler,
+  Notification,
+  addNotificationReceivedListener,
+  addNotificationResponseReceivedListener,
+  AndroidImportance,
+  getExpoPushTokenAsync,
+  getPermissionsAsync,
+  requestPermissionsAsync,
+  setNotificationChannelAsync,
+  EventSubscription,
+} from 'expo-notifications'
 import { Stack } from 'expo-router'
 import * as SecureStore from 'expo-secure-store'
 import * as SplashScreen from 'expo-splash-screen'
@@ -16,7 +27,7 @@ import { LogBox, Platform } from 'react-native'
 LogBox.ignoreAllLogs() // Ignore all log notifications
 
 interface NotificationState {
-  notification: Notifications.Notification | undefined
+  notification: Notification | undefined
   isReady: boolean
   isHealthy: boolean
 }
@@ -25,7 +36,7 @@ const GOOGLE_WEB_CLIENT_ID = '490333496504-qe9p6s4an7ub4ros021q2p6kda9hakhm.apps
 const MAPBOX_TOKEN = Constants.expoConfig?.extra?.mapboxAccessToken ?? EMPTY_STRING
 
 const configureNotifications = () => {
-  Notifications.setNotificationHandler({
+  setNotificationHandler({
     handleNotification: async () => ({
       shouldShowAlert: true,
       shouldPlaySound: true,
@@ -64,17 +75,16 @@ const updateUserPushToken = async (token: string): Promise<void> => {
 const registerForPushNotificationsAsync = async (): Promise<string | undefined> => {
   try {
     if (Platform.OS === 'android') {
-      await Notifications.setNotificationChannelAsync('default', {
+      await setNotificationChannelAsync('default', {
         name: 'default',
-        importance: Notifications.AndroidImportance.MAX,
+        importance: AndroidImportance.MAX,
         vibrationPattern: [0, 250, 250, 250],
         lightColor: '#FF231F7C',
       })
     }
 
-    const { status: existingStatus } = await Notifications.getPermissionsAsync()
-    const finalStatus =
-      existingStatus === 'granted' ? existingStatus : (await Notifications.requestPermissionsAsync()).status
+    const { status: existingStatus } = await getPermissionsAsync()
+    const finalStatus = existingStatus === 'granted' ? existingStatus : (await requestPermissionsAsync()).status
 
     if (finalStatus !== 'granted') {
       handleRegistrationError('Permission not granted for push notifications')
@@ -85,7 +95,7 @@ const registerForPushNotificationsAsync = async (): Promise<string | undefined> 
       handleRegistrationError('Project ID not found')
     }
 
-    const { data: pushTokenString } = await Notifications.getExpoPushTokenAsync({ projectId })
+    const { data: pushTokenString } = await getExpoPushTokenAsync({ projectId })
     return pushTokenString
   } catch (error) {
     console.error('Push notification registration error:', error)
@@ -102,8 +112,8 @@ export default function RootLayout() {
     isHealthy: false,
   })
 
-  const notificationListener = useRef<Notifications.EventSubscription>()
-  const responseListener = useRef<Notifications.EventSubscription>()
+  const notificationListener = useRef<EventSubscription>()
+  const responseListener = useRef<EventSubscription>()
 
   const initializeApp = useCallback(async () => {
     try {
@@ -131,11 +141,11 @@ export default function RootLayout() {
   useEffect(() => {
     initializeApp()
 
-    notificationListener.current = Notifications.addNotificationReceivedListener((notification) =>
+    notificationListener.current = addNotificationReceivedListener((notification) =>
       setState((prev: NotificationState) => ({ ...prev, notification }))
     )
 
-    responseListener.current = Notifications.addNotificationResponseReceivedListener((response) =>
+    responseListener.current = addNotificationResponseReceivedListener((response) =>
       console.log('Notification response:', response)
     )
 

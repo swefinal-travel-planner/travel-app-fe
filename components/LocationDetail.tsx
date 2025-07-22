@@ -1,14 +1,17 @@
+import { useToast } from '@/components/ToastContext'
 import { colorPalettes } from '@/constants/Itheme'
 import { FontFamily, FontSize } from '@/constants/font'
 import { Radius, Size, SpacingScale } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import beApi from '@/lib/beApi'
 import { getGroupIconsFromTypes } from '@/utils/TypeBadges'
+import { uploadImage2Cloud } from '@/utils/uploadImage2Cloud'
 import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
 import { useEffect, useMemo, useState } from 'react'
 import { Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Carousel } from 'react-native-ui-lib'
+import ImageActionSheet from './ImageActionSheet'
 import Pressable from './Pressable'
 
 type LocationDetailProps = {
@@ -62,9 +65,44 @@ const LocationDetail = ({
   const groupIcons = getGroupIconsFromTypes(types)
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
+  const [showActionSheet, setShowActionSheet] = useState(false)
+  const { showToast } = useToast()
+  const [refreshKey, setRefreshKey] = useState(0)
 
   const [checkinImages, setCheckinImages] = useState<CheckinImage[]>([])
   const [loadingImages, setLoadingImages] = useState(false)
+
+  const handleImageUpload = async (uri: string) => {
+    if (!tripId || !tripItemId || !uri) return
+
+    try {
+      // 1. Upload to cloud
+      const cloudUrl = await uploadImage2Cloud(uri, 'trip_images')
+      if (!cloudUrl) throw new Error('Cloud upload failed')
+
+      // 2. Send cloud URL to backend
+      const response = await beApi.post(`/trips/${tripId}/images`, {
+        imageUrl: cloudUrl,
+        tripItemID: Number(tripItemId),
+      })
+      setShowActionSheet(false)
+      if (response.status == 204) {
+        showToast({
+          type: 'success',
+          message: 'Image uploaded successfully!',
+          position: 'bottom',
+        })
+      }
+      setRefreshKey((prev) => prev + 1)
+    } catch (error) {
+      console.error('Failed to upload image:', error)
+      showToast({
+        type: 'error',
+        message: 'Failed to upload image. Please try again.',
+        position: 'bottom',
+      })
+    }
+  }
 
   useEffect(() => {
     const fetchCheckinImages = async () => {
@@ -72,7 +110,6 @@ const LocationDetail = ({
 
       try {
         setLoadingImages(true)
-        console.log('tripId:', tripId, 'tripItemId:', tripItemId)
         const response = await beApi.get(`/trips/${tripId}/trip-items/${tripItemId}/images`)
         setCheckinImages(response.data.data || [])
       } catch (error) {
@@ -83,7 +120,7 @@ const LocationDetail = ({
     }
 
     fetchCheckinImages()
-  }, [tripId, tripItemId])
+  }, [tripId, tripItemId, refreshKey])
 
   return (
     <View style={styles.container}>
@@ -152,10 +189,11 @@ const LocationDetail = ({
               marginVertical: SpacingScale.LARGE,
             }}
             onPress={() => {
-              console.log(`Checkin at ${title} (tripItemId: ${tripItemId})`)
+              setShowActionSheet(true)
             }}
           />
         )}
+
         {status && (
           <>
             <Text style={styles.subtitle}>Check-in Photos</Text>
@@ -173,6 +211,13 @@ const LocationDetail = ({
           </>
         )}
       </ScrollView>
+
+      <ImageActionSheet
+        visible={showActionSheet}
+        onDismiss={() => setShowActionSheet(false)}
+        onImagePicked={handleImageUpload}
+        allowsEditing={false}
+      />
     </View>
   )
 }

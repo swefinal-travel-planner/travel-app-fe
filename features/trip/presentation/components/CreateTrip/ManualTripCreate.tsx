@@ -87,6 +87,7 @@ export default function ManualTripCreate({ nextFn }: Readonly<ManualTripCreatePr
         style={{
           color: theme.white,
           backgroundColor: theme.primary,
+          minWidth: '100%',
           paddingVertical: 15,
           marginTop: 15,
         }}

@@ -62,6 +62,9 @@ const TripCard: React.FC<TripCardProps> = ({
     if (status === 'completed') {
       return <Text style={[styles.statusText, { fontFamily: FontFamily.BOLD, opacity: 0.5 }]}>Completed</Text>
     }
+    if (status == 'in_progress') {
+      return <Text style={[styles.statusText, { fontFamily: FontFamily.BOLD, color: theme.primary }]}>In progress</Text>
+    }
     return <Text style={[styles.statusText, { fontFamily: FontFamily.BOLD, color: theme.primary }]}>Ready to go!</Text>
   }
 
