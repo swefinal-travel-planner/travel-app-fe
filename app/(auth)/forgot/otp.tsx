@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router'
 import React, { useEffect, useMemo, useState } from 'react'
-import { Keyboard, Text, TouchableWithoutFeedback, View } from 'react-native'
+import { Keyboard, Text, TouchableWithoutFeedback, View, StyleSheet } from 'react-native'
 
 import { usePwdResetStore } from '@/store/usePwdResetStore'
 
@@ -10,8 +10,9 @@ import axios from 'axios'
 import OtpField from '@/components/input/OtpField'
 import Pressable from '@/components/Pressable'
 
+import { FontFamily } from '@/constants/font'
+import { colorPalettes } from '@/constants/Itheme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
-import { createStyles } from '../../../components/styles'
 
 export default function ForgotPasswordOtp() {
   const theme = useThemeStyle()
@@ -97,3 +98,28 @@ export default function ForgotPasswordOtp() {
     </TouchableWithoutFeedback>
   )
 }
+
+const createStyles = (theme: typeof colorPalettes.light) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      gap: 16,
+      paddingVertical: 80,
+      paddingHorizontal: 40,
+      alignItems: 'stretch',
+      justifyContent: 'center',
+      backgroundColor: theme.white,
+    },
+    title: {
+      color: theme.primary,
+      fontSize: 28,
+      fontFamily: FontFamily.BOLD,
+      marginBottom: 12,
+    },
+    subtitle: {
+      color: theme.primary,
+      fontSize: 16,
+      fontFamily: FontFamily.REGULAR,
+      marginBottom: 20,
+    },
+  })

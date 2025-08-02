@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'expo-router'
 import { Controller, useForm } from 'react-hook-form'
-import { Keyboard, Text, TouchableWithoutFeedback, View } from 'react-native'
+import { Keyboard, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
 import { z } from 'zod'
 
 import { usePwdResetStore } from '@/store/usePwdResetStore'
@@ -12,9 +12,10 @@ import axios from 'axios'
 import CustomTextField from '@/components/input/CustomTextField'
 import Pressable from '@/components/Pressable'
 
+import { FontFamily } from '@/constants/font'
+import { colorPalettes } from '@/constants/Itheme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { useMemo } from 'react'
-import { createStyles } from '../../../components/styles'
 
 interface ForgotFormData {
   email: string
@@ -94,3 +95,40 @@ export default function ForgotPassword() {
     </TouchableWithoutFeedback>
   )
 }
+
+const createStyles = (theme: typeof colorPalettes.light) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      gap: 16,
+      paddingVertical: 80,
+      paddingHorizontal: 40,
+      alignItems: 'stretch',
+      justifyContent: 'center',
+      backgroundColor: theme.white,
+    },
+    primaryButton: {
+      width: '100%',
+      alignSelf: 'stretch',
+      marginVertical: 20,
+      backgroundColor: theme.primary,
+      color: theme.white,
+    },
+    title: {
+      color: theme.primary,
+      fontSize: 28,
+      fontFamily: FontFamily.BOLD,
+      marginBottom: 12,
+    },
+    subtitle: {
+      color: theme.primary,
+      fontSize: 16,
+      fontFamily: FontFamily.REGULAR,
+      marginBottom: 20,
+    },
+    error: {
+      color: theme.error,
+      fontSize: 12,
+      fontFamily: FontFamily.REGULAR,
+    },
+  })
