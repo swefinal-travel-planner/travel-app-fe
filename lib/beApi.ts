@@ -79,7 +79,14 @@ beApi.interceptors.response.use(
     const is401Error =
       (error.response && error.response.status === 401) || error.status === 401 || error.message?.includes('401')
 
-    if (is401Error && !originalRequest._retry) {
+    // Don't attempt token refresh for authentication endpoints
+    const isAuthEndpoint =
+      originalRequest.url?.includes('/auth/login') ||
+      originalRequest.url?.includes('/auth/google-login') ||
+      originalRequest.url?.includes('/auth/signup') ||
+      originalRequest.url?.includes('/auth/refresh')
+
+    if (is401Error && !originalRequest._retry && !isAuthEndpoint) {
       console.log('Received 401 Unauthorized - attempting to refresh token')
       originalRequest._retry = true
 

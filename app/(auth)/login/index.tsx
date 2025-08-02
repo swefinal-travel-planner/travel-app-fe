@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Image } from 'expo-image'
 import { Link, useRouter } from 'expo-router'
 import { Controller, useForm } from 'react-hook-form'
-import { Keyboard, Text, TouchableWithoutFeedback, View, StyleSheet } from 'react-native'
+import { Keyboard, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
 import { z } from 'zod'
 
 import { auth } from '@/firebaseConfig'
@@ -11,7 +11,7 @@ import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth'
 
 import saveLoginInfo from '@/utils/saveLoginInfo'
 
-import beApi, { BE_URL, safeBeApiCall } from '@/lib/beApi'
+import beApi, { BE_URL } from '@/lib/beApi'
 import axios from 'axios'
 
 import CustomTextField from '@/components/input/CustomTextField'
@@ -23,7 +23,7 @@ import { FontFamily } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import updateNotifToken from '@/utils/updateNotifToken'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 
 interface LoginFormData {
   email: string
@@ -41,6 +41,7 @@ const schema = z.object({
 export default function Login() {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
+  const [apiError, setApiError] = useState<string>('')
 
   const router = useRouter()
 
@@ -53,7 +54,7 @@ export default function Login() {
     resolver: zodResolver(schema),
   })
 
-  const errorMessage = errors.email?.message || errors.password?.message
+  const errorMessage = errors.email?.message || errors.password?.message || apiError
 
   const handleGoogleLogin = async () => {
     try {
@@ -77,12 +78,7 @@ export default function Login() {
           id_token: idToken,
         }
 
-        const response = await safeBeApiCall(() => beApi.post(`${BE_URL}/auth/google-login`, payload))
-
-        // If response is null, it means it was a silent error
-        if (!response) {
-          return
-        }
+        const response = await beApi.post(`${BE_URL}/auth/google-login`, payload)
 
         await saveLoginInfo(
           response.data.data.userId,
@@ -102,7 +98,13 @@ export default function Login() {
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        // handle errors coming from the API call
+        // Handle API errors from Google login
+        const errorData = error.response?.data
+        if (errorData?.errors && errorData.errors.length > 0) {
+          setApiError(errorData.errors[0].message)
+        } else {
+          setApiError('Google login failed. Please try again.')
+        }
         console.error('API error:', error.response?.data || error.message)
       } else if (isErrorWithCode(error)) {
         switch (error.code) {
@@ -124,17 +126,17 @@ export default function Login() {
   // handle regular login
   const onSubmit = async (data: LoginFormData) => {
     try {
+      // Clear any previous API errors
+      setApiError('')
+
       const payload = {
         email: data.email || '',
         password: data.password || '',
       }
 
-      const response = await safeBeApiCall(() => beApi.post(`${BE_URL}/auth/login`, payload))
-
-      // If response is null, it means it was a silent error
-      if (!response) {
-        return
-      }
+      // For login, we should use direct beApi call instead of safeBeApiCall
+      // because login 401 errors should not trigger token refresh
+      const response = await beApi.post(`${BE_URL}/auth/login`, payload)
 
       await saveLoginInfo(
         response.data.data.userId || 0,
@@ -151,9 +153,25 @@ export default function Login() {
       router.replace('/(tabs)')
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        // handle errors coming from the API call
+        // Handle axios errors (API errors)
+        const errorData = error.response?.data
+        if (error.response?.status === 401) {
+          // This is a login failure, not a token expiry
+          if (errorData?.errors && errorData.errors.length > 0) {
+            setApiError(errorData.errors[0].message)
+          } else {
+            setApiError('Invalid email or password. Please try again.')
+          }
+        } else if (errorData?.errors && errorData.errors.length > 0) {
+          // Other API errors
+          setApiError(errorData.errors[0].message)
+        } else {
+          setApiError('An error occurred during login. Please try again.')
+        }
         console.error('API error:', error.response?.data || error.message)
       } else {
+        // Handle non-axios errors (network, etc.)
+        setApiError('An unexpected error occurred. Please try again.')
         console.error('Login error:', error)
       }
     }
@@ -173,7 +191,11 @@ export default function Login() {
               onBlur={onBlur}
               leftIcon="mail-outline"
               type="email"
-              onChange={onChange}
+              onChange={(text) => {
+                onChange(text)
+                // Clear API error when user starts typing
+                if (apiError) setApiError('')
+              }}
               value={value}
               placeholder="Email"
               autoCapitalize="none"
@@ -188,7 +210,11 @@ export default function Login() {
             <PasswordField
               onBlur={onBlur}
               leftIcon="key-outline"
-              onChange={onChange}
+              onChange={(text) => {
+                onChange(text)
+                // Clear API error when user starts typing
+                if (apiError) setApiError('')
+              }}
               value={value}
               placeholder="Password"
               autoCapitalize="none"
