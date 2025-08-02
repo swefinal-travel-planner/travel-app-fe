@@ -1,15 +1,15 @@
 import { useRouter } from 'expo-router'
 import React, { useEffect, useMemo, useState } from 'react'
-import { Keyboard, Text, TouchableWithoutFeedback, View } from 'react-native'
+import { Keyboard, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
 
 import { useSignupStore } from '@/store/useSignupStore'
 
 import beApi, { BE_URL } from '@/lib/beApi'
 import axios from 'axios'
 
+import { FontFamily } from '@/constants/font'
+import { colorPalettes } from '@/constants/Itheme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
-import { createStyles } from '../../../components/styles'
-
 import OtpField from '@/components/input/OtpField'
 import Pressable from '@/components/Pressable'
 
@@ -100,3 +100,28 @@ export default function SignUpOtp() {
     </TouchableWithoutFeedback>
   )
 }
+
+const createStyles = (theme: typeof colorPalettes.light) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      gap: 16,
+      paddingVertical: 80,
+      paddingHorizontal: 40,
+      alignItems: 'stretch',
+      justifyContent: 'center',
+      backgroundColor: theme.white,
+    },
+    title: {
+      color: theme.primary,
+      fontSize: 28,
+      fontFamily: FontFamily.BOLD,
+      marginBottom: 12,
+    },
+    subtitle: {
+      color: theme.primary,
+      fontSize: 16,
+      fontFamily: FontFamily.REGULAR,
+      marginBottom: 20,
+    },
+  })

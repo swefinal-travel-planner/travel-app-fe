@@ -1,13 +1,20 @@
 import { useRouter } from 'expo-router'
 import { useEffect, useMemo, useState } from 'react'
-import { Keyboard, KeyboardAvoidingView, Platform, Text, TouchableWithoutFeedback, View } from 'react-native'
-
+import {
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native'
+import { FontFamily } from '@/constants/font'
+import { colorPalettes } from '@/constants/Itheme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
-import { createStyles } from '../../../components/styles'
-
 import Chip from '@/components/Chip'
-import Pressable from '@/components/Pressable'
 import CustomTextField from '@/components/input/CustomTextField'
+import Pressable from '@/components/Pressable'
 
 const data = [
   { id: '1', value: '🥜 Peanuts' },
@@ -84,3 +91,28 @@ export default function SignUpAllergies() {
     </TouchableWithoutFeedback>
   )
 }
+
+const createStyles = (theme: typeof colorPalettes.light) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      gap: 16,
+      paddingVertical: 80,
+      paddingHorizontal: 40,
+      alignItems: 'stretch',
+      justifyContent: 'center',
+      backgroundColor: theme.white,
+    },
+    title: {
+      color: theme.primary,
+      fontSize: 28,
+      fontFamily: FontFamily.BOLD,
+      marginBottom: 12,
+    },
+    subtitle: {
+      color: theme.primary,
+      fontSize: 16,
+      fontFamily: FontFamily.REGULAR,
+      marginBottom: 20,
+    },
+  })

@@ -1,21 +1,22 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Link, useRouter } from 'expo-router'
-import { Controller, useForm } from 'react-hook-form'
-import { Keyboard, Text, TouchableWithoutFeedback, View } from 'react-native'
-import { z } from 'zod'
-import { Image } from 'expo-image'
 import { auth } from '@/firebaseConfig'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { GoogleSignin, isErrorWithCode, statusCodes } from '@react-native-google-signin/google-signin'
+import { Image } from 'expo-image'
+import { Link, useRouter } from 'expo-router'
 import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth'
+import { useMemo } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import { Keyboard, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
+import { z } from 'zod'
 
 import { useSignupStore } from '@/store/useSignupStore'
 
 import beApi, { BE_URL } from '@/lib/beApi'
 import axios from 'axios'
 
+import { FontFamily } from '@/constants/font'
+import { colorPalettes } from '@/constants/Itheme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
-import { useMemo } from 'react'
-import { createStyles } from '../../../components/styles'
 
 import CustomTextField from '@/components/input/CustomTextField'
 import PasswordField from '@/components/input/PasswordField'
@@ -241,3 +242,68 @@ export default function SignUp() {
     </TouchableWithoutFeedback>
   )
 }
+
+const createStyles = (theme: typeof colorPalettes.light) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      gap: 16,
+      paddingVertical: 80,
+      paddingHorizontal: 40,
+      alignItems: 'stretch',
+      justifyContent: 'center',
+      backgroundColor: theme.white,
+    },
+    primaryButton: {
+      width: '100%',
+      alignSelf: 'stretch',
+      marginVertical: 20,
+      backgroundColor: theme.primary,
+      color: theme.white,
+    },
+    title: {
+      color: theme.primary,
+      fontSize: 28,
+      fontFamily: FontFamily.BOLD,
+      marginBottom: 12,
+    },
+    subtitle: {
+      color: theme.primary,
+      fontSize: 16,
+      fontFamily: FontFamily.REGULAR,
+      marginBottom: 20,
+    },
+    text: {
+      color: theme.primary,
+      fontSize: 12,
+      fontFamily: FontFamily.REGULAR,
+    },
+    link: {
+      color: theme.primary,
+      fontSize: 12,
+      paddingVertical: 8,
+      fontFamily: FontFamily.BOLD,
+      textDecorationLine: 'underline',
+    },
+    span: {
+      flexDirection: 'row',
+      gap: 4,
+      alignItems: 'center',
+      justifyContent: 'center',
+      alignSelf: 'center',
+    },
+    socials: {
+      flexDirection: 'row',
+      gap: 28,
+      alignSelf: 'center',
+    },
+    socialIcon: {
+      width: 40,
+      height: 40,
+    },
+    error: {
+      color: theme.error,
+      fontSize: 12,
+      fontFamily: FontFamily.REGULAR,
+    },
+  })
