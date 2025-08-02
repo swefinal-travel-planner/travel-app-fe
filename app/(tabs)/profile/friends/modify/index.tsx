@@ -1,4 +1,5 @@
 import Pressable from '@/components/Pressable'
+import { useToast } from '@/components/ToastContext'
 import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import { Radius } from '@/constants/theme'
@@ -30,16 +31,23 @@ type Friend = {
   status: 'pending' | 'accepted' | 'declined'
 }
 
+type PendingInvite = {
+  username: string
+  type: 'sent' | 'received'
+  invitationId?: string
+}
+
 const TripFriendInviteScreen = () => {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
   const router = useRouter()
   const tripId = useTripId()
+  const { showToast } = useToast()
 
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<SearchResult[]>([])
-  const [friends, setFriends] = useState<Friend[]>([])
-  const [pendingInvites, setPendingInvites] = useState<string[]>([])
+  const [friendIds, setFriendIds] = useState<number[]>([])
+  const [pendingInvites, setPendingInvites] = useState<PendingInvite[]>([])
   const [isSearching, setIsSearching] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
@@ -52,7 +60,7 @@ const TripFriendInviteScreen = () => {
   const loadFriends = useCallback(async () => {
     try {
       const response = await beApi.get(`/friends`)
-      setFriends(response.data.data ?? [])
+      setFriendIds(response.data.data?.map((friend: Friend) => friend.id) ?? [])
     } catch (error) {
       console.error('Error loading friends:', error)
     }
@@ -63,12 +71,26 @@ const TripFriendInviteScreen = () => {
       const response1 = await beApi.get(`/invitation-friends/requested`)
       const response2 = await beApi.get(`/invitation-friends/received`)
 
-      // Extract usernames from both responses and merge them
-      const requestedUsernames = response1.data.data?.map((invite: any) => invite.receiverUsername) ?? []
-      const receivedUsernames = response2.data.data?.map((invite: any) => invite.senderUsername) ?? [] // Assuming received invites have senderUsername
+      // Extract usernames from sent requests (we sent these)
+      const requestedInvites: PendingInvite[] =
+        response1.data.data?.map((invite: any) => ({
+          username: invite.receiverUsername,
+          type: 'sent' as const,
+          invitationId: invite.id,
+        })) ?? []
 
-      // Merge both arrays and remove duplicates
-      const allPendingInvites = [...new Set([...requestedUsernames, ...receivedUsernames])]
+      // Extract usernames from received requests (others sent to us)
+      const receivedInvites: PendingInvite[] =
+        response2.data.data?.map((invite: any) => ({
+          username: invite.senderUsername,
+          type: 'received' as const,
+          invitationId: invite.id,
+        })) ?? []
+
+      // Merge both arrays
+      const allPendingInvites = [...requestedInvites, ...receivedInvites]
+
+      console.log('Pending invites:', allPendingInvites)
 
       setPendingInvites(allPendingInvites)
     } catch (error) {
@@ -89,9 +111,6 @@ const TripFriendInviteScreen = () => {
         const searchResponse = await beApi.get(`/users?searchTerm=${searchTerm}`)
 
         if (searchResponse.data.data) {
-          // Filter out existing friends from search results
-          const friendIds = friends.map((f: Friend) => f.id)
-
           // Handle the new list format returned by the API
           const users = Array.isArray(searchResponse.data.data)
             ? searchResponse.data.data
@@ -100,11 +119,11 @@ const TripFriendInviteScreen = () => {
               : []
 
           const filteredResults: SearchResult[] = users
-            .filter((user: any) => !friendIds.includes(user.id.toString()))
+            .filter((user: any) => !friendIds.includes(user.id))
             .map((user: any) => ({
               ...user,
               avatar: user.imageURL || user.photoURL || user.avatar || '',
-              isInvited: pendingInvites.includes(user.username),
+              isInvited: pendingInvites.some((invite) => invite.username === user.username),
               isFriend: false,
             }))
 
@@ -119,7 +138,7 @@ const TripFriendInviteScreen = () => {
         setIsSearching(false)
       }
     },
-    [tripId, pendingInvites, friends]
+    [tripId, friendIds, pendingInvites]
   )
 
   const handleSearchChange = useCallback(
@@ -137,6 +156,7 @@ const TripFriendInviteScreen = () => {
   const sendInvitation = useCallback(
     async (username: string, email: string) => {
       setIsLoading(true)
+      console.log('Sending invitation to:', username, email)
       try {
         const response = await safeBeApiCall(() =>
           beApi.post(`/invitation-friends`, {
@@ -146,7 +166,7 @@ const TripFriendInviteScreen = () => {
 
         // Server returns 204 No Content for successful invitation
         if (response.status === 204 || response.data) {
-          setPendingInvites((prev) => [...prev, username])
+          setPendingInvites((prev) => [...prev, { username, type: 'sent' }])
           setSearchResults((prev) =>
             prev.map((user) => (user.username === username ? { ...user, isInvited: true } : user))
           )
@@ -155,7 +175,21 @@ const TripFriendInviteScreen = () => {
       } catch (error: any) {
         console.error('Invitation error:', error.response?.data?.message)
         const errorMessage = error.response?.data?.message ?? 'Failed to send invitation'
-        Alert.alert('Error', errorMessage)
+
+        // If invitation already exists, update UI to reflect this
+        if (error.response?.data?.errors?.[0]?.code === 'ADD_FRIEND_INVITATION_ALREADY_EXISTS') {
+          // Reload pending invites to get the latest state
+          await loadPendingInvites()
+          setSearchResults((prev) =>
+            prev.map((user) => (user.username === username ? { ...user, isInvited: true } : user))
+          )
+          showToast({
+            type: 'info',
+            message: 'A friend invitation already exists with this user',
+          })
+        } else {
+          Alert.alert('Error', errorMessage)
+        }
       } finally {
         setIsLoading(false)
       }
@@ -163,31 +197,84 @@ const TripFriendInviteScreen = () => {
     [tripId]
   )
 
+  const cancelInvitation = useCallback(
+    async (username: string) => {
+      setIsLoading(true)
+      try {
+        // Find the invitation for this username
+        const invitation = pendingInvites.find((invite) => invite.username === username && invite.type === 'sent')
+
+        if (invitation && invitation.invitationId) {
+          await beApi.delete(`/invitation-friends/${invitation.invitationId}`)
+          setPendingInvites((prev) => prev.filter((invite) => invite.username !== username))
+          setSearchResults((prev) =>
+            prev.map((user) => (user.username === username ? { ...user, isInvited: false } : user))
+          )
+          Alert.alert('Success', 'Friend request cancelled successfully!')
+        } else {
+          // Fallback: get the invitation ID from API
+          const response = await beApi.get(`/invitation-friends/requested`)
+          const requests = response.data.data || []
+          const invitationFromApi = requests.find((req: any) => req.receiverUsername === username)
+
+          if (invitationFromApi) {
+            await beApi.delete(`/invitation-friends/${invitationFromApi.id}`)
+            setPendingInvites((prev) => prev.filter((invite) => invite.username !== username))
+            setSearchResults((prev) =>
+              prev.map((user) => (user.username === username ? { ...user, isInvited: false } : user))
+            )
+            Alert.alert('Success', 'Friend request cancelled successfully!')
+          }
+        }
+      } catch (error: any) {
+        console.error('Cancel invitation error:', error.response?.data?.message)
+        const errorMessage = error.response?.data?.message ?? 'Failed to cancel invitation'
+        Alert.alert('Error', errorMessage)
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [pendingInvites]
+  )
+
   const handleGoBack = () => {
     router.back()
   }
 
-  const renderSearchResult = ({ item }: { item: SearchResult }) => (
-    <View style={styles.resultCard}>
-      <View style={styles.userInfo}>
-        <Avatar size={50} source={item.avatar ? { uri: item.avatar } : getPlaceHolder(50, 50)} />
-        <View style={styles.userDetails}>
-          <Text style={styles.username}>{item.username}</Text>
-          <Text style={styles.email}>{item.email}</Text>
+  const renderSearchResult = ({ item }: { item: SearchResult }) => {
+    const pendingInvite = pendingInvites.find((invite) => invite.username === item.username)
+    const buttonText = pendingInvite ? (pendingInvite.type === 'sent' ? 'Cancel' : 'Request sent') : 'Add friend'
+    const isDisabled = isLoading || pendingInvite?.type === 'received'
+    const buttonColor = pendingInvite?.type === 'sent' ? theme.error : theme.primary
+
+    return (
+      <View style={styles.resultCard}>
+        <View style={styles.userInfo}>
+          <Avatar size={50} source={item.avatar ? { uri: item.avatar } : getPlaceHolder(50, 50)} />
+          <View style={styles.userDetails}>
+            <Text style={styles.username}>{item.username}</Text>
+            <Text style={styles.email}>{item.email}</Text>
+          </View>
         </View>
+        <Pressable
+          title={buttonText}
+          disabled={isDisabled}
+          style={{
+            backgroundColor: buttonColor,
+            color: theme.white,
+          }}
+          onPress={() => {
+            if (pendingInvite?.type === 'sent') {
+              cancelInvitation(item.username)
+            } else if (!pendingInvite) {
+              sendInvitation(item.username, item.email)
+            }
+          }}
+          size="small"
+        />
       </View>
-      <Pressable
-        title={item.isInvited ? 'Pending invitation' : 'Invite'}
-        disabled={item.isInvited ?? isLoading}
-        style={{
-          backgroundColor: item.isInvited ? theme.disabled : theme.primary,
-          color: theme.white,
-        }}
-        onPress={() => sendInvitation(item.username, item.email)}
-        size="small"
-      />
-    </View>
-  )
+    )
+  }
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>

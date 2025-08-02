@@ -14,7 +14,7 @@ import { ScrollView } from 'react-native-gesture-handler'
 import Modal from 'react-native-modal'
 import { Portal } from 'react-native-paper'
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated'
-import { Avatar, Button, Card, Text, Toast, View } from 'react-native-ui-lib'
+import { Avatar, Button, Card, Text, View } from 'react-native-ui-lib'
 import { z } from 'zod'
 
 interface FriendListModalProps {
@@ -34,7 +34,6 @@ const FriendListModal = ({ visible, closeModal, friendList }: FriendListModalPro
   const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null)
   const [isDialogVisible, setIsDialogVisible] = useState(false)
   const [filteredFriendlist, setFilteredFriendlist] = useState<Friend[]>(friendList)
-  const [add, setAdd] = useState(false)
 
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
@@ -90,27 +89,6 @@ const FriendListModal = ({ visible, closeModal, friendList }: FriendListModalPro
     onError: (err) => console.log('Mutation failed!', err),
   })
 
-  const addFriendMutation = useMutation({
-    mutationFn: async () => {
-      const emailValue = watch('email')
-      const response = await beApi.post('/invitation-friends', { receiverEmail: emailValue })
-      if (!response.status.toString().startsWith('2')) {
-        const errorBody = await response.data
-        throw new Error(errorBody.message ?? `HTTP Error: ${response.status}`)
-      }
-    },
-    onError: (err) => console.log('Mutation failed!', err),
-    onSuccess: () => {
-      Toast.show('Friend added successfully', {
-        position: 'bottom',
-        duration: 2000,
-      })
-      setIsSearching(false)
-      searchFriendMutation.reset()
-      reset()
-    },
-  })
-
   const inputAnimatedStyle = useAnimatedStyle(() => ({
     width: withSpring(isSearching ? 280 : 0, { damping: 15, stiffness: 120 }),
     opacity: withSpring(isSearching ? 1 : 0),
@@ -129,7 +107,7 @@ const FriendListModal = ({ visible, closeModal, friendList }: FriendListModalPro
     <>
       <Portal>
         <Dialog.Container visible={isDialogVisible}>
-          <Dialog.Title>Remove Friend</Dialog.Title>
+          <Dialog.Title>Remove friend</Dialog.Title>
           <Dialog.Description>
             Are you sure you want to remove <Text style={styles.boldText}>{selectedFriend?.name}</Text> from your
             friends list?
@@ -219,15 +197,9 @@ const FriendListModal = ({ visible, closeModal, friendList }: FriendListModalPro
                   </View>
                   <Text text60>{searchFriendMutation.data.username}</Text>
                 </View>
-                <Button
-                  label="Add"
-                  backgroundColor={add ? theme.disabled : theme.primary}
-                  onPress={() => {
-                    // addFriendMutation.mutate()
-                    // Immediately set pending state for visual feedback
-                    setAdd(true)
-                  }}
-                />
+                <Text text70 style={styles.friendText}>
+                  Friend
+                </Text>
               </View>
             )}
 
@@ -389,6 +361,10 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       height: 50,
       justifyContent: 'center',
       alignItems: 'center',
+    },
+    friendText: {
+      color: theme.primary,
+      fontWeight: 'bold',
     },
   })
 
