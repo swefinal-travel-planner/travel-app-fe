@@ -4,7 +4,7 @@ import { GoogleSignin, isErrorWithCode, statusCodes } from '@react-native-google
 import { Image } from 'expo-image'
 import { Link, useRouter } from 'expo-router'
 import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { Keyboard, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
 import { z } from 'zod'
@@ -51,6 +51,7 @@ const schema = z
 export default function SignUp() {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
+  const [apiError, setApiError] = useState<string>('')
 
   const router = useRouter()
   const setRequest = useSignupStore((state) => state.setRequest)
@@ -65,7 +66,7 @@ export default function SignUp() {
   })
 
   const errorMessage =
-    errors.name?.message || errors.email?.message || errors.password?.message || errors.repPassword?.message
+    errors.name?.message || errors.email?.message || errors.password?.message || errors.repPassword?.message || apiError
 
   const handleGoogleLogin = async () => {
     try {
@@ -107,7 +108,13 @@ export default function SignUp() {
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        // handle errors coming from the API call
+        // Handle API errors from Google login
+        const errorData = error.response?.data
+        if (errorData?.errors && errorData.errors.length > 0) {
+          setApiError(errorData.errors[0].message)
+        } else {
+          setApiError('Google signup failed. Please try again.')
+        }
         console.error('API error:', error.response?.data || error.message)
       } else if (isErrorWithCode(error)) {
         switch (error.code) {
@@ -121,6 +128,7 @@ export default function SignUp() {
             console.error('Google sign-in error:', error)
         }
       } else {
+        setApiError('Google signup failed. Please try again.')
         console.error('Google sign-in error:', error)
       }
     }
@@ -129,6 +137,9 @@ export default function SignUp() {
   // handle regular signup
   const onSubmit = async (data: SignupFormData) => {
     try {
+      // Clear any previous API errors
+      setApiError('')
+
       const payload = {
         email: data.email || '',
         name: data.name || '',
@@ -145,9 +156,17 @@ export default function SignUp() {
       router.push('/signup/otp')
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        // handle errors coming from the API call
+        // Handle axios errors (API errors)
+        const errorData = error.response?.data
+        if (errorData?.errors && errorData.errors.length > 0) {
+          setApiError(errorData.errors[0].message)
+        } else {
+          setApiError('An error occurred during signup. Please try again.')
+        }
         console.error('API error:', error.response?.data || error.message)
       } else {
+        // Handle non-axios errors (network, etc.)
+        setApiError('An unexpected error occurred. Please try again.')
         console.error('Signup error:', error)
       }
     }
@@ -167,7 +186,11 @@ export default function SignUp() {
               onBlur={onBlur}
               leftIcon="person-outline"
               type="name"
-              onChange={onChange}
+              onChange={(text) => {
+                onChange(text)
+                // Clear API error when user starts typing
+                if (apiError) setApiError('')
+              }}
               value={value}
               placeholder="Full name"
             />
@@ -182,7 +205,11 @@ export default function SignUp() {
               onBlur={onBlur}
               leftIcon="mail-outline"
               type="email"
-              onChange={onChange}
+              onChange={(text) => {
+                onChange(text)
+                // Clear API error when user starts typing
+                if (apiError) setApiError('')
+              }}
               value={value}
               placeholder="Email"
               autoCapitalize="none"
@@ -197,7 +224,11 @@ export default function SignUp() {
             <PasswordField
               onBlur={onBlur}
               leftIcon="key-outline"
-              onChange={onChange}
+              onChange={(text) => {
+                onChange(text)
+                // Clear API error when user starts typing
+                if (apiError) setApiError('')
+              }}
               value={value}
               placeholder="Password"
               autoCapitalize="none"
@@ -212,7 +243,11 @@ export default function SignUp() {
             <PasswordField
               onBlur={onBlur}
               leftIcon="key-outline"
-              onChange={onChange}
+              onChange={(text) => {
+                onChange(text)
+                // Clear API error when user starts typing
+                if (apiError) setApiError('')
+              }}
               value={value}
               placeholder="Confirm password"
               autoCapitalize="none"
