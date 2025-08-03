@@ -8,6 +8,14 @@ import { useMemo } from 'react'
 import { Alert, StyleSheet, Text, View } from 'react-native'
 import PressableOpacity from './PressableOpacity'
 
+// Import trip icon assets
+const tripIcons = {
+  0: require('@/assets/icons/trips/World-pana.svg'),
+  1: require('@/assets/icons/trips/World-amico.svg'),
+  2: require('@/assets/icons/trips/World-bro.svg'),
+  3: require('@/assets/icons/trips/World-rafiki.svg'),
+}
+
 type TripCardProps = {
   tripId: string
   tripName: string
@@ -37,6 +45,31 @@ const TripCard: React.FC<TripCardProps> = ({
   const styles = useMemo(() => createStyles(theme), [theme])
 
   const isDisabled = status === 'ai_generating' || status === 'failed'
+
+  // Get trip icon based on trip ID modulo 4
+  const getTripIcon = () => {
+    const tripIdNumber = parseInt(tripId, 10) || 0
+    const iconIndex = tripIdNumber % 4
+    return tripIcons[iconIndex as keyof typeof tripIcons]
+  }
+
+  // Get specific styling for each icon if needed
+  const getIconStyle = () => {
+    const tripIdNumber = parseInt(tripId, 10) || 0
+    const iconIndex = tripIdNumber % 4
+
+    // Apply specific styling for World-rafiki (index 3)
+    if (iconIndex === 3) {
+      return {
+        width: 96,
+        height: 96,
+        marginLeft: -8,
+        marginTop: -8,
+      }
+    }
+
+    return {}
+  }
 
   const handleDelete = () => {
     Alert.alert('Delete trip', `Are you sure you want to delete "${tripName}"? This action cannot be undone.`, [
@@ -74,31 +107,27 @@ const TripCard: React.FC<TripCardProps> = ({
       onPress={onPress}
       disabled={isDisabled}
     >
-      {tripImage && tripImage !== '' && (
-        <View style={styles.imageContainer}>
-          <Image source={{ uri: tripImage }} style={styles.image} contentFit="cover" transition={200} />
-        </View>
-      )}
-
-      <View style={styles.contentContainer}>
-        <View style={styles.textContainer}>
-          <Text style={styles.name} numberOfLines={1}>
-            {tripName}
-          </Text>
-
-          <Text style={styles.location} numberOfLines={1}>
-            {days} days · {num_members} members
-          </Text>
-
-          {renderStatusText()}
-        </View>
-
-        {onDelete && (
-          <PressableOpacity style={styles.deleteButton} onPress={handleDelete}>
-            <Ionicons name="trash-outline" size={24} color={theme.primary} />
-          </PressableOpacity>
-        )}
+      <View style={styles.imageContainer}>
+        <Image source={getTripIcon()} style={[styles.image, getIconStyle()]} contentFit="contain" />
       </View>
+
+      <View style={styles.textContainer}>
+        <Text style={styles.name} numberOfLines={1}>
+          {tripName}
+        </Text>
+
+        <Text style={styles.location} numberOfLines={1}>
+          {days} days · {num_members} members
+        </Text>
+
+        {renderStatusText()}
+      </View>
+
+      {onDelete && (
+        <PressableOpacity style={styles.deleteButton} onPress={handleDelete}>
+          <Ionicons name="trash-outline" size={24} color={theme.primary} />
+        </PressableOpacity>
+      )}
     </PressableOpacity>
   )
 }
@@ -111,11 +140,13 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       borderRadius: Radius.ROUNDED,
       padding: 16,
       backgroundColor: theme.secondary,
+      flex: 1,
+      width: '100%',
+      flexDirection: 'row',
     },
     imageContainer: {
-      width: '100%',
-      height: 120,
-      marginBottom: 12,
+      height: 80,
+      width: 80,
       borderRadius: Radius.ROUNDED,
       overflow: 'hidden',
     },
@@ -130,7 +161,8 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     },
     textContainer: {
       flex: 1,
-      marginRight: 12,
+      marginLeft: 12,
+      justifyContent: 'center',
     },
     name: {
       color: theme.primary,
@@ -151,5 +183,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     deleteButton: {
       padding: 8,
       borderRadius: Radius.NORMAL,
+      justifyContent: 'center',
+      height: '100%',
     },
   })
