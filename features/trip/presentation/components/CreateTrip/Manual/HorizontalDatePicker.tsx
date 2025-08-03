@@ -1,23 +1,27 @@
 import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import { Radius } from '@/constants/theme'
+import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { TripRequest } from '@/store/useAiTripStore'
 import React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 type HorizontalDatePickerProps = {
-  theme: typeof colorPalettes.light
   request?: Partial<TripRequest | null>
   selectedDate: Date | null
   onSelectDate?: (date: Date) => void
 }
 
 export default function HorizontalDatePicker({
-  theme,
   request,
   selectedDate,
   onSelectDate,
 }: Readonly<HorizontalDatePickerProps>) {
+  const theme = useThemeStyle()
+
+  // Create dynamic styles based on theme
+  const styles = createStyles(theme)
+
   if (!request?.startDate || !request?.days) return null
 
   const startDate = new Date(request.startDate)
@@ -30,13 +34,13 @@ export default function HorizontalDatePicker({
   })
 
   return (
-    <View style={[{ backgroundColor: theme?.white ?? '#ffffff' }, styles.wrapper]}>
+    <View style={styles.wrapper}>
       {dates.map((date) => {
         const isSelected = date.toDateString() === selectedDate?.toDateString()
         return (
           <TouchableOpacity
             key={date.toDateString()}
-            style={[styles.dateItem, isSelected && { backgroundColor: theme?.primary ?? '#3e5d4f' }]}
+            style={[styles.dateItem, isSelected && styles.selectedDateItem]}
             onPress={() => onSelectDate?.(date)}
           >
             <Text style={[styles.dayText, isSelected && styles.selectedText]}>
@@ -54,34 +58,39 @@ export default function HorizontalDatePicker({
   )
 }
 
-const styles = StyleSheet.create({
-  wrapper: {
-    flexDirection: 'row',
-    paddingVertical: 10,
-    borderRadius: Radius.FULL,
-    marginBottom: 20,
-    marginHorizontal: 10,
-  },
-  dateItem: {
-    width: 40,
-    height: 40,
-    borderRadius: Radius.FULL,
-    marginHorizontal: 5,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'transparent',
-  },
-  dayText: {
-    fontSize: FontSize.SM,
-    fontFamily: FontFamily.REGULAR,
-    color: '#4a3b32',
-  },
-  dateText: {
-    fontSize: FontSize.XL,
-    fontFamily: FontFamily.BOLD,
-    color: '#4a3b32',
-  },
-  selectedText: {
-    color: 'white',
-  },
-})
+const createStyles = (theme: typeof colorPalettes.light) =>
+  StyleSheet.create({
+    wrapper: {
+      flexDirection: 'row',
+      paddingVertical: 10,
+      borderRadius: Radius.FULL,
+      marginBottom: 20,
+      marginHorizontal: 10,
+      backgroundColor: theme.white,
+    },
+    dateItem: {
+      width: 40,
+      height: 40,
+      borderRadius: Radius.FULL,
+      marginHorizontal: 5,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: 'transparent',
+    },
+    selectedDateItem: {
+      backgroundColor: theme.primary,
+    },
+    dayText: {
+      fontSize: FontSize.SM,
+      fontFamily: FontFamily.REGULAR,
+      color: theme.primary,
+    },
+    dateText: {
+      fontSize: FontSize.XL,
+      fontFamily: FontFamily.BOLD,
+      color: theme.primary,
+    },
+    selectedText: {
+      color: 'white',
+    },
+  })

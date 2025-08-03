@@ -2,13 +2,13 @@ import FoodSpotType from '@/features/trip/presentation/components/CreateTrip/AI/
 import LocPreference from '@/features/trip/presentation/components/CreateTrip/AI/LocPreference'
 import MedicalReqs from '@/features/trip/presentation/components/CreateTrip/AI/MedicalReq'
 import OtherReqs from '@/features/trip/presentation/components/CreateTrip/AI/OtherReq'
-import ManualTripCreate from '@/features/trip/presentation/components/CreateTrip/ManualTripCreate'
-import SpotNumber from '@/features/trip/presentation/components/CreateTrip/SpotNumber'
-import SpotType from '@/features/trip/presentation/components/CreateTrip/SpotType'
+import UpdateManualTrip from '@/features/trip/presentation/components/CreateTrip/Manual/UpdateManualTrip'
+import SpotNumber from '@/features/trip/presentation/components/CreateTrip/AI/SpotNumber'
+import SpotType from '@/features/trip/presentation/components/CreateTrip/AI/SpotType'
 import TripLength from '@/features/trip/presentation/components/CreateTrip/TripLength'
 import ChooseLocation from '@/features/trip/presentation/components/CreateTrip/TripLocation'
 import TripRename from '@/features/trip/presentation/components/CreateTrip/TripRename'
-import WaitScreen from '@/features/trip/presentation/components/CreateTrip/WaitScreen'
+import WaitScreen from '@/features/trip/presentation/components/CreateTrip/AI/WaitScreen'
 import { ComponentType } from 'react'
 
 export const TRIP_TYPES = {
@@ -45,7 +45,7 @@ export const createAiTripSteps: TripStep[] = [
 export const createManualTripSteps: TripStep[] = [
   { component: ChooseLocation },
   { component: TripLength },
-  { component: ManualTripCreate },
+  { component: UpdateManualTrip },
   {
     component: TripRename,
     isLastStep: true,
