@@ -10,7 +10,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
 import { useEffect, useMemo, useState } from 'react'
 import { Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { Carousel } from 'react-native-ui-lib'
+import Carousel from './Carousel'
 import ImageActionSheet from './ImageActionSheet'
 import Pressable from './Pressable'
 
@@ -131,25 +131,18 @@ const LocationDetail = ({
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Carousel
-          pagingEnabled
-          containerPaddingVertical={8}
-          initialPage={0}
-          style={{
-            borderRadius: Radius.ROUNDED,
-          }}
-          loop
-          containerStyle={{
-            marginVertical: SpacingScale.XXLARGE,
-            borderRadius: Radius.ROUNDED,
-            height: 256,
-          }}
-          containerMarginHorizontal={0}
-          pageControlPosition={Carousel.pageControlPositions.UNDER}
-          pageControlProps={{ color: theme.primary }}
-        >
-          {images?.map((item, index) => <Image key={index} style={styles.placeImage} source={{ uri: item }} />) || []}
-        </Carousel>
+        <View style={styles.carouselContainer}>
+          <Carousel
+            images={images || []}
+            height={256}
+            showIndicators={true}
+            autoPlay={false}
+            onImagePress={(index) => {
+              // Optional: Handle image press
+              console.log('Image pressed:', index)
+            }}
+          />
+        </View>
 
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.addressTitle}>{address}</Text>
@@ -253,7 +246,8 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       backgroundColor: theme.secondary,
     },
     placeImage: {
-      flex: 1,
+      width: '100%',
+      height: '100%',
       borderRadius: Radius.ROUNDED,
     },
     title: {
@@ -346,6 +340,9 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       color: theme.dimText,
       fontFamily: FontFamily.ITALIC,
       marginBottom: SpacingScale.MEDIUM,
+    },
+    carouselContainer: {
+      marginVertical: SpacingScale.XXLARGE,
     },
   })
 export default LocationDetail
