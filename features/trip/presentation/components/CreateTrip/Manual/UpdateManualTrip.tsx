@@ -5,17 +5,17 @@ import { useThemeStyle } from '@/hooks/useThemeStyle'
 import React, { useEffect, useState } from 'react'
 import { StyleSheet, Text } from 'react-native'
 import { View } from 'react-native-ui-lib'
-import { useCreateTrip } from '../../state/useCreateTrip'
-import { useManualTripStore } from '../../state/useManualTrip'
-import { useUpdateTripItem } from '../../state/useUpdateTripItem'
+import { useCreateTrip } from '../../../state/useCreateTrip'
+import { useManualTripStore } from '../../../state/useManualTrip'
+import { useUpdateTripItem } from '../../../state/useUpdateTripItem'
 import DayPlanner from './DayPlanner'
 import HorizontalDatePicker from './HorizontalDatePicker'
 
-type ManualTripCreateProps = {
+type UpdateManualTripProps = {
   nextFn: () => void
 }
 
-export default function ManualTripCreate({ nextFn }: Readonly<ManualTripCreateProps>) {
+export default function UpdateManualTrip({ nextFn }: Readonly<UpdateManualTripProps>) {
   const { createTrip, isLoading: isCreating, error: createError } = useCreateTrip()
   const { updateTripItems, isLoading: isUpdating, error: updateError } = useUpdateTripItem()
 
@@ -74,12 +74,7 @@ export default function ManualTripCreate({ nextFn }: Readonly<ManualTripCreatePr
   return (
     <View style={[styles.container]}>
       {selectedDate && (
-        <HorizontalDatePicker
-          request={request}
-          selectedDate={selectedDate}
-          onSelectDate={setSelectedDate}
-          theme={theme}
-        />
+        <HorizontalDatePicker request={request} selectedDate={selectedDate} onSelectDate={setSelectedDate} />
       )}
       {selectedDate && <DayPlanner selectedDate={selectedDate} />}
       <Pressable

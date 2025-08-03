@@ -3,7 +3,7 @@ import { Image } from 'expo-image'
 import React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { ScaleDecorator } from 'react-native-draggable-flatlist'
-import { TypedTripItem } from './DayPlanner'
+import { TypedTripItem } from './Manual/DayPlanner'
 
 export type TripItemCardProps = {
   item: TypedTripItem
