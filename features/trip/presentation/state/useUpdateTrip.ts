@@ -9,15 +9,15 @@ export const useUpdateTrip = () => {
 
   const updateTripInfoUseCase = new UpdateTripInfoUseCase(tripRepository)
 
-  const updateTrip = async (trip: UpdateTripDTO): Promise<number | null> => {
+  const updateTrip = async (trip: UpdateTripDTO): Promise<boolean> => {
+    console.log(trip, 'trip')
     setIsLoading(true)
     setError(null)
     try {
-      const updatedTrip = await updateTripInfoUseCase.execute(trip)
-      return updatedTrip
+      return await updateTripInfoUseCase.execute(trip)
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Failed to update trip'))
-      return null
+      return false
     } finally {
       setIsLoading(false)
     }

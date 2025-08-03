@@ -12,7 +12,7 @@ type TripRenameProps = {
   nextFn: () => void
   setTripState: (trip: Partial<TripRequest>) => void
   getTripState?: TripRequest | null
-  onSubmit?: () => void
+  onSubmit: (title?: string) => void
   isSubmitting?: boolean
 }
 
@@ -28,11 +28,9 @@ export default function TripRename({
   const [localTitle, setLocalTitle] = useState('')
 
   const handleSubmit = () => {
-    setTripState({ title: localTitle.trim() })
-    if (onSubmit) {
-      // Use localTitle directly, since it's the source of truth here
-      onSubmit()
-    }
+    const trimmedTitle = localTitle.trim()
+    setTripState({ title: trimmedTitle })
+    onSubmit(trimmedTitle)
     nextFn()
   }
 

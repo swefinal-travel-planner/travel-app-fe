@@ -19,7 +19,7 @@ export default function ManualTripCreate({ nextFn }: Readonly<ManualTripCreatePr
   const { createTrip, isLoading: isCreating, error: createError } = useCreateTrip()
   const { updateTripItems, isLoading: isUpdating, error: updateError } = useUpdateTripItem()
 
-  const { request, getItemsForDate } = useManualTripStore()
+  const { request, getItemsForDate, setRequest } = useManualTripStore()
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
 
   useEffect(() => {
@@ -28,7 +28,7 @@ export default function ManualTripCreate({ nextFn }: Readonly<ManualTripCreatePr
 
   const theme = useThemeStyle()
 
-  const handleNext = async () => {
+  const handleNextBtn = async () => {
     if (!selectedDate) {
       // Handle validation error
       return
@@ -39,6 +39,7 @@ export default function ManualTripCreate({ nextFn }: Readonly<ManualTripCreatePr
 
     const createTripDTO: CreateTripDTO = {
       title: request?.title ?? 'Untitled Trip',
+      city: request?.city ?? '',
       startDate: selectedDate,
       days: request?.days ?? 1,
     }
@@ -47,6 +48,7 @@ export default function ManualTripCreate({ nextFn }: Readonly<ManualTripCreatePr
 
     if (createdTripId) {
       const { request, itemsByDate } = useManualTripStore.getState()
+      setRequest({ id: createdTripId })
 
       // First ensure all dates are included
       const completeItemsByDate = ensureAllDatesIncluded(request, itemsByDate)
@@ -81,7 +83,7 @@ export default function ManualTripCreate({ nextFn }: Readonly<ManualTripCreatePr
       )}
       {selectedDate && <DayPlanner selectedDate={selectedDate} />}
       <Pressable
-        onPress={handleNext}
+        onPress={handleNextBtn}
         title={isCreating ? 'Creating...' : 'Next'}
         disabled={isCreating}
         style={{

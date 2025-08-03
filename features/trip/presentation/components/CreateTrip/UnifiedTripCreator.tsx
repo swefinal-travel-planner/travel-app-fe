@@ -1,9 +1,9 @@
 import { TripStep, TripType } from '@/constants/createTripSteps'
 import { colorPalettes } from '@/constants/Itheme'
 import { useManualTripStore } from '@/features/trip/presentation/state/useManualTrip'
-import beApi, { BE_URL, safeBeApiCall } from '@/lib/beApi'
+import beApi, { BE_URL } from '@/lib/beApi'
 import { useAiTripStore } from '@/store/useAiTripStore'
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { Alert, StyleSheet } from 'react-native'
 import { View } from 'react-native-ui-lib'
 import { useUpdateTrip } from '../../state/useUpdateTrip'
@@ -34,6 +34,9 @@ export default function UnifiedTripCreator({
   const aiTripStore = useAiTripStore()
   const manualTripStore = useManualTripStore()
 
+  // Move the hook call to the top level
+  const { updateTrip, isLoading: isUpdating, error: updateError } = useUpdateTrip()
+
   const getStore = useMemo(() => {
     return tripType === 'AI' ? aiTripStore : manualTripStore
   }, [tripType, aiTripStore, manualTripStore])
@@ -42,7 +45,7 @@ export default function UnifiedTripCreator({
     try {
       setIsSubmitting(true)
 
-      const response = await safeBeApiCall(() => beApi.post(`${BE_URL}/trips/ai`, useAiTripStore.getState().request))
+      const response = await beApi.post(`${BE_URL}/trips/ai`, useAiTripStore.getState().request)
 
       if (!response) {
         Alert.alert('Error', 'Failed to create AI trip. Please try again.')
@@ -58,32 +61,23 @@ export default function UnifiedTripCreator({
     }
   }
 
-  const submitManualTrip = useCallback(async () => {
+  const updateManualTripTitle = async (title?: string) => {
     try {
       setIsSubmitting(true)
       const request = manualTripStore.request
-      const resetManualTrip = manualTripStore.resetManualTrip
 
-      if (!request) {
+      if (!request || !request.id) {
         throw new Error('No trip request data')
       }
-      if (!request.title) {
-        Alert.alert('Error', 'Trip title is missing.')
-        return
-      }
-      const payload = {
-        ...request,
-      }
 
-      const { updateTrip, isLoading: isUpdating, error: updateError } = useUpdateTrip()
-      const response = await updateTrip({ title: payload.title, id: payload.id ? payload.id : 0 })
+      const isUpdated = await updateTrip({ title: title, id: request.id })
 
-      if (!response) {
+      if (!isUpdated) {
         Alert.alert('Error', 'Failed to create manual trip. Please try again.')
         return
       }
 
-      resetManualTrip()
+      manualTripStore.resetManualTrip()
       onComplete()
     } catch (error) {
       console.error('Manual trip creation error:', error)
@@ -91,29 +85,29 @@ export default function UnifiedTripCreator({
     } finally {
       setIsSubmitting(false)
     }
-  }, [manualTripStore, onComplete])
+  }
 
-  const handleNext = useCallback(() => {
+  const handleNext = () => {
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1)
     }
-  }, [currentStep, steps.length])
+  }
 
-  const handleBack = useCallback(() => {
+  const handleBack = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1)
     } else {
       onBack()
     }
-  }, [currentStep, onBack])
+  }
 
-  const handleSubmit = useCallback(() => {
+  const handleSubmit = (title?: string) => {
     if (tripType === 'AI') {
       submitAiTrip()
       return
     }
-    submitManualTrip()
-  }, [tripType, submitAiTrip, submitManualTrip])
+    updateManualTripTitle(title)
+  }
 
   return (
     <View style={styles.container}>
