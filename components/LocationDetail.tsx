@@ -137,7 +137,7 @@ const LocationDetail = ({
             height={256}
             showIndicators={true}
             autoPlay={false}
-            onImagePress={(index) => {
+            onImagePress={(index: any) => {
               // Optional: Handle image press
               console.log('Image pressed:', index)
             }}

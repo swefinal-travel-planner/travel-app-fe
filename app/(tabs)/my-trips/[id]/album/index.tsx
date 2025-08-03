@@ -8,12 +8,14 @@ import { useGetTripImages } from '@/features/trip/presentation/state/useGetTripI
 import { usePostTripImages } from '@/features/trip/presentation/state/usePostTripImages'
 import { useTripId } from '@/hooks/useTripId'
 import { uploadImage2Cloud } from '@/utils/uploadImage2Cloud'
+import { useQueryClient } from '@tanstack/react-query'
 import React, { useState } from 'react'
 import { Alert, SafeAreaView, StyleSheet } from 'react-native'
 
 export default function AlbumScreen() {
   const tripId = useTripId()
   const { showToast } = useToast()
+  const queryClient = useQueryClient()
 
   if (!tripId) {
     console.log(`Invalid tripId: ${tripId}`) // Log an error if tripId is not valid
@@ -67,6 +69,8 @@ export default function AlbumScreen() {
     if (tripId && uri) {
       try {
         await postTripImage(tripId, (await uploadImage2Cloud(uri, 'trip_images')) ?? '')
+        // Invalidate and refetch the trip images query to show the new image
+        await queryClient.invalidateQueries({ queryKey: ['tripImages', tripId] })
         showToast({
           type: 'success',
           message: 'Image uploaded successfully!',
