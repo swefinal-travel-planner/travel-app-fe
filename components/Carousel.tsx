@@ -16,64 +16,21 @@ type CarouselProps = {
   onImagePress?: (index: number) => void
 }
 
-const Carousel = ({
+export default function Carousel({
   images,
   height = 256,
   showIndicators = true,
   autoPlay = false,
   autoPlayInterval = 3000,
   onImagePress,
-}: Readonly<CarouselProps>) => {
+}: Readonly<CarouselProps>) {
   const theme = useThemeStyle()
   const scrollViewRef = useRef<ScrollView>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [autoPlayTimer, setAutoPlayTimer] = useState<NodeJS.Timeout | null>(null)
 
   const imageWidth = screenWidth - 32 // Account for padding
-
-  const styles = StyleSheet.create({
-    container: {
-      height,
-      borderRadius: Radius.ROUNDED,
-      overflow: 'hidden',
-      position: 'relative',
-    },
-    scrollView: {
-      flex: 1,
-    },
-    imageContainer: {
-      width: imageWidth,
-      height: '100%',
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    image: {
-      width: '100%',
-      height: '100%',
-      borderRadius: Radius.ROUNDED,
-    },
-    indicatorsContainer: {
-      position: 'absolute',
-      bottom: 16,
-      left: 0,
-      right: 0,
-      flexDirection: 'row',
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    indicator: {
-      width: 8,
-      height: 8,
-      borderRadius: 4,
-      marginHorizontal: 4,
-    },
-    activeIndicator: {
-      backgroundColor: theme.white,
-    },
-    inactiveIndicator: {
-      backgroundColor: theme.white + '80', // 50% opacity
-    },
-  })
+  const styles = createStyles(theme, height, imageWidth)
 
   const scrollToIndex = useCallback(
     (index: number, animated = true) => {
@@ -198,4 +155,47 @@ const Carousel = ({
   )
 }
 
-export default Carousel
+const createStyles = (theme: any, height: number, imageWidth: number) =>
+  StyleSheet.create({
+    container: {
+      height,
+      borderRadius: Radius.ROUNDED,
+      overflow: 'hidden',
+      position: 'relative',
+    },
+    scrollView: {
+      flex: 1,
+    },
+    imageContainer: {
+      width: imageWidth,
+      height: '100%',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    image: {
+      width: '100%',
+      height: '100%',
+      borderRadius: Radius.ROUNDED,
+    },
+    indicatorsContainer: {
+      position: 'absolute',
+      bottom: 16,
+      left: 0,
+      right: 0,
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    indicator: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      marginHorizontal: 4,
+    },
+    activeIndicator: {
+      backgroundColor: theme.white,
+    },
+    inactiveIndicator: {
+      backgroundColor: theme.white + '80', // 50% opacity
+    },
+  })
