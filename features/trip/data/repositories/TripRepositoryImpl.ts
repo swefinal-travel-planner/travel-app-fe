@@ -10,12 +10,9 @@ export class TripRepositoryImpl implements TripRepository {
     return response.data.data.id ?? null
   }
 
-  async updateTrip(trip: UpdateTripDTO): Promise<number | null> {
+  async updateTrip(trip: UpdateTripDTO): Promise<boolean> {
     const response = await beApi.patch(`/trips/${trip.id}`, trip)
-    if (response.data.success) {
-      return response.data.data.id ?? null
-    }
-    throw new Error('Failed to update trip')
+    return response.status === 204
   }
 
   async updateTripItems(tripId: number, tripItems: UpdateTripItemDTO[]): Promise<void> {

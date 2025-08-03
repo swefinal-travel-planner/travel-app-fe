@@ -25,13 +25,13 @@ export type Trip = {
 }
 
 export type CreateTripDTO = {
-  city?: string
+  city: string
   days?: number
   startDate?: Date
   title?: string
 }
 
-export type UpdateTripDTO = CreateTripDTO & {
+export type UpdateTripDTO = Partial<CreateTripDTO> & {
   id: number
 }
 
