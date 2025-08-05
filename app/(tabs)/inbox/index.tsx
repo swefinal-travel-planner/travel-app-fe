@@ -84,7 +84,7 @@ export default function Inbox() {
   return (
     <View style={styles.container}>
       <View style={styles.filters}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={true}>
+        <ScrollView horizontal>
           <Chip
             key="all"
             value="All"
