@@ -7,7 +7,7 @@ export interface NotificationConfig {
   label: string
   message: (notification: Notification) => string
   action: 'actionable' | 'navigable'
-  navigationPath?: string
+  navigationPath?: (notification: Notification) => string
   apiEndpoint?: string
 }
 
@@ -17,7 +17,8 @@ export const NOTIFICATION_CONFIGS: Record<NotificationCategory, NotificationConf
     label: NOTIFICATION_CATEGORY_LABELS.tripGenerated,
     message: () => 'Your trip is ready! Check it out.',
     action: 'navigable',
-    navigationPath: '/my-trips',
+    navigationPath: (notification) =>
+      notification.referenceEntity?.id ? `/my-trips/${notification.referenceEntity.id}` : '/my-trips',
   },
   friendRequestReceived: {
     category: 'friendRequestReceived',
@@ -32,7 +33,7 @@ export const NOTIFICATION_CONFIGS: Record<NotificationCategory, NotificationConf
     label: NOTIFICATION_CATEGORY_LABELS.friendRequestAccepted,
     message: (notification) => `${notification.triggerEntity?.name ?? 'Someone'} accepted your friend request.`,
     action: 'navigable',
-    navigationPath: '/profile',
+    navigationPath: () => '/profile',
   },
   tripInvitationReceived: {
     category: 'tripInvitationReceived',
@@ -47,14 +48,16 @@ export const NOTIFICATION_CONFIGS: Record<NotificationCategory, NotificationConf
     label: NOTIFICATION_CATEGORY_LABELS.tripGeneratedFailed,
     message: () => "We're sorry, but your trip couldn't be prepared. Please try again.",
     action: 'navigable',
-    navigationPath: '/my-trips',
+    navigationPath: (notification) =>
+      notification.referenceEntity?.id ? `/my-trips/${notification.referenceEntity.id}` : '/my-trips',
   },
   tripStartingSoon: {
     category: 'tripStartingSoon',
     label: NOTIFICATION_CATEGORY_LABELS.tripStartingSoon,
     message: () => `Your trip is starting soon! Don't forget to check your itinerary.`,
     action: 'navigable',
-    navigationPath: '/my-trips',
+    navigationPath: (notification) =>
+      notification.referenceEntity?.id ? `/my-trips/${notification.referenceEntity.id}` : '/my-trips',
   },
 }
 
@@ -84,7 +87,11 @@ export class NotificationService {
   }
 
   static getNavigationPath(notification: Notification): string | undefined {
-    return NOTIFICATION_CONFIGS[notification.type]?.navigationPath
+    return NOTIFICATION_CONFIGS[notification.type]?.navigationPath?.(notification)
+  }
+
+  static getNotificationEntityId(notification: Notification): number | undefined {
+    return notification.referenceEntity?.id
   }
 
   static getApiEndpoint(notification: Notification): string | undefined {

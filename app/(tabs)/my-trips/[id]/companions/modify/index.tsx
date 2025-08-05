@@ -10,6 +10,7 @@ import beApi, { safeBeApiCall } from '@/lib/beApi'
 import { Friend } from '@/lib/types/Profile'
 import { SearchResult } from '@/lib/types/UserSearch'
 import Ionicons from '@expo/vector-icons/Ionicons'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'expo-router'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import {
@@ -47,10 +48,27 @@ const TripCompanionInviteScreen = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<SearchResult[]>([])
   const [companions, setCompanions] = useState<TripCompanion[]>([])
-  const [pendingInvites, setPendingInvites] = useState<number[]>([])
+  type Invitation = {
+    id: number
+    receiverId: number
+    tripId: number
+  }
+
   const [friends, setFriends] = useState<FriendWithInviteStatus[]>([])
   const [isSearching, setIsSearching] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+
+  const queryClient = useQueryClient()
+
+  // React Query for pending invitations
+  const { data: pendingInvites = [], refetch: refetchPendingInvites } = useQuery({
+    queryKey: ['pendingInvites', tripId],
+    queryFn: async () => {
+      const response = await beApi.get(`/trips/${tripId}/pending-invitations`)
+      return response.data.data || []
+    },
+    enabled: !!tripId,
+  })
 
   const loadCompanions = useCallback(async () => {
     try {
@@ -69,23 +87,6 @@ const TripCompanionInviteScreen = () => {
     }
   }, [tripId])
 
-  const loadPendingInvites = useCallback(async () => {
-    try {
-      const response = await safeBeApiCall(() => beApi.get(`/trips/${tripId}/pending-invitations`))
-
-      // If response is null, it means it was a silent error
-      if (!response) {
-        setPendingInvites([])
-        return
-      }
-
-      setPendingInvites(response.data.data?.map((invite: any) => invite.receiverId) || [])
-    } catch (error) {
-      console.error('Error loading pending invites:', error)
-      setPendingInvites([])
-    }
-  }, [tripId])
-
   const loadFriends = useCallback(async () => {
     try {
       const response = await safeBeApiCall(() => beApi.get('/friends'))
@@ -98,11 +99,12 @@ const TripCompanionInviteScreen = () => {
 
       // Transform friends data to match Friend interface
       const friendsData = response.data.data || []
+      const pendingInviteIds = pendingInvites.map((invite: Invitation) => invite.receiverId)
       const transformedFriends: FriendWithInviteStatus[] = friendsData.map((friend: any) => ({
         id: friend.id,
         name: friend.username || friend.name,
         avatar: friend.imageURL || friend.avatar || '',
-        isInvited: pendingInvites.includes(friend.id),
+        isInvited: pendingInviteIds.includes(friend.id),
         isCompanion: companions.some((comp) => comp.user_id === friend.id.toString()),
       }))
       setFriends(transformedFriends)
@@ -115,7 +117,7 @@ const TripCompanionInviteScreen = () => {
   // Load initial data on component mount
   useEffect(() => {
     loadCompanions()
-    loadPendingInvites()
+    loadFriends()
   }, [tripId])
 
   // Load friends when companions or pending invites change
@@ -155,7 +157,7 @@ const TripCompanionInviteScreen = () => {
             .map((user: any) => ({
               ...user,
               avatar: user.imageURL || user.photoURL || user.avatar || '',
-              isInvited: pendingInvites.includes(user.id),
+              isInvited: pendingInvites.some((invite: Invitation) => invite.receiverId === user.id),
               isCompanion: false,
             }))
 
@@ -209,7 +211,7 @@ const TripCompanionInviteScreen = () => {
 
         // Server returns 204 No Content for successful invitation
         if (response.status === 204 || response.data) {
-          setPendingInvites((prev) => [...prev, userId])
+          queryClient.invalidateQueries({ queryKey: ['pendingInvites', tripId] })
           setSearchResults((prev) => prev.map((user) => (user.id === userId ? { ...user, isInvited: true } : user)))
           setFriends((prev) => prev.map((friend) => (friend.id === userId ? { ...friend, isInvited: true } : friend)))
           showToast({
@@ -230,51 +232,69 @@ const TripCompanionInviteScreen = () => {
         setIsLoading(false)
       }
     },
-    [tripId]
+    [tripId, queryClient]
+  )
+
+  const withdrawInvitation = useCallback(
+    async (invitationId: number) => {
+      setIsLoading(true)
+      try {
+        const response = await safeBeApiCall(() => beApi.delete(`/invitation-trips/withdraw/${invitationId}`))
+
+        // If response is null, it means it was a silent error
+        if (!response) {
+          showToast({
+            type: 'error',
+            message: 'Failed to withdraw invitation. Please try again.',
+            position: 'bottom',
+          })
+          return
+        }
+
+        // Remove from pending invites
+        queryClient.invalidateQueries({ queryKey: ['pendingInvites', tripId] })
+        setSearchResults((prev) =>
+          prev.map((user) => (user.id === invitationId ? { ...user, isInvited: false } : user))
+        )
+        setFriends((prev) =>
+          prev.map((friend) => (friend.id === invitationId ? { ...friend, isInvited: false } : friend))
+        )
+
+        showToast({
+          type: 'success',
+          message: 'Invitation withdrawn successfully!',
+          position: 'bottom',
+        })
+      } catch (error: any) {
+        console.error('Withdraw invitation error:', error.response?.data?.message)
+        const errorMessage = error.response?.data?.message || 'Failed to withdraw invitation'
+        showToast({
+          type: 'error',
+          message: errorMessage,
+          position: 'bottom',
+        })
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [tripId, queryClient]
   )
 
   const handleGoBack = () => {
     router.back()
   }
 
-  const renderSearchResult = ({ item }: { item: SearchResult }) => (
-    <View style={styles.resultCard}>
-      <View style={styles.userInfo}>
-        <Avatar size={50} source={item.avatar ? { uri: item.avatar } : getPlaceHolder(50, 50)} />
-        <View style={styles.userDetails}>
-          <Text style={styles.username}>{item.username}</Text>
-          <Text style={styles.email}>{item.email}</Text>
+  const renderSearchResult = ({ item }: { item: SearchResult }) => {
+    const invitation = pendingInvites.find((invite: Invitation) => invite.receiverId === item.id)
+    return (
+      <View style={styles.resultCard}>
+        <View style={styles.userInfo}>
+          <Avatar size={50} source={item.avatar ? { uri: item.avatar } : getPlaceHolder(50, 50)} />
+          <View style={styles.userDetails}>
+            <Text style={styles.username}>{item.username}</Text>
+            <Text style={styles.email}>{item.email}</Text>
+          </View>
         </View>
-      </View>
-      <Pressable
-        title={item.isInvited ? 'Withdraw' : 'Invite'}
-        disabled={isLoading}
-        style={{
-          backgroundColor: item.isInvited ? theme.error : theme.primary,
-          color: theme.white,
-        }}
-        onPress={() =>
-          item.isInvited ? console.log('Withdraw invitation for user:', item.id) : sendInvitation(item.id)
-        }
-        size="small"
-      />
-    </View>
-  )
-
-  const renderFriendResult = ({ item }: { item: FriendWithInviteStatus }) => (
-    <View style={styles.resultCard}>
-      <View style={styles.userInfo}>
-        <Avatar size={50} source={item.avatar ? { uri: item.avatar } : getPlaceHolder(50, 50)} />
-        <View style={styles.userDetails}>
-          <Text style={styles.username}>{item.name}</Text>
-          <Text style={styles.email}>Friend</Text>
-        </View>
-      </View>
-      {item.isCompanion ? (
-        <View style={[styles.statusBadge, { backgroundColor: theme.green }]}>
-          <Text style={styles.statusText}>Companion</Text>
-        </View>
-      ) : (
         <Pressable
           title={item.isInvited ? 'Withdraw' : 'Invite'}
           disabled={isLoading}
@@ -282,14 +302,43 @@ const TripCompanionInviteScreen = () => {
             backgroundColor: item.isInvited ? theme.error : theme.primary,
             color: theme.white,
           }}
-          onPress={() =>
-            item.isInvited ? console.log('Withdraw invitation for friend:', item.id) : sendInvitation(item.id)
-          }
+          onPress={() => (item.isInvited && invitation ? withdrawInvitation(invitation.id) : sendInvitation(item.id))}
           size="small"
         />
-      )}
-    </View>
-  )
+      </View>
+    )
+  }
+
+  const renderFriendResult = ({ item }: { item: FriendWithInviteStatus }) => {
+    const invitation = pendingInvites.find((invite: Invitation) => invite.receiverId === item.id)
+    return (
+      <View style={styles.resultCard}>
+        <View style={styles.userInfo}>
+          <Avatar size={50} source={item.avatar ? { uri: item.avatar } : getPlaceHolder(50, 50)} />
+          <View style={styles.userDetails}>
+            <Text style={styles.username}>{item.name}</Text>
+            <Text style={styles.email}>Friend</Text>
+          </View>
+        </View>
+        {item.isCompanion ? (
+          <View style={[styles.statusBadge, { backgroundColor: theme.green }]}>
+            <Text style={styles.statusText}>Companion</Text>
+          </View>
+        ) : (
+          <Pressable
+            title={item.isInvited ? 'Withdraw' : 'Invite'}
+            disabled={isLoading}
+            style={{
+              backgroundColor: item.isInvited ? theme.error : theme.primary,
+              color: theme.white,
+            }}
+            onPress={() => (item.isInvited && invitation ? withdrawInvitation(invitation.id) : sendInvitation(item.id))}
+            size="small"
+          />
+        )}
+      </View>
+    )
+  }
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
