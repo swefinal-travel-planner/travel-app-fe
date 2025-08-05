@@ -10,17 +10,6 @@ export default [
     ],
   },
   {
-    title: 'Scenic & Natural',
-    data: [
-      '🌿 Ecotourism areas',
-      '🌳 National parks',
-      '💧 Waterfalls, natural lakes',
-      '⛰️ Caves, rocky mountains',
-      '🏖️ Beaches, tourist islands',
-      '🌸 Flower fields, cloud hunting, tea hills',
-    ],
-  },
-  {
     title: 'Historical',
     data: [
       '🏯 Ancient citadels, fortresses',
@@ -52,13 +41,7 @@ export default [
   },
   {
     title: 'Nightlife / Adult',
-    data: [
-      '🍸 Bars',
-      '🍷 Pubs / lounges',
-      '🕺 Nightclubs',
-      '🎤 Karaoke',
-      '🎰 Casinos',
-    ],
+    data: ['🍸 Bars', '🍷 Pubs / lounges', '🕺 Nightclubs', '🎤 Karaoke', '🎰 Casinos'],
   },
   {
     title: 'Other',
@@ -71,12 +54,7 @@ export default [
   },
   {
     title: 'Resorts & Relaxation',
-    data: [
-      '🏝️ Beach / mountain resorts',
-      '🏨 Luxury hotels',
-      '🏡 Vacation villas',
-      '🌿 Nature-based homestays',
-    ],
+    data: ['🏝️ Beach / mountain resorts', '🏨 Luxury hotels', '🏡 Vacation villas', '🌿 Nature-based homestays'],
   },
   {
     title: 'Adventure & Outdoors',
@@ -100,25 +78,11 @@ export default [
   },
   {
     title: 'Food & Culinary',
-    data: [
-      '🍢 Food streets / night markets',
-      '🍽️ Local specialty restaurants',
-      '🥢 Traditional eateries',
-    ],
+    data: ['🍢 Food streets / night markets', '🍽️ Local specialty restaurants', '🥢 Traditional eateries'],
   },
   {
     title: 'Community Tourism',
     data: ['🏚️ Ethnic cultural villages', '🏺 Traditional craft villages'],
-  },
-  {
-    title: 'Festivals & Events',
-    data: [
-      '🎎 Traditional festival venues',
-      '🎤 Concert / music show venues',
-      '🏟️ Fairs / exhibitions',
-      '🥘 Cultural / food festivals',
-      '🌟 Light festivals / flower festivals',
-    ],
   },
   {
     title: 'Landmarks',

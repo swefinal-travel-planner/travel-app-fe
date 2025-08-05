@@ -7,6 +7,7 @@ import { Dimensions, FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, V
 import Pressable from '@/components/Pressable'
 import SpotCard from '@/components/SpotCards/SpotCard'
 
+import Carousel from '@/components/Carousel'
 import CarouselSpotCard from '@/components/SpotCards/CarouselSpotCard'
 import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
@@ -15,7 +16,6 @@ import { useThemeStyle } from '@/hooks/useThemeStyle'
 import beApi, { safeBeApiCall } from '@/lib/beApi'
 import { Trip, TripItem } from '@/lib/types/Trip'
 import { useMemo } from 'react'
-import { Carousel } from 'react-native-ui-lib'
 
 const EXPO_PUBLIC_CORE_API_URL = process.env.EXPO_PUBLIC_CORE_API_URL
 
@@ -143,9 +143,7 @@ const Index = () => {
   return (
     <ScrollView style={styles.mainContainer} contentContainerStyle={styles.scrollContent}>
       <View style={styles.container}>
-        <View style={styles.topCenter}>
-          <Text style={styles.hugeText}>Welcome back{username}!</Text>
-
+        <View style={styles.topPanel}>
           {ongoingTrip ? (
             <View style={styles.currentTrip}>
               <Text style={styles.subText}>Today's plan</Text>
@@ -154,19 +152,20 @@ const Index = () => {
               </Text>
 
               <Carousel
-                pagingEnabled
-                containerPaddingVertical={8}
-                initialPage={0}
-                containerStyle={{
-                  width: cardWidth,
-                  height: 240,
+                height={300}
+                showIndicators={true}
+                autoPlay={false}
+                containerPadding={0}
+                useContainerWidth={true}
+                itemSpacing={16}
+                onItemPress={(index: number) => {
+                  // Handle trip item press if needed
+                  console.log('Trip item pressed:', index)
                 }}
-                containerMarginHorizontal={0}
-                pageControlPosition={Carousel.pageControlPositions.UNDER}
-                pageControlProps={{ color: theme.primary }}
+                itemWidth={290}
               >
                 {ongoingTripItems.map((item, index) => (
-                  <CarouselSpotCard key={index} tripItem={item} />
+                  <CarouselSpotCard tripItem={item} key={index} />
                 ))}
               </Carousel>
 
@@ -273,21 +272,22 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       color: theme.primary,
       fontFamily: FontFamily.BOLD,
     },
-    topCenter: {
+    topPanel: {
       width: '100%',
-      alignItems: 'center',
-      justifyContent: 'center',
+      alignItems: 'flex-start',
+      justifyContent: 'flex-start',
     },
     currentTrip: {
       width: '100%',
       borderRadius: Radius.ROUNDED,
       marginVertical: 24,
       padding: 20,
-      alignItems: 'center',
-      justifyContent: 'center',
+      alignItems: 'flex-start',
+      justifyContent: 'flex-start',
       backgroundColor: theme.secondary,
     },
     button: {
+      minWidth: '100%',
       marginTop: 16,
       backgroundColor: theme.primary,
       color: theme.white,

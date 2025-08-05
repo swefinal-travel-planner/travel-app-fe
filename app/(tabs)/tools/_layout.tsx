@@ -58,8 +58,8 @@ function TabButton({
   const styles = useMemo(() => createStyles(theme), [theme])
 
   return (
-    <TouchableOpacity onPress={onPress} style={[active ? styles.activeTab : styles.tabButton]}>
-      <Ionicons name={icon} size={IconSize.MD} color={theme.primary} />
+    <TouchableOpacity onPress={onPress} style={active ? styles.activeTab : styles.tabButton}>
+      <Ionicons name={icon} size={IconSize.MD} color={active ? theme.white : theme.primary} />
     </TouchableOpacity>
   )
 }
@@ -92,7 +92,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       backgroundColor: 'transparent',
     },
     activeTab: {
-      backgroundColor: theme.secondary,
+      backgroundColor: theme.primary,
       padding: Padding.NORMAL,
       borderRadius: Radius.FULL,
       alignItems: 'center',

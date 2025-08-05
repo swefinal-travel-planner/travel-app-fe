@@ -15,11 +15,11 @@ interface Location {
 }
 
 interface SpotCardProps {
-  tripItem?: TripItem
+  tripItem: TripItem
   onCheckIn?: () => void
 }
 
-const CarouselSpotCard: React.FC<SpotCardProps> = ({ tripItem, onCheckIn }) => {
+const CarouselSpotCard = ({ tripItem, onCheckIn }: SpotCardProps) => {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
 
@@ -54,17 +54,16 @@ const createStyles = (theme: typeof colorPalettes.light) =>
   StyleSheet.create({
     wrapper: {
       width: '100%',
-      height: 206,
       alignItems: 'center',
       justifyContent: 'center',
     },
     imageContainer: {
-      width: '100%',
-      height: 120,
+      minWidth: '100%',
+      height: 200,
       marginBottom: 8,
     },
     image: {
-      width: '100%',
+      minWidth: '100%',
       height: '100%',
       borderRadius: 8,
       borderColor: '#A68372',
