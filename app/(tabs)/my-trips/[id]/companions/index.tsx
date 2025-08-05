@@ -51,8 +51,17 @@ export default function TripCompanionsScreen() {
   }, [tripId])
 
   const handleRemoveCompanion = (userId: string) => {
-    // Implement the logic to remove a companion
-    console.log(`Removing companion with user_id: ${userId}`)
+    // Remove a companion from the trip
+    // Optionally, you may want to show a confirmation dialog before removing
+    const removeCompanion = async (userId: string) => {
+      try {
+        await beApi.delete(`/trips/${tripId}/members/${userId}`)
+        setCompanions((prev) => prev.filter((c) => c.user_id !== userId))
+      } catch (error) {
+        console.error('Error removing companion:', error)
+      }
+    }
+    removeCompanion(userId)
   }
 
   return (
@@ -67,9 +76,14 @@ export default function TripCompanionsScreen() {
                   <Text style={styles.companionName}>{companion.name}</Text>
                   <Text style={styles.companionRole}>{companion.role}</Text>
                 </View>
-                <PressableOpacity style={styles.removeButton} onPress={() => handleRemoveCompanion(companion.user_id)}>
-                  <Ionicons name="trash-outline" size={24} color={theme.primary} />
-                </PressableOpacity>
+                {companion.role === 'administrator' ? null : (
+                  <PressableOpacity
+                    style={styles.removeButton}
+                    onPress={() => handleRemoveCompanion(companion.user_id)}
+                  >
+                    <Ionicons name="trash-outline" size={24} color={theme.primary} />
+                  </PressableOpacity>
+                )}
               </View>
             ))
           ) : (

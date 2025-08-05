@@ -162,7 +162,7 @@ const Index = () => {
                   // Handle trip item press if needed
                   console.log('Trip item pressed:', index)
                 }}
-                itemWidth={290}
+                itemWidth={310}
               >
                 {ongoingTripItems.map((item, index) => (
                   <CarouselSpotCard tripItem={item} key={index} />
