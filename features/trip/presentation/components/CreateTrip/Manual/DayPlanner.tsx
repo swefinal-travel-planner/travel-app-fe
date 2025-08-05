@@ -1,7 +1,7 @@
 import { Place } from '@/features/place/domain/models/Place'
 import { AddPlaceModal } from '@/features/place/presentation/components/AddPlaceComponent'
 import { TimeSlot, timeSlots, TripItem } from '@/features/trip/domain/models/Trip'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import DraggableFlatList, { RenderItemParams } from 'react-native-draggable-flatlist'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
@@ -28,9 +28,15 @@ export type DayPlannerProps = {
 function buildList(data: TypedTripItem[]): Item[] {
   const list: Item[] = []
   for (const time of timeSlots) {
-    list.push({ type: 'header', time })
-    const items = data.filter((item) => item.timeInDate === time)
-    list.push(...items)
+    if (time === 'morning') {
+      // skip the header for morning
+      const items = data.filter((item) => item.timeInDate === time)
+      list.push(...items)
+    } else {
+      list.push({ type: 'header', time })
+      const items = data.filter((item) => item.timeInDate === time)
+      list.push(...items)
+    }
   }
   return list
 }
@@ -40,77 +46,112 @@ export default function DayPlanner({ selectedDate }: Readonly<DayPlannerProps>) 
   const [modalVisible, setModalVisible] = useState(false)
   const [selectedTime, setSelectedTime] = useState<TimeSlot | null>(null)
 
-  const { getItemsForDate, addTripItems } = useManualTripStore()
+  const { getItemsForDate, addTripItems, deleteTripItem, itemsByDate } = useManualTripStore()
 
-  // Update data when selected date changes
+  // Get the specific date key to avoid unnecessary re-renders
+  const dateKey = selectedDate.toDateString()
+
+  // Update data when the selected date changes or when items for this specific date change
   useEffect(() => {
-    const items = getItemsForDate(selectedDate)
-    // Convert TripItem[] to TypedTripItem[]
-    const typedItems: TypedTripItem[] = items.map((item) => ({
-      ...item,
-      type: 'item',
-    }))
-    setData(buildList(typedItems))
-  }, [selectedDate, getItemsForDate])
+    // Add defensive check to prevent issues during initial load
+    if (!selectedDate) return
 
-  const onDragEnd = ({ data: newData }: { data: Item[] }) => {
-    const updatedTripItems: TypedTripItem[] = []
-    let currentTime: TimeSlot | null = null
-    let globalOrder = 1
-
-    for (const item of newData) {
-      if (item.type === 'header') {
-        currentTime = item.time
-      } else if (item.type === 'item' && currentTime) {
-        updatedTripItems.push({
-          ...item,
-          timeInDate: currentTime,
-          orderInDay: globalOrder++,
-        })
-      }
+    try {
+      const items = getItemsForDate(selectedDate)
+      const typedItems = items.map((item) => ({
+        ...item,
+        type: 'item' as const,
+      }))
+      const listData = buildList(typedItems)
+      setData(listData)
+    } catch (error) {
+      console.warn('Error updating DayPlanner data:', error)
+      // Set empty data as fallback
+      setData([])
     }
+  }, [selectedDate, itemsByDate[dateKey]])
 
-    setData(buildList(updatedTripItems))
-    addTripItems(updatedTripItems, selectedDate)
-  }
+  const onDragEnd = useCallback(
+    ({ data: newData }: { data: Item[] }) => {
+      const updatedTripItems: TypedTripItem[] = []
+      let currentTime: TimeSlot = 'morning'
+      let globalOrder = 1
 
-  const handleAddItem = (time: TimeSlot) => {
+      for (const item of newData) {
+        if (item.type === 'header') {
+          currentTime = item.time
+        } else if (item.type === 'item' && currentTime) {
+          updatedTripItems.push({
+            ...item,
+            timeInDate: currentTime,
+            orderInDay: globalOrder++,
+          })
+        }
+      }
+
+      // Only update the store, let useEffect handle the UI update
+      addTripItems(updatedTripItems, selectedDate)
+    },
+    [addTripItems, selectedDate]
+  )
+
+  const handleAddItem = useCallback((time: TimeSlot) => {
     setSelectedTime(time)
     setModalVisible(true)
-  }
+  }, [])
 
-  const handleConfirmAdd = (places: Place[]) => {
-    if (!selectedTime) return
+  const handleConfirmAdd = useCallback(
+    (places: Place[]) => {
+      if (!selectedTime) return
 
-    const existingItems = data.filter((item): item is TypedTripItem => item.type === 'item')
-    const orderNumbers = existingItems.map((item) => item.orderInDay ?? 0)
-    const currentMaxOrder = orderNumbers.length > 0 ? Math.max(...orderNumbers) : 0
+      // Get existing items directly from the store instead of local state
+      const existingItems = getItemsForDate(selectedDate)
+      const orderNumbers = existingItems.map((item) => item.orderInDay ?? 0)
+      const currentMaxOrder = orderNumbers.length > 0 ? Math.max(...orderNumbers) : 0
 
-    const newItems: TypedTripItem[] = places.map((place, index) => ({
-      name: place.name,
-      type: 'item',
-      title: place.name,
-      item_id: place.id,
-      timeInDate: selectedTime,
-      orderInDay: currentMaxOrder + index + 1,
-      placeID: place.id,
-      place: place,
-    }))
+      const newItems: TripItem[] = places.map((place, index) => ({
+        name: place.name,
+        title: place.name,
+        item_id: place.id,
+        timeInDate: selectedTime,
+        orderInDay: currentMaxOrder + index + 1,
+        placeID: place.id,
+        place: place,
+      }))
 
-    const updatedItems = [...existingItems, ...newItems]
-    setData(buildList(updatedItems))
-    addTripItems(updatedItems, selectedDate)
-    setModalVisible(false)
-    setSelectedTime(null)
-  }
+      const updatedItems = [...existingItems, ...newItems]
+      // Only update the store, let useEffect handle the UI update
+      addTripItems(updatedItems, selectedDate)
+      setModalVisible(false)
+      setSelectedTime(null)
+    },
+    [selectedTime, getItemsForDate, addTripItems, selectedDate]
+  )
 
-  const renderItem = ({ item, drag, isActive }: RenderItemParams<Item>) => {
-    if (item.type === 'header') {
-      return <SectionHeader time={item.time} onAddItem={handleAddItem} />
-    }
+  const handleDeleteItem = useCallback(
+    (itemId: string) => {
+      deleteTripItem(itemId, selectedDate)
+      // The useEffect will automatically update the data when itemsByDate changes
+      // No need to manually update local state here
+    },
+    [deleteTripItem, selectedDate]
+  )
 
-    return <TripItemCard item={item} drag={drag} isActive={isActive} />
-  }
+  const renderItem = useCallback(
+    ({ item, drag, isActive }: RenderItemParams<Item>) => {
+      if (item.type === 'header') {
+        return <SectionHeader time={item.time} onAddItem={handleAddItem} />
+      }
+
+      return <TripItemCard item={item} drag={drag} isActive={isActive} onDelete={handleDeleteItem} />
+    },
+    [handleAddItem, handleDeleteItem]
+  )
+
+  const keyExtractor = useCallback(
+    (item: Item, index: number) => (item.type === 'header' ? `header-${item.time}` : item.item_id + String(index)),
+    []
+  )
 
   return (
     <View style={styles.wrapper}>
@@ -123,11 +164,13 @@ export default function DayPlanner({ selectedDate }: Readonly<DayPlannerProps>) 
         />
       </View>
       <GestureHandlerRootView style={styles.container}>
+        <SectionHeader time={'morning'} onAddItem={handleAddItem} />
         <DraggableFlatList
           data={data}
-          keyExtractor={(item) => (item.type === 'header' ? `header-${item.time}` : item.item_id)}
+          keyExtractor={keyExtractor}
           onDragEnd={onDragEnd}
           renderItem={renderItem}
+          contentContainerStyle={styles.contentContainer}
         />
       </GestureHandlerRootView>
     </View>
@@ -139,6 +182,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     height: '100%',
+    paddingHorizontal: 12,
   },
   container: {
     flex: 1,
@@ -149,5 +193,8 @@ const styles = StyleSheet.create({
   centerContent: {
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  contentContainer: {
+    paddingBottom: 40,
   },
 })

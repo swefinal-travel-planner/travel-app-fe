@@ -1,5 +1,6 @@
+import { FontFamily, FontSize } from '@/constants/font'
 import { TimeSlot } from '@/features/trip/domain/models/Trip'
-import FontAwesome6 from '@expo/vector-icons/FontAwesome6'
+import { Ionicons } from '@expo/vector-icons'
 import React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
@@ -11,9 +12,9 @@ type SectionHeaderProps = {
 export const SectionHeader: React.FC<SectionHeaderProps> = ({ time, onAddItem }) => {
   return (
     <View style={styles.sectionHeader}>
-      <Text style={styles.sectionTitle}>{time.toUpperCase()}</Text>
+      <Text style={styles.sectionTitle}>{time.charAt(0).toUpperCase() + time.slice(1).toLowerCase()}</Text>
       <TouchableOpacity onPress={() => onAddItem(time)} style={styles.addButton}>
-        <FontAwesome6 name="plus" size={24} color="black" />
+        <Ionicons name="add" size={24} color="black" />
       </TouchableOpacity>
     </View>
   )
@@ -28,10 +29,10 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   sectionTitle: {
-    fontWeight: 'bold',
-    fontSize: 16,
+    fontFamily: FontFamily.BOLD,
+    fontSize: FontSize.LG,
     marginBottom: 5,
-    color: '#333',
+    color: '#1A434E',
   },
   addButton: {
     padding: 4,

@@ -2,17 +2,7 @@ import { colorPalettes } from '@/constants/Itheme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import AntDesign from '@expo/vector-icons/AntDesign'
 import { Fragment, ReactNode, useEffect, useMemo, useState } from 'react'
-import {
-  FlatList,
-  Image,
-  Modal,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextStyle,
-  View,
-  ViewStyle,
-} from 'react-native'
+import { FlatList, Image, Modal, Pressable, StyleSheet, Text, TextStyle, View, ViewStyle } from 'react-native'
 
 interface UniversalPickerProps<T> {
   data: T[]
@@ -43,9 +33,7 @@ export function UniversalPicker<T>({
   const styles = useMemo(() => createStyles(theme), [theme])
 
   const [modalVisible, setModalVisible] = useState(false)
-  const [selected, setSelected] = useState<T | undefined>(
-    initialValue ?? data[0]
-  )
+  const [selected, setSelected] = useState<T | undefined>(initialValue ?? data[0])
 
   useEffect(() => {
     if (initialValue) setSelected(initialValue)
@@ -59,25 +47,13 @@ export function UniversalPicker<T>({
 
   return (
     <View>
-      <Pressable
-        style={[styles.button, style]}
-        onPress={() => setModalVisible(true)}
-      >
-        {selected && iconExtractor && (
-          <Image source={iconExtractor(selected)} style={styles.icon} />
-        )}
-        <Text style={[styles.text, textStyle]}>
-          {selected ? labelExtractor(selected) : placeholder}
-        </Text>
+      <Pressable style={[styles.button, style]} onPress={() => setModalVisible(true)}>
+        {selected && iconExtractor && <Image source={iconExtractor(selected)} style={styles.icon} />}
+        <Text style={[styles.text, textStyle]}>{selected ? labelExtractor(selected) : placeholder}</Text>
         <AntDesign name="down" size={15} />
       </Pressable>
 
-      <Modal
-        visible={modalVisible}
-        animationType="slide"
-        transparent
-        onRequestClose={() => setModalVisible(false)}
-      >
+      <Modal visible={modalVisible} animationType="slide" transparent onRequestClose={() => setModalVisible(false)}>
         <View style={styles.modalOverlay}>
           <View style={styles.modal}>
             <FlatList
@@ -85,25 +61,12 @@ export function UniversalPicker<T>({
               keyExtractor={keyExtractor}
               renderItem={({ item }) => {
                 if (renderItem) {
-                  return (
-                    <Fragment key={keyExtractor(item)}>
-                      {renderItem(item, () => handleSelect(item))}
-                    </Fragment>
-                  )
+                  return <Fragment key={keyExtractor(item)}>{renderItem(item, () => handleSelect(item))}</Fragment>
                 }
 
                 return (
-                  <Pressable
-                    key={keyExtractor(item)}
-                    style={styles.item}
-                    onPress={() => handleSelect(item)}
-                  >
-                    {iconExtractor && (
-                      <Image
-                        source={iconExtractor(item)}
-                        style={styles.iconSmall}
-                      />
-                    )}
+                  <Pressable key={keyExtractor(item)} style={styles.item} onPress={() => handleSelect(item)}>
+                    {iconExtractor && <Image source={iconExtractor(item)} style={styles.iconSmall} />}
                     <Text style={styles.label}>{labelExtractor(item)}</Text>
                   </Pressable>
                 )

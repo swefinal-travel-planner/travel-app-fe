@@ -33,10 +33,13 @@ export default function HorizontalDatePicker({
     return date
   })
 
+  // Select the first date if no date is selected
+  const effectiveSelectedDate = selectedDate || dates[0]
+
   return (
     <View style={styles.wrapper}>
       {dates.map((date) => {
-        const isSelected = date.toDateString() === selectedDate?.toDateString()
+        const isSelected = date.toDateString() === effectiveSelectedDate?.toDateString()
         return (
           <TouchableOpacity
             key={date.toDateString()}
@@ -69,8 +72,8 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       backgroundColor: theme.white,
     },
     dateItem: {
-      width: 40,
-      height: 40,
+      width: 48,
+      height: 48,
       borderRadius: Radius.FULL,
       marginHorizontal: 5,
       alignItems: 'center',
@@ -86,6 +89,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       color: theme.primary,
     },
     dateText: {
+      marginTop: -4,
       fontSize: FontSize.XL,
       fontFamily: FontFamily.BOLD,
       color: theme.primary,

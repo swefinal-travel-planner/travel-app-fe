@@ -14,6 +14,7 @@ export const PlaceItem: React.FC<PlaceItemProps> = ({ place, isSelected, onToggl
       <View style={styles.imageContainer}>
         <Image source={{ uri: place.images[0] }} style={styles.placeImage} />
       </View>
+
       <View style={styles.contentContainer}>
         <View style={styles.placeInfo}>
           <Text style={styles.placeName}>{place.name}</Text>
@@ -38,10 +39,8 @@ const createStyles = (theme: any) =>
     placeContainer: {
       flexDirection: 'column',
       padding: 15,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.background,
-      backgroundColor: theme.background,
-      borderRadius: Radius.NORMAL,
+      backgroundColor: theme.secondary,
+      borderRadius: Radius.ROUNDED,
       gap: 12,
     },
     imageContainer: {
@@ -58,6 +57,7 @@ const createStyles = (theme: any) =>
       justifyContent: 'space-between',
       alignItems: 'center',
       width: '100%',
+      gap: 12,
     },
     placeInfo: {
       flex: 1,
@@ -75,10 +75,11 @@ const createStyles = (theme: any) =>
       marginRight: 4,
     },
     placeType: {
-      fontSize: FontSize.MD,
+      fontSize: FontSize.SM,
       fontFamily: FontFamily.REGULAR,
       color: theme.dimText,
       marginTop: 4,
+      marginRight: 12,
     },
     addButton: {
       backgroundColor: theme.primary,
@@ -89,7 +90,7 @@ const createStyles = (theme: any) =>
     addButtonText: {
       color: theme.white,
       fontSize: FontSize.MD,
-      fontFamily: FontFamily.BOLD,
+      fontFamily: FontFamily.REGULAR,
     },
     selectedContainer: {
       borderColor: theme.primary,
