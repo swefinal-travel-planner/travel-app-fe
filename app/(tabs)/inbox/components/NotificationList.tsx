@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { Avatar, Colors, Drawer } from 'react-native-ui-lib'
 
 import { useThemeStyle } from '@/hooks/useThemeStyle'
@@ -18,9 +18,17 @@ interface NotificationListProps {
   notificationList: Notification[] | undefined
   removeNotification: (id: number) => void
   markAsRead: (id: number) => void
+  refreshing?: boolean
+  onRefresh?: () => void
 }
 
-function NotificationList({ notificationList, removeNotification, markAsRead }: NotificationListProps) {
+function NotificationList({
+  notificationList,
+  removeNotification,
+  markAsRead,
+  refreshing = false,
+  onRefresh,
+}: NotificationListProps) {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
   const router = useRouter()
@@ -34,7 +42,7 @@ function NotificationList({ notificationList, removeNotification, markAsRead }: 
     }
   }
 
-  const handleAcceptFriendRequest = async (notif: Notification) => {
+  const handleAcceptRequest = async (notif: Notification) => {
     if (!notif.isSeen) markAsRead(notif.id)
     await NotificationService.acceptRequest(notif)
   }
@@ -45,6 +53,16 @@ function NotificationList({ notificationList, removeNotification, markAsRead }: 
         paddingBottom: 80,
         paddingHorizontal: 24,
       }}
+      refreshControl={
+        onRefresh ? (
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={theme.primary}
+            colors={[theme.primary]}
+          />
+        ) : undefined
+      }
     >
       {notificationList?.map((notif) => (
         <Drawer
@@ -53,8 +71,8 @@ function NotificationList({ notificationList, removeNotification, markAsRead }: 
             notif.action === 'actionable'
               ? {
                   text: !notif.isSeen ? 'Accept' : 'Accepted',
-                  background: !notif.isSeen ? Colors.green30 : Colors.grey50,
-                  onPress: !notif.isSeen ? () => handleAcceptFriendRequest(notif) : () => {},
+                  background: !notif.isSeen ? Colors.green30 : Colors.grey70,
+                  onPress: !notif.isSeen ? () => handleAcceptRequest(notif) : undefined,
                 }
               : undefined
           }
@@ -74,7 +92,7 @@ function NotificationList({ notificationList, removeNotification, markAsRead }: 
           fullSwipeRight
           onFullSwipeRight={() => removeNotification(notif.id)}
           fullSwipeLeft={!notif.isSeen}
-          onFullSwipeLeft={() => handleAcceptFriendRequest(notif)}
+          onFullSwipeLeft={() => handleAcceptRequest(notif)}
         >
           <Pressable onPress={notif.action === 'navigable' ? () => handleNavigate(notif) : undefined}>
             <View style={!notif.isSeen ? styles.unreadNotifContainer : styles.notifContainer}>

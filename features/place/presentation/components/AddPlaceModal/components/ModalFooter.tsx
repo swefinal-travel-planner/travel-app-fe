@@ -48,7 +48,7 @@ const createStyles = (theme: any) =>
     },
     buttonText: {
       fontSize: FontSize.MD,
-      fontFamily: FontFamily.BOLD,
+      fontFamily: FontFamily.REGULAR,
     },
     cancelText: {
       color: theme.primary,

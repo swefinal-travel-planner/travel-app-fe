@@ -6,13 +6,14 @@ import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { NotificationCategory } from '@/lib/types/Notification'
 import { NotificationService } from '@/services/notificationService'
 import Ionicons from '@expo/vector-icons/Ionicons'
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import NotificationList from './components/NotificationList'
 
 export default function Inbox() {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
+  const [refreshing, setRefreshing] = useState(false)
 
   const {
     filteredNotifications,
@@ -23,6 +24,7 @@ export default function Inbox() {
     markAsRead,
     isLoading,
     error,
+    fetchNotifications,
   } = useNotifications()
 
   const handleCategorySelect = (category: string) => {
@@ -45,6 +47,15 @@ export default function Inbox() {
   }
 
   const isAllSelected = activeCategories.length === 0
+
+  const onRefresh = async () => {
+    setRefreshing(true)
+    try {
+      await fetchNotifications()
+    } finally {
+      setRefreshing(false)
+    }
+  }
 
   const renderContent = () => {
     if (error) {
@@ -77,6 +88,8 @@ export default function Inbox() {
         notificationList={filteredNotifications}
         removeNotification={removeNotification}
         markAsRead={markAsRead}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
       />
     )
   }
@@ -84,7 +97,7 @@ export default function Inbox() {
   return (
     <View style={styles.container}>
       <View style={styles.filters}>
-        <ScrollView horizontal>
+        <ScrollView horizontal showsHorizontalScrollIndicator={true}>
           <Chip
             key="all"
             value="All"

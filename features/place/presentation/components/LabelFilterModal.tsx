@@ -1,15 +1,8 @@
+import { FontFamily } from '@/constants/font'
 import { Radius } from '@/constants/theme'
 import { useLabels } from '@/features/placeLabel/presentation/state/useLabels'
 import React, { memo, useCallback, useState } from 'react'
-import {
-  Modal,
-  SafeAreaView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native'
+import { Modal, SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 interface LabelFilterModalProps {
   visible: boolean
@@ -25,13 +18,8 @@ interface LabelButtonProps {
 }
 
 const LabelButton = memo<LabelButtonProps>(({ label, isSelected, onPress }) => (
-  <TouchableOpacity
-    style={[styles.labelButton, isSelected && styles.selectedLabel]}
-    onPress={onPress}
-  >
-    <Text style={[styles.labelText, isSelected && styles.selectedLabelText]}>
-      {label}
-    </Text>
+  <TouchableOpacity style={[styles.labelButton, isSelected && styles.selectedLabel]} onPress={onPress}>
+    <Text style={[styles.labelText, isSelected && styles.selectedLabelText]}>{label}</Text>
   </TouchableOpacity>
 ))
 
@@ -42,23 +30,21 @@ interface CategorySectionProps {
   onLabelToggle: (label: string) => void
 }
 
-const CategorySection = memo<CategorySectionProps>(
-  ({ category, labels, selectedLabels, onLabelToggle }) => (
-    <View style={styles.categoryContainer}>
-      <Text style={styles.categoryTitle}>{category}</Text>
-      <View style={styles.labelsList}>
-        {labels.map((label) => (
-          <LabelButton
-            key={label}
-            label={label}
-            isSelected={selectedLabels.includes(label)}
-            onPress={() => onLabelToggle(label)}
-          />
-        ))}
-      </View>
+const CategorySection = memo<CategorySectionProps>(({ category, labels, selectedLabels, onLabelToggle }) => (
+  <View style={styles.categoryContainer}>
+    <Text style={styles.categoryTitle}>{category}</Text>
+    <View style={styles.labelsList}>
+      {labels.map((label) => (
+        <LabelButton
+          key={label}
+          label={label}
+          isSelected={selectedLabels.includes(label)}
+          onPress={() => onLabelToggle(label)}
+        />
+      ))}
     </View>
-  )
-)
+  </View>
+))
 
 export const LabelFilterModal: React.FC<LabelFilterModalProps> = ({
   visible,
@@ -66,9 +52,7 @@ export const LabelFilterModal: React.FC<LabelFilterModalProps> = ({
   onApply,
   initialSelectedLabels = [],
 }) => {
-  const [selectedLabels, setSelectedLabels] = useState<string[]>(
-    initialSelectedLabels
-  )
+  const [selectedLabels, setSelectedLabels] = useState<string[]>(initialSelectedLabels)
   const { data: labels, isLoading, error } = useLabels({ language: 'en' })
 
   const handleLabelToggle = useCallback((label: string) => {
@@ -89,18 +73,14 @@ export const LabelFilterModal: React.FC<LabelFilterModalProps> = ({
   if (!visible) return null
 
   return (
-    <Modal
-      visible={visible}
-      animationType="slide"
-      presentationStyle="fullScreen"
-    >
+    <Modal visible={visible} animationType="slide" presentationStyle="fullScreen">
       <SafeAreaView style={styles.container}>
         <StatusBar barStyle="dark-content" />
         <View style={styles.header}>
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
             <Text style={styles.closeButtonText}>Cancel</Text>
           </TouchableOpacity>
-          <Text style={styles.title}>Filter by Labels</Text>
+          <Text style={styles.title}>Filter by labels</Text>
           <TouchableOpacity onPress={handleApply} style={styles.applyButton}>
             <Text style={styles.applyButtonText}>Apply</Text>
           </TouchableOpacity>
@@ -165,10 +145,12 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   closeButtonText: {
+    fontFamily: FontFamily.REGULAR,
     fontSize: 16,
     color: '#666',
   },
   title: {
+    fontFamily: FontFamily.BOLD,
     fontSize: 18,
     fontWeight: '600',
   },
@@ -176,8 +158,9 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   applyButtonText: {
+    fontFamily: FontFamily.BOLD,
     fontSize: 16,
-    color: '#563D30',
+    color: '#1A434E',
     fontWeight: '600',
   },
   content: {
@@ -197,6 +180,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     marginBottom: 12,
     color: '#333',
+    fontFamily: FontFamily.BOLD,
   },
   labelsList: {
     flexDirection: 'row',
@@ -212,10 +196,10 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
   },
   selectedLabel: {
-    backgroundColor: '#563D30',
-    borderColor: '#563D30',
+    backgroundColor: '#1A434E',
   },
   labelText: {
+    fontFamily: FontFamily.REGULAR,
     fontSize: 14,
     color: '#333',
   },
@@ -223,7 +207,8 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   errorText: {
-    color: 'red',
+    fontFamily: FontFamily.REGULAR,
+    color: '#D73C62',
     textAlign: 'center',
   },
 })
