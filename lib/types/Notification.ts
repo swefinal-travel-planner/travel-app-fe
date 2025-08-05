@@ -6,6 +6,7 @@ export type NotificationCategory =
   | 'friendRequestAccepted'
   | 'tripInvitationReceived'
   | 'tripGeneratedFailed'
+  | 'tripStartingSoon'
 
 type referenceEntity = {
   id: number

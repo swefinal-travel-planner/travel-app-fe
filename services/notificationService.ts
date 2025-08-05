@@ -15,14 +15,15 @@ export const NOTIFICATION_CONFIGS: Record<NotificationCategory, NotificationConf
   tripGenerated: {
     category: 'tripGenerated',
     label: NOTIFICATION_CATEGORY_LABELS.tripGenerated,
-    message: () => 'Your trip has been generated successfully!',
+    message: () => 'Your trip is ready! Check it out.',
     action: 'navigable',
     navigationPath: '/my-trips',
   },
   friendRequestReceived: {
     category: 'friendRequestReceived',
     label: NOTIFICATION_CATEGORY_LABELS.friendRequestReceived,
-    message: (notification) => `${notification.triggerEntity?.name ?? 'Someone'} sent you a friend request.`,
+    message: (notification) =>
+      `${notification.triggerEntity?.name ?? 'Someone'} sent you a friend request. Swipe right to accept!`,
     action: 'actionable',
     apiEndpoint: '/invitation-friends/accept',
   },
@@ -36,14 +37,22 @@ export const NOTIFICATION_CONFIGS: Record<NotificationCategory, NotificationConf
   tripInvitationReceived: {
     category: 'tripInvitationReceived',
     label: NOTIFICATION_CATEGORY_LABELS.tripInvitationReceived,
-    message: (notification) => `${notification.triggerEntity?.name ?? 'Someone'} invited you to join a trip.`,
+    message: (notification) =>
+      `${notification.triggerEntity?.name ?? 'Someone'} invited you to join a trip. Swipe right to accept!`,
     action: 'actionable',
-    apiEndpoint: '/invitation-friends/accept',
+    apiEndpoint: '/invitation-trips/accept',
   },
   tripGeneratedFailed: {
     category: 'tripGeneratedFailed',
     label: NOTIFICATION_CATEGORY_LABELS.tripGeneratedFailed,
-    message: () => 'Failed to generate your trip. Please try again.',
+    message: () => "We're sorry, but your trip couldn't be prepared. Please try again.",
+    action: 'navigable',
+    navigationPath: '/my-trips',
+  },
+  tripStartingSoon: {
+    category: 'tripStartingSoon',
+    label: NOTIFICATION_CATEGORY_LABELS.tripStartingSoon,
+    message: () => `Your trip is starting soon! Don't forget to check your itinerary.`,
     action: 'navigable',
     navigationPath: '/my-trips',
   },
