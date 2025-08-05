@@ -90,7 +90,12 @@ export function AddPlaceModal({ visible, selectedTime, onClose, onConfirm }: Rea
     <Modal transparent={false} visible={visible} onRequestClose={handleClose} animationType="slide">
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
-          <ModalHeader selectedTime={selectedTime} onFilterPress={handleFilterPress} theme={theme} />
+          <ModalHeader
+            selectedTime={selectedTime}
+            onFilterPress={handleFilterPress}
+            theme={theme}
+            filterCount={selectedLabels.length}
+          />
 
           {renderContent()}
 

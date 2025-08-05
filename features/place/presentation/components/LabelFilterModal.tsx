@@ -2,7 +2,7 @@ import { FontFamily } from '@/constants/font'
 import { Radius } from '@/constants/theme'
 import { useLabels } from '@/features/placeLabel/presentation/state/useLabels'
 import React, { memo, useCallback, useState } from 'react'
-import { Modal, SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Modal, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 interface LabelFilterModalProps {
   visible: boolean
@@ -80,7 +80,9 @@ export const LabelFilterModal: React.FC<LabelFilterModalProps> = ({
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
             <Text style={styles.closeButtonText}>Cancel</Text>
           </TouchableOpacity>
-          <Text style={styles.title}>Filter by labels</Text>
+          <Text style={styles.title}>
+            Filter by labels{selectedLabels.length > 0 ? ` (${selectedLabels.length})` : ''}
+          </Text>
           <TouchableOpacity onPress={handleApply} style={styles.applyButton}>
             <Text style={styles.applyButtonText}>Apply</Text>
           </TouchableOpacity>
@@ -109,7 +111,11 @@ export const LabelFilterModal: React.FC<LabelFilterModalProps> = ({
             )
           }
           return (
-            <View style={styles.content}>
+            <ScrollView
+              style={styles.content}
+              contentContainerStyle={styles.contentContainer}
+              showsVerticalScrollIndicator={true}
+            >
               {Object.entries(labels).map(([category, categoryLabels]) => (
                 <CategorySection
                   key={category}
@@ -119,7 +125,7 @@ export const LabelFilterModal: React.FC<LabelFilterModalProps> = ({
                   onLabelToggle={handleLabelToggle}
                 />
               ))}
-            </View>
+            </ScrollView>
           )
         })()}
       </SafeAreaView>
@@ -166,6 +172,9 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     padding: 16,
+  },
+  contentContainer: {
+    paddingBottom: 16, // Add padding at the bottom for better scrolling
   },
   centerContent: {
     flex: 1,

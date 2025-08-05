@@ -38,8 +38,10 @@ export default function UpdateManualTrip({ nextFn, mode = 'create', tripId }: Re
     ? useTripDetails(currentTripId)
     : { trip: null, tripItems: [], groupedItems: [], loading: false }
 
-  const { request, getItemsForDate, setRequest, loadExistingTrip, setEditMode, isEditMode } = useManualTripStore()
+  const { request, getItemsForDate, setRequest, loadExistingTrip, setEditMode, isEditMode, hasAnyItems, itemsByDate } =
+    useManualTripStore()
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
+  const [validationError, setValidationError] = useState<string | null>(null)
   const hasLoadedDataRef = useRef(false)
 
   // Load existing trip data when in edit mode - only run once
@@ -104,11 +106,27 @@ export default function UpdateManualTrip({ nextFn, mode = 'create', tripId }: Re
     }
   }, [request?.startDate])
 
+  // Clear validation error when items are added or removed
+  useEffect(() => {
+    if (validationError && hasAnyItems()) {
+      setValidationError(null)
+    }
+  }, [validationError, itemsByDate])
+
   const theme = useThemeStyle()
 
   const handleSaveOrNext = async () => {
+    // Clear any previous validation errors
+    setValidationError(null)
+
     if (!selectedDate) {
-      // Handle validation error
+      setValidationError('Please select a start date')
+      return
+    }
+
+    // Check if there are any items in the trip
+    if (!hasAnyItems()) {
+      setValidationError('Please add at least one place to your trip before proceeding')
       return
     }
 
@@ -181,6 +199,11 @@ export default function UpdateManualTrip({ nextFn, mode = 'create', tripId }: Re
         <HorizontalDatePicker request={request} selectedDate={selectedDate} onSelectDate={setSelectedDate} />
       )}
       {selectedDate && <DayPlanner selectedDate={selectedDate} />}
+      {validationError && (
+        <View style={styles.errorContainer}>
+          <Text style={[styles.errorText, { color: theme.error || '#ff0000' }]}>{validationError}</Text>
+        </View>
+      )}
       <View style={styles.buttonContainer}>
         <Pressable
           onPress={handleSaveOrNext}
@@ -216,5 +239,15 @@ const styles = StyleSheet.create({
   centerContent: {
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  errorContainer: {
+    width: '100%',
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  errorText: {
+    fontSize: 14,
+    fontWeight: 'bold',
   },
 })
