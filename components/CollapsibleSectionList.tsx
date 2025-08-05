@@ -4,14 +4,7 @@ import { Radius } from '@/constants/theme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { formatAttribute } from '@/utils/tripAttributes'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import {
-  Animated,
-  Pressable,
-  SectionList,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native'
+import { Animated, Pressable, SectionList, StyleSheet, Text, View } from 'react-native'
 import Chip from './Chip'
 
 interface ListProps {
@@ -20,11 +13,7 @@ interface ListProps {
   onValueChange?: (newValue: string[]) => void
 }
 
-const CollapsibleSectionList: React.FC<ListProps> = ({
-  data,
-  selectedValues = [],
-  onValueChange,
-}) => {
+const CollapsibleSectionList: React.FC<ListProps> = ({ data, selectedValues = [], onValueChange }) => {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
 
@@ -47,9 +36,7 @@ const CollapsibleSectionList: React.FC<ListProps> = ({
     const section = data.find((section) => section.title === title)
     if (!section) return 0
 
-    return section.data.filter((item) =>
-      selectedValues.includes(formatAttribute(item))
-    ).length
+    return section.data.filter((item) => selectedValues.includes(formatAttribute(item))).length
   }
 
   const handleToggle = (title: string) => {
@@ -92,9 +79,7 @@ const CollapsibleSectionList: React.FC<ListProps> = ({
 
   const handleDeselect = (value: string) => {
     if (onValueChange) {
-      const newValues = selectedValues.filter(
-        (v) => v !== formatAttribute(value)
-      )
+      const newValues = selectedValues.filter((v) => v !== formatAttribute(value))
       onValueChange(newValues)
     }
   }
@@ -140,9 +125,7 @@ const CollapsibleSectionList: React.FC<ListProps> = ({
           <Pressable onPress={() => handleToggle(title)}>
             <View style={styles.headerContainer}>
               <Text style={styles.header}>{title}</Text>
-              {selectedCount > 0 && (
-                <Text style={styles.selectedCount}>{selectedCount}</Text>
-              )}
+              {selectedCount > 0 && <Text style={styles.selectedCount}>{selectedCount}</Text>}
             </View>
           </Pressable>
         )

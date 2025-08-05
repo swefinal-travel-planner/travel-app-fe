@@ -19,6 +19,14 @@ const DateRangeField = ({ startDate, endDate, setStartDate, setEndDate }: DateRa
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
 
+  // Format date to "Month Day" format (e.g., "Oct 10")
+  const formatDateDisplay = (dateString: string) => {
+    const date = new Date(dateString)
+    const month = date.toLocaleDateString('en-US', { month: 'short' })
+    const day = date.getDate()
+    return `${month} ${day}`
+  }
+
   const [modalVisible, setModalVisible] = useState(false)
 
   // Temp state for selection before confirmation
@@ -105,7 +113,9 @@ const DateRangeField = ({ startDate, endDate, setStartDate, setEndDate }: DateRa
     <View style={styles.container}>
       <TouchableOpacity onPress={openPicker} style={styles.field}>
         <Text style={styles.fieldText}>
-          {startDate && endDate ? `From: ${startDate} - To: ${endDate}` : 'Select date range'}
+          {startDate && endDate
+            ? `From: ${formatDateDisplay(startDate)} - To: ${formatDateDisplay(endDate)}`
+            : 'Select date range'}
         </Text>
         <FontAwesome5 name="calendar-alt" size={24} color={theme.primary} />
       </TouchableOpacity>
@@ -157,6 +167,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       color: '#333',
       fontSize: 16,
       fontFamily: FontFamily.REGULAR,
+      alignSelf: 'center',
     },
     modalBackdrop: {
       flex: 1,
