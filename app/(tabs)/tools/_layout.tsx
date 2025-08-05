@@ -78,7 +78,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       flexDirection: 'row',
       padding: Padding.MEDIUM,
       borderRadius: Radius.FULL,
-      backgroundColor: theme.green,
+      backgroundColor: theme.secondary,
       justifyContent: 'center',
       position: 'absolute',
       top: 55,

@@ -7,10 +7,10 @@ import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { Notification } from '@/lib/types/Notification'
 
 import { colorPalettes } from '@/constants/Itheme'
+import { NotificationService } from '@/services/notificationService'
 
 import { FontFamily, FontSize } from '@/constants/font'
 import { Radius } from '@/constants/theme'
-import beApi from '@/lib/beApi'
 import { formatDateTime } from '@/utils/Datetime'
 import { useRouter } from 'expo-router'
 
@@ -28,26 +28,15 @@ function NotificationList({ notificationList, removeNotification, markAsRead }: 
   const handleNavigate = (notif: Notification) => {
     if (!notif.isSeen) markAsRead(notif.id)
 
-    switch (notif.type) {
-      case 'tripGenerated':
-      case 'tripGeneratedFailed':
-        router.push('/my-trips')
-        break
-      case 'friendRequestAccepted':
-        router.push('/profile')
-        break
-      default:
-        break
+    const navigationPath = NotificationService.getNavigationPath(notif)
+    if (navigationPath) {
+      router.push(navigationPath as any)
     }
   }
 
   const handleAcceptFriendRequest = async (notif: Notification) => {
     if (!notif.isSeen) markAsRead(notif.id)
-    try {
-      await beApi.put(`/invitation-friends/accept/${notif.referenceEntity.id}`)
-    } catch (error) {
-      console.error('Error accepting friend request:', error)
-    }
+    await NotificationService.acceptRequest(notif)
   }
 
   return (
@@ -102,7 +91,7 @@ function NotificationList({ notificationList, removeNotification, markAsRead }: 
                 {!notif.isSeen ? (
                   <View>
                     <View style={styles.view4}>
-                      <Text style={styles.notifTitle}>{notif.type.charAt(0).toUpperCase() + notif.type.slice(1)}</Text>
+                      <Text style={styles.notifTitle}>{NotificationService.getCategoryLabel(notif.type)}</Text>
                       <Text style={styles.subText}>{formatDateTime(notif.createdAt)}</Text>
                     </View>
                     <Text style={styles.text}>{notif.referenceData}</Text>
@@ -110,9 +99,7 @@ function NotificationList({ notificationList, removeNotification, markAsRead }: 
                 ) : (
                   <View>
                     <View style={styles.view4}>
-                      <Text style={styles.notifTitleDim}>
-                        {notif.type.charAt(0).toUpperCase() + notif.type.slice(1)}
-                      </Text>
+                      <Text style={styles.notifTitleDim}>{NotificationService.getCategoryLabel(notif.type)}</Text>
                       <Text style={styles.subTextDim}>{formatDateTime(notif.createdAt)}</Text>
                     </View>
                     <Text style={styles.textDim}>{notif.referenceData}</Text>

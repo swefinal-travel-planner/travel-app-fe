@@ -58,7 +58,7 @@ const configureMapbox = () => {
 
 // Utility functions
 const handleRegistrationError = (errorMessage: string): never => {
-  console.error(errorMessage)
+  console.error('Error in handleRegistrationError:', errorMessage)
   throw new Error(errorMessage)
 }
 
@@ -106,6 +106,7 @@ const registerForPushNotificationsAsync = async (): Promise<string | undefined> 
 // Main Component
 export default function RootLayout() {
   const [queryClient] = useState(() => new QueryClient())
+
   const [state, setState] = useState<NotificationState>({
     notification: undefined,
     isReady: false,
@@ -133,13 +134,17 @@ export default function RootLayout() {
     } catch (error) {
       console.error('App initialization error:', error)
       setState((prev: NotificationState) => ({ ...prev, isReady: true, isHealthy: false }))
-    } finally {
-      await SplashScreen.hideAsync()
     }
   }, [])
 
+  const hideSplashScreen = async () => {
+    await SplashScreen.hideAsync()
+  }
+
   useEffect(() => {
     initializeApp()
+
+    hideSplashScreen()
 
     notificationListener.current = addNotificationReceivedListener((notification) =>
       setState((prev: NotificationState) => ({ ...prev, notification }))
@@ -153,7 +158,7 @@ export default function RootLayout() {
       notificationListener.current?.remove()
       responseListener.current?.remove()
     }
-  }, [initializeApp])
+  })
 
   if (!state.isReady) {
     return null
