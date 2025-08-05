@@ -31,11 +31,12 @@ export const Cities = [
   },
   {
     key: 'HN',
-    label: 'Ha Noi',
+    label: 'Ha Noi Capital',
     districts: [
-      { key: 'HK', coordinates: [105.852, 21.0285], label: 'Hoan Kiem' },
-      { key: 'BD', coordinates: [105.8355, 21.0288], label: 'Ba Dinh' },
-      { key: 'CG', coordinates: [105.8009, 21.0333], label: 'Cau Giay' },
+      { key: 'HK', coordinates: [105.852, 21.0285], label: 'Hoan Kiem District' },
+      { key: 'BD', coordinates: [105.8355, 21.0288], label: 'Ba Dinh District' },
+      { key: 'CG', coordinates: [105.8009, 21.0333], label: 'Cau Giay District' },
+      { key: 'HAN', coordinates: [105.8009, 21.0333], label: 'Ha Dong District' },
     ],
   },
 ]

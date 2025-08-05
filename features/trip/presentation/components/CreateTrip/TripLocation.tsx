@@ -38,10 +38,9 @@ export default function TripLocation({ theme, nextFn, setTripState }: Readonly<T
 
   return (
     <View style={[styles.container, { backgroundColor: theme.white }]}>
-      <Text style={[styles.text, { color: theme.primary }]}>Where is your trip located ?</Text>
+      <Text style={[styles.questionTitle, { color: theme.primary }]}>Where is your trip located ?</Text>
 
       <View style={[styles.locationContainer, { backgroundColor: theme.white }]}>
-        <Text style={styles.pickerLabel}>City</Text>
         {/* City Picker */}
         <Picker
           placeholder="Select a city"
@@ -69,8 +68,6 @@ export default function TripLocation({ theme, nextFn, setTripState }: Readonly<T
             />
           ))}
         </Picker>
-
-        <Text style={[styles.pickerLabel, { marginTop: 8 }]}>District</Text>
 
         <Picker
           placeholder="Select a destination"
@@ -126,26 +123,27 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     container: {
       flex: 1,
       flexDirection: 'column',
-      width: '100%',
+      minWidth: '100%',
+      height: '100%',
       alignItems: 'stretch',
       justifyContent: 'space-between',
       paddingHorizontal: 24,
-      paddingTop: 40,
+      paddingTop: 20,
       paddingBottom: 80,
     },
     locationContainer: {
       marginBottom: 16,
       marginTop: 16,
+      gap: 16,
     },
     mapContainer: {
       width: '100%',
       flex: 1,
-      maxHeight: '50%',
       marginVertical: 16,
       borderRadius: Radius.ROUNDED,
       overflow: 'hidden',
     },
-    text: {
+    questionTitle: {
       fontFamily: FontFamily.BOLD,
       fontSize: FontSize.XXXL,
       textAlign: 'center',
