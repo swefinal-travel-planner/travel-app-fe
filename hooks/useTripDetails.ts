@@ -73,7 +73,7 @@ export const useTripDetails = (tripId: string) => {
         const sortedItems = dayItems // already sorted by orderInDay
         const placeIDs = sortedItems.map((item) => item.placeID)
 
-        if (placeIDs.length < 2) {
+        if (placeIDs.length <= 1) {
           // Only one spot, no travel
           sortedItems[0].distance = 0
           sortedItems[0].time = 0

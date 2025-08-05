@@ -160,7 +160,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: '#f5f5f5',
+      backgroundColor: theme.white,
       paddingTop: 110,
     },
     loadingContainer: {
