@@ -27,5 +27,5 @@ export interface Notification {
   referenceEntity: referenceEntity
   triggerEntity: triggerEntity
   type: NotificationCategory
-  action: string
+  action: 'actionable' | 'navigable'
 }

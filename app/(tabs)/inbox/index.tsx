@@ -1,107 +1,112 @@
-import React, { useEffect, useMemo, useState } from 'react'
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
-
-import Ionicons from '@expo/vector-icons/Ionicons'
-
-import { useThemeStyle } from '@/hooks/useThemeStyle'
-
-import { Notification, NotificationCategory } from '@/lib/types/Notification'
-
-import { colorPalettes } from '@/constants/Itheme'
-
 import Chip from '@/components/Chip'
 import { FontFamily, FontSize } from '@/constants/font'
-import beApi from '@/lib/beApi'
-import { generateMessage, getAction } from '@/utils/genNotiMessage'
+import { colorPalettes } from '@/constants/Itheme'
+import { useNotifications } from '@/hooks/useNotifications'
+import { useThemeStyle } from '@/hooks/useThemeStyle'
+import { NotificationCategory } from '@/lib/types/Notification'
+import { NotificationService } from '@/services/notificationService'
+import Ionicons from '@expo/vector-icons/Ionicons'
+import React, { useMemo } from 'react'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import NotificationList from './components/NotificationList'
 
 export default function Inbox() {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
 
-  const [notifications, setNotifications] = useState<Notification[]>()
-  //inbox as Notification[]
+  const {
+    filteredNotifications,
+    availableCategories,
+    activeCategories,
+    setActiveCategories,
+    removeNotification,
+    markAsRead,
+    isLoading,
+    error,
+  } = useNotifications()
 
-  const categories: NotificationCategory[] = [
-    'tripGenerated',
-    'friendRequestReceived',
-    'friendRequestAccepted',
-    'tripInvitationReceived',
-    'tripGeneratedFailed',
-  ]
-  const getNotifications = async () => {
-    try {
-      const response = await beApi.get('/notifications')
-      const rawNotifications: Notification[] = response.data.data
-      const enrichedNotifications: Notification[] = rawNotifications.map((notif) => ({
-        ...notif,
-        referenceData: generateMessage(notif),
-        action: getAction(notif),
-      }))
-      setNotifications(enrichedNotifications)
-    } catch (error) {
-      console.error('Error fetching notifications:', error)
-    }
-  }
-  useEffect(() => {
-    getNotifications()
-  }, [])
-
-  const [activeCategories, setActiveCategories] = useState<NotificationCategory[]>([])
-
-  const filteredNotifications =
-    activeCategories.length === 0
-      ? notifications
-      : notifications?.filter((n) => activeCategories.includes(n.type as NotificationCategory))
-
-  const removeNotification = (id: number) => {
-    setNotifications(notifications?.filter((notif) => notif.id !== id))
-  }
-
-  const markAsRead = async (id: number) => {
-    setNotifications(notifications?.map((notif) => (notif.id === id ? { ...notif, isSeen: true } : notif)))
-    try {
-      await beApi.post(`/notifications/${id}/seen`)
-    } catch (error) {
-      console.error('Error updatings notification state:', error)
+  const handleCategorySelect = (category: string) => {
+    if (category === 'all') {
+      setActiveCategories([])
+    } else {
+      // Single selection: replace current selection with the new one
+      setActiveCategories([category as NotificationCategory])
     }
   }
 
-  // useEffect(() => {
-  //   console.log('Active categories changed:', activeCategories)
-  // }, [activeCategories])
+  const handleCategoryDeselect = (category: string) => {
+    if (category === 'all') {
+      // If "All" is deselected, select the first available category
+      setActiveCategories([availableCategories[0]])
+    } else {
+      // If a specific category is deselected, switch to "All"
+      setActiveCategories([])
+    }
+  }
+
+  const isAllSelected = activeCategories.length === 0
+
+  const renderContent = () => {
+    if (error) {
+      return (
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+        </View>
+      )
+    }
+
+    if (isLoading) {
+      return (
+        <View style={styles.loadingContainer}>
+          <Text style={styles.regularText}>Loading notifications...</Text>
+        </View>
+      )
+    }
+
+    if (filteredNotifications?.length === 0) {
+      return (
+        <View style={styles.noNotifContainer}>
+          <Ionicons name="notifications-off-outline" size={48} color={theme.text} />
+          <Text style={styles.regularText}>No notifications</Text>
+        </View>
+      )
+    }
+
+    return (
+      <NotificationList
+        notificationList={filteredNotifications}
+        removeNotification={removeNotification}
+        markAsRead={markAsRead}
+      />
+    )
+  }
 
   return (
     <View style={styles.container}>
       <View style={styles.filters}>
-        <Text style={styles.filtersTitle}>Filter:</Text>
-
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {categories.map((cat) => (
+        <ScrollView horizontal showsHorizontalScrollIndicator={true}>
+          <Chip
+            key="all"
+            value="All"
+            size="large"
+            isSelected={isAllSelected}
+            onSelect={() => handleCategorySelect('all')}
+            onDeselect={() => handleCategoryDeselect('all')}
+          />
+          {availableCategories.map((category) => (
             <Chip
-              key={cat}
-              value={cat.charAt(0).toUpperCase() + cat.slice(1)}
-              size="small"
-              onSelect={() => setActiveCategories([...activeCategories, cat])}
-              onDeselect={() => setActiveCategories(activeCategories.filter((c) => c !== cat))}
+              key={category}
+              value={NotificationService.getCategoryLabel(category)}
+              size="large"
+              isSelected={activeCategories.includes(category)}
+              onSelect={() => handleCategorySelect(category)}
+              onDeselect={() => handleCategoryDeselect(category)}
             />
           ))}
         </ScrollView>
       </View>
 
-      {filteredNotifications?.length === 0 ? (
-        <View style={styles.noNotifContainer}>
-          <Ionicons name="notifications-off-outline" size={48} color={theme.text} />
-
-          <Text style={styles.regularText}>No notifications</Text>
-        </View>
-      ) : (
-        <NotificationList
-          notificationList={filteredNotifications}
-          removeNotification={removeNotification}
-          markAsRead={markAsRead}
-        />
-      )}
+      {renderContent()}
     </View>
   )
 }
@@ -130,6 +135,24 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       height: '80%',
       alignItems: 'center',
       justifyContent: 'center',
+    },
+    loadingContainer: {
+      flexDirection: 'column',
+      height: '80%',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    errorContainer: {
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 20,
+    },
+    errorText: {
+      color: theme.error || '#ff0000',
+      fontSize: FontSize.MD,
+      fontFamily: FontFamily.REGULAR,
+      textAlign: 'center',
     },
     regularText: {
       color: theme.text,
