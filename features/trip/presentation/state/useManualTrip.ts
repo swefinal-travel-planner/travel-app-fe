@@ -21,6 +21,7 @@ type ManualTripState = {
   updateTripItem: (updatedItem: TripItem, date: Date) => void
   addTripItems: (items: TripItem[], date: Date) => void
   getItemsForDate: (date: Date) => TripItem[]
+  hasAnyItems: () => boolean
   loadExistingTrip: (tripData: any, tripItems: TripItem[]) => void
   setEditMode: (isEdit: boolean) => void
   log: () => void
@@ -45,6 +46,14 @@ export const useManualTripStore = create<ManualTripState>((set, get) => ({
     const dateStr = date.toDateString()
     const itemsByDate = get().itemsByDate[dateStr] || {}
     return Object.values(itemsByDate).flat()
+  },
+
+  // Check if there are any items across all dates
+  hasAnyItems: () => {
+    const itemsByDate = get().itemsByDate
+    return Object.values(itemsByDate).some((dateItems) =>
+      Object.values(dateItems).some((timeSlotItems) => timeSlotItems && timeSlotItems.length > 0)
+    )
   },
 
   // Add trip items for a specific date

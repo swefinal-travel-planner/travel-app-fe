@@ -5,7 +5,7 @@ import React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { ModalHeaderProps } from '../types'
 
-export const ModalHeader: React.FC<ModalHeaderProps> = ({ selectedTime, onFilterPress, theme }) => {
+export const ModalHeader: React.FC<ModalHeaderProps> = ({ selectedTime, onFilterPress, theme, filterCount = 0 }) => {
   const styles = createStyles(theme)
 
   return (
@@ -14,6 +14,11 @@ export const ModalHeader: React.FC<ModalHeaderProps> = ({ selectedTime, onFilter
         <Text style={styles.modalTitle}>Add places to {selectedTime}</Text>
         <TouchableOpacity style={styles.filterButton} onPress={onFilterPress}>
           <Ionicons name="filter-outline" size={24} color={theme.primary} />
+          {filterCount > 0 && (
+            <View style={styles.filterBadge}>
+              <Text style={styles.filterBadgeText}>{filterCount}</Text>
+            </View>
+          )}
         </TouchableOpacity>
       </View>
     </View>
@@ -43,5 +48,24 @@ const createStyles = (theme: any) =>
       position: 'absolute',
       right: 10,
       borderRadius: Radius.FULL,
+    },
+    filterBadge: {
+      position: 'absolute',
+      top: -8,
+      right: -8,
+      backgroundColor: theme.primary,
+      borderRadius: Radius.FULL,
+      minWidth: 20,
+      height: 20,
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 1,
+      paddingHorizontal: 4,
+    },
+    filterBadgeText: {
+      color: theme.white,
+      fontSize: FontSize.XS,
+      fontFamily: FontFamily.BOLD,
+      textAlign: 'center',
     },
   })

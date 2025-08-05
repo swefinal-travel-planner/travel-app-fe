@@ -20,6 +20,7 @@ export type ModalHeaderProps = {
   selectedTime: TimeSlot | null
   onFilterPress: () => void
   theme: typeof colorPalettes.light
+  filterCount?: number
 }
 
 export type ModalFooterProps = {
