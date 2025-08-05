@@ -44,7 +44,6 @@ function NotificationList({
 
   const handleAcceptRequest = async (notif: Notification) => {
     if (!notif.isSeen) markAsRead(notif.id)
-    console.log('Accepting friend request:', notif)
     await NotificationService.acceptRequest(notif)
   }
 
@@ -73,7 +72,7 @@ function NotificationList({
               ? {
                   text: !notif.isSeen ? 'Accept' : 'Accepted',
                   background: !notif.isSeen ? Colors.green30 : Colors.grey70,
-                  onPress: () => handleAcceptRequest(notif),
+                  onPress: !notif.isSeen ? () => handleAcceptRequest(notif) : undefined,
                 }
               : undefined
           }
