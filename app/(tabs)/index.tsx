@@ -157,12 +157,12 @@ const Index = () => {
                 autoPlay={false}
                 containerPadding={0}
                 useContainerWidth={true}
-                itemSpacing={16}
+                itemSpacing={0}
+                indicatorsOutside={true}
                 onItemPress={(index: number) => {
                   // Handle trip item press if needed
                   console.log('Trip item pressed:', index)
                 }}
-                itemWidth={310}
               >
                 {ongoingTripItems.map((item, index) => (
                   <CarouselSpotCard tripItem={item} key={index} />
@@ -288,7 +288,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     },
     button: {
       minWidth: '100%',
-      marginTop: 16,
+      marginTop: 24,
       backgroundColor: theme.primary,
       color: theme.white,
     },

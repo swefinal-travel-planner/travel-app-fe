@@ -133,6 +133,9 @@ const LocationDetail = ({
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.carouselContainer}>
           <Carousel
+            containerPadding={0}
+            useContainerWidth={true}
+            itemSpacing={0}
             images={images || []}
             height={256}
             showIndicators={true}

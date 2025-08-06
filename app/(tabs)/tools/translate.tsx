@@ -165,7 +165,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: '#f5f5f5',
+      backgroundColor: theme.white,
       paddingHorizontal: 16,
       paddingTop: 110,
       paddingBottom: 16,
@@ -175,7 +175,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       alignItems: 'flex-end',
       justifyContent: 'space-between',
       marginBottom: 24,
-      backgroundColor: 'white',
+      backgroundColor: theme.secondary,
       borderRadius: Radius.ROUNDED,
       padding: 16,
     },
@@ -201,10 +201,10 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       marginHorizontal: 16,
     },
     inputContainer: {
-      backgroundColor: 'white',
       borderRadius: Radius.ROUNDED,
       padding: 16,
       marginBottom: 16,
+      backgroundColor: theme.secondary,
     },
     inputHeader: {
       flexDirection: 'row',
@@ -252,11 +252,11 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     },
     translateButtonText: {
       fontSize: FontSize.LG,
-      fontFamily: FontFamily.BOLD,
+      fontFamily: FontFamily.REGULAR,
       color: 'white',
     },
     outputContainer: {
-      backgroundColor: 'white',
+      backgroundColor: theme.secondary,
       borderRadius: Radius.ROUNDED,
       padding: 16,
       flex: 1,

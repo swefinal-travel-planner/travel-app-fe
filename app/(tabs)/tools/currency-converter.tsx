@@ -114,7 +114,7 @@ export default function CurrencyConverter() {
           />
 
           <View style={styles.resultContainer}>
-            <Text style={styles.resultLabel}>Converted Amount</Text>
+            <Text style={styles.resultLabel}>Converted amount</Text>
             <Text style={styles.resultText}>
               {isLoading ? 'Converting...' : convertedAmount ? `${convertedAmount}` : '0.00'}
             </Text>
@@ -125,7 +125,7 @@ export default function CurrencyConverter() {
         {/* Exchange Rate Card */}
         {exchangeRate > 0 && !isLoading && (
           <View style={styles.rateCard}>
-            <Text style={styles.rateTitle}>Exchange Rate</Text>
+            <Text style={styles.rateTitle}>Exchange rate</Text>
             <View style={styles.rateContainer}>
               <View style={styles.rateItem}>
                 <Text style={styles.rateValue}>1</Text>
@@ -153,16 +153,11 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       position: 'relative',
     },
     currencyCard: {
-      backgroundColor: 'white',
+      backgroundColor: theme.secondary,
       marginHorizontal: 16,
       marginBottom: 16,
       borderRadius: Radius.ROUNDED,
       padding: 20,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
-      elevation: 3,
     },
     cardTitle: {
       fontSize: FontSize.LG,
@@ -176,6 +171,8 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       backgroundColor: theme.background,
       borderRadius: Radius.FULL,
       marginBottom: 20,
+      fontFamily: FontFamily.REGULAR,
+      fontSize: FontSize.MD,
     },
     inputContainer: {
       marginBottom: 10,
@@ -193,7 +190,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       color: theme.text,
       paddingHorizontal: 20,
       backgroundColor: theme.background,
-      borderRadius: Radius.NORMAL,
+      borderRadius: Radius.FULL,
       textAlign: 'center',
     },
     swapButton: {
@@ -204,11 +201,6 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       top: 240,
       zIndex: 1,
       alignSelf: 'center',
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.2,
-      shadowRadius: 4,
-      elevation: 4,
     },
     resultContainer: {
       alignItems: 'center',
@@ -232,16 +224,11 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       color: theme.primary,
     },
     rateCard: {
-      backgroundColor: 'white',
+      backgroundColor: theme.secondary,
       marginHorizontal: 16,
       marginBottom: 16,
       borderRadius: Radius.ROUNDED,
       padding: 20,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
-      elevation: 3,
     },
     rateTitle: {
       fontSize: FontSize.LG,

@@ -1,8 +1,10 @@
-interface Forecast {
+import { CurrentWeather } from './CurrentWeather'
+
+export interface Forecast {
   forecastday: ForecastDay[]
 }
 
-interface ForecastDay {
+export interface ForecastDay {
   date: string
   day: CurrentWeather
   hour: CurrentWeather[]

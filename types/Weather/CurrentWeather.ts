@@ -1,4 +1,6 @@
-interface CurrentWeather {
+import { AirQuality } from './AirQuality'
+
+export interface CurrentWeather {
   time_epoch: number
   time: string
   last_updated_epoch: number
@@ -26,7 +28,7 @@ interface CurrentWeather {
   daily_chance_of_rain: number
 }
 
-interface WeatherCondition {
+export interface WeatherCondition {
   text: string
   icon: string
   code: number

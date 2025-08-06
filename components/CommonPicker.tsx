@@ -1,3 +1,4 @@
+import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import AntDesign from '@expo/vector-icons/AntDesign'
@@ -86,6 +87,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       flexDirection: 'row',
       padding: 10,
       alignItems: 'center',
+      justifyContent: 'space-between',
     },
     icon: {
       width: 32,
@@ -100,8 +102,9 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       resizeMode: 'contain',
     },
     text: {
-      fontSize: 18,
+      fontSize: FontSize.LG,
       marginRight: 5,
+      fontFamily: FontFamily.REGULAR,
     },
     modalOverlay: {
       flex: 1,
@@ -122,6 +125,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       alignItems: 'center',
     },
     label: {
-      fontSize: 18,
+      fontSize: FontSize.LG,
+      fontFamily: FontFamily.REGULAR,
     },
   })

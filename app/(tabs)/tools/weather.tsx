@@ -3,6 +3,7 @@ import { FontFamily, FontSize } from '@/constants/font'
 import { Radius } from '@/constants/theme'
 import { dayImages, nightImages } from '@/constants/weatherImages'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
+import { mockWeatherData } from '@/lib/mock_data/weatherMockData'
 import { ApiGetWeather } from '@/services/api/tools/ApiWeather'
 import { WeatherResponse } from '@/types/Weather/WeatherResponse'
 import { formatDayMonthDate, formatTimeAMPM } from '@/utils/Datetime'
@@ -13,43 +14,14 @@ import React, { useMemo } from 'react'
 import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
+// Debug flag - set to true to always use mock data for UI testing
+const FORCE_MOCK_DATA = false
+
 export default function Weather() {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
   const todayFormatted = formatDayMonthDate(new Date())
   const navigation = useRouter()
-
-  const {
-    data: weatherData,
-    isLoading,
-    error,
-  } = useQuery<WeatherResponse>({
-    queryKey: ['weather', 'Ho_Chi_Minh', 7, 'yes'],
-    queryFn: ApiGetWeather,
-  })
-
-  if (isLoading) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={theme.primary} />
-          <Text style={styles.loadingText}>Loading weather data...</Text>
-        </View>
-      </SafeAreaView>
-    )
-  }
-
-  if (error) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.errorContainer}>
-          <Ionicons name="cloud-offline-outline" size={64} color="#666" />
-          <Text style={styles.errorTitle}>Unable to load weather</Text>
-          <Text style={styles.errorText}>Please check your connection and try again</Text>
-        </View>
-      </SafeAreaView>
-    )
-  }
 
   const getImageSource = (condition: string, isDay: boolean) => {
     const formattedCondition = condition
@@ -78,6 +50,149 @@ export default function Weather() {
     return 'Hazardous'
   }
 
+  const {
+    data: weatherData,
+    isLoading,
+    error,
+  } = useQuery<WeatherResponse>({
+    queryKey: ['weather', 'Ho_Chi_Minh', 7, 'yes'],
+    queryFn: ApiGetWeather,
+    enabled: !FORCE_MOCK_DATA, // Disable API calls when using mock data
+  })
+
+  // Use mock data when API fails for debugging or when forced for testing
+  const displayWeatherData = error || FORCE_MOCK_DATA ? mockWeatherData : weatherData
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={theme.primary} />
+          <Text style={styles.loadingText}>Loading weather data...</Text>
+        </View>
+      </SafeAreaView>
+    )
+  }
+
+  if (error || FORCE_MOCK_DATA) {
+    return (
+      <SafeAreaView style={styles.container}>
+        {/* Debug banner */}
+        <View style={styles.debugBanner}>
+          <Text style={styles.debugText}>
+            {FORCE_MOCK_DATA ? 'Force using mock data for testing' : 'API failed, using fallback data'}
+          </Text>
+        </View>
+
+        <ScrollView showsVerticalScrollIndicator={false}>
+          {/* Header */}
+          <View style={styles.header}>
+            <View style={styles.locationContainer}>
+              <Ionicons name="location" size={24} color={theme.primary} />
+              <Text style={styles.locationText}>{displayWeatherData?.location.name}</Text>
+            </View>
+            <Text style={styles.dateText}>Today, {todayFormatted}</Text>
+          </View>
+
+          {/* Current Weather Card */}
+          <View style={styles.currentWeatherCard}>
+            <View style={styles.currentWeatherHeader}>
+              <View style={styles.temperatureSection}>
+                <Text style={styles.temperature}>{Math.round(displayWeatherData?.current.temp_c ?? 0)}°</Text>
+                <Text style={styles.condition}>{displayWeatherData?.current.condition.text}</Text>
+                <Text style={styles.feelsLike}>
+                  Feels like {Math.round(displayWeatherData?.current.feelslike_c ?? 0)}°
+                </Text>
+              </View>
+              <Image
+                source={getImageSource(
+                  displayWeatherData?.current.condition.text ?? 'Sunny',
+                  displayWeatherData?.current.is_day ?? true
+                )}
+                style={styles.weatherIcon}
+              />
+            </View>
+          </View>
+
+          {/* Weather Details Grid */}
+          <View style={styles.weatherDetailsCard}>
+            <Text style={styles.sectionTitle}>Weather details</Text>
+            <View style={styles.weatherGrid}>
+              <View style={styles.weatherDetail}>
+                <Ionicons name="water-outline" size={24} color={theme.white} />
+                <Text style={styles.detailValue}>{Math.round(displayWeatherData?.current.humidity ?? 0)}%</Text>
+                <Text style={styles.detailLabel}>Humidity</Text>
+              </View>
+              <View style={styles.weatherDetail}>
+                <Ionicons name="speedometer-outline" size={24} color={theme.white} />
+                <Text style={styles.detailValue}>{Math.round(displayWeatherData?.current.uv ?? 0)}</Text>
+                <Text style={styles.detailLabel}>UV index</Text>
+              </View>
+              <View style={styles.weatherDetail}>
+                <Ionicons name="airplane-outline" size={24} color={theme.white} />
+                <Text style={styles.detailValue}>{Math.round(displayWeatherData?.current.wind_kph ?? 0)}</Text>
+                <Text style={styles.detailLabel}>Wind (km/h)</Text>
+              </View>
+              <View style={styles.weatherDetail}>
+                <Ionicons name="eye-outline" size={24} color={theme.white} />
+                <Text style={styles.detailValue}>{Math.round(displayWeatherData?.current.vis_km ?? 0)}</Text>
+                <Text style={styles.detailLabel}>Visibility (km)</Text>
+              </View>
+            </View>
+          </View>
+
+          {/* Air Quality Card */}
+          <View style={styles.airQualityCard}>
+            <Text style={styles.sectionTitle}>Air Quality</Text>
+            <View style={styles.aqiContainer}>
+              <Text
+                style={[
+                  styles.aqiValue,
+                  { color: getAQIColor(Math.round(displayWeatherData?.current.air_quality['us-epa-index'] ?? 0)) },
+                ]}
+              >
+                {Math.round(displayWeatherData?.current.air_quality['us-epa-index'] ?? 0)}
+              </Text>
+              <Text
+                style={[
+                  styles.aqiLabel,
+                  { color: getAQIColor(Math.round(displayWeatherData?.current.air_quality['us-epa-index'] ?? 0)) },
+                ]}
+              >
+                {getAQILabel(Math.round(displayWeatherData?.current.air_quality['us-epa-index'] ?? 0))}
+              </Text>
+            </View>
+          </View>
+
+          {/* Hourly Forecast */}
+          <View style={styles.hourlyForecastCard}>
+            <View style={styles.forecastHeader}>
+              <Text style={styles.sectionTitle}>Hourly Forecast</Text>
+              <Pressable onPress={() => navigation.push('/(tabs)/tools/forecast')} style={styles.forecastButton}>
+                <Text style={styles.forecastButtonText}>7-Day Forecast</Text>
+                <Ionicons name="chevron-forward" size={16} color={theme.primary} />
+              </Pressable>
+            </View>
+
+            <ScrollView
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.hourlyScrollContainer}
+            >
+              {displayWeatherData?.forecast.forecastday[0].hour.map((hour) => (
+                <View key={hour.time_epoch} style={styles.hourlyItem}>
+                  <Text style={styles.hourText}>{formatTimeAMPM(hour.time)}</Text>
+                  <Image source={{ uri: `https:${hour.condition.icon}` }} style={styles.hourlyIcon} />
+                  <Text style={styles.hourlyTemp}>{Math.round(hour.temp_c)}°</Text>
+                </View>
+              ))}
+            </ScrollView>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    )
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -85,7 +200,7 @@ export default function Weather() {
         <View style={styles.header}>
           <View style={styles.locationContainer}>
             <Ionicons name="location" size={24} color={theme.primary} />
-            <Text style={styles.locationText}>{weatherData?.location.name}</Text>
+            <Text style={styles.locationText}>{displayWeatherData?.location.name}</Text>
           </View>
           <Text style={styles.dateText}>Today, {todayFormatted}</Text>
         </View>
@@ -94,14 +209,16 @@ export default function Weather() {
         <View style={styles.currentWeatherCard}>
           <View style={styles.currentWeatherHeader}>
             <View style={styles.temperatureSection}>
-              <Text style={styles.temperature}>{Math.round(weatherData?.current.temp_c ?? 0)}°</Text>
-              <Text style={styles.condition}>{weatherData?.current.condition.text}</Text>
-              <Text style={styles.feelsLike}>Feels like {Math.round(weatherData?.current.feelslike_c ?? 0)}°</Text>
+              <Text style={styles.temperature}>{Math.round(displayWeatherData?.current.temp_c ?? 0)}°</Text>
+              <Text style={styles.condition}>{displayWeatherData?.current.condition.text}</Text>
+              <Text style={styles.feelsLike}>
+                Feels like {Math.round(displayWeatherData?.current.feelslike_c ?? 0)}°
+              </Text>
             </View>
             <Image
               source={getImageSource(
-                weatherData?.current.condition.text ?? 'Sunny',
-                weatherData?.current.is_day ?? true
+                displayWeatherData?.current.condition.text ?? 'Sunny',
+                displayWeatherData?.current.is_day ?? true
               )}
               style={styles.weatherIcon}
             />
@@ -110,26 +227,26 @@ export default function Weather() {
 
         {/* Weather Details Grid */}
         <View style={styles.weatherDetailsCard}>
-          <Text style={styles.sectionTitle}>Weather Details</Text>
+          <Text style={styles.sectionTitle}>Weather details</Text>
           <View style={styles.weatherGrid}>
             <View style={styles.weatherDetail}>
-              <Ionicons name="water-outline" size={24} color={theme.primary} />
-              <Text style={styles.detailValue}>{Math.round(weatherData?.current.humidity ?? 0)}%</Text>
+              <Ionicons name="water-outline" size={24} color={theme.white} />
+              <Text style={styles.detailValue}>{Math.round(displayWeatherData?.current.humidity ?? 0)}%</Text>
               <Text style={styles.detailLabel}>Humidity</Text>
             </View>
             <View style={styles.weatherDetail}>
-              <Ionicons name="speedometer-outline" size={24} color={theme.primary} />
-              <Text style={styles.detailValue}>{Math.round(weatherData?.current.uv ?? 0)}</Text>
-              <Text style={styles.detailLabel}>UV Index</Text>
+              <Ionicons name="speedometer-outline" size={24} color={theme.white} />
+              <Text style={styles.detailValue}>{Math.round(displayWeatherData?.current.uv ?? 0)}</Text>
+              <Text style={styles.detailLabel}>UV index</Text>
             </View>
             <View style={styles.weatherDetail}>
-              <Ionicons name="airplane-outline" size={24} color={theme.primary} />
-              <Text style={styles.detailValue}>{Math.round(weatherData?.current.wind_kph ?? 0)}</Text>
+              <Ionicons name="airplane-outline" size={24} color={theme.white} />
+              <Text style={styles.detailValue}>{Math.round(displayWeatherData?.current.wind_kph ?? 0)}</Text>
               <Text style={styles.detailLabel}>Wind (km/h)</Text>
             </View>
             <View style={styles.weatherDetail}>
-              <Ionicons name="eye-outline" size={24} color={theme.primary} />
-              <Text style={styles.detailValue}>{Math.round(weatherData?.current.vis_km ?? 0)}</Text>
+              <Ionicons name="eye-outline" size={24} color={theme.white} />
+              <Text style={styles.detailValue}>{Math.round(displayWeatherData?.current.vis_km ?? 0)}</Text>
               <Text style={styles.detailLabel}>Visibility (km)</Text>
             </View>
           </View>
@@ -137,23 +254,23 @@ export default function Weather() {
 
         {/* Air Quality Card */}
         <View style={styles.airQualityCard}>
-          <Text style={styles.sectionTitle}>Air Quality</Text>
+          <Text style={styles.sectionTitle}>Air quality</Text>
           <View style={styles.aqiContainer}>
             <Text
               style={[
                 styles.aqiValue,
-                { color: getAQIColor(Math.round(weatherData?.current.air_quality['us-epa-index'] ?? 0)) },
+                { color: getAQIColor(Math.round(displayWeatherData?.current.air_quality['us-epa-index'] ?? 0)) },
               ]}
             >
-              {Math.round(weatherData?.current.air_quality['us-epa-index'] ?? 0)}
+              {Math.round(displayWeatherData?.current.air_quality['us-epa-index'] ?? 0)}
             </Text>
             <Text
               style={[
                 styles.aqiLabel,
-                { color: getAQIColor(Math.round(weatherData?.current.air_quality['us-epa-index'] ?? 0)) },
+                { color: getAQIColor(Math.round(displayWeatherData?.current.air_quality['us-epa-index'] ?? 0)) },
               ]}
             >
-              {getAQILabel(Math.round(weatherData?.current.air_quality['us-epa-index'] ?? 0))}
+              {getAQILabel(Math.round(displayWeatherData?.current.air_quality['us-epa-index'] ?? 0))}
             </Text>
           </View>
         </View>
@@ -161,9 +278,9 @@ export default function Weather() {
         {/* Hourly Forecast */}
         <View style={styles.hourlyForecastCard}>
           <View style={styles.forecastHeader}>
-            <Text style={styles.sectionTitle}>Hourly Forecast</Text>
+            <Text style={styles.sectionTitle}>Hourly forecast</Text>
             <Pressable onPress={() => navigation.push('/(tabs)/tools/forecast')} style={styles.forecastButton}>
-              <Text style={styles.forecastButtonText}>7-Day Forecast</Text>
+              <Text style={styles.forecastButtonText}>7-day forecast</Text>
               <Ionicons name="chevron-forward" size={16} color={theme.primary} />
             </Pressable>
           </View>
@@ -173,7 +290,7 @@ export default function Weather() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.hourlyScrollContainer}
           >
-            {weatherData?.forecast.forecastday[0].hour.map((hour) => (
+            {displayWeatherData?.forecast.forecastday[0].hour.map((hour) => (
               <View key={hour.time_epoch} style={styles.hourlyItem}>
                 <Text style={styles.hourText}>{formatTimeAMPM(hour.time)}</Text>
                 <Image source={{ uri: `https:${hour.condition.icon}` }} style={styles.hourlyIcon} />
@@ -226,6 +343,20 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       color: '#666',
       textAlign: 'center',
     },
+    debugBanner: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: 8,
+      paddingHorizontal: 16,
+      marginTop: 16,
+    },
+    debugText: {
+      fontSize: FontSize.SM,
+      fontFamily: FontFamily.REGULAR,
+      color: theme.text,
+      marginLeft: 8,
+    },
     header: {
       paddingTop: 20,
       paddingHorizontal: 16,
@@ -248,16 +379,11 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       color: '#666',
     },
     currentWeatherCard: {
-      backgroundColor: 'white',
+      backgroundColor: theme.secondary,
       marginHorizontal: 16,
       marginBottom: 16,
       borderRadius: Radius.ROUNDED,
       padding: 24,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
-      elevation: 3,
     },
     currentWeatherHeader: {
       flexDirection: 'row',
@@ -270,7 +396,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     temperature: {
       fontSize: 64,
       fontFamily: FontFamily.BOLD,
-      color: theme.text,
+      color: theme.primary,
       lineHeight: 70,
     },
     condition: {
@@ -290,16 +416,11 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       height: 120,
     },
     weatherDetailsCard: {
-      backgroundColor: 'white',
+      backgroundColor: theme.secondary,
       marginHorizontal: 16,
       marginBottom: 16,
       borderRadius: Radius.ROUNDED,
       padding: 20,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
-      elevation: 3,
     },
     sectionTitle: {
       fontSize: FontSize.LG,
@@ -316,33 +437,28 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       width: '48%',
       alignItems: 'center',
       paddingVertical: 16,
-      backgroundColor: theme.background,
-      borderRadius: Radius.NORMAL,
+      backgroundColor: theme.primary,
+      borderRadius: Radius.ROUNDED,
       marginBottom: 12,
     },
     detailValue: {
       fontSize: FontSize.XL,
       fontFamily: FontFamily.BOLD,
-      color: theme.text,
+      color: theme.white,
       marginTop: 8,
     },
     detailLabel: {
       fontSize: FontSize.SM,
       fontFamily: FontFamily.REGULAR,
-      color: '#666',
+      color: theme.white,
       marginTop: 4,
     },
     airQualityCard: {
-      backgroundColor: 'white',
+      backgroundColor: theme.secondary,
       marginHorizontal: 16,
       marginBottom: 16,
       borderRadius: Radius.ROUNDED,
       padding: 20,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
-      elevation: 3,
     },
     aqiContainer: {
       flexDirection: 'row',
@@ -362,16 +478,11 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       flex: 1,
     },
     hourlyForecastCard: {
-      backgroundColor: 'white',
+      backgroundColor: theme.secondary,
       marginHorizontal: 16,
       marginBottom: 20,
       borderRadius: Radius.ROUNDED,
       padding: 20,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
-      elevation: 3,
     },
     forecastHeader: {
       flexDirection: 'row',

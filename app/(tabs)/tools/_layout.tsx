@@ -70,6 +70,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       flex: 1,
       paddingHorizontal: Padding.SMALL,
       paddingTop: Padding.XLARGE,
+      backgroundColor: theme.white,
     },
     container: {
       flex: 1,

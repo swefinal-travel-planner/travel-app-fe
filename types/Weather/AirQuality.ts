@@ -1,4 +1,4 @@
-type AirQuality = {
+export type AirQuality = {
   co: number
   no2: number
   o3: number

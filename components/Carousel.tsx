@@ -24,6 +24,7 @@ type CarouselProps = {
   containerPadding?: number
   useContainerWidth?: boolean // Use container width instead of screen width
   itemSpacing?: number // Space between carousel items
+  indicatorsOutside?: boolean // Position indicators outside the carousel
 }
 
 export default function Carousel({
@@ -39,6 +40,7 @@ export default function Carousel({
   containerPadding = 16,
   useContainerWidth = false,
   itemSpacing = 0,
+  indicatorsOutside = false,
 }: Readonly<CarouselProps>) {
   const theme = useThemeStyle()
   const scrollViewRef = useRef<ScrollView>(null)
@@ -56,7 +58,7 @@ export default function Carousel({
   const availableWidth = useContainerWidth ? containerWidth : screenWidth
   const calculatedItemWidth = itemWidth || availableWidth - containerPadding * 2 - itemSpacing
 
-  const styles = createStyles(theme, height, calculatedItemWidth, itemSpacing)
+  const styles = createStyles(theme, height, calculatedItemWidth, itemSpacing, indicatorsOutside)
 
   // Get the total number of items
   const totalItems = isImageCarousel ? images!.length : React.Children.count(children)
@@ -217,7 +219,7 @@ export default function Carousel({
   )
 }
 
-const createStyles = (theme: any, height: number, itemWidth: number, itemSpacing: number) =>
+const createStyles = (theme: any, height: number, itemWidth: number, itemSpacing: number, indicatorsOutside: boolean) =>
   StyleSheet.create({
     container: {
       height,
@@ -248,7 +250,7 @@ const createStyles = (theme: any, height: number, itemWidth: number, itemSpacing
     },
     indicatorsContainer: {
       position: 'absolute',
-      bottom: 16,
+      bottom: indicatorsOutside ? 0 : 16,
       left: 0,
       right: 0,
       flexDirection: 'row',
@@ -262,9 +264,9 @@ const createStyles = (theme: any, height: number, itemWidth: number, itemSpacing
       marginHorizontal: 4,
     },
     activeIndicator: {
-      backgroundColor: theme.white,
+      backgroundColor: indicatorsOutside ? theme.primary : theme.white,
     },
     inactiveIndicator: {
-      backgroundColor: theme.white + '80', // 50% opacity
+      backgroundColor: indicatorsOutside ? theme.primary + '40' : theme.white + '80',
     },
   })
