@@ -14,9 +14,10 @@ interface ChipProps {
   onSelect?: (value: string) => void
   onDeselect?: (value: string) => void
   style?: StyleProp<ViewStyle>
+  align?: 'left' | 'center'
 }
 
-const Chip: React.FC<ChipProps> = ({ value, size, isSelected, onSelect, onDeselect, style }) => {
+const Chip: React.FC<ChipProps> = ({ value, size, isSelected, onSelect, onDeselect, style, align = 'center' }) => {
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme, size), [theme])
 
@@ -29,7 +30,9 @@ const Chip: React.FC<ChipProps> = ({ value, size, isSelected, onSelect, onDesele
     <PressableOpacity
       style={[
         styles.wrapper,
-        selected ? { backgroundColor: theme.primary } : { backgroundColor: theme.background },
+        selected ? { backgroundColor: theme.primary } : { backgroundColor: theme.brown },
+        align === 'left' ? { justifyContent: 'flex-start' } : { justifyContent: 'center' },
+        align === 'left' ? { alignItems: 'flex-start' } : { alignItems: 'center' },
         style,
       ]}
       onPress={() => {
@@ -48,7 +51,15 @@ const Chip: React.FC<ChipProps> = ({ value, size, isSelected, onSelect, onDesele
         }
       }}
     >
-      <Text style={[styles.value, selected ? { color: theme.white } : { color: theme.primary }]}>{value}</Text>
+      <Text
+        style={[
+          styles.value,
+          align === 'left' ? { textAlign: 'left' } : { textAlign: 'center' },
+          selected ? { color: theme.white } : { color: theme.primary },
+        ]}
+      >
+        {value}
+      </Text>
     </PressableOpacity>
   )
 }
@@ -59,16 +70,13 @@ const createStyles = (theme: typeof colorPalettes.light, size: string) =>
   StyleSheet.create({
     wrapper: {
       flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
       borderRadius: Radius.FULL,
       paddingHorizontal: size === 'large' ? 16 : 12,
       paddingVertical: size === 'large' ? 8 : 4,
-      marginRight: size === 'large' ? 12 : 8,
     },
     value: {
       fontSize: size === 'large' ? FontSize.LG : FontSize.MD,
       fontFamily: FontFamily.REGULAR,
-      textAlign: 'center',
+      marginLeft: 20,
     },
   })

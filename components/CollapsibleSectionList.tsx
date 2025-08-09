@@ -17,7 +17,7 @@ const CollapsibleSectionList: React.FC<ListProps> = ({ data, selectedValues = []
   const theme = useThemeStyle()
   const styles = useMemo(() => createStyles(theme), [theme])
 
-  const [expandedSections, setExpandedSections] = useState(new Set())
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set())
 
   // Store animation values for each section
   const animationValues = useRef<Map<string, Animated.Value>>(new Map()).current
@@ -32,6 +32,17 @@ const CollapsibleSectionList: React.FC<ListProps> = ({ data, selectedValues = []
     })
   }, [data])
 
+  // Sections that contain any of the selected values
+  const selectedSections = useMemo(() => {
+    if (!selectedValues || selectedValues.length === 0) return new Set<string>()
+    const sectionsWithSelection = new Set<string>()
+    data.forEach((section) => {
+      const hasSelected = section.data.some((item) => selectedValues.includes(formatAttribute(item)))
+      if (hasSelected) sectionsWithSelection.add(section.title)
+    })
+    return sectionsWithSelection
+  }, [data, selectedValues])
+
   const getSelectedCountForSection = (title: string) => {
     const section = data.find((section) => section.title === title)
     if (!section) return 0
@@ -40,31 +51,45 @@ const CollapsibleSectionList: React.FC<ListProps> = ({ data, selectedValues = []
   }
 
   const handleToggle = (title: string) => {
-    // Get or create animation value for this section
-    let animValue = animationValues.get(title)
-    if (!animValue) {
-      animValue = new Animated.Value(0)
-      animationValues.set(title, animValue)
+    // Ensure anim value exists for current
+    let currentAnim = animationValues.get(title)
+    if (!currentAnim) {
+      currentAnim = new Animated.Value(0)
+      animationValues.set(title, currentAnim)
     }
 
-    // Update expanded sections state
-    setExpandedSections((prevExpandedSections) => {
-      const next = new Set(prevExpandedSections)
-      const willExpand = !next.has(title)
+    setExpandedSections((prev) => {
+      const isCurrentlyOpen = prev.has(title)
+      const next = new Set<string>()
 
-      if (willExpand) {
-        next.add(title)
-      } else {
-        next.delete(title)
+      if (isCurrentlyOpen) {
+        // Close current
+        Animated.timing(currentAnim, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: false,
+        }).start()
+        return next
       }
 
-      // Animate to new state
-      Animated.timing(animValue, {
-        toValue: willExpand ? 1 : 0,
-        duration: 300,
-        useNativeDriver: false, // Height animations can't use native driver
-      }).start()
+      // Close all others
+      animationValues.forEach((val, key) => {
+        if (key !== title) {
+          Animated.timing(val, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: false,
+          }).start()
+        }
+      })
 
+      // Open only this one
+      Animated.timing(currentAnim, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: false,
+      }).start()
+      next.add(title)
       return next
     })
   }
@@ -113,17 +138,22 @@ const CollapsibleSectionList: React.FC<ListProps> = ({ data, selectedValues = []
               isSelected={isSelected}
               onSelect={handleSelect}
               onDeselect={handleDeselect}
-              style={{ marginHorizontal: 16, marginBottom: 4 }}
+              style={{ marginBottom: 8 }}
+              align="left"
             />
           </Animated.View>
         )
       }}
       renderSectionHeader={({ section: { title } }) => {
         const selectedCount = getSelectedCountForSection(title)
+        const hasAnySelection = selectedValues.length > 0
+        const disabledBySelection = hasAnySelection && !selectedSections.has(title)
+        const disabledByExpand = !hasAnySelection && expandedSections.size > 0 && !expandedSections.has(title)
+        const isDisabled = disabledBySelection || disabledByExpand
 
         return (
-          <Pressable onPress={() => handleToggle(title)}>
-            <View style={styles.headerContainer}>
+          <Pressable onPress={() => handleToggle(title)} disabled={isDisabled}>
+            <View style={[styles.headerContainer, isDisabled && { opacity: 0.5 }]}>
               <Text style={styles.header}>{title}</Text>
               {selectedCount > 0 && <Text style={styles.selectedCount}>{selectedCount}</Text>}
             </View>
@@ -171,7 +201,7 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       height: 24,
       borderRadius: 12,
       textAlign: 'center',
-      lineHeight: 20,
+      lineHeight: 24,
       overflow: 'hidden',
     },
   })
