@@ -16,7 +16,7 @@ const DistanceTimeIndicator: React.FC<DistanceTimeIndicatorProps> = ({ distance,
 
   return (
     <View style={styles.distanceTimeContainer}>
-      <Ionicons name="car-outline" size={14} color={theme.text} style={{ marginRight: 4 }} />
+      <Ionicons name="bicycle-outline" size={14} color={theme.text} style={{ marginRight: 4 }} />
       <Text style={styles.distanceTimeText}>{distance} km</Text>
       <Ionicons name="time-outline" size={14} color={theme.text} style={{ marginLeft: 12, marginRight: 4 }} />
       <Text style={styles.distanceTimeText}>{time} min</Text>

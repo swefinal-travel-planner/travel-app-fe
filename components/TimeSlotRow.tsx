@@ -96,7 +96,7 @@ const createStyles = (theme: typeof colorPalettes.light, marginBottom: number) =
       alignItems: 'stretch',
     },
     timeSpent: {
-      width: 20,
+      width: 30,
       marginLeft: 8,
       alignSelf: 'stretch',
       alignItems: 'center',

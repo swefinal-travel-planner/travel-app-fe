@@ -220,16 +220,16 @@ export const getGroupIconsFromTypes = (typesStr: string) => {
 
 // Default time spent (in minutes) per GROUP (re-uses existing typeToGroupMap)
 export const groupToFixedMinutes: Record<string, number> = {
-  'Camping & Resort': 120, // 2.0h
-  'Culture & Arts': 60, // 1.0h
-  Entertainment: 120, // 2.0h
-  'Food & Drink': 90, // 1.5h
-  'History & Landmarks': 90, // 1.5h
-  Nature: 120, // 2.0h
-  'Outdoor Activities': 120, // 2.0h
-  Shopping: 60, // 1.0h
-  'Spa & Wellness': 120, // 2.0h
-  'Tourism Services': 90, // 1.5h
+  'Camping & Resort': 60, // 1.0h
+  'Culture & Arts': 30, // 0.5h
+  Entertainment: 60, // 1.0h
+  'Food & Drink': 30, // 0.5h
+  'History & Landmarks': 30, // 0.5h
+  Nature: 60, // 1.0h
+  'Outdoor Activities': 60, // 1.0h
+  Shopping: 30, // 0.5h
+  'Spa & Wellness': 60, // 1.0h
+  'Tourism Services': 30, // 0.5h
 }
 
 // Removed randomness; we now use a fixed duration per group

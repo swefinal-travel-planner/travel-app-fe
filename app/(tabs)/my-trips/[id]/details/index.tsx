@@ -144,7 +144,10 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       bottom: 36,
       width: 1,
       zIndex: -1,
-      backgroundColor: theme.dimText,
+      borderRightWidth: 1,
+      borderRightColor: theme.dimText,
+      borderStyle: 'dashed',
+      backgroundColor: 'transparent',
     },
   })
 
