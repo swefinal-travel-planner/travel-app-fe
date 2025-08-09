@@ -77,7 +77,6 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       color: theme.white,
       backgroundColor: theme.primary,
       padding: 8,
-      marginTop: 8,
       borderRadius: Radius.FULL,
     },
     destinationText: {
