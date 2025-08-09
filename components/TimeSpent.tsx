@@ -17,9 +17,10 @@ const TimeSpent: React.FC<TimeSpentProps> = ({ minutes, types, style }) => {
 
   const computedMinutes =
     typeof minutes === 'number' ? Math.round(minutes) : getDefaultTimeSpentFromTypes(types || '', 60)
+  const quantizedMinutes = Math.max(30, Math.round(computedMinutes / 30) * 30)
 
-  const hours = Math.floor(computedMinutes / 60)
-  const remainingMinutes = computedMinutes % 60
+  const hours = Math.floor(quantizedMinutes / 60)
+  const remainingMinutes = quantizedMinutes % 60
 
   const hasHalfHour = remainingMinutes === 30
   let displayHours: string

@@ -2,7 +2,7 @@ import { ConfigContext, ExpoConfig } from 'expo/config'
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
-  name: 'Travel AI',
+  name: 'Voyago',
   description:
     'An AI-powered travel app that helps users plan their trips with personalized recommendations and real-time updates.',
   slug: 'travel-app-fe',
