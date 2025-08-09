@@ -29,11 +29,7 @@ export default function SpotType({ theme, nextFn }: Readonly<SpotTypeProps>) {
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.textQuestion, { color: theme.primary }]}>What type of spots do you want to visit?</Text>
-
-      <Text style={[styles.subTextQuestion, { color: theme.text }]}>
-        Scroll to see all categories, and tap to expand each category.
-      </Text>
+      <Text style={[styles.textQuestion, { color: theme.primary }]}>What kind of trip are you craving right now?</Text>
 
       <Text style={[styles.subTextQuestion, { color: theme.text }]}>Select at least one category to continue.</Text>
 
