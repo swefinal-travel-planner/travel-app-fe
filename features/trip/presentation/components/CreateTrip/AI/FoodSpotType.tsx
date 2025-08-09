@@ -30,11 +30,7 @@ export default function FoodSpotType({ theme, nextFn }: Readonly<FoodSpotTypePro
   return (
     <View style={styles.container}>
       <Text style={[styles.textQuestion, { color: theme.primary }]}>
-        What type of culinary spots do you want to visit?
-      </Text>
-
-      <Text style={[styles.subTextQuestion, { color: theme.text }]}>
-        Scroll to see all categories, and tap to expand each category.
+        What kind of food experience makes you happiest when traveling or eating out?
       </Text>
 
       <Text style={[styles.subTextQuestion, { color: theme.text }]}>Select at least one category to continue.</Text>
