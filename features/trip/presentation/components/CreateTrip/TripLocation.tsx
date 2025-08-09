@@ -18,7 +18,7 @@ type TripLocationProps = {
 
 export default function TripLocation({ theme, nextFn, setTripState }: Readonly<TripLocationProps>) {
   const styles = useMemo(() => createStyles(theme), [theme])
-  const [selectedCityKey, setSelectedCityKey] = useState(Cities[0].key)
+  const [selectedCityKey, setSelectedCityKey] = useState('')
   const [selectedDistrictKey, setSelectedDistrictKey] = useState(Cities[0].districts[0].key)
 
   // Find selected city and district
@@ -26,6 +26,7 @@ export default function TripLocation({ theme, nextFn, setTripState }: Readonly<T
     () => Cities.find((city) => city.key === selectedCityKey) || Cities[0],
     [selectedCityKey]
   )
+
   const selectedDistrict = useMemo(
     () => selectedCity.districts.find((d) => d.key === selectedDistrictKey) || selectedCity.districts[0],
     [selectedCity, selectedDistrictKey]
@@ -48,7 +49,6 @@ export default function TripLocation({ theme, nextFn, setTripState }: Readonly<T
           getLabel={(item) => Cities.find((city) => city.key === item)?.label ?? ''}
           onChange={(item) => {
             setSelectedCityKey(item?.toString() ?? '')
-            // Reset district to first of new city
             const city = Cities.find((city) => city.key === item)
             setSelectedDistrictKey(city?.districts[0].key ?? '')
           }}
@@ -64,29 +64,6 @@ export default function TripLocation({ theme, nextFn, setTripState }: Readonly<T
               onPress={() => {
                 setSelectedCityKey(city.key)
                 setSelectedDistrictKey(city.districts[0].key)
-              }}
-            />
-          ))}
-        </Picker>
-
-        <Picker
-          placeholder="Select a destination"
-          value={selectedDistrictKey}
-          getLabel={(item) => selectedCity.districts.find((d) => d.key === item)?.label ?? ''}
-          onChange={(item) => {
-            setSelectedDistrictKey(item?.toString() ?? '')
-          }}
-          topBarProps={{ title: 'Districts', titleStyle: styles.pickerLabel }}
-          style={styles.picker}
-        >
-          {selectedCity.districts.map((district) => (
-            <Picker.Item
-              key={district.key}
-              value={district.key}
-              label={district.label}
-              labelStyle={styles.pickerItem}
-              onPress={() => {
-                setSelectedDistrictKey(district.key)
               }}
             />
           ))}

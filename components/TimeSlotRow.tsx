@@ -1,5 +1,6 @@
 import DistanceTimeIndicator from '@/components/DistanceTimeIndicator'
 import SpotCard from '@/components/SpotCard'
+import TimeSpent from '@/components/TimeSpent'
 import { FontFamily, FontSize } from '@/constants/font'
 import { colorPalettes } from '@/constants/Itheme'
 import { Radius } from '@/constants/theme'
@@ -17,6 +18,7 @@ interface Spot {
   orderInDay: number
   distance: number
   time: number
+  types?: string
 }
 
 interface TimeSlotRowProps {
@@ -54,7 +56,7 @@ const TimeSlotRow: React.FC<TimeSlotRowProps> = ({ timeSlot, spots, onSpotPress,
                   </View>
                 )}
 
-                {distance && time && (
+                {!!distance && !!time && (
                   <View style={styles.distanceTimeWrapper}>
                     <DistanceTimeIndicator distance={distance} time={time} />
                   </View>
@@ -62,7 +64,7 @@ const TimeSlotRow: React.FC<TimeSlotRowProps> = ({ timeSlot, spots, onSpotPress,
               </View>
 
               <View style={styles.spotCardContainer}>
-                <View style={{ flex: 1 }}>
+                <View style={{ flex: 1, minWidth: 100 }}>
                   <SpotCard
                     id={spot.id}
                     name={spot.name}
@@ -71,6 +73,7 @@ const TimeSlotRow: React.FC<TimeSlotRowProps> = ({ timeSlot, spots, onSpotPress,
                     onPress={onSpotPress}
                   />
                 </View>
+                <TimeSpent types={spot.types} style={styles.timeSpent} />
                 <View style={styles.dot} />
               </View>
             </React.Fragment>
@@ -90,17 +93,24 @@ const createStyles = (theme: typeof colorPalettes.light, marginBottom: number) =
     },
     spotCardContainer: {
       flexDirection: 'row',
+      alignItems: 'stretch',
+    },
+    timeSpent: {
+      width: 30,
+      marginLeft: 8,
+      alignSelf: 'stretch',
       alignItems: 'center',
+      justifyContent: 'center',
     },
     dot: {
-      width: 12,
-      height: 12,
+      width: 20,
+      height: 20,
       borderRadius: Radius.FULL,
       backgroundColor: theme.dimText,
-      marginLeft: 8,
-      marginRight: -21,
-      borderWidth: 2,
+      marginRight: -25,
+      borderWidth: 7,
       borderColor: theme.white,
+      alignSelf: 'center',
     },
     timeSlotLabelContainer: {
       paddingTop: 6,

@@ -85,6 +85,7 @@ const typeToGroupMap: Record<string, string> = {
   farm: 'Food & Drink',
   confectionery: 'Food & Drink',
   chocolate: 'Food & Drink',
+  'food location': 'Food & Drink',
   drinks: 'Food & Drink',
   coffee_and_tea: 'Food & Drink',
   restaurant: 'Food & Drink',
@@ -215,4 +216,40 @@ export const getGroupIconsFromTypes = (typesStr: string) => {
     ...typeGroupIcons[group],
     key: group,
   }))
+}
+
+// Default time spent (in minutes) per GROUP (re-uses existing typeToGroupMap)
+export const groupToFixedMinutes: Record<string, number> = {
+  'Camping & Resort': 60, // 1.0h
+  'Culture & Arts': 30, // 0.5h
+  Entertainment: 60, // 1.0h
+  'Food & Drink': 30, // 0.5h
+  'History & Landmarks': 30, // 0.5h
+  Nature: 60, // 1.0h
+  'Outdoor Activities': 60, // 1.0h
+  Shopping: 30, // 0.5h
+  'Spa & Wellness': 60, // 1.0h
+  'Tourism Services': 30, // 0.5h
+}
+
+// Removed randomness; we now use a fixed duration per group
+
+// Derive a default time spent from a comma-separated types string
+// Strategy: map leaf types to groups, then take the max group default
+export const getDefaultTimeSpentFromTypes = (typesStr: string, fallbackMinutes = 60): number => {
+  if (!typesStr) return fallbackMinutes
+  const types = typesStr.split(',').map((t) => t.trim())
+  const groups = new Set<string>()
+  for (const type of types) {
+    const group = typeToGroupMap[type]
+    if (group) groups.add(group)
+  }
+  if (groups.size === 0) return fallbackMinutes
+  let best: number | undefined
+  Array.from(groups).forEach((group) => {
+    const fixed = groupToFixedMinutes[group]
+    if (typeof fixed !== 'number') return
+    best = typeof best === 'number' ? Math.max(best, fixed) : fixed
+  })
+  return typeof best === 'number' ? best : fallbackMinutes
 }

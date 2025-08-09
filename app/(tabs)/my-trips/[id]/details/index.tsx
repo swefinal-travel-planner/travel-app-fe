@@ -7,6 +7,7 @@ import TripInfoCard from '@/components/TripInfoCard'
 import { colorPalettes } from '@/constants/Itheme'
 import { useThemeStyle } from '@/hooks/useThemeStyle'
 import { useTripDetails } from '@/hooks/useTripDetails'
+import { DebugWrapper } from '@/utils/DebugWrapper'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import React, { useMemo } from 'react'
 import { SafeAreaView, ScrollView, StyleSheet, View } from 'react-native'
@@ -143,7 +144,10 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       bottom: 36,
       width: 1,
       zIndex: -1,
-      backgroundColor: theme.dimText,
+      borderRightWidth: 1,
+      borderRightColor: theme.dimText,
+      borderStyle: 'dashed',
+      backgroundColor: 'transparent',
     },
   })
 

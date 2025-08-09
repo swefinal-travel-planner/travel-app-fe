@@ -1,97 +1,29 @@
 export default [
   {
-    title: 'Shopping',
+    title: '🧭  I’m up for an adventure',
     data: [
-      '🧺 Traditional markets',
-      '🏬 Shopping malls',
-      '🌆 Shopping streets / night markets',
-      '🎁 Specialty / souvenir stores',
-      '🛒 Local supermarkets',
+      '🏺 I love diving into local culture, stories, and architecture.',
+      '🍣 I can’t wait to taste the region’s specialties.',
+      '🧗 Nature calls — hiking, exploring, and fresh air energize me.',
+      '🎡 I’m all about lively streets, fun spots, and entertainment hubs.',
     ],
   },
   {
-    title: 'Historical',
+    title: '😌  I just want to relax',
     data: [
-      '🏯 Ancient citadels, fortresses',
-      '🏺 Historical museums',
-      '🕊️ Memorial sites / monuments',
-      '🏠 Old mansions / villas',
-      '⚔️ War relics',
+      '🧘 Gentle moments like spa, yoga, or a peaceful massage.',
+      '🏖️ Chilling at a scenic resort with a view of the sea or mountains.',
+      '☕ Sipping coffee while watching the world go by.',
+      '🛕 Visiting serene temples and sacred places to feel grounded.',
     ],
   },
   {
-    title: 'Cultural & Artistic',
+    title: '🔀  A mix of both ',
     data: [
-      '🖼️ Art museums / specialty museums',
-      '🎭 Theaters',
-      '📚 Large libraries',
-      '🎨 Art spaces / galleries',
-      '🏮 Cultural centers of ethnic groups',
-    ],
-  },
-  {
-    title: 'Amusement & Entertainment',
-    data: [
-      '🎢 Theme parks',
-      '💦 Water parks',
-      '🕹️ Indoor game centers',
-      '🎬 Entertainment complexes (eat, play, watch movies...)',
-      '🚶‍♂️ Walking streets',
-    ],
-  },
-  {
-    title: 'Nightlife / Adult',
-    data: ['🍸 Bars', '🍷 Pubs / lounges', '🕺 Nightclubs', '🎤 Karaoke', '🎰 Casinos'],
-  },
-  {
-    title: 'Other',
-    data: [
-      '🎞️ Movie theaters',
-      '💆 Spa / relaxation massage',
-      '☕ Unique cafes / rooftop cafes',
-      '👾 Game centers / arcades',
-    ],
-  },
-  {
-    title: 'Resorts & Relaxation',
-    data: ['🏝️ Beach / mountain resorts', '🏨 Luxury hotels', '🏡 Vacation villas', '🌿 Nature-based homestays'],
-  },
-  {
-    title: 'Adventure & Outdoors',
-    data: [
-      '🧗 Hiking / trekking',
-      '🏕️ Camping / picnicking',
-      '🚴 Mountain biking',
-      '🏄 Diving, SUP, kayaking',
-      '🪂 Paragliding, ziplining',
-    ],
-  },
-  {
-    title: 'Wellness & Spiritual',
-    data: [
-      '🧘 Meditation centers / yoga retreats',
-      '🏖️ Health resorts',
-      '♨️ Hot springs',
-      '⛩️ Temples, pagodas, churches',
-      '🙏 Pilgrimage sites',
-    ],
-  },
-  {
-    title: 'Food & Culinary',
-    data: ['🍢 Food streets / night markets', '🍽️ Local specialty restaurants', '🥢 Traditional eateries'],
-  },
-  {
-    title: 'Community Tourism',
-    data: ['🏚️ Ethnic cultural villages', '🏺 Traditional craft villages'],
-  },
-  {
-    title: 'Landmarks',
-    data: [
-      '🏙️ Famous buildings / skyscrapers',
-      '🌉 Glass bridges / suspension bridges',
-      '🔭 City observatories',
-      '🏛️ Unique architectural works',
-      '🗿 City monuments / symbols',
+      '🏰 A bit of history and culture through must-see landmarks.',
+      '🛍️ Strolling through night markets and picking up local treats.',
+      '🏖️ Quiet time at a pretty homestay or a place with a calming view.',
+      '🌄 Light adventures like trekking or short outdoor excursions.',
     ],
   },
 ]

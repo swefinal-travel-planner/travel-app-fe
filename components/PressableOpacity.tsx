@@ -28,9 +28,7 @@ const PressableOpacity = ({ children, onPress, style, ...props }: PressableOpaci
 
   return (
     <Pressable onPressIn={fadeIn} onPressOut={fadeOut} onPress={onPress} {...props}>
-      <Animated.View style={[style, { opacity: animated, alignSelf: 'stretch', justifyContent: 'center' }]}>
-        {children}
-      </Animated.View>
+      <Animated.View style={[{ opacity: animated, alignSelf: 'stretch' }, style]}>{children}</Animated.View>
     </Pressable>
   )
 }

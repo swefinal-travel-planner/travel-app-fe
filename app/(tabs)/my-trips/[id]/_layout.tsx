@@ -6,7 +6,7 @@ import { useTripId } from '@/hooks/useTripId'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { Tabs, useRouter, useSegments } from 'expo-router'
 import React, { useMemo } from 'react'
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 export default function TripDetailLayout() {
   const router = useRouter()
@@ -52,6 +52,7 @@ export default function TripDetailLayout() {
           },
           tabBarItemStyle: {
             height: 60,
+            overflow: 'hidden',
           },
           tabBarLabelStyle: {
             fontSize: FontSize.LG,
@@ -61,6 +62,7 @@ export default function TripDetailLayout() {
           tabBarIconStyle: {
             display: 'none',
           },
+          tabBarButton: (props) => <Pressable {...props} android_ripple={null} />,
         }}
       >
         <Tabs.Screen

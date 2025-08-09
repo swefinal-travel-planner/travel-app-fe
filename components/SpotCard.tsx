@@ -30,7 +30,7 @@ const SpotCard: React.FC<SpotCardProps> = ({ id, name, address, image, onPress }
           <Text style={styles.spotName}>{name}</Text>
           <View style={styles.spotLocationContainer}>
             <Ionicons name="location-outline" size={14} color={theme.text} />
-            <Text style={styles.spotAddress} numberOfLines={1}>
+            <Text style={styles.spotAddress} numberOfLines={2}>
               {address}
             </Text>
           </View>
@@ -76,8 +76,8 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     },
     spotLocationContainer: {
       flexDirection: 'row',
-      alignItems: 'flex-end',
-      paddingRight: 20,
+      justifyContent: 'center',
+      alignItems: 'center',
       marginTop: 4,
     },
     spotAddress: {

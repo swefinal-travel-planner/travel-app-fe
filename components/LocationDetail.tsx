@@ -262,8 +262,8 @@ const createStyles = (theme: typeof colorPalettes.light) =>
     subtitle: {
       fontSize: Size.MEDIUM,
       fontWeight: '600',
-      color: theme.dimText,
-      marginTop: SpacingScale.MEDIUM,
+      color: theme.primary,
+      marginVertical: SpacingScale.MEDIUM,
       fontFamily: FontFamily.BOLD,
     },
     description: {
