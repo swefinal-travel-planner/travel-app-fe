@@ -177,7 +177,7 @@ const LocationDetail = ({
 
         {status && (
           <Pressable
-            title="Checkin"
+            title="Check in"
             disabled={status === 'completed' || status === 'cancelled' || status === 'not_started'}
             style={{
               backgroundColor: theme.primary,
@@ -192,7 +192,7 @@ const LocationDetail = ({
 
         {status && (
           <>
-            <Text style={styles.subtitle}>Check-in Photos</Text>
+            <Text style={styles.subtitle}>Check-in photos</Text>
             {loadingImages ? (
               <Text style={styles.loadingText}>Loading images...</Text>
             ) : checkinImages.length === 0 ? (
@@ -284,7 +284,8 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       flexWrap: 'wrap',
       justifyContent: 'flex-start',
       gap: 12,
-      marginBottom: SpacingScale.LARGE,
+      marginBottom: 60,
+      marginTop: 20,
     },
     activityItem: {
       width: 100,
@@ -337,12 +338,14 @@ const createStyles = (theme: typeof colorPalettes.light) =>
       color: theme.dimText,
       fontFamily: FontFamily.REGULAR,
       marginBottom: SpacingScale.MEDIUM,
+      marginTop: 12,
     },
     emptyText: {
       fontSize: Size.NORMAL,
       color: theme.dimText,
-      fontFamily: FontFamily.ITALIC,
+      fontFamily: FontFamily.REGULAR,
       marginBottom: SpacingScale.MEDIUM,
+      marginTop: 12,
     },
     carouselContainer: {
       marginVertical: SpacingScale.XXLARGE,
