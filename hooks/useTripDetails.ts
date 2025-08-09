@@ -19,7 +19,6 @@ export const useTripDetails = (tripId: string) => {
   const [trip, setTrip] = useState<Trip>()
   const [tripItems, setTripItems] = useState<TripItem[]>([])
   const [groupedItems, setGroupedItems] = useState<GroupedItem[]>([])
-  const [distanceTimes, setDistanceTimes] = useState<DistanceTime[]>([])
   const [activeDay, setActiveDay] = useState(0)
   const [loading, setLoading] = useState(true)
 
@@ -46,7 +45,7 @@ export const useTripDetails = (tripId: string) => {
 
       let items: TripItem[] = tripItemData.data.data
 
-      console.log('Fetched trip items:', items)
+      console.log('Fetched trip items:', items[0])
 
       // Check if items array is empty
       if (!items || items.length === 0) {
@@ -127,6 +126,7 @@ export const useTripDetails = (tripId: string) => {
                 timeSlot: spot.timeInDate,
                 orderInTrip: spot.orderInTrip,
                 orderInDay: spot.orderInDay,
+                types: spot.placeInfo?.type ?? [],
                 placeID: spot.placeID,
                 distance: spot.distance ?? null,
                 time: spot.time ?? null,
