@@ -39,4 +39,17 @@ export const Cities = [
       { key: 'HAN', coordinates: [105.8009, 21.0333], label: 'Ha Dong District' },
     ],
   },
+  {
+    key: 'DN',
+    label: 'Da Nang City',
+    districts: [
+      { key: 'HC', coordinates: [108.219, 16.0678], label: 'Hai Chau District' },
+      { key: 'ST', coordinates: [108.247, 16.1036], label: 'Son Tra District' },
+      { key: 'NHS', coordinates: [108.2479, 15.9956], label: 'Ngu Hanh Son District' },
+      { key: 'TK', coordinates: [108.1833, 16.0667], label: 'Thanh Khe District' },
+      { key: 'LC', coordinates: [108.1333, 16.0833], label: 'Lien Chieu District' },
+      { key: 'CL', coordinates: [108.2167, 16.0], label: 'Cam Le District' },
+      { key: 'HV', coordinates: [108.05, 16.0167], label: 'Hoa Vang District' },
+    ],
+  },
 ]

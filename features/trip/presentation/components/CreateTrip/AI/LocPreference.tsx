@@ -76,12 +76,10 @@ export default function LocPreference({ theme, nextFn }: Readonly<LocPreferenceP
             width: '100%',
             height: '20%',
             borderRadius: Radius.FULL,
-            backgroundColor: theme.background,
-          }}
-          sliderStyle={{
-            borderRadius: Radius.FULL,
             backgroundColor: theme.primary,
           }}
+          backgroundColor={theme.background}
+          tintColor={theme.primary}
           fontStyle={{ fontFamily: FontFamily.REGULAR, fontSize: FontSize.LG, color: theme.text }}
           activeFontStyle={{
             fontFamily: FontFamily.BOLD,
@@ -111,7 +109,6 @@ export default function LocPreference({ theme, nextFn }: Readonly<LocPreferenceP
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    width: '100%',
     flexDirection: 'column',
     justifyContent: 'space-between',
     alignItems: 'stretch',
@@ -121,11 +118,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
   },
   textFieldContainer: {
-    width: '100%',
+    height: '50%',
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    height: '55%',
   },
   textQuestion: {
     display: 'flex',
@@ -140,6 +136,7 @@ const styles = StyleSheet.create({
     fontSize: FontSize.MD,
   },
   textField: {
+    height: 40,
     textAlign: 'center',
     fontFamily: FontFamily.REGULAR,
     fontSize: FontSize.MD,
